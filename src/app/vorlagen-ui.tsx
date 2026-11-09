@@ -138,7 +138,11 @@ export function VorlagenListe(props: {
       {vorlagen.map((v) => (
         <Kartenstapel className="karte" key={v.id} frisch={v.id === frischeId || v.id === zurueckgeholt}>
           <div className="kopfzeile">
-            <h2>{v.name}</h2>
+            {/* Vorlage aus einem Beispiel- oder Übungsbogen: auf der Karte sichtbar (Prüfrunde Beispielbögen, BB-W10, BB-D2). */}
+            <h2>
+              {v.name}
+              {v.bogen.uebung && <span className="uebung-badge">ÜBUNG</span>}
+            </h2>
             <button type="button" className="primaer" onClick={() => onMustern(v)}>
               Einsatz vorbereiten
             </button>

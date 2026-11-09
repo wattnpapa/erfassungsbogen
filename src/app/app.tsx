@@ -1626,6 +1626,7 @@ function AppInhalt() {
       return;
     nachzueglerMerken(neuerArbeitsbogen, abgewaehlt);
     setBogen(neuerArbeitsbogen);
+    if (neuerArbeitsbogen.uebung) beispielMerken(neuerArbeitsbogen); // Vorlage aus einem Beispiel (BB-D2, R14-E6)
     setNachMusterung(true);
     setzeEmpfang(null);
     setSchritt(SCHRITT_EINSATZ);
@@ -2079,6 +2080,7 @@ function AppInhalt() {
     }
     if (!(await darfBogenErsetzen({ titel: "Vorlage bearbeiten?", was: `die Vorlage „${v.name}"`, ok: "Vorlage bearbeiten" }))) return;
     setBogen(structuredClone(v.bogen));
+    if (v.bogen.uebung) beispielMerken(v.bogen); // BB-D2, R14-E6
     setVorlageInBearbeitung(v.id);
     setzeEmpfang(null);
     setSchritt(0);
@@ -2170,6 +2172,10 @@ function AppInhalt() {
       setErsetzterEntwurf(null);
     }
     setBogen(zurueck.bogen);
+    // Prüfrunde Beispielbögen (BB-D2): Ein zurückgeholter Übungsbogen trägt
+    // seine erfundenen Namen weiter; die Rückfrage beim Abwählen von „Übung"
+    // gilt deshalb auch nach dem Zurückholen (R14-E6).
+    if (zurueck.bogen.uebung) beispielMerken(zurueck.bogen);
     // Eine zurückgeholte Erfassung bleibt eine Erfassung — samt Sammlung, falls es sie noch gibt.
     const ziel = zurueck.fremd?.einsatzId;
     setFremdeErfassung(!!zurueck.fremd);
@@ -2384,6 +2390,21 @@ function AppInhalt() {
     // Meldung scheinbar normal in der Liste und der Meldekopf rechnet mit ihr.
     const uebungDaneben = einsatz != null && !!b.uebung && einsatz.art !== EinsatzArt.UEBUNG;
     const uebungZusatz = uebungDaneben ? " Achtung: als ÜBUNG gekennzeichnet — zählt nicht in die Lage." : "";
+    // Prüfrunde Beispielbögen (BB-D3, BB-W7): Ein Übungsbogen ging mit einem Tipp
+    // in eine echte Sammlung und bekam dort eine Nummer. Jetzt fragt die App
+    // vorher; im Kiosk-Scan genügt die Quittung (kein Dialog im Scanstapel).
+    if (uebungDaneben && !kiosk && !schonDa) {
+      const ja = await frageJaNein({
+        titel: "Übungsbogen in diese Sammlung?",
+        text: `„${einheitAnzeigename(b.einheit)}" ist als ÜBUNG gekennzeichnet. In „${einsatz!.name}" zählt er nicht in die Lage, bekommt aber eine Nummer. Für Übungen gibt es Sammlungen der Art „Übung“.`,
+        ok: "Trotzdem ablegen",
+        fokus: "abbruch",
+      });
+      if (!ja) {
+        setMeldung(`„${einheitAnzeigename(b.einheit)}" nicht aufgenommen.`);
+        return false;
+      }
+    }
     let override: string | undefined;
     const bekannt = einsatz?.eintraege.some((e) => e.einheitSchluessel === schl) ?? false;
     // Im Kiosk-Stapel keine Fachfrage: Eine veränderte Fassung derselben
@@ -3318,7 +3339,7 @@ function AppInhalt() {
    * abgebrochen. Beide Wege dorthin (Startseite und Einsatz-Auswahl über einem
    * offenen Bogen) fragen dasselbe — deshalb eine gemeinsame Stelle.
    */
-  async function einsatzErfragen(): Promise<Einsatzsammlung | null> {
+  async function einsatzErfragen(artVorgabe?: EinsatzArt): Promise<Einsatzsammlung | null> {
     // Lässt der Browser nichts speichern (privates Fenster), entstünde keine Sammlung: Das sagt schon der Tipp auf
     // „Neue Einsatz-Sammlung…", bevor ein Name getippt wird (R18-O1).
     if (browserSpeicherhuelle() === null) {
@@ -3332,7 +3353,7 @@ function AppInhalt() {
       ok: "Einsatz anlegen",
       felder: [
         { name: "name", label: "Name", platzhalter: "z. B. Hochwasser Weser" },
-        { name: "art", label: "Art", auswahl: ART_WAHL },
+        { name: "art", label: "Art", auswahl: ART_WAHL, vorgabe: artVorgabe != null ? String(artVorgabe) : undefined },
         { name: "ort", label: "Ort / Auftrag (optional)", optional: true, platzhalter: "z. B. Deichabschnitt Nord" },
       ],
     });
@@ -3747,7 +3768,9 @@ function AppInhalt() {
 
   /** Aus der Einsatz-Auswahl heraus einen neuen Einsatz anlegen und den Bogen hineinlegen. */
   async function neuerEinsatzFuerBogen() {
-    const s = await einsatzErfragen();
+    // Ein Übungsbogen schlägt die Art „Übung" vor (Prüfrunde Beispielbögen, BB-K7, BB-A1):
+    // In einer Sammlung der Art „Einsatz" zählte er nicht, die Lage stand bei 0.
+    const s = await einsatzErfragen(bogen?.uebung ? EinsatzArt.UEBUNG : undefined);
     if (!s) return;
     await bogenInEinsatzLegen(s.id);
   }
@@ -4875,7 +4898,11 @@ function AppInhalt() {
             >
               <EinheitZeichen einheit={bogen.einheit} className="einheit-avatar gross" aria-hidden="true" />
               <span className="entwurf-text">
-                <strong>{einheitAnzeigename(bogen.einheit)}</strong>
+                <strong>
+                  {einheitAnzeigename(bogen.einheit)}
+                  {/* Beispiel oder Übung auf einen Blick (BB-D4, BB-E8, BB-N8). */}
+                  {bogen.uebung && <span className="uebung-badge">{beispielUnveraendert() ? "BEISPIEL" : "ÜBUNG"}</span>}
+                </strong>
                 {/* Vorlagen-Bearbeitung: Die Karte trug denselben Titel wie der
                     eigene Bogen darunter und wurde als Doppelung verworfen (R3-D1). */}
                 {bearbeiteteVorlage && (
@@ -5030,7 +5057,10 @@ function AppInhalt() {
         {ersetzterEntwurf && (
           <section className="entwurf-karte verdraengt">
             <span className="entwurf-text">
-              <strong>{einheitAnzeigename(ersetzterEntwurf.bogen.einheit)}</strong>
+              <strong>
+                {einheitAnzeigename(ersetzterEntwurf.bogen.einheit)}
+                {ersetzterEntwurf.bogen.uebung && <span className="uebung-badge">ÜBUNG</span>}
+              </strong>
               <span className="hinweis">
                 Zuletzt geschlossener Bogen
                 {ersetzterEntwurf.ersetztGrund === "fenster-geladen"

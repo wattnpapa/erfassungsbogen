@@ -3278,8 +3278,27 @@
       min-height: calc(var(--ziel-basis) + var(--ziel)); display: flex; align-items: center;
     }
     .beispiele-erklaerung > p { margin: var(--r-1) 0 0; max-width: 62ch; }
-    /* Pfadleiste: Zurück-Knopf und der klickbare Pfad in einer Zeile. */
-    .beispiel-pfad { display: flex; align-items: center; flex-wrap: wrap; gap: var(--r-2) var(--r-3); margin: 0 0 var(--r-4); }
+    /* Suche über alle Beispielbögen (BB-S2, BB-K4). */
+    .beispiel-suche { display: flex; flex-direction: column; gap: var(--r-1); margin: 0 0 var(--r-4); font-size: var(--t-s); font-weight: 600; color: var(--text-2); }
+    .beispiel-suche input { width: 100%; max-width: 32rem; font-weight: 400; }
+    /* Pfadleiste: Zurück-Knopf und der klickbare Pfad in einer Zeile. Klebt unter
+       der Kopfzeile des Dialogs (deren Höhe misst fusszeile.tsx nach
+       --beispiel-kopf), damit Zurück und Pfad beim Rollen durch 100 Bögen
+       erreichbar bleiben (BB-G5, BB-M5, BB-H5). */
+    .beispiel-pfad {
+      display: flex; align-items: center; flex-wrap: wrap; gap: var(--r-1) var(--r-3); margin: 0 0 var(--r-4);
+      position: sticky; top: var(--beispiel-kopf, 0px); z-index: 2; background: var(--flaeche);
+      padding-block: var(--r-1); box-shadow: 0 1px 0 var(--linie-fein);
+    }
+    .beispiel-pfad strong[tabindex]:focus-visible { outline: var(--fokus) solid var(--akzent); outline-offset: 2px; }
+    /* Tippziele im Pfad mindestens 44 px breit (BB-G4, BB-M4: „Alle" hatte 24 px). */
+    .beispiel-pfad li > button.link { min-width: 44px; justify-content: center; padding-inline: 0.35rem; }
+    .beispiel-pfad .pfad-auslassung { display: none; }
+    @media (max-width: 40rem) {
+      /* Tiefe Ordner: nur „Alle", „…" und die letzten zwei Ebenen (BB-S8, BB-M4, BB-H11). */
+      .beispiel-pfad .pfad-mitte { display: none; }
+      .beispiel-pfad .pfad-auslassung { display: flex; }
+    }
     .beispiel-pfad ol { display: flex; flex-wrap: wrap; align-items: center; margin: 0; padding: 0; list-style: none; font-size: var(--t-s); }
     .beispiel-pfad li { display: flex; align-items: center; }
     .beispiel-pfad li + li::before { content: "›"; color: var(--text-3); padding-inline: 0.45em; }
@@ -3329,6 +3348,8 @@
     table.uebersicht.beispiele .hinweis { display: block; }
     .beispiel-einheit { display: flex; align-items: center; gap: 0.5rem; }
     .beispiel-einheit > img { height: 1.9rem; width: auto; flex: 0 0 auto; }
+    /* Platz des taktischen Zeichens, bis der Bogen geladen ist (BB-G2). */
+    .beispiel-zeichen-platz { display: inline-block; height: 1.9rem; width: 1.9rem; flex: 0 0 auto; }
     .beispiel-einheit > span { min-width: 0; }
     /* Nicht umbrechen: drei Knöpfe auf zwei Zeilen machten jede Zeile doppelt
        so hoch. Die Spalte nimmt nur, was die Knöpfe brauchen (width: 1 %);
@@ -3348,7 +3369,12 @@
     /* Auf dem Handy wird aus jeder Tabellenzeile eine Karte: die Aktionen
        müssen ohne seitliches Rollen erreichbar sein. Die role-Attribute im
        Markup halten die Tabellensemantik trotz display:block. */
-    @media (max-width: 34rem) {
+    /* Prüfrunde Beispielbögen (BB-G1, BB-H4, BB-K2, BB-M2): Die Umschaltung hing an
+       der Fensterbreite (34rem). Zwischen etwa 545 und 900 px blieb die Tabelle,
+       obwohl der Dialog schmaler war; „PDF" und „Link" lagen außerhalb. Jetzt
+       entscheidet die Breite des Tabellen-Rahmens (.tabellen-scroll ist ein
+       Container): Karten, solange die Tabelle mit einzeiligen Knöpfen nicht passt. */
+    @container (max-width: 46rem) {
       table.uebersicht.beispiele,
       table.uebersicht.beispiele tbody,
       table.uebersicht.beispiele tr,
@@ -3359,8 +3385,13 @@
       }
       table.uebersicht.beispiele td { border: none; padding: 0.15rem 0; }
       table.uebersicht.beispiele td.zahl::before { content: "Stärke "; color: var(--text-2); }
-      .beispiel-aktionen { flex-wrap: wrap; gap: 1.2rem; padding-top: 0.3rem; }
+      .beispiel-aktionen { flex-wrap: wrap; gap: 0.6rem 1.2rem; padding-top: 0.3rem; }
       table.uebersicht.beispiele td:last-child { width: auto; }
+      /* Höhe vorhalten, solange die Angaben laden (BB-G2): Herkunft bis zu drei
+         Zeilen, Stärke zwei. Vorher wuchs jede Karte beim Nachladen um bis zu
+         50 px, und ein Tipp auf „Link" traf „Anzeigen" der nächsten Karte. */
+      table.uebersicht.beispiele td:nth-child(2) { min-height: calc(3 * 1.5 * var(--t-s)); }
+      table.uebersicht.beispiele td.zahl { min-height: calc(2 * 1.5 * var(--t-s)); }
     }
     /* Teil-Quittung: Kästchenzeile des mehrteiligen QR-Transports (siehe
        teil-quittung.tsx). Ein gefülltes Kästchen sagt auf einem amtlichen Bogen

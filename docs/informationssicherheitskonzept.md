@@ -248,7 +248,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > übrigen Beispiele verdrängten, Prüfrunde Beispielbögen BB-O2); ohne Netz
 > fehlen nur noch nicht geöffnete Bögen dieses Ordners (Verfügbarkeit 5.5, für
 > den Einsatz unkritisch), Startseite und Dialog sagen das. Keine neuen
-> Hosts zur Laufzeit, CSP unverändert, kein neuer `localStorage`-Schlüssel. Lieferkette
+> Hosts zur Laufzeit, CSP unverändert, kein neuer `localStorage`-Schlüssel.
+> Seit 2026-11-09 merkt sich der Beispielbögen-Dialog den zuletzt offenen
+> Ordner im `sessionStorage` des Tabs (`eeb.beispiel-pfad.v1`, nur die
+> Ordnernamen als JSON-Liste, keine Bogen- oder Personendaten; endet mit dem
+> Tab), damit „Anzeigen", Schließen und Neuladen nicht wieder bei „Alle"
+> beginnen (Prüfrunde Beispielbögen, BB-S3). Lieferkette
 > (6.4): keine neue Abhängigkeit; die Einheitenliste je OV stammt von der
 > inoffiziellen OV-Karte thw.blafusel.de und wird nur beim Erzeugen abgerufen
 > (`npm run beispiele:thw-ov -- --abrufen`), JS-Gesamtumfang 6,45 MB.

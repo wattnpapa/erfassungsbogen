@@ -1393,7 +1393,8 @@ describe("Assistenten-Durchlauf", () => {
       await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
       await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
       const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" });
-      await nutzer.click(within(dialog).getByRole("button", { name: /^THW/ }));
+      // Der Dialog steht wieder im zuletzt offenen Ordner (BB-S3, BB-W3) — kein zweites „THW".
+      expect(within(dialog).getByText("THW", { selector: "[aria-current]" })).toBeDefined();
       const anzeigen = await within(dialog).findAllByRole("button", { name: "Anzeigen" }, { timeout: 15000 });
       await nutzer.click(anzeigen[1]!);
 
@@ -1455,6 +1456,37 @@ describe("Assistenten-Durchlauf", () => {
       globalThis.fetch = echtesFetch;
     }
   }, 20000);
+
+  /** Prüfrunde Beispielbögen (BB-S2, BB-K4): Suche findet einen Ordner ohne LV › RSt › OV. */
+  it("findet Beispiel-Ordner über die Suche und öffnet sie", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
+    const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" });
+    await nutzer.type(within(dialog).getByRole("searchbox", { name: "Suchen" }), "hannover");
+    const treffer = within(dialog).getByRole("list", { name: "Gefundene Ordner" });
+    await nutzer.click(within(treffer).getAllByRole("button")[0]!);
+    expect(within(dialog).getByText("Einlagen Kräfte Hannover", { selector: "[aria-current]" })).toBeDefined();
+    expect((within(dialog).getByRole("searchbox", { name: "Suchen" }) as HTMLInputElement).value).toBe("");
+  });
+
+  /** Prüfrunde Beispielbögen (BB-E4, BB-H2, BB-N2): Escape/Zurück-Geste geht eine Ebene hoch. */
+  it("geht mit Escape im Beispiel-Dialog eine Ebene hoch statt zu schließen", async () => {
+    const nutzer = userEvent.setup();
+    render(<App />);
+    await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
+    const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" });
+    await nutzer.click(within(dialog).getByRole("button", { name: /^Katastrophenschutz/ }));
+    expect(within(dialog).getByText("Katastrophenschutz", { selector: "[aria-current]" })).toBeDefined();
+
+    const abbruch = new Event("cancel", { cancelable: true });
+    act(() => {
+      dialog.dispatchEvent(abbruch);
+    });
+    expect(abbruch.defaultPrevented).toBe(true);
+    expect(dialog.hasAttribute("open")).toBe(true);
+    expect(within(dialog).queryByRole("navigation", { name: "Ordner" })).toBeNull();
+  });
 
   const NAHBEREICH = /Gerät in der Nähe|AirDrop|Quick Share/;
 

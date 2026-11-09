@@ -57,7 +57,9 @@ const VORLAGE = "https://erfassungsbogen.app/vorlage.html";
 // sichtbar bleiben.
 const ORDNER_LABEL: Record<string, string> = {
   thw: "THW",
-  ortsverbaende: "Alle Einheiten aller Ortsverbände (LV › RSt › OV)",
+  // Ohne „›" im Namen: Das Zeichen trennt in der Pfadleiste die Ebenen und
+  // täuschte hier weitere vor (Prüfrunde Beispielbögen, BB-M4, BB-N3).
+  ortsverbaende: "Alle Einheiten aller Ortsverbände (nach Landesverband, Regionalstelle, OV)",
   bbk: "BBK (Bundeseinheiten)",
   feuerwehr: "Feuerwehr",
   polizei: "Polizei",
@@ -129,6 +131,8 @@ const BEISPIELE: BeispielEintrag[] = beispielEintraege(
 /** Anzeigenamen der nachgeladenen Ordner (Landesverband, Regionalstelle, Ortsverband). */
 const ORDNER_LABEL_NACHGELADEN = new Map<string, string>();
 let ovBeispieleVersprechen: Promise<void> | null = null;
+/** Ist der Baustein mit den Ordnern der Ortsverbände schon eingehängt? */
+let ovGeladen = false;
 
 /** Bögen aller Ortsverbände einmalig dazuholen; ein Fehlschlag (offline, alter Stand) darf später erneut versucht werden. */
 function ovBeispieleLaden(): Promise<void> {
@@ -137,6 +141,7 @@ function ovBeispieleLaden(): Promise<void> {
       BEISPIELE.push(...beispielEintraege(THW_OV_BEISPIELE));
       BEISPIELE.sort(nachDatei);
       for (const [ordner, label] of Object.entries(THW_OV_ORDNER_LABEL)) ORDNER_LABEL_NACHGELADEN.set(ordner, label);
+      ovGeladen = true;
     })
     .catch((err: unknown) => {
       ovBeispieleVersprechen = null;
@@ -198,6 +203,84 @@ const OV_OFFLINE_TEXT =
   "Die Bögen der THW-Ortsverbände lädt die App nicht vorab: Ein Bogen braucht beim ersten Öffnen Netz und bleibt danach auf dem Gerät.";
 const OV_ORDNER = ["thw", "ortsverbaende"];
 const imOvOrdner = (pfad: string[]): boolean => OV_ORDNER.every((seg, i) => pfad[i] === seg);
+
+/**
+ * Zuletzt offener Ordner des Dialogs, je Tab (Prüfrunde Beispielbögen, BB-S3,
+ * BB-G3, BB-E4, BB-H2, BB-N2, BB-W3): Nach „Anzeigen", Schließen oder
+ * Neuladen begann der Dialog wieder bei „Alle" — bis zum eigenen OV fünf
+ * Tipps. Nur der Ordnerpfad, keine Bogendaten.
+ */
+const PFAD_SCHLUESSEL = "eeb.beispiel-pfad.v1";
+function pfadLaden(): string[] {
+  try {
+    const p: unknown = JSON.parse(sessionStorage.getItem(PFAD_SCHLUESSEL) ?? "[]");
+    return Array.isArray(p) && p.every((x) => typeof x === "string") ? (p as string[]) : [];
+  } catch {
+    return [];
+  }
+}
+function pfadMerken(p: string[]): void {
+  try {
+    if (p.length) sessionStorage.setItem(PFAD_SCHLUESSEL, JSON.stringify(p));
+    else sessionStorage.removeItem(PFAD_SCHLUESSEL);
+  } catch {
+    /* gesperrt: dann beginnt der Dialog oben */
+  }
+}
+
+/** Suchtext vereinheitlichen: klein, Umlaute ausgeschrieben, nur Buchstaben und Ziffern. */
+const NORM_CACHE = new Map<string, string>();
+function suchNorm(t: string): string {
+  let n = NORM_CACHE.get(t);
+  if (n === undefined) {
+    n = t
+      .toLocaleLowerCase("de-DE")
+      .replace(/ä/g, "ae")
+      .replace(/ö/g, "oe")
+      .replace(/ü/g, "ue")
+      .replace(/ß/g, "ss")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+    NORM_CACHE.set(t, n);
+  }
+  return n;
+}
+
+const SUCHE_MAX_ORDNER = 20;
+const SUCHE_MAX_BOEGEN = 60;
+
+/**
+ * Suche über Ordnernamen und Dateinamen aller Beispielbögen (Prüfrunde
+ * Beispielbögen, BB-S2, BB-K4, BB-W8): Ein OV war nur über LV › RSt › OV zu
+ * finden, also mit Wissen um die Regionalstelle. Jedes Wort muss vorkommen.
+ * Ordner: der kürzeste Pfad, dessen Beschriftungen alle Wörter tragen.
+ */
+function suchTreffer(q: string): { ordner: string[][]; boegen: BeispielEintrag[]; mehr: boolean } {
+  const woerter = suchNorm(q).split(" ").filter(Boolean);
+  if (woerter.length === 0) return { ordner: [], boegen: [], mehr: false };
+  const passt = (text: string) => woerter.every((w) => text.includes(w));
+  const ordner = new Map<string, string[]>();
+  const boegen: BeispielEintrag[] = [];
+  let mehr = false;
+  for (const b of BEISPIELE) {
+    let text = "";
+    for (let i = 0; i < b.ordner.length; i++) {
+      text += ` ${suchNorm(ordnerLabel(b.ordner[i]!))} ${suchNorm(b.ordner[i]!)}`;
+      if (passt(text)) {
+        const pfad = b.ordner.slice(0, i + 1);
+        ordner.set(pfad.join("/"), pfad);
+        break;
+      }
+    }
+    if (passt(`${text} ${suchNorm(b.datei)}`)) {
+      if (boegen.length < SUCHE_MAX_BOEGEN) boegen.push(b);
+      else mehr = true;
+    }
+  }
+  const liste = [...ordner.values()].sort((a, b) => a.length - b.length || a.map(ordnerLabel).join(" ").localeCompare(b.map(ordnerLabel).join(" "), "de"));
+  if (liste.length > SUCHE_MAX_ORDNER) mehr = true;
+  return { ordner: liste.slice(0, SUCHE_MAX_ORDNER), boegen, mehr };
+}
 
 /** Beispielbogen-JSON laden (gecacht) und auf das aktuelle Schema heben. */
 async function beispielBogen(url: string): Promise<Erfassungsbogen> {
@@ -528,6 +611,21 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
   // Ordner-Navigation im Beispielbögen-Dialog: erst Organisation/Thema, ggf.
   // weitere Ebenen (z. B. Bundesland), dann der Bogen.
   const [beispielPfad, setBeispielPfad] = useState<string[]>([]);
+  const [beispielSuche, setBeispielSuche] = useState("");
+  // Nach einem Ordnerwechsel im Dialog: nach oben rollen und den Fokus in den
+  // Dialog setzen (BB-S4, BB-M3, BB-E7, BB-H5, BB-N3). Vorher blieb die
+  // Rollhöhe stehen, und der Fokus fiel auf <body>.
+  const fokusNachWechsel = useRef(false);
+  function pfadSetzen(p: string[]) {
+    fokusNachWechsel.current = true;
+    setBeispielSuche("");
+    setBeispielPfad(p);
+    pfadMerken(p);
+  }
+  const pfadAktuell = useRef(beispielPfad);
+  pfadAktuell.current = beispielPfad;
+  const sucheAktuell = useRef(beispielSuche);
+  sucheAktuell.current = beispielSuche;
   // Dateiname des Bogens, dessen PDF gerade entsteht (leer = keiner läuft).
   const [beispielLaeuft, setBeispielLaeuft] = useState("");
   const [beispielFehler, setBeispielFehler] = useState("");
@@ -549,6 +647,9 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
   const beispielSitzung = useRef(0);
   // Der Baustein mit den Ordnern der Ortsverbände ließ sich nicht laden (ohne Netz).
   const [ovFehlt, setOvFehlt] = useState(false);
+  // Lädt der Baustein der Ortsverbände noch? Dann stehen Platzhalter, statt dass
+  // der Ordner später unbemerkt über der Liste erscheint (BB-S5, BB-H10, BB-N6).
+  const [ovLaedt, setOvLaedt] = useState(!ovGeladen);
   const [beispielLaedt, setBeispielLaedt] = useState(false);
   const sicherung = useRef<HTMLDialogElement>(null);
   const [sicherungFehler, setSicherungFehler] = useState("");
@@ -605,6 +706,12 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
   // wechselt. Fehlschläge (z. B. offline) sind kein Beinbruch: die Tabelle
   // zeigt dann den Dateinamen und meldet es unter der Liste.
   const beispielPfadSchluessel = beispielPfad.join("/");
+  // Anzeigestand: Suche oder offener Ordner. Hängt mittelbar auch am
+  // nachgeladenen Ordner der Ortsverbände (ovBeispieleStand löst das Neurechnen aus).
+  const suchErgebnis = beispielSuche.trim().length >= 2 ? suchTreffer(beispielSuche) : null;
+  const beispielOrdner = suchErgebnis ? [] : unterordner(beispielPfad);
+  const beispielBoegen = suchErgebnis ? suchErgebnis.boegen : boegenHier(beispielPfad);
+  const sichtbarSchluessel = beispielBoegen.map((b) => b.url).join("|");
   // Bögen aller Ortsverbände beim ersten Öffnen dazuholen (eigener Baustein,
   // siehe ovBeispieleLaden); der Zähler lässt Ordnerliste und Tabelle neu rechnen.
   const [ovBeispieleStand, setOvBeispieleStand] = useState(0);
@@ -619,9 +726,14 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
         () => {
           if (!aktiv) return;
           setOvFehlt(false);
+          setOvLaedt(false);
           setOvBeispieleStand((n) => n + 1);
         },
-        () => aktiv && setOvFehlt(true),
+        () => {
+          if (!aktiv) return;
+          setOvFehlt(true);
+          setOvLaedt(false);
+        },
       );
     void laden();
     window.addEventListener("online", laden);
@@ -632,8 +744,7 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
   }, [beispieleOffen]);
   useEffect(() => {
     if (!beispieleOffen) return;
-    const pfad = beispielPfadSchluessel ? beispielPfadSchluessel.split("/") : [];
-    const urls = boegenHier(pfad).map((b) => b.url);
+    const urls = sichtbarSchluessel ? sichtbarSchluessel.split("|") : [];
     let aktiv = true;
     // Schon Bekanntes sofort zeigen, den Rest nachladen.
     const bekannt: Record<string, Erfassungsbogen> = {};
@@ -674,11 +785,55 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
     return () => {
       aktiv = false;
     };
-  }, [beispieleOffen, beispielPfadSchluessel, ovBeispieleStand]);
+  }, [beispieleOffen, sichtbarSchluessel]);
 
-  // Anzeigestand der offenen Ebene.
-  const beispielOrdner = unterordner(beispielPfad);
-  const beispielBoegen = boegenHier(beispielPfad);
+  // Nach einem Ordnerwechsel im Dialog: Ansicht nach oben, Fokus auf den Ort.
+  useEffect(() => {
+    if (!fokusNachWechsel.current) return;
+    fokusNachWechsel.current = false;
+    const d = beispiele.current;
+    if (!d) return;
+    d.scrollTop = 0;
+    const ziel = d.querySelector<HTMLElement>(".beispiel-pfad [aria-current]") ?? d.querySelector<HTMLElement>(".beispiel-register button");
+    ziel?.focus({ preventScroll: true });
+  }, [beispielPfadSchluessel]);
+
+  // Escape und die Zurück-Geste (cancel) gehen eine Ebene hoch bzw. leeren die
+  // Suche, statt den ganzen Dialog zu schließen (BB-E4, BB-H2, BB-N2).
+  // „Schließen" schließt weiterhin sofort.
+  useEffect(() => {
+    if (kompakt) return;
+    const d = beispiele.current;
+    if (!d) return;
+    const abbrechen = (e: Event) => {
+      if (sucheAktuell.current) {
+        e.preventDefault();
+        setBeispielSuche("");
+        return;
+      }
+      const p = pfadAktuell.current;
+      if (p.length === 0) return;
+      e.preventDefault();
+      pfadSetzen(p.slice(0, -1));
+    };
+    d.addEventListener("cancel", abbrechen);
+    return () => d.removeEventListener("cancel", abbrechen);
+  }, [kompakt]);
+
+  // Die Pfadleiste klebt unter der Kopfzeile des Dialogs (BB-G5, BB-M5, BB-H5):
+  // Deren Höhe hängt an Schriftgröße und Breite, deshalb gemessen.
+  useEffect(() => {
+    if (!beispieleOffen || typeof ResizeObserver !== "function") return;
+    const d = beispiele.current;
+    const kopf = d?.querySelector<HTMLElement>(":scope > .kopfzeile");
+    if (!d || !kopf) return;
+    const messen = () => d.style.setProperty("--beispiel-kopf", `${kopf.offsetHeight}px`);
+    messen();
+    const ro = new ResizeObserver(messen);
+    ro.observe(kopf);
+    return () => ro.disconnect();
+  }, [beispieleOffen]);
+
   const beispielGeladen = beispielBoegen.filter((b) => b.url in beispielDaten).length;
 
   /** PDF eines Beispielbogens anfordern; Fehler im Dialog zeigen. */
@@ -749,7 +904,7 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
     setBeispielLaeuft("*alle*");
     const sitzung = beispielSitzung.current;
     try {
-      const boegen = await Promise.all(boegenHier(beispielPfad).map(({ url }) => beispielKopie(url)));
+      const boegen = await Promise.all(beispielBoegen.map(({ url }) => beispielKopie(url)));
       if (beispielSitzung.current !== sitzung) return;
       if (await onAlsUebung(boegen, beispielPfad.map(ordnerLabel).join(" › "))) beispiele.current?.close();
     } catch (err) {
@@ -938,7 +1093,12 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
   }
 
   function beispieleOeffnen() {
-    setBeispielPfad([]); // beim Öffnen wieder ganz oben starten
+    // Dort weiter, wo man zuletzt war (BB-S3, BB-W3); einen nicht mehr
+    // vorhandenen Ordner verwirft der Dialog. Der Ordner der Ortsverbände kommt
+    // erst mit seinem Baustein und darf deshalb kurz leer sein.
+    const p = pfadLaden();
+    setBeispielPfad(p.length === 0 || unterPfad(p).length > 0 || imOvOrdner(p) ? p : []);
+    setBeispielSuche("");
     setBeispielFehler("");
     setBeispieleOffen(true);
     if (!beispiele.current?.open) beispiele.current?.showModal();
@@ -1337,22 +1497,34 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
             den kompletten Bogen und öffnet ihn beim Antippen in der App.
           </p>
         </details>
-        {/* Pfadleiste: ein echter Zurück-Knopf plus der klickbare Pfad. Vorher
-            stand „← Zurück" als Link lose neben dem fetten Ordnernamen, und
-            zwei Ebenen höher kam man nur über zweimal Zurück. */}
-        {beispielPfad.length > 0 && (
+        {/* Suche über alle Ordner und Bögen (BB-S2, BB-K4, BB-W8). */}
+        <label className="beispiel-suche">
+          <span>Suchen</span>
+          <input
+            type="search"
+            value={beispielSuche}
+            placeholder="Ort, OV oder Einheit, z. B. Oldenburg"
+            enterKeyHint="search"
+            onChange={(e) => setBeispielSuche(e.target.value)}
+          />
+        </label>
+        {/* Pfadleiste: ein echter Zurück-Knopf plus der klickbare Pfad. Klebt
+            unter der Kopfzeile; bei tiefen Ordnern stehen auf schmalen Geräten
+            nur „Alle", „…" und die letzten zwei Ebenen. */}
+        {!suchErgebnis && beispielPfad.length > 0 && (
           <nav className="beispiel-pfad" aria-label="Ordner">
-            <button type="button" onClick={() => setBeispielPfad(beispielPfad.slice(0, -1))}>‹ Zurück</button>
+            <button type="button" onClick={() => pfadSetzen(beispielPfad.slice(0, -1))}>‹ Zurück</button>
             <ol>
               <li>
-                <button type="button" className="link" onClick={() => setBeispielPfad([])}>Alle</button>
+                <button type="button" className="link" onClick={() => pfadSetzen([])}>Alle</button>
               </li>
+              {beispielPfad.length > 2 && <li className="pfad-auslassung" aria-hidden="true">…</li>}
               {beispielPfad.map((seg, i) => (
-                <li key={`${i}/${seg}`}>
+                <li key={`${i}/${seg}`} className={beispielPfad.length > 2 && i < beispielPfad.length - 2 ? "pfad-mitte" : undefined}>
                   {i === beispielPfad.length - 1 ? (
-                    <strong aria-current="location">{ordnerLabel(seg)}</strong>
+                    <strong aria-current="location" tabIndex={-1}>{ordnerLabel(seg)}</strong>
                   ) : (
-                    <button type="button" className="link" onClick={() => setBeispielPfad(beispielPfad.slice(0, i + 1))}>
+                    <button type="button" className="link" onClick={() => pfadSetzen(beispielPfad.slice(0, i + 1))}>
                       {ordnerLabel(seg)}
                     </button>
                   )}
@@ -1361,6 +1533,38 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
             </ol>
           </nav>
         )}
+        {/* Bildschirmleser: neuer Ordner bzw. Suchergebnis (BB-M3). */}
+        <p className="nur-sr" aria-live="polite">
+          {suchErgebnis
+            ? `${suchErgebnis.ordner.length} Ordner und ${suchErgebnis.boegen.length} Bögen gefunden`
+            : beispielPfad.length > 0
+              ? `${ordnerLabel(beispielPfad[beispielPfad.length - 1]!)}: ${beispielBoegen.length} Bögen, ${beispielOrdner.length} Unterordner`
+              : ""}
+        </p>
+        {suchErgebnis && (
+          <p className="beispiel-zaehler">
+            <strong>
+              {suchErgebnis.ordner.length} Ordner, {suchErgebnis.boegen.length}{" "}
+              {suchErgebnis.boegen.length === 1 ? "Bogen" : "Bögen"}
+            </strong>
+            {suchErgebnis.mehr && <span className="hinweis">Nicht alle Treffer gezeigt — genauer suchen, z. B. mit Einheit.</span>}
+            {ovLaedt && <span className="hinweis">Bögen der Ortsverbände werden noch geladen …</span>}
+          </p>
+        )}
+        {suchErgebnis && suchErgebnis.ordner.length > 0 && (
+          <ul className="beispiel-register" aria-label="Gefundene Ordner">
+            {suchErgebnis.ordner.map((pfad) => (
+              <li key={`s/${pfad.join("/")}`}>
+                <button type="button" onClick={() => pfadSetzen(pfad)}>
+                  <span className="beispiel-register-name">{pfad.map(ordnerLabel).join(" › ")}</span>
+                  <span className="beispiel-register-zahl">
+                    {unterPfad(pfad).length.toLocaleString("de-DE")} {unterPfad(pfad).length === 1 ? "Bogen" : "Bögen"}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
         {/* Ordner als Register: jede Zeile ganz antippbar, Name links, Bogenzahl
             rechts in der Datenschrift. Vorher eine Aufzählung unterstrichener
             Links mit der Zahl in Klammern. */}
@@ -1368,14 +1572,24 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
           <ul className="beispiel-register" aria-label={beispielPfad.length === 0 ? "Organisation oder Thema" : "Unterordner"}>
             {beispielOrdner.map(({ ordner, anzahl }) => (
               <li key={`d/${ordner}`}>
-                <button type="button" onClick={() => setBeispielPfad([...beispielPfad, ordner])}>
+                <button type="button" onClick={() => pfadSetzen([...beispielPfad, ordner])}>
                   <span className="beispiel-register-name">{ordnerLabel(ordner)}</span>
                   <span className="beispiel-register-zahl">
-                    {anzahl.toLocaleString("de-DE")} {anzahl === 1 ? "Bogen" : "Bögen"}
+                    {/* THW zählt erst fertig, wenn die Ortsverbände da sind (BB-L H5, BB-N6). */}
+                    {ovLaedt && beispielPfad.length === 0 && ordner === "thw" ? "… Bögen" : `${anzahl.toLocaleString("de-DE")} ${anzahl === 1 ? "Bogen" : "Bögen"}`}
                   </span>
                 </button>
               </li>
             ))}
+            {/* Platzhalter, bis der Ordner der Ortsverbände geladen ist (BB-S5, BB-H10). */}
+            {ovLaedt && beispielPfad.length === 1 && beispielPfad[0] === "thw" && (
+              <li>
+                <button type="button" disabled>
+                  <span className="beispiel-register-name">{ordnerLabel("ortsverbaende")}</span>
+                  <span className="beispiel-register-zahl">wird geladen …</span>
+                </button>
+              </li>
+            )}
           </ul>
         )}
         {ovFehlt && beispielPfad.length <= 1 && (beispielPfad.length === 0 || beispielPfad[0] === "thw") && (
@@ -1383,11 +1597,11 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
             Ohne Netz fehlt unter „THW“ der Ordner „Alle Einheiten aller Ortsverbände“. Er erscheint, sobald das Netz zurück ist.
           </p>
         )}
-        {imOvOrdner(beispielPfad) && <p className="hinweis">{OV_OFFLINE_TEXT}</p>}
+        {!suchErgebnis && imOvOrdner(beispielPfad) && <p className="hinweis">{OV_OFFLINE_TEXT}</p>}
         {/* Bogenzahl über der Tabelle, der Ladestand gleich dahinter: ein Ordner
             mit 45 Bögen braucht einen Moment, und eine Tabelle mit „—" sieht
             sonst aus wie „keine Daten". */}
-        {beispielBoegen.length > 0 && (
+        {!suchErgebnis && beispielBoegen.length > 0 && (
           <p className="beispiel-zaehler">
             <strong>
               {beispielBoegen.length.toLocaleString("de-DE")} {beispielBoegen.length === 1 ? "Bogen" : "Bögen"}
@@ -1399,7 +1613,7 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
             )}
           </p>
         )}
-        {onAlsUebung && beispielBoegen.length > 1 && (
+        {onAlsUebung && !suchErgebnis && beispielBoegen.length > 1 && (
           <div className="beispiel-sammelweg">
             <button type="button" disabled={beispielLaeuft !== ""} onClick={() => void alleAlsUebung()}>
               Alle {beispielBoegen.length.toLocaleString("de-DE")} in eine Übungs-Sammlung
@@ -1431,8 +1645,10 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
                     <tr key={datei} role="row">
                       <td role="cell">
                         <span className="beispiel-einheit">
-                          {b && (
+                          {b ? (
                             <EinheitZeichen einheit={b.einheit} aria-hidden="true" />
+                          ) : (
+                            <span className="beispiel-zeichen-platz" aria-hidden="true" />
                           )}
                           <span>
                             <strong>{b ? einheitsTypText(b) || datei : datei}</strong>

@@ -90,4 +90,24 @@ Behoben, Nr. 1 bis 6 der Tabelle:
 6. Die vier Teile des 2. Einsatzzugs Hannover tragen den Teil im Namen (Generator
    `scripts/praktische-ausbildung-beispielboegen.mts`).
 
-Tests in `src/app/app.test.tsx` für 1, 3 und 5. Offen: Nr. 7 bis 21.
+Tests in `src/app/app.test.tsx` für 1, 3 und 5.
+
+Behoben am 09.11.2026, Nr. 7 bis 12:
+
+7. Der Dialog öffnet im zuletzt offenen Ordner (`sessionStorage` `eeb.beispiel-pfad.v1`, auch nach
+   „Anzeigen" und Neuladen); Escape und die Zurück-Geste (`cancel`) gehen eine Ebene hoch bzw. leeren die
+   Suche. Ein eigener Knopf „Zurück zu den Beispielbögen" im geöffneten Bogen fehlt weiter.
+8. Nach einem Ordnerwechsel rollt der Dialog nach oben, der Fokus liegt auf dem Ordnernamen, eine
+   Live-Region sagt Ordner und Zahl an. Die Pfadleiste klebt unter der Kopfzeile; unter 40 rem stehen nur
+   „Alle", „…" und die letzten zwei Ebenen; Pfadziele mindestens 44 px breit; „›" aus dem Ordnernamen
+   der Ortsverbände entfernt.
+9. Karten statt Tabelle per `@container (max-width: 46rem)` am Tabellen-Rahmen statt an der Fensterbreite.
+10. Suche über Ordner- und Dateinamen (alle Wörter müssen vorkommen, höchstens 20 Ordner und 60 Bögen).
+11. Karten halten Höhe für Herkunft und Stärke vor, das Zeichen hat einen Platzhalter; solange der Ordner
+    der Ortsverbände lädt, zeigt THW „… Bögen" und unter THW einen Platzhalter-Eintrag.
+12. „ÜBUNG" bzw. „BEISPIEL" auf den Startseitenkarten (offener Bogen, Rückholplatz) und auf Vorlagen;
+    Rückfrage vor der Ablage eines Übungsbogens in eine Sammlung, die keine Übung ist (nicht im Kiosk-Scan);
+    neue Sammlung aus einem Übungsbogen mit Art „Übung" vorbelegt; die Namensprüfung beim Abwählen von
+    „Übung" gilt auch nach Zurückholen, Musterung und „Vorlage bearbeiten".
+
+Tests für 7, 10 und die Rückkehr in den Ordner. Offen: Nr. 13 bis 21.
