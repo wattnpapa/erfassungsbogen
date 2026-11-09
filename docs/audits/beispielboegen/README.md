@@ -1,5 +1,7 @@
 # Rollenaudits, Schwerpunkt Beispielbögen (Stand 08.11.2026)
 
+> Runde 2 (09.11.2026, nach der Behebung von Nr. 1 bis 21): [runde-2/README.md](runde-2/README.md).
+
 Schwerpunktrunde außerhalb der Rundenzählung: zwölf Prüfberichte (elf THW-Rollen und
 Mobile-UI), geprüft wurde nur der Bereich Beispielbögen. Prüfgegenstand ist die Live-Seite
 https://erfassungsbogen.app/ auf Stand `main` Commit `0dd56d4`, also nach dem Umbau vom
