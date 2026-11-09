@@ -12,6 +12,20 @@
 > umsetzen: SBOM, CSP ohne unsafe-inline, Entpack-Grenze") betrifft die Kapitel
 > 2.1, 8.3, 8.6, 8.7 und 11.2 — dort jeweils vermerkt.
 >
+> **Nachgezogen 2026-11-09 (Import THW-Word-Bogen):** Kap. 5.2, 6.3, 12. Neuer Eingang
+> für ausgefüllte Word-Bögen aus den THW-Vorlagen `06-*_Erfassungsbogen.dotx` (`.docx`)
+> neben JSON und PDF, in „Aus Datei laden…" und „Bögen einlesen…". `word-bogen.ts`
+> (nachgeladen, nicht im Startbündel) liest das ZIP selbst (nur „stored"/„deflate",
+> kein ZIP64, verschlüsselt abgelehnt), entpackt nur `word/document.xml` über
+> `inflateRawBegrenzt` (Deckel 8 MiB, Datei höchstens 25 MiB), liest die
+> Word-Formularfelder (`w:ffData`) mit `DOMParser` und bildet sie auf den
+> `Erfassungsbogen` ab: Einheitstyp, Funktionen und Fahrzeugtypen über
+> `@bos/vokabulare/thw`, Vorbelegungen der Vorlage gefiltert, Nicht-Zuordenbares in
+> `sonstiges`, Quittung in der Rückmeldung. Fehler als `WordBogenFehler`
+> (`word-bogen-fehler.ts`, von `datei-fehler.ts` durchgereicht). Keine neue
+> Abhängigkeit, kein neuer Speicherschlüssel, kein Netz; Schema und Transportformat
+> unverändert (Quelle der Meldung bleibt „pdf-import" = „Aus Datei").
+>
 > **Nachgezogen 2026-11-09 (Bogen-PDF im Raster der THWin-Vorlage):** Kap. 5, 8.2, 10.
 > `pdf-dokument.ts` setzt Einzel- und Sammel-PDF jetzt im nachgemessenen Raster von
 > `06-K_A_Erfassungsbogen.dotx` (Konstanten `RASTER`, `BOGEN_RAENDER`, `ZEILE_HOCH`,
@@ -1120,6 +1134,7 @@ flowchart TB
 | `einsaetze-ui.tsx` (56 KB, größte UI-Datei) | Einsatz-Sammlung: Liste, Detailsicht mit Summen, Abrücken, Zug-Etikett, Aufteilen/Zusammenführen, Folgemeldung/Historie/Diff, Sammel-PDF, CSV-Export (wahlweise nur die seit dem letzten Export neuen Bögen), Papierkorb. |
 | `qr-scanner-web.tsx` + `qr-bild.ts`/`qr-stapel.ts`/`qr-boegen.ts` | Web-QR-Scan per `getUserMedia`/jsQR, Einzelbild-Decodierung, Stapel-Import (mehrere Fotos/Screenshots, Mehrteil-Erkennung), Gruppierung von QR-Texten zu vollständigen Bögen. |
 | `pdf-dokument.ts` (rund 3 900 Zeilen, größte Nicht-UI-Datei) | Baut die pdfmake-Dokumentdefinition im Papier-Layout inkl. eingebettetem QR-Code auf der letzten Seite. Seit 2026-10-06 (R4-A3, R4-A7) mit Probesätzen ohne Bilder (pdfmake `pageBreakBefore` misst Messpunkte): Lageblatt mit mindestens fünf Nachtragszeilen (zu voll: eigene Rückseite, `einsatzLageblattSeiteFuellen`), Sammel-PDF mit enger gesetzten Bögen, wo sonst eine Restseite entstünde (`einsatzPdfDokumentGesetzt`), Einzel-PDF mit freien Zeilen, wo sie keine Seite kosten (`einzelPdfDokument`). Seit 2026-11-09 im Raster der THWin-Papiervorlage (`RASTER`, `BOGEN_RAENDER`; THW-Wortbildmarke in `pdf-logo-thw.ts`). Die Seitenzahlen prüft `pdf-seiten.test.ts` mit echtem Satz. Seit 2026-10-17 (R5-A2, R5-A3, R5-A8, R5-A9, R5-K2): Kopfzeile je Bogenseite im Seitenrand (`bogenKopfzeile`, Sammel-PDF mit `bogenStart` aus einem Probesatz mit Platzhalterbildern), unteilbare Fahrzeugblöcke, Sortierung nach Nr. (`nachNummer`), WinAnsi-Abbildung aller Texte (`winAnsiText`, Test `pdf-winansi.test.ts`). |
+| `word-bogen.ts` / `word-bogen-fehler.ts` | Import ausgefüllter THW-Word-Bögen (`.docx`, seit 2026-11-09): eigener ZIP-Leser für `word/document.xml` mit Entpackgrenze, Formularfelder per `DOMParser`, Abbildung auf den Bogen nach der Feldtabelle in `docs/thw-word-vorlagen.md`, Quittung „übernommen / unter Sonstiges / nicht übernommen". Nur nachgeladen. |
 | `pdf-bilder.ts` / `pdf-qr.ts` / `pdf-stroeme.ts` | Rückfallebene: PDF-Bild-Objekte roh als Pixel lesen und den enthaltenen QR-Code decodieren – bewusst ohne vollständigen PDF-Renderer. |
 | `bogen-csv.ts` / `einsatz-csv.ts` / `csv.ts` | Datenexporte: vollständiges CSV je Bogen/Einsatz (Langformat mit Satzart-Spalte), CSV-Übersicht für die Lagekarte, gemeinsame CSV-Formatgrundlagen (Semikolon, UTF-8-BOM, Dezimalkomma). Der XLSX-Export im „Oldenburg"-Format (`oldenburg-xlsx.ts`, `xlsx.ts`) ist seit 2026-11-03 ausgebaut. |
 | `entwurf.ts` / `speicher-browser.ts` / `speicher-schonend.ts` / `einsaetze-lesen.ts` / `sicherung.ts` / `absenderkarte.ts` / `export-stand.ts` | Lokale Persistenz: Entwurfswiederherstellung, `localStorage`-Anbindung der Einsatz-Sammlung (seit 2026-10-05, R3-O2, mit schonender Hülle: kein Schreiben unveränderten Textes, Lesen scheitert nicht an einem gesperrten Speicher, Lese-Ergebnis gemerkt solange der Speichertext gleich ist), Datensicherung/-Export, freiwillige Absenderkarte, Export-Stand je Einsatz **und Format** (Sammel-PDF, Übersichts-CSV, Alle-Daten-CSV; bis 2026-11-03 auch Excel; welche Meldungen und welchen Zustand je Einheit der Stab in diesem Format schon bekommen hat — Grundlage des Teilexports „nur neue Bögen", `eeb.export-stand.v2`, nachgezogen 2026-10-06, R4-W2/K1), dazu Lageblatt- und Weitergabe-Stand (wann zuletzt ein Lageblatt bzw. die ganze Sammlung herausging; Übergabevermerk, nachgezogen 2026-09-29, R2-W5; beide führen seit 2026-10-06 den Zustand je Einheit, R4-K1) und Kenntnis-Stand (welche Meldungen an diesem Gerät zuletzt „zur Kenntnis genommen" wurden — Grundlage der Sammelquittung und der Marke „neue Fassung", `eeb.kenntnis-stand.v1`, nachgezogen 2026-10-04, R3-K1). |
@@ -1398,6 +1413,12 @@ Bitmaps gleichzeitig im Speicher zu halten) und ohne Rückfrage je Bogen –
 gleicher Inhalt wird übersprungen, neuer Inhalt derselben Einheit landet als
 neue Fassung in der Historie; am Ende steht ein Bericht (Funde, Dateien ohne
 Bogen, unvollständige Mehrteil-Sätze).
+
+*Nachgezogen 2026-11-09 (Import THW-Word-Bogen):* Eine `.docx` aus den
+THW-Vorlagen geht denselben Weg wie eine Bogen-Datei ohne Signatur
+(`boegenAusDatei` → `boegenAufnehmen`, einzeln über `ladeDatei` mit der Frage
+„Wohin damit?"). Vorher liest `word-bogen.ts` die Formularfelder und baut den
+Bogen; seine Quittung steht in der Rückmeldung bzw. im Stapelbericht.
 
 *Nachgezogen 2026-09-29 (Audit Runde 2, R2-A2):* Je Bild werden alle QR-Codes
 gelesen (`qrAlleAusBild`, ZXing mit bis zu acht Symbolen; die jsQR-Rückfallebene
@@ -2383,6 +2404,7 @@ Repository-Analyse, keine offiziellen Angaben des Projekts.
 | --- | --- |
 | `EEB2` / `EEB2C` | Magic-Bytes/Format-Kennung des QR-Payloads: `EEB2` = unsignierter Bogen, `EEB2C` = signierter Container mit einer oder mehreren Signaturstufen. |
 | Base41 | Eigenes, an Base45/RFC 9285 angelehntes, aber URL-sicheres 41-Zeichen-Alphabet zur Transportkodierung des QR-Dateninhalts (alphanumerischer QR-Modus). |
+| THW-Word-Bogen | Ausgefüllter Erfassungsbogen aus einer THW-Word-Vorlage `06-*_Erfassungsbogen.dotx`, gespeichert als `.docx`; die App liest seine Formularfelder (`word-bogen.ts`, `docs/thw-word-vorlagen.md`). |
 | Schema-Version | Versionsnummer des Datenmodells (aktuell 12); steuert, welche Felder ein Bogen enthalten kann und wie er migriert wird. |
 | `transportSchemaVersion` | Funktion, die beim Kodieren die kleinste Schema-Version wählt, die den tatsächlichen Bogeninhalt noch verlustfrei trägt. |
 | Segmentierung (`EEBS.`) | Aufteilung eines zu großen Bogens auf mehrere QR-Codes; jeder Teil trägt Teilnummer, Gesamtzahl und eine Prüfsumme. |

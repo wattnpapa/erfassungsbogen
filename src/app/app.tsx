@@ -66,6 +66,7 @@ import { useOnline } from "./online";
 import { ereignisZaehlen, type Ereignis } from "./statistik";
 import { fehlerText } from "./nachladen";
 import { dateiFehlerMeldung } from "./datei-fehler";
+import { WORD_DATEI_ARTEN, istWordDatei } from "./word-bogen-fehler";
 import type { DateiFehler } from "./fehler-buendeln";
 import { FehlerImBild } from "./fehler-im-bild";
 import { entfernteImImportKlaeren } from "./entfernte-meldungen";
@@ -1649,7 +1650,7 @@ function AppInhalt() {
     e.target.value = "";
     if (!datei) return;
     setFehler(""); // eine Meldung gehört zur letzten Handlung, nicht zur vorletzten (E6)
-    if (!istPdfDatei(datei)) {
+    if (!istPdfDatei(datei) && !istWordDatei(datei)) {
       try {
         const vorlage = vorlageAusDatei(await datei.text());
         if (vorlage) {
@@ -1671,8 +1672,16 @@ function AppInhalt() {
     // jetzt ohne Rückfrage und lässt beide Plätze unberührt.
     let geladen: { bogen: Erfassungsbogen; anonymisiert: boolean };
     let anzahl = 1;
+    /** Word-Bogen: was übernommen, unter Sonstiges eingetragen oder verworfen wurde. */
+    let wordQuittung: string[] = [];
     try {
-      if (istPdfDatei(datei)) {
+      if (istWordDatei(datei)) {
+        // Dynamisch: der Word-Leser gehört nicht ins Startbündel.
+        const { bogenAusWordBytes } = await import("./word-bogen");
+        const w = bogenAusWordBytes(new Uint8Array(await datei.arrayBuffer()));
+        geladen = { bogen: w.bogen, anonymisiert: false };
+        wordQuittung = w.quittung;
+      } else if (istPdfDatei(datei)) {
         const bytes = new Uint8Array(await datei.arrayBuffer());
         const boegen = boegenAusPdfBytes(bytes);
         if (boegen.length === 0) {
@@ -1701,7 +1710,7 @@ function AppInhalt() {
     const bereitsGefragt = wohin === "oeffnen" && bereitsGefragtVorab;
     let nichtAbgelegt: string | null = null;
     if (wohin !== "oeffnen") {
-      const ok = await bogenInSammlung(wohin, geladen.bogen, "pdf-import", undefined, false, mehrere);
+      const ok = await bogenInSammlung(wohin, geladen.bogen, "pdf-import", undefined, false, [mehrere, ...wordQuittung].filter(Boolean).join(" "));
       setZeigeStart(false);
       // Wie beim Link: nur bei vollem Speicher wird der Bogen stattdessen geöffnet (R2-O2).
       nichtAbgelegt = ok ? null : ablageFehler.current;
@@ -1731,6 +1740,7 @@ function AppInhalt() {
     setMeldung(
       [
         geladen.anonymisiert ? FRIST_ABGELAUFEN_MELDUNG : "",
+        ...wordQuittung,
         anzahl > 1
           ? `Die PDF enthält ${anzahl} Bögen — geöffnet ist „${einheitAnzeigename(b.einheit)}". Alle auf einmal: „Einsatz importieren…".`
           : "",
@@ -4017,9 +4027,16 @@ function AppInhalt() {
    * reist beim QR-Weg mit, damit der Meldekopf die fremde Meldung später mit
    * erhaltener Original-Signatur weiterreichen kann.
    */
-  async function boegenAusDatei(datei: File, abgelehnt?: string[]): Promise<QrBogen[]> {
+  async function boegenAusDatei(datei: File, abgelehnt?: string[], quittung?: string[]): Promise<QrBogen[]> {
     const ohneNachweis = (boegen: Erfassungsbogen[]): QrBogen[] =>
       boegen.map((bogen) => ({ bogen, signatur: { zustand: "unsigniert" } as SignaturStatus, herkunft: null }));
+    if (istWordDatei(datei)) {
+      // THW-Word-Bogen (.docx): Formularfelder lesen; die Quittung nennt, was übernommen und was verworfen wurde.
+      const { bogenAusWordBytes } = await import("./word-bogen");
+      const w = bogenAusWordBytes(new Uint8Array(await datei.arrayBuffer()));
+      quittung?.push(`${datei.name}: ${w.quittung.join(" ")}`);
+      return ohneNachweis([w.bogen]);
+    }
     if (!istPdfDatei(datei)) {
       // Nur echte Bögen weiterreichen: Vorher wanderte jedes JSON-Objekt als
       // „Bogen" weiter — eine Sicherung fragte dann „1 Bogen gefunden, Einsatz
@@ -4202,6 +4219,7 @@ function AppInhalt() {
     // welche Fassung gilt (R4-W1).
     const vorher = einsaetzeLaden().find((x) => x.id === zielId)?.eintraege ?? [];
     const neueIds: string[] = [];
+    const wordQuittungen: string[] = [];
     for (const datei of dateien) {
       try {
         const bytes = istPdfDatei(datei) ? new Uint8Array(await datei.arrayBuffer()) : null;
@@ -4226,7 +4244,7 @@ function AppInhalt() {
         }
         if (art === "nur-qr") zusatz.lage = true;
         const abgelehnt: string[] = [];
-        const r = boegenAufnehmen(zielId, await boegenAusDatei(datei, abgelehnt), art === "nur-qr");
+        const r = boegenAufnehmen(zielId, await boegenAusDatei(datei, abgelehnt, wordQuittungen), art === "nur-qr");
         for (const satz of abgelehnt) kaputt.push({ datei: datei.name, text: satz, nameVorn: true });
         neu += r.neu;
         uebersprungen += r.uebersprungen;
@@ -4257,6 +4275,7 @@ function AppInhalt() {
     const doppelt = doppeltImStapel(zielId, vorher, neueIds);
     const hinweise = [
       ...sammlungenUebernommen,
+      ...wordQuittungen,
       ...vorrang,
       ...aehnlich,
       ...anonym,
@@ -4271,7 +4290,7 @@ function AppInhalt() {
       zeilen: [...fehlerZeilen, ...hinweise],
       fehler: fehlerZeilen.join(" "),
       // Die mögliche Doppelung gehört in die sichtbare Quittung, nicht nur in die Zeilen des Berichts (R7-N1).
-      meldung: [...sammlungenUebernommen, bogenMeldung, ...anonym, ...doppelt, eintreffzeitStapelHinweis(neu), ...vorrang, ...(mitBildern ? [] : aehnlich)].filter(Boolean).join(" "),
+      meldung: [...sammlungenUebernommen, bogenMeldung, ...wordQuittungen, ...anonym, ...doppelt, eintreffzeitStapelHinweis(neu), ...vorrang, ...(mitBildern ? [] : aehnlich)].filter(Boolean).join(" "),
     };
   }
 
@@ -5137,7 +5156,7 @@ function AppInhalt() {
                   mit der Maus bedienbar. */}
               <label className="datei-knopf">
                 Aus Datei laden…
-                <input type="file" accept=".pdf,application/pdf,.json,application/json" onChange={ladeDatei} className="nur-sr" />
+                <input type="file" accept={`.pdf,application/pdf,.json,application/json,${WORD_DATEI_ARTEN}`} onChange={ladeDatei} className="nur-sr" />
               </label>
               {/* Die Papier-Reserve für die eigene Einheit, bevor man sie
                   braucht: stand nur als Fußzeilen-Link unter „Projekt“, bei

@@ -11,6 +11,19 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > **Wichtig:** Der Commit „Sicherheitsbericht umsetzen" (`c7604e9`, 2026-09-12)
 > hat das in R5/M6 genannte Dekomprimierungs-Risiko bereits behoben.
 >
+> **Nachgezogen 2026-11-09 — Import THW-Word-Bogen:** Neuer Eingangsweg (5.1, 5.5):
+> Ein ausgefüllter Word-Bogen aus den THW-Vorlagen `06-*_Erfassungsbogen.dotx`
+> (`.docx`) lässt sich wie eine Bogen-Datei einlesen. Die App liest ihn lokal und
+> übernimmt dieselben Kategorien wie der Papier- und der App-Bogen (5.4: Namen,
+> Funktionen, Dienststelle, dienstliche/private Mobilnummer und E-Mail der
+> Führungskräfte, Qualifikationen, Fahrzeuge, Sofortbedarf). Was sich keinem Feld
+> zuordnen lässt (etwa Faxnummern, Zahl der Vegetarier, Unterbringung nach
+> Geschlecht als Kopfzahlen, unbekannte Felder), steht im Freitext „Sonstiges" des
+> Bogens, damit nichts unbemerkt verloren geht; die Quittung nach dem Import nennt
+> es. Die Datei selbst wird nicht gespeichert. Keine neue Datenkategorie, kein
+> neuer Empfänger, keine Netzverbindung, kein neuer Speicherort; die Frist und die
+> Löschwege (5.7) gelten für den so entstandenen Bogen wie für jeden anderen.
+>
 > **Nachgezogen 2026-11-03 — Excel-Liste „Oldenburg" entfernt:** Der Exportweg
 > „Excel-Liste im Format „Oldenburg"" (Einzelbogen und Einsatz-Sammlung) ist ausgebaut;
 > die übergeordnete Führungsstelle übernimmt Bögen über den geteilten Link selbst in
@@ -652,6 +665,9 @@ definieren.
   (Stärke- und Bedarfssummen) beim Meldekopf.
 - Ausdruck als PDF im Layout des gewohnten Papierformulars, inklusive QR-Code.
 - Export als CSV (bis 2026-11-03 auch als organisationsspezifisches Excel-Format).
+- Übernahme eines ausgefüllten THW-Word-Bogens (`.docx`) in die App, damit eine
+  Einheit, die ihren Bogen mit der Word-Vorlage des THW erstellt hat, am Meldekopf
+  nicht abgetippt werden muss (seit 2026-11-09).
 - Führung der Kräfteübersicht am Meldekopf mit Eintreff- und Abrückzeit je
   Einheit und einer Notiz/einem Auftrag der Führungsstelle; Ausgabe als
   Übergabeblatt (Sammel-PDF mit eingebetteter Sammlung) und einseitiges
@@ -724,6 +740,11 @@ biometrische Daten, strafrechtliche Daten.
   begrenzten Kanal — zu keinem Zeitpunkt über einen Server.
 - Beim Empfänger: Dekodierung, optionale Signaturprüfung (reiner Anzeigestatus,
   blockiert den Import nie), Aufnahme in die lokale Einsatz-Sammlung.
+- Seit 2026-11-09 alternativ: Einlesen eines THW-Word-Bogens (`.docx`) vom
+  Gerät. Die App liest die Formularfelder lokal, baut daraus einen Bogen
+  (unsigniert), legt Nicht-Zuordenbares in „Sonstiges" ab und zeigt eine
+  Quittung. Danach derselbe Weg wie oben; die Word-Datei selbst bleibt, wo sie
+  war, und wird von der App nicht gespeichert.
 - Aggregation mehrerer Meldungen zu Summen beim Meldekopf.
 - Optionaler Ausdruck (PDF) oder Tabellenexport (CSV; bis 2026-11-03 auch
   Excel). Übersichts-CSV und Lageblatt führen je Einheit auch die

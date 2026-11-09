@@ -72,8 +72,30 @@ prüfen. Der zuverlässige Weg bleibt die `.docx`.
 Ein Import „THW-Word-Bogen (.docx)“ neben dem bestehenden Datei-Import: Feld
 für Feld nach der Tabelle oben, Vorbelegungen herausfiltern, Funktionen aus dem
 festen Text der Zeile, Einheitstyp aus `Teileinheit`, und alles, was sich nicht
-zuordnen lässt, unter „Sonstiges“. Nicht umgesetzt; zuerst sollte feststehen,
-ob die Bögen am Meldekopf als `.docx` ankommen oder nur gedruckt.
+zuordnen lässt, unter „Sonstiges“.
+
+Umgesetzt am 2026-11-09 in `src/app/word-bogen.ts` (Tests:
+`word-bogen.test.ts` mit einer per Code gebauten Minimal-.docx). Einstieg:
+„Aus Datei laden…“ und „Bögen einlesen…“ nehmen `.docx` an. Festlegungen
+dabei:
+
+- Funktion aus dem festen Text vor `…_Zusatzf`: ZFü und SGL zählen als
+  Führer, ZTrFü, GrFü, TrFü und psFK (PSF) als Unterführer, He als
+  Mannschaft. „FüKr /“ (Vorlage Sonstige) wird Freitext-Funktion „FüKr“ mit
+  Stärkerolle Unterführer.
+- Zusatzfunktionen über das Funktionsvokabular, „Kf CE“ (oder „CE“, „C1E“ …)
+  als Fahrerlaubnis, Rest als Freitext.
+- Namen ohne Komma stehen ganz im Nachnamen.
+- Fahrzeugzeilen zählen nur mit Kennzeichen, Funkrufname, Kreuz oder
+  Sondergerät; der StAN-Fahrzeugname allein ist Vorbelegung.
+- `int_ext_He_N` wird der Person mit gleichem Namen (sonst eindeutigem
+  Nachnamen) zugeordnet, sonst Sonstiges.
+- Einsatzbeginn/-ende ohne Datum beziehen sich auf den ersten Tag des
+  Zeitraums (Ende vor Beginn: Folgetag); die Quittung sagt es.
+- Zahl der Vegetarier und M/W/D bleiben unter Sonstiges: im Modell hängen sie
+  an den Personen, die der Word-Bogen nicht kennzeichnet.
+- Die Stärke im Kopf wird nur verglichen; bei Abweichung nennt die Quittung
+  beide Zahlen.
 
 ## Layout
 

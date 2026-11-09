@@ -1038,6 +1038,25 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   Einsatzansicht steht der Hinweis, dass die PDFs für Papier gedacht und hell
   sind. Kein neuer Empfänger, keine neue Netzverbindung.
 
+- **Import THW-Word-Bogen** (`src/app/word-bogen.ts`, seit 2026-11-09): Neuer
+  Importweg für ausgefüllte Word-Bögen aus den THW-Vorlagen
+  `06-*_Erfassungsbogen.dotx` (`.docx`) in „Aus Datei laden…" und „Bögen
+  einlesen…". Die Datei wird nur lokal gelesen, ohne Netz und ohne neue
+  Abhängigkeit. Schutz gegen präparierte Dateien: Dateigröße höchstens 25 MiB
+  (`MAX_WORD_DATEI`); ein eigener ZIP-Leser holt ausschließlich
+  `word/document.xml` (nur Verfahren „stored" und „deflate", kein ZIP64,
+  verschlüsselte Einträge werden abgelehnt) und entpackt sie über
+  `inflateRawBegrenzt` mit Deckel 8 MiB (`MAX_DOCUMENT_XML`, wie R2). Das XML
+  liest `DOMParser` als `application/xml`; dabei wird nichts ausgeführt und
+  nichts nachgeladen, Makros (`.docm`, `vbaProject.bin`), eingebettete Objekte
+  und Verknüpfungen werden nie angefasst. Übernommen werden nur Textwerte der
+  bekannten Formularfelder; sie landen als Daten im Bogen und durchlaufen
+  danach dieselben Wege wie jeder andere Bogen (Prüfung `bogenBefund`,
+  CSV-Formel-Abwehr beim Export, `winAnsiText` im PDF). Fehler meldet der
+  Leser als ganzen Satz (`WordBogenFehler`), nie als Parser-Text. Ein
+  Word-Bogen trägt keine Signatur; er kommt wie eine Bogen-Datei als
+  „unsigniert" in die Sammlung (5.2 gilt unverändert).
+
 ### 5.5 Datensparsamkeit und Löschung
 
 - **Datenschutzfrist** (`vendor/eeb-format/src/datenschutzfrist.ts`): 90 Tage
@@ -1261,7 +1280,7 @@ ORP.1 Organisation, INF.1 Gebäude) sind nicht Gegenstand dieses Dokuments.
 | # | Gefährdung | Betroffenes Zielobjekt | Eintrittswahrscheinlichkeit | Schadenshöhe | Gesamt |
 | --- | --- | --- | --- | --- | --- |
 | R1 | Verlust/Diebstahl eines Geräts mit ungesperrtem Zugriff | D1–D4 (alle lokalen Daten) | Mittel (Einsatzgeräte werden im Feld mitgeführt) | Hoch (Zugriff auf alle lokal gespeicherten Bögen, Absenderkarte, Signaturschlüssel) | **Hoch** |
-| R2 | ~~Dekomprimierungs-Angriff über präparierte Importdatei (`inflateRaw` ohne Größenlimit)~~ **behoben mit `c7604e9`** (Deckel 4 MiB) | A1–A4 (Anwendungsverfügbarkeit) | Niedrig-Mittel | Mittel (Speicherüberlastung/Absturz; kein Datenabfluss) | ~~Mittel~~ → Sehr niedrig |
+| R2 | ~~Dekomprimierungs-Angriff über präparierte Importdatei (`inflateRaw` ohne Größenlimit)~~ **behoben mit `c7604e9`** (Deckel 4 MiB; der Word-Import seit 2026-11-09 nutzt dieselbe Funktion mit Deckel 8 MiB, 5.4) | A1–A4 (Anwendungsverfügbarkeit) | Niedrig-Mittel | Mittel (Speicherüberlastung/Absturz; kein Datenabfluss) | ~~Mittel~~ → Sehr niedrig |
 | R3 | Diebstahl/Auslesen des unverschlüsselten privaten Signaturschlüssels | D4, K1 (Vertrauenskette) | Niedrig (setzt Gerätezugriff oder weitere Schwachstelle voraus) | Mittel (Signieren im Namen des Geräts möglich) — durch den Austausch des Schlüssels (M3) auf die Zeit bis zum Bemerken und den Abgleich der neuen Kurzform begrenzbar | Niedrig-Mittel |
 | R4 | Cross-Site-Scripting trotz CSP — ~~über `'unsafe-inline'` bei `script-src`~~ **mit `c7604e9` auf Hash-Freigabe umgestellt**; Restrisiko nur noch über `style-src 'unsafe-inline'` | A1 (Web-App) | Niedrig (CSP schränkt Auswirkungen stark ein) | Mittel (potenziell Zugriff auf `localStorage`-Inhalte des Tabs) | ~~Niedrig-Mittel~~ → Niedrig |
 | R5 | Kompromittierte oder manipulierte Build-/Update-Kette | B1–B5, A2 (Desktop) | Niedrig | Hoch (Verteilung manipulierter Software an alle Nutzer der Plattform) | Mittel-Hoch |
