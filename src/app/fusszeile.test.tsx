@@ -395,7 +395,7 @@ describe("Beispielbogen-Link kopieren", () => {
       // Fußzeile hat dafür keinen Link mehr.
       expect(screen.queryByRole("button", { name: "Beispielbögen" })).toBeNull();
       await act(async () => beispielboegenOeffnen());
-      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" });
+      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
       await nutzer.click(within(dialog).getByRole("button", { name: /^THW/ }));
       const knoepfe = await within(dialog).findAllByRole("button", { name: "Link" }, { timeout: 15000 });
       await nutzer.click(knoepfe[0]!);

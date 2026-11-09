@@ -1329,24 +1329,31 @@ describe("Assistenten-Durchlauf", () => {
       globalThis.fetch = echtesFetch;
     };
 
-    render(<App />);
-    await neuerBogenBis(nutzer, 0);
-    await nutzer.type(screen.getByLabelText("Ort der Einheit (Pflicht)"), "Eigenhausen");
-    await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
+    // Scheitert ein Schritt, muss fetch trotzdem zurück — sonst liefert die
+    // Attrappe auch den folgenden Tests nur noch diesen Bogen.
+    try {
+      render(<App />);
+      await neuerBogenBis(nutzer, 0);
+      await nutzer.type(screen.getByLabelText("Ort der Einheit (Pflicht)"), "Eigenhausen");
+      await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
 
-    // Über den Einstieg auf der Startseite unter „So funktioniert's" — der
-    // Fußzeilen-Link öffnet denselben Dialog (fusszeile.test.tsx).
-    await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
-    const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" });
-    // Erst den Ordner der eigenen Organisation, dann stehen die Bögen da. Die
-    // Angaben je Bogen laden nach — die Frist deckt das mit ab.
-    await nutzer.click(within(dialog).getByRole("button", { name: /^THW/ }));
-    const anzeigen = await within(dialog).findAllByRole("button", { name: "Anzeigen" }, { timeout: 15000 });
-    await nutzer.click(anzeigen[0]!);
+      // Über den Einstieg auf der Startseite unter „So funktioniert's". Der Dialog
+      // ist ein eigener, nachgeladener Baustein (beispiele-dialog.tsx), daher die Frist.
+      await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
+      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
+      // Erst den Ordner der eigenen Organisation, dann stehen die Bögen da. Die
+      // Angaben je Bogen laden nach — die Frist deckt das mit ab.
+      await nutzer.click(within(dialog).getByRole("button", { name: /^THW/ }));
+      const anzeigen = await within(dialog).findAllByRole("button", { name: "Anzeigen" }, { timeout: 15000 });
+      await nutzer.click(anzeigen[0]!);
 
-    // Die Rückfrage zeichnet die Dialogschicht einen Tick später.
-    const frage = await screen.findByRole("dialog", { name: "Beispielbogen öffnen?" });
-    return { dialog, frage, fetchZurueck };
+      // Die Rückfrage zeichnet die Dialogschicht einen Tick später.
+      const frage = await screen.findByRole("dialog", { name: "Beispielbogen öffnen?" });
+      return { dialog, frage, fetchZurueck };
+    } catch (e) {
+      fetchZurueck();
+      throw e;
+    }
   }
 
   it("behält beim Abbruch der Rückfrage den eigenen Bogen", async () => {
@@ -1392,7 +1399,7 @@ describe("Assistenten-Durchlauf", () => {
 
       await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
       await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
-      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" });
+      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
       // Der Dialog steht wieder im zuletzt offenen Ordner (BB-S3, BB-W3) — kein zweites „THW".
       expect(within(dialog).getByText("THW", { selector: "[aria-current]" })).toBeDefined();
       const anzeigen = await within(dialog).findAllByRole("button", { name: "Anzeigen" }, { timeout: 15000 });
@@ -1416,7 +1423,7 @@ describe("Assistenten-Durchlauf", () => {
       const nutzer = userEvent.setup();
       render(<App />);
       await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
-      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" });
+      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
       await nutzer.click(within(dialog).getByRole("button", { name: /^THW/ }));
       await nutzer.click(await within(dialog).findByRole("button", { name: /^Alle .* in eine Übungs-Sammlung$/ }));
 
@@ -1440,7 +1447,7 @@ describe("Assistenten-Durchlauf", () => {
       const nutzer = userEvent.setup();
       render(<App />);
       await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
-      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" });
+      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
       await nutzer.click(within(dialog).getByRole("button", { name: /^ASB/ }));
       const anzeigen = await within(dialog).findAllByRole("button", { name: "Anzeigen" });
       await nutzer.click(anzeigen[0]!);
@@ -1462,7 +1469,7 @@ describe("Assistenten-Durchlauf", () => {
     const nutzer = userEvent.setup();
     render(<App />);
     await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
-    const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" });
+    const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
     await nutzer.type(within(dialog).getByRole("searchbox", { name: "Suchen" }), "hannover");
     const treffer = within(dialog).getByRole("list", { name: "Gefundene Ordner" });
     await nutzer.click(within(treffer).getAllByRole("button")[0]!);
@@ -1475,7 +1482,7 @@ describe("Assistenten-Durchlauf", () => {
     const nutzer = userEvent.setup();
     render(<App />);
     await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
-    const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" });
+    const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
     await nutzer.click(within(dialog).getByRole("button", { name: /^Katastrophenschutz/ }));
     expect(within(dialog).getByText("Katastrophenschutz", { selector: "[aria-current]" })).toBeDefined();
 

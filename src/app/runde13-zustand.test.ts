@@ -199,8 +199,9 @@ describe("R13-G1 Doppeltipp während der Erzeugung", () => {
 });
 
 describe("R13-O2 Beispielbögen: Fehler im Bild", () => {
-  it("die Fußzeile zeigt den Fehler der Beispielliste mit FehlerImBild (Ansage und Scrollen)", () => {
-    const quelle = readFileSync(new URL("./fusszeile.tsx", import.meta.url), "utf8");
+  it("der Beispielbögen-Dialog zeigt den Fehler der Beispielliste mit FehlerImBild (Ansage und Scrollen)", () => {
+    // Seit 2026-11-09 eigener, nachgeladener Baustein (vorher in fusszeile.tsx).
+    const quelle = readFileSync(new URL("./beispiele-dialog.tsx", import.meta.url), "utf8");
     expect(quelle).toMatch(/\{beispielFehler && <FehlerImBild text=\{beispielFehler\} \/>\}/);
     expect(quelle).not.toMatch(/<p className="fehler">\{beispielFehler\}<\/p>/);
   });
