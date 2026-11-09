@@ -3190,6 +3190,15 @@
     footer.seite .fuss-gruppe button.link.gefahr { text-decoration-color: var(--alarm); }
     @media (hover: hover) { footer.seite .fuss-gruppe button.link.gefahr:hover { color: var(--alarm); } }
     .fuss-marke { margin: 0; color: var(--text-2); }
+    .fuss-offline { margin: 0 0 var(--r-2); color: var(--text-2); font-size: var(--t-xs); }
+    /* Startseite: dünner Fortschrittsbalken des Offline-Vorrats zwischen Kopf und erstem Absatz. Die negative
+       Außenkante hebt seine Höhe auf, Erscheinen und Verschwinden verschieben nichts. */
+    .offline-fortschritt {
+      height: 3px; margin: 0 0 -3px; border-radius: 2px; overflow: hidden;
+      background: var(--linie);
+    }
+    .offline-fortschritt > span { display: block; height: 100%; background: var(--gut); transition: width 0.6s ease-out; }
+    @media (prefers-reduced-motion: reduce) { .offline-fortschritt > span { transition: none; } }
     footer.seite a { color: var(--akzent-hell); }
     /* Schmale Variante im Assistenten: eine Zeile mit den Angaben, die auf
        jeder Seite stehen müssen. Beim Ausfüllen soll unter dem Formular nicht
@@ -5542,7 +5551,7 @@
       html, body { background: #fff !important; color: #000 !important; }
       *, *::before, *::after { background: transparent !important; color: #000 !important; box-shadow: none !important; text-shadow: none !important; animation: none !important; transition: none !important; }
       .sprungmarke, .kopfnav, footer.nav, footer.seite, .anzeige-balken, .anzeige-schalter, .anzeige-leiste, .quittung-daumen, .fest-warnung,
-      nav.schritte, .zur-start, .kopf-oberzeile, .knopfreihe, .tipp-moment, .start-seo, .offline-badge,
+      nav.schritte, .zur-start, .kopf-oberzeile, .knopfreihe, .tipp-moment, .start-seo, .offline-badge, .offline-fortschritt,
       .entwurf-karte, .ansicht-wahl, .sortieren, .einheiten-filter, .ansicht-umschalter, .luecken-zaehler,
       main button:not(.spalten-sortierung) { display: none !important; }
       /* R10-A2: Die offenen Punkte der Übersicht sind Knöpfe; ohne diese Ausnahme stand auf Papier „2 offene Punkte … antippen zum

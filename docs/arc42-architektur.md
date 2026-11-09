@@ -31,7 +31,7 @@
 > `06-K_A_Erfassungsbogen.dotx` (Konstanten `RASTER`, `BOGEN_RAENDER`, `ZEILE_HOCH`,
 > `ZEILE_PERSONAL`): Rahmen 474,9 pt ab x = 74,4 pt, Linien 0,5 pt, 10 pt Schrift,
 > Mindesthöhen der Vorlage, Titelbalken dreigeteilt (Kurzzeichen · Titel in der
-> Kennfarbe · beim THW die Wortbildmarke aus der Vorlage, `pdf-logo-thw.ts`, sonst der
+> Kennfarbe · beim THW die Wortbildmarke aus der Vorlage, `pdf-logo-thw.ts`, bei ASB, Bundeswehr, DLRG, DRK, JUH und MHD deren Logo als Vektorgrafik (`pdf-logos.ts`), sonst der
 > Name der Organisation). Auf Papier gilt für das THW das Vorlagen-Blau #003399
 > (`orgFarbePapier` in `org-farben.ts`), die Oberfläche bleibt bei #20214f. Der
 > Sofortbedarf steht wie in der Vorlage direkt unter den Fahrzeugen. Folgen: Blanko
@@ -1144,7 +1144,7 @@ flowchart TB
 | `dialoge.tsx` | Ersatz für Systemdialoge: `frageText`/`frageFelder` (statt `prompt`), `frageJaNein` (statt `confirm`), `frageWahl`, `zeigeHinweis` (statt `alert`); gezeichnet von einer einmal eingehängten `<Dialogschicht />`. |
 | `einsaetze-ui.tsx` (56 KB, größte UI-Datei) | Einsatz-Sammlung: Liste, Detailsicht mit Summen, Abrücken, Zug-Etikett, Aufteilen/Zusammenführen, Folgemeldung/Historie/Diff, Sammel-PDF, CSV-Export (wahlweise nur die seit dem letzten Export neuen Bögen), Papierkorb. |
 | `qr-scanner-web.tsx` + `qr-bild.ts`/`qr-stapel.ts`/`qr-boegen.ts` | Web-QR-Scan per `getUserMedia`/jsQR, Einzelbild-Decodierung, Stapel-Import (mehrere Fotos/Screenshots, Mehrteil-Erkennung), Gruppierung von QR-Texten zu vollständigen Bögen. |
-| `pdf-dokument.ts` (rund 3 900 Zeilen, größte Nicht-UI-Datei) | Baut die pdfmake-Dokumentdefinition im Papier-Layout inkl. eingebettetem QR-Code auf der letzten Seite. Seit 2026-10-06 (R4-A3, R4-A7) mit Probesätzen ohne Bilder (pdfmake `pageBreakBefore` misst Messpunkte): Lageblatt mit mindestens fünf Nachtragszeilen (zu voll: eigene Rückseite, `einsatzLageblattSeiteFuellen`), Sammel-PDF mit enger gesetzten Bögen, wo sonst eine Restseite entstünde (`einsatzPdfDokumentGesetzt`), Einzel-PDF mit freien Zeilen, wo sie keine Seite kosten (`einzelPdfDokument`). Seit 2026-11-09 im Raster der THWin-Papiervorlage (`RASTER`, `BOGEN_RAENDER`; THW-Wortbildmarke in `pdf-logo-thw.ts`). Die Seitenzahlen prüft `pdf-seiten.test.ts` mit echtem Satz. Seit 2026-10-17 (R5-A2, R5-A3, R5-A8, R5-A9, R5-K2): Kopfzeile je Bogenseite im Seitenrand (`bogenKopfzeile`, Sammel-PDF mit `bogenStart` aus einem Probesatz mit Platzhalterbildern), unteilbare Fahrzeugblöcke, Sortierung nach Nr. (`nachNummer`), WinAnsi-Abbildung aller Texte (`winAnsiText`, Test `pdf-winansi.test.ts`). |
+| `pdf-dokument.ts` (rund 3 900 Zeilen, größte Nicht-UI-Datei) | Baut die pdfmake-Dokumentdefinition im Papier-Layout inkl. eingebettetem QR-Code auf der letzten Seite. Seit 2026-10-06 (R4-A3, R4-A7) mit Probesätzen ohne Bilder (pdfmake `pageBreakBefore` misst Messpunkte): Lageblatt mit mindestens fünf Nachtragszeilen (zu voll: eigene Rückseite, `einsatzLageblattSeiteFuellen`), Sammel-PDF mit enger gesetzten Bögen, wo sonst eine Restseite entstünde (`einsatzPdfDokumentGesetzt`), Einzel-PDF mit freien Zeilen, wo sie keine Seite kosten (`einzelPdfDokument`). Seit 2026-11-09 im Raster der THWin-Papiervorlage (`RASTER`, `BOGEN_RAENDER`; THW-Wortbildmarke in `pdf-logo-thw.ts`, Logos von ASB, Bundeswehr, DLRG, DRK, JUH und MHD als SVG in `pdf-logos.ts`). Die Seitenzahlen prüft `pdf-seiten.test.ts` mit echtem Satz. Seit 2026-10-17 (R5-A2, R5-A3, R5-A8, R5-A9, R5-K2): Kopfzeile je Bogenseite im Seitenrand (`bogenKopfzeile`, Sammel-PDF mit `bogenStart` aus einem Probesatz mit Platzhalterbildern), unteilbare Fahrzeugblöcke, Sortierung nach Nr. (`nachNummer`), WinAnsi-Abbildung aller Texte (`winAnsiText`, Test `pdf-winansi.test.ts`). |
 | `word-bogen.ts` / `word-bogen-fehler.ts` | Import ausgefüllter THW-Word-Bögen (`.docx`, seit 2026-11-09): eigener ZIP-Leser für `word/document.xml` mit Entpackgrenze, Formularfelder per `DOMParser`, Abbildung auf den Bogen nach der Feldtabelle in `docs/thw-word-vorlagen.md`, Quittung „übernommen / unter Sonstiges / nicht übernommen". Nur nachgeladen. |
 | `pdf-bilder.ts` / `pdf-qr.ts` / `pdf-stroeme.ts` | Rückfallebene: PDF-Bild-Objekte roh als Pixel lesen und den enthaltenen QR-Code decodieren – bewusst ohne vollständigen PDF-Renderer. |
 | `bogen-csv.ts` / `einsatz-csv.ts` / `csv.ts` | Datenexporte: vollständiges CSV je Bogen/Einsatz (Langformat mit Satzart-Spalte), CSV-Übersicht für die Lagekarte, gemeinsame CSV-Formatgrundlagen (Semikolon, UTF-8-BOM, Dezimalkomma). Der XLSX-Export im „Oldenburg"-Format (`oldenburg-xlsx.ts`, `xlsx.ts`) ist seit 2026-11-03 ausgebaut. |
@@ -1559,7 +1559,12 @@ Die Offline-Zeile zeigt beim Laden den Fortschritt des Kerns in MB und danach
 neuen Hosts, alle Abrufe gehen an die eigene Herkunft. „Funktioniert komplett
 offline" steht erst, wenn die Zusatzstufe gezählt und vollständig ist; bis zur
 ersten Zählung nennt die Zeile nur den Kern (`zweiStufen` in
-`src/app/offline-bereit.ts`, nachgezogen 2026-10-05).
+`src/app/offline-bereit.ts`, nachgezogen 2026-10-05). Seit 2026-11-09 steht
+die Zeile nur noch als Kasten auf der Startseite, solange der Kern lädt, kein
+Vorrat möglich ist oder der Speicher gesperrt ist. Liegt der Kern im Gerät
+(`offlineRuhig`), steht der Text klein in der Fußzeile, und ein 3 px hoher
+Balken oben auf der Startseite zeigt den Fortschritt (`offlineFortschritt`:
+Kern in Bytes, Zusatzstufe in Dateien).
 
 ### 6.5 Desktop-Auto-Update (Electron)
 

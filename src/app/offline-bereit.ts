@@ -340,6 +340,28 @@ export function offlineLangText(s: OfflineZustand): string {
   return fassungen.reduce((a, b) => (b.length > a.length ? b : a));
 }
 
+/**
+ * Braucht der Stand den Kasten auf der Startseite? Sobald der Kern im Gerät liegt („bereit"), gehen Bogen, PDF, QR-Code und
+ * Empfang ohne Netz; was dann noch nachlädt, ist Beiwerk. Der Text steht in diesen Ständen leise in der Fußzeile, der Fortschritt
+ * als dünner Balken oben auf der Seite. Den Kasten behalten nur Stände, die etwas verlangen: Kern lädt noch, kein Vorrat möglich,
+ * Speicher gesperrt.
+ */
+export function offlineRuhig(s: OfflineZustand): boolean {
+  return s.stand === "bereit" && !s.speicherGesperrt;
+}
+
+/**
+ * Anteil des laufenden Ladens (0 bis 1) für den Balken oben auf der Startseite, oder null, wenn nichts lädt: erst die erste Stufe
+ * in Bytes, danach die zweite in Dateien.
+ */
+export function offlineFortschritt(s: OfflineZustand): number | null {
+  if (s.stand === "laedt") return s.kern && s.kern.gesamt > 0 ? Math.min(1, s.kern.geladen / s.kern.gesamt) : null;
+  if (s.stand === "bereit" && s.zusatz && s.zusatz.gesamt > 0 && s.zusatz.fertig < s.zusatz.gesamt) {
+    return s.zusatz.fertig / s.zusatz.gesamt;
+  }
+  return null;
+}
+
 /** Text der Offline-Zeile auf der Startseite. */
 export function offlineText(s: OfflineZustand): string {
   // Sperrt der Browser den Speicher, bleibt nichts auf dem Gerät — die Zeile
