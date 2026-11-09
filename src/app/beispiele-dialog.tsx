@@ -493,6 +493,8 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
   // Zeit des letzten Ordnerwechsels: Ein Doppeltipp auf ein Register öffnete
   // sonst mit dem zweiten Tipp einen Unterordner (BB-E6).
   const letzterWechsel = useRef(0);
+  // Wann der Dialog aufging: Der Sammelknopf nimmt kurz danach keinen Tipp an (Doppeltipp auf „Beispielbögen ansehen").
+  const geoeffnetUm = useRef(0);
   // Der Dialog lädt die Bögen des offenen Ordners nach, um Einheit, Herkunft
   // und Stärke in der Tabelle zu zeigen. Die Tabelle rendert ausschließlich aus
   // `beispielDaten` (URL → Bogen) — der Modul-Cache ist nur die Abkürzung beim
@@ -736,7 +738,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
     if (!onAlsUebung) return;
     // Ein Doppeltipp auf ein Register traf mit dem zweiten Tipp diesen Knopf und
     // legte ohne Rückfrage eine Sammlung an (Runde 2, BB2-G2, BB2-E2).
-    if (performance.now() - letzterWechsel.current < 800) return;
+    if (performance.now() - Math.max(letzterWechsel.current, geoeffnetUm.current) < 800) return;
     setBeispielFehler("");
     setBeispielLaeuft("*alle*");
     const sitzung = beispielSitzung.current;
@@ -765,7 +767,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
     setBeispielSuche("");
     setAusSuche("");
     setBeispielFehler("");
-    letzterWechsel.current = performance.now(); // Doppeltipp auf „Beispielbögen ansehen" trifft nichts im Dialog
+    geoeffnetUm.current = performance.now();
     setBeispieleOffen(true);
     if (!beispiele.current?.open) beispiele.current?.showModal();
   }
