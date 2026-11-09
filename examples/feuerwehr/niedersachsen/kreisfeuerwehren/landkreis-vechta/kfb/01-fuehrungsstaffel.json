@@ -1,0 +1,305 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3509600,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Vechta",
+    "einheitsTyp": {
+      "freitext": "Führungsstaffel"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "KFB Vechta"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Vechta"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2437,
+    "zeitraumBis": 2439,
+    "ortAuftrag": "Überörtliche Hilfe Großbrand Landkreis Cloppenburg — Brandbekämpfung, Wassertransport, technische Hilfe"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Malte",
+      "nachname": "Fricke",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "KFB-Führer/-in (ELW 1 Dinklage)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Dinklage",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556801057"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verbandsführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Kahrs",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stellv. KFB-Führer/-in Nord (ELW 1 Dinklage)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Dinklage",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559918262"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verbandsführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Wendt",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stellv. KFB-Führer/-in Süd (ELW 1 Dinklage)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Dinklage",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556475115"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verbandsführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Kevin",
+      "nachname": "Behrens",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in zbV (ELW 1 Dinklage)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Ortsfeuerwehr Dinklage",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559986438"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Silke",
+      "nachname": "Hagedorn",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (MTF Lohne)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Lohne",
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553289575"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Harms",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTF Lohne)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Lohne",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tim",
+      "nachname": "Fricke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTF Lohne)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Ortsfeuerwehr Lohne",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Melanie",
+      "nachname": "Dierks",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTF Lohne)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Lohne",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Birgit",
+      "nachname": "Klöpper",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTF Lohne)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Lohne",
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Hauke",
+      "nachname": "Gieschen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTF Lohne)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Lohne",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "aenderungen": "Einsatzleitwagen 1; Standort: Ortsfeuerwehr Dinklage",
+      "kennzeichen": "VEC-FW 538",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Vechta",
+        "teile": [
+          22,
+          11,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "aenderungen": "Mannschaftstransportfahrzeug; Standort: Ortsfeuerwehr Lohne",
+      "kennzeichen": "VEC-FW 539",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Vechta",
+        "teile": [
+          23,
+          17,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 10,
+    "dieselLiter": 115,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Kreisfeuerwehrbereitschaft des Landkreises Vechta: Führungsstaffel, vier Züge der Feuerwehren und der 5. Zug (Verpflegung, Logistik) des DRK-Kreisverbands Vechta."
+}

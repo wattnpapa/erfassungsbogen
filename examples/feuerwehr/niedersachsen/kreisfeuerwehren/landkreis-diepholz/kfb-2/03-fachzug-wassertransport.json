@@ -1,0 +1,818 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3495198,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Diepholz",
+    "einheitsTyp": {
+      "freitext": "Fachzug Wassertransport"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "KFB 2"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Diepholz"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2427,
+    "zeitraumBis": 2429,
+    "ortAuftrag": "Überörtliche Hilfe Vegetationsbrand Lüneburger Heide — Wasserversorgung über lange Wegstrecke"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Lena",
+      "nachname": "Schierholz",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (TSF Cantrup)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Cantrup",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557438752"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Merle",
+      "nachname": "Schierholz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (TSF Cantrup)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Cantrup",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Rippe",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Zugführer/-in (TSF Cantrup)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Cantrup",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552147050"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Svenja",
+      "nachname": "Plate",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (TSF Cantrup)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Ortsfeuerwehr Cantrup",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Stelljes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (TSF Cantrup)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Cantrup",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Philipp",
+      "nachname": "Stöver",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (TSF Cantrup)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Cantrup",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Werner",
+      "nachname": "Siemers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (TLF 8/18 Neuenkirchen)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Neuenkirchen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556616649"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Bastian",
+      "nachname": "Stelljes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (TLF 8/18 Neuenkirchen)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Neuenkirchen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Joachim",
+      "nachname": "Hagedorn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (TLF 8/18 Neuenkirchen)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Neuenkirchen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Plate",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (HLF 10/6 Borstel)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Borstel",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559466913"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lena",
+      "nachname": "Harms",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (HLF 10/6 Borstel)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Borstel",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Jannik",
+      "nachname": "Lüdeke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (HLF 10/6 Borstel)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Borstel",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Martin",
+      "nachname": "Heitmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (HLF 10/6 Borstel)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Ortsfeuerwehr Borstel",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Imke",
+      "nachname": "Gieschen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (HLF 10/6 Borstel)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Borstel",
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Rippe",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (HLF 10/6 Borstel)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Ortsfeuerwehr Borstel",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Gesa",
+      "nachname": "Wachendorf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (HLF 10/6 Borstel)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Borstel",
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Werner",
+      "nachname": "Rohlfs",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (HLF 10/6 Borstel)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Borstel",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Behrens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (HLF 10/6 Borstel)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Borstel",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Vehrenkamp",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (TLF 2000 Heiligenloh)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Heiligenloh",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556034220"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Simon",
+      "nachname": "Niemeyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (TLF 2000 Heiligenloh)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Heiligenloh",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Dominik",
+      "nachname": "Grashorn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (TLF 2000 Heiligenloh)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Heiligenloh",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Harms",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (TLF 8 W Schwaförden)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Schwaförden",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552250098"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Torben",
+      "nachname": "Rohlfs",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (TLF 8 W Schwaförden)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Schwaförden",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Stefan",
+      "nachname": "Dreyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (TLF 8 W Schwaförden)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Schwaförden",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Schröder",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (TLF 16/24 Schmalförden)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Schmalförden",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551423731"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Oetken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (TLF 16/24 Schmalförden)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Schmalförden",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Harms",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (TLF 16/24 Schmalförden)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Schmalförden",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Gerd",
+      "nachname": "Tiemann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (TLF 3000 Schwarme)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Schwarme",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551087393"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Bastian",
+      "nachname": "Wulf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (TLF 3000 Schwarme)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Schwarme",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Anna",
+      "nachname": "Siemers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (TLF 3000 Schwarme)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Schwarme",
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "TSF"
+      },
+      "aenderungen": "Tragkraftspritzenfahrzeug; Standort: Ortsfeuerwehr Cantrup",
+      "kennzeichen": "DH-FW 234",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Diepholz",
+        "teile": [
+          19,
+          40,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "TLF 8/18"
+      },
+      "aenderungen": "Tanklöschfahrzeug 8/18; Standort: Ortsfeuerwehr Neuenkirchen",
+      "kennzeichen": "DH-FW 235",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Diepholz",
+        "teile": [
+          21,
+          21,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "HLF 10/6"
+      },
+      "aenderungen": "Hilfeleistungslöschgruppenfahrzeug 10/6; Standort: Ortsfeuerwehr Borstel",
+      "kennzeichen": "DH-FW 236",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Diepholz",
+        "teile": [
+          87,
+          43,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "TLF 2000"
+      },
+      "aenderungen": "Tanklöschfahrzeug 2000; Standort: Ortsfeuerwehr Heiligenloh",
+      "kennzeichen": "DH-FW 237",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Diepholz",
+        "teile": [
+          72,
+          21,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "TLF 8 W"
+      },
+      "aenderungen": "Tanklöschfahrzeug 8 W; Standort: Ortsfeuerwehr Schwaförden",
+      "kennzeichen": "DH-FW 238",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Diepholz",
+        "teile": [
+          55,
+          21,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "TLF 16/24"
+      },
+      "aenderungen": "Tanklöschfahrzeug 16/24; Standort: Ortsfeuerwehr Schmalförden",
+      "kennzeichen": "DH-FW 239",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Diepholz",
+        "teile": [
+          53,
+          21,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "TLF 3000"
+      },
+      "aenderungen": "Tanklöschfahrzeug 3000; Standort: Ortsfeuerwehr Schwarme",
+      "kennzeichen": "DH-FW 240",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Diepholz",
+        "teile": [
+          34,
+          21,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 30,
+    "dieselLiter": 555,
+    "benzinLiter": 0,
+    "gemischLiter": 10,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Kreisfeuerwehrbereitschaft 2 des Landkreises Diepholz (Feuerwehren Twistringen, Bruchhausen-Vilsen, Schwaförden und Siedenburg): Bereitschaftsführung und die Fachzüge Wasserförderung, Wassertransport, Personalreserve und Logistik."
+}

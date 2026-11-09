@@ -1,0 +1,726 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3505390,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Nienburg/Weser",
+    "einheitsTyp": {
+      "freitext": "Führungsstaffel"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "KFB Nord"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Nienburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2434,
+    "zeitraumBis": 2436,
+    "ortAuftrag": "Überörtliche Hilfe Hochwasser Innerste (Landkreis Hildesheim) — Deichverteidigung und Wasserförderung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Kevin",
+      "nachname": "Ehlers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kradmelder/-in (Krad FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 4,
+      "dienststelle": "Feuerwehrtechnische Zentrale Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Gerd",
+      "nachname": "Windhorst",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Kradmelder/-in (Krad FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 4,
+      "dienststelle": "Feuerwehrtechnische Zentrale Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Bösch",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (MTW FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Feuerwehrtechnische Zentrale Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553184091"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hannes",
+      "nachname": "Holle",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTW FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Feuerwehrtechnische Zentrale Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Klenke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTW FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Feuerwehrtechnische Zentrale Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Grashorn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTW FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Feuerwehrtechnische Zentrale Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Nicole",
+      "nachname": "Tiemann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTW FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Feuerwehrtechnische Zentrale Nienburg",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Plate",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTW FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Feuerwehrtechnische Zentrale Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Antje",
+      "nachname": "Bartels",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (MTW Haßbergen)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Haßbergen",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559527096"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Arne",
+      "nachname": "Fricke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTW Haßbergen)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Haßbergen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Antje",
+      "nachname": "Lohmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTW Haßbergen)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Haßbergen",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Dierks",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTW Haßbergen)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Haßbergen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Eike",
+      "nachname": "Behrens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTW Haßbergen)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Ortsfeuerwehr Haßbergen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Felix",
+      "nachname": "Schröder",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTW Haßbergen)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Ortsfeuerwehr Haßbergen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Jannik",
+      "nachname": "Nienaber",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Bereitschaftsführer/-in (FüKW TEL)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550816122"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Julian",
+      "nachname": "Lange",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (FüKW TEL)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Hillmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in (FüKW TEL)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Führungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Kevin",
+      "nachname": "Niemeyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (FüKW TEL)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Werner",
+      "nachname": "Ahrens",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stellv. Bereitschaftsführer/-in (ELW 2 TEL)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553206587"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verbandsführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Lena",
+      "nachname": "Buschmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (ELW 2 TEL)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Stefan",
+      "nachname": "Eggers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in (ELW 2 TEL)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Führungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Julian",
+      "nachname": "Albers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 TEL)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Jan",
+      "nachname": "Niemeyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 TEL)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Schierholz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 TEL)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Julian",
+      "nachname": "Vehrenkamp",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 TEL)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Fabian",
+      "nachname": "Rabe",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Notfallsanitäter/-in (RTW DRK SEG Nienburg)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "DRK SEG Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559215231"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notfallsanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Kai",
+      "nachname": "Eggers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in (RTW DRK SEG Nienburg)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "DRK SEG Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "Krad"
+      },
+      "aenderungen": "Kraftrad (Kradmelder); Standort: Feuerwehrtechnische Zentrale Nienburg",
+      "kennzeichen": "NI-FW 391",
+      "sitzplaetze": 1,
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nienburg",
+        "teile": [
+          80,
+          79,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Krad"
+      },
+      "aenderungen": "Kraftrad (Kradmelder); Standort: Feuerwehrtechnische Zentrale Nienburg",
+      "kennzeichen": "NI-FW 392",
+      "sitzplaetze": 1,
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nienburg",
+        "teile": [
+          80,
+          79,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen; Standort: Feuerwehrtechnische Zentrale Nienburg",
+      "kennzeichen": "NI-FW 393",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nienburg",
+        "teile": [
+          80,
+          17,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen; Standort: Ortsfeuerwehr Haßbergen",
+      "kennzeichen": "NI-FW 394",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nienburg",
+        "teile": [
+          12,
+          17,
+          4
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "FüKW"
+      },
+      "aenderungen": "Führungskraftwagen; Standort: Technische Einsatzleitung Nienburg",
+      "kennzeichen": "NI-FW 395",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nienburg",
+        "teile": [
+          85,
+          14,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "ELW 2"
+      },
+      "aenderungen": "Einsatzleitwagen 2; Standort: Technische Einsatzleitung Nienburg",
+      "kennzeichen": "NI-FW 396",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nienburg",
+        "teile": [
+          85,
+          12,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "aenderungen": "Rettungswagen; Standort: DRK SEG Nienburg",
+      "kennzeichen": "NI-RK 397",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Nienburg",
+        "teile": [
+          44,
+          85,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 27,
+    "dieselLiter": 305,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Kreisfeuerwehrbereitschaft Nord (I) des Landkreises Nienburg/Weser: Führungsstaffel mit TEL und die Fachzüge Wasserförderung, Wassertransport, Technische Hilfeleistung und Brandbekämpfung."
+}

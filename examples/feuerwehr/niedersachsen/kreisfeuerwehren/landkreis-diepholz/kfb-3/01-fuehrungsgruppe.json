@@ -1,0 +1,348 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3515392,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Diepholz",
+    "einheitsTyp": {
+      "freitext": "Führungsgruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "KFB 3"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Diepholz"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2441,
+    "zeitraumBis": 2443,
+    "ortAuftrag": "Überörtliche Hilfe Großschadenslage Landkreis Nienburg/Weser — Brandbekämpfung und technische Hilfe"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Markus",
+      "nachname": "Wöhler",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stellv. Bereitschaftsführer/-in (ELW 1 Rehden)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Rehden",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557620996"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verbandsführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Birgit",
+      "nachname": "Menke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (ELW 1 Rehden)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Rehden",
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Kfz-Mechatroniker (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Heitmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in (ELW 1 Rehden)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Rehden",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Führungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Svenja",
+      "nachname": "Rippe",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 1 Rehden)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Rehden",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Windhorst",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Bereitschaftsführer/-in (KdoW Diepholz)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Diepholz",
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556790314"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hauke",
+      "nachname": "Brüning",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (KdoW Diepholz)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Diepholz",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Blome",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in (TSF Marl)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Marl",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552764470"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Rippe",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (TSF Marl)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Marl",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Schröder",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (TSF Marl)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Marl",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Fricke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (TSF Marl)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Marl",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Torben",
+      "nachname": "Harms",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (TSF Marl)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Marl",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Ahrens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (TSF Marl)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Ortsfeuerwehr Marl",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 1"
+      },
+      "aenderungen": "Einsatzleitwagen 1; Standort: Ortsfeuerwehr Rehden",
+      "kennzeichen": "DH-FW 252",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Diepholz",
+        "teile": [
+          18,
+          11,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen; Standort: Ortsfeuerwehr Diepholz; Fahrzeug des Landkreises",
+      "kennzeichen": "DH-FW 253",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Diepholz",
+        "teile": [
+          79,
+          10,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "TSF"
+      },
+      "aenderungen": "Tragkraftspritzenfahrzeug; Standort: Ortsfeuerwehr Marl",
+      "kennzeichen": "DH-FW 254",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Diepholz",
+        "teile": [
+          56,
+          40,
+          2
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 12,
+    "dieselLiter": 160,
+    "benzinLiter": 0,
+    "gemischLiter": 10,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Kreisfeuerwehrbereitschaft 3 des Landkreises Diepholz (Feuerwehren Sulingen, Barnstorf, Diepholz, Rehden, Kirchdorf, Wagenfeld und Lemförde): Führungsgruppe und die Züge Wasserförderung, Wassertransport, Gefährliche Stoffe und Technische Hilfeleistung."
+}

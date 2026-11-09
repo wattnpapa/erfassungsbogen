@@ -1,0 +1,287 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3505429,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Nienburg/Weser",
+    "einheitsTyp": {
+      "freitext": "Versorgungszug"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Nienburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2434,
+    "zeitraumBis": 2436,
+    "ortAuftrag": "Verpflegung der Kreisfeuerwehrbereitschaften im Hochwassereinsatz, rund 250 Portionen je Mahlzeit"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Pascal",
+      "nachname": "Möhlmann",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (MTW Wietzen)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Wietzen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554399807"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Grashorn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Feuerwehrkoch/-köchin (MTW Wietzen)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Wietzen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Katrin",
+      "nachname": "Wachendorf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Feuerwehrkoch/-köchin (MTW Wietzen)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Wietzen",
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Stelljes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Feuerwehrkoch/-köchin (MTW Wietzen)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Ortsfeuerwehr Wietzen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Hauke",
+      "nachname": "Menke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Feuerwehrkoch/-köchin (MTW Wietzen)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Wietzen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Koch (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Nils",
+      "nachname": "Ehlers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTW Wietzen)"
+        }
+      ],
+      "fahrerlaubnis": 6,
+      "dienststelle": "Ortsfeuerwehr Wietzen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Kevin",
+      "nachname": "Thöle",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Zugführer/-in (GW-V Wietzen)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Wietzen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550081549"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Björn",
+      "nachname": "Bammann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Feuerwehrkoch/-köchin (GW-V Wietzen)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Wietzen",
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Bartels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (GW-V Wietzen)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Wietzen",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Motorsägenschein AS Baum I (extern)"
+        }
+      ]
+    },
+    {
+      "vorname": "Jannik",
+      "nachname": "Lange",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (LKW Wietzen)"
+        }
+      ],
+      "fahrerlaubnis": 8,
+      "dienststelle": "Ortsfeuerwehr Wietzen",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Stelljes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Feuerwehrkoch/-köchin (LKW Wietzen)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Wietzen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen; Standort: Ortsfeuerwehr Wietzen; VW-Bus, Baujahr 1997",
+      "kennzeichen": "NI-FW 470"
+    },
+    {
+      "typ": {
+        "freitext": "GW-V"
+      },
+      "aenderungen": "Gerätewagen Versorgung (Feldküche); Standort: Ortsfeuerwehr Wietzen; MAN, Baujahr 2013",
+      "kennzeichen": "NI-FW 471"
+    },
+    {
+      "typ": {
+        "freitext": "LKW"
+      },
+      "aenderungen": "Lastkraftwagen; Standort: Ortsfeuerwehr Wietzen; Mercedes-Benz 811, 7,5 t, Ladebordwand",
+      "kennzeichen": "NI-FW 472",
+      "sitzplaetze": 3
+    },
+    {
+      "typ": {
+        "freitext": "Anh Spülmobil"
+      },
+      "aenderungen": "Anhänger Spülmobil; Standort: Ortsfeuerwehr Wietzen",
+      "kennzeichen": "NI-FW 473"
+    },
+    {
+      "typ": {
+        "freitext": "Anh Kühl"
+      },
+      "aenderungen": "Kühlanhänger; Standort: Ortsfeuerwehr Wietzen",
+      "kennzeichen": "NI-FW 474"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 11,
+    "dieselLiter": 245,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Versorgungszug der Kreisfeuerwehr (Standort Feuerwehrhaus Wietzen, seit 1971), Personal aus Feuerwehren von Hoya bis Winzlar. Gerät: 4 Feldkochherde; GW-Versorgung mit 150-l-Kochkessel, Konvektomat, Kippbratpfanne, Kühlzelle, Geschirrspüler."
+}

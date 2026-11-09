@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3485273,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Cloppenburg",
+    "einheitsTyp": {
+      "freitext": "5. Zug Verpflegung"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "KFB Cloppenburg"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Cloppenburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2420,
+    "zeitraumBis": 2422,
+    "ortAuftrag": "Überörtliche Hilfe Vegetationsbrand Landkreis Emsland — Wasserversorgung über lange Wegstrecke"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Julian",
+      "nachname": "Stelljes",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (Fahrzeug DRK DRK Molbergen)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "DRK Molbergen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559670570"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Björn",
+      "nachname": "Ehlers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (Fahrzeug DRK DRK Molbergen)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "DRK Molbergen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Alexander",
+      "nachname": "Windhorst",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Zugführer/-in (Fahrzeug DRK DRK Molbergen)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "DRK Molbergen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551061254"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Nadine",
+      "nachname": "Bammann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (Fahrzeug DRK DRK Bösel)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "DRK Bösel",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554670260"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Schnakenberg",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (Fahrzeug DRK DRK Bösel)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "DRK Bösel",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "Fahrzeug DRK"
+      },
+      "aenderungen": "Fahrzeug DRK; Standort: DRK Molbergen; Fahrzeugtyp auf der Seite nicht genannt; Funkkennung dort „58-61“",
+      "kennzeichen": "CLP-FW 198",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Cloppenburg",
+        "teile": [
+          58,
+          61,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Fahrzeug DRK"
+      },
+      "aenderungen": "Fahrzeug DRK; Standort: DRK Bösel; Fahrzeugtyp auf der Seite nicht genannt; Funkkennung dort „15-67“",
+      "kennzeichen": "CLP-FW 199",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Cloppenburg",
+        "teile": [
+          15,
+          67,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 5,
+    "dieselLiter": 90,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Wird bei Bedarf vom DRK gestellt; Zugführung auf der Seite nicht besetzt. Kreisfeuerwehrbereitschaft Cloppenburg: Führungsstaffel und die Züge Wasserförderung, Wassertransport, Wald und Flächenbrand, Technische Hilfe sowie Verpflegung (bei Bedarf, DRK)."
+}

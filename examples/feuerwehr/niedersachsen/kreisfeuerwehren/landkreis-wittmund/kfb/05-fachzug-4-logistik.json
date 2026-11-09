@@ -1,0 +1,572 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3529838,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Wittmund",
+    "einheitsTyp": {
+      "freitext": "Fachzug 4 Logistik"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "KFB Wittmund"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Wittmund"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2451,
+    "zeitraumBis": 2453,
+    "ortAuftrag": "Überörtliche Hilfe Sturmflut Landkreis Aurich — Deichsicherung und Ölsperren"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Marco",
+      "nachname": "Wachendorf",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (MTF Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Ortsfeuerwehr Holtgast",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553375193"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Kfz-Mechatroniker (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Hannes",
+      "nachname": "Thöle",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Zugführer/-in (MTF Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Holtgast",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556778797"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Nienaber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in (MTF Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Kreisfeuerwehr Wittmund",
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Führungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Lea",
+      "nachname": "Tiemann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTF Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Wittmund",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Lüdeke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (MTF Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Wittmund",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Vehrenkamp",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (MTF Ardorf)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Ortsfeuerwehr Ardorf",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551848380"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Pascal",
+      "nachname": "Kracke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTF Ardorf)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Ardorf",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Björn",
+      "nachname": "Klöpper",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (MTF Ardorf)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Ardorf",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Hanna",
+      "nachname": "Wessels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (MTF Ardorf)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Ardorf",
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Nicole",
+      "nachname": "Wulf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (MTF Ardorf)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Ardorf",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Heike",
+      "nachname": "Ehlers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (MTF Ardorf)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Ortsfeuerwehr Ardorf",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Anna",
+      "nachname": "Möhlmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (GW-L2 Blomberg)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Blomberg",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554939147"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Ole",
+      "nachname": "Lohmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (GW-L2 Blomberg)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Blomberg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Gerken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (GW-L2 Blomberg)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Blomberg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Meyer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (WLF-K Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Wittmund",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551073601"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Klenke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (WLF-K Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Wittmund",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Jens",
+      "nachname": "Lange",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (WLF-K Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Wittmund",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Kahrs",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (LKW Holtgast)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Holtgast",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554767843"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Tanja",
+      "nachname": "Barlag",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (LKW Holtgast)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Holtgast",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Anja",
+      "nachname": "Dierks",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (LKW Holtgast)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Ortsfeuerwehr Holtgast",
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "aenderungen": "Mannschaftstransportfahrzeug; Standort: Kreisfeuerwehr Wittmund",
+      "kennzeichen": "WTM-FW 589",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Wittmund",
+        "teile": [
+          80,
+          19,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "aenderungen": "Mannschaftstransportfahrzeug; Standort: Ortsfeuerwehr Ardorf",
+      "kennzeichen": "WTM-FW 590",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Wittmund",
+        "teile": [
+          10,
+          19,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-L2"
+      },
+      "aenderungen": "Gerätewagen Logistik 2; Standort: Ortsfeuerwehr Blomberg",
+      "kennzeichen": "WTM-FW 591",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Wittmund",
+        "teile": [
+          13,
+          68,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "WLF-K"
+      },
+      "aenderungen": "Wechselladerfahrzeug mit Ladekran; Standort: Kreisfeuerwehr Wittmund",
+      "kennzeichen": "WTM-FW 592",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Wittmund",
+        "teile": [
+          80,
+          67,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "LKW"
+      },
+      "aenderungen": "Lastkraftwagen; Standort: Ortsfeuerwehr Holtgast; Fahrzeug der Kreisfeuerwehr",
+      "kennzeichen": "WTM-FW 593",
+      "sitzplaetze": 3,
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Wittmund",
+        "teile": [
+          80,
+          69,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "FKH 57/5"
+      },
+      "aenderungen": "Feldkochherd 57/5 (Anhänger); Standort: Ortsfeuerwehr Holtgast; Fahrzeug der Kreisfeuerwehr",
+      "kennzeichen": "WTM-FW 594"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 20,
+    "dieselLiter": 360,
+    "benzinLiter": 0,
+    "gemischLiter": 10,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Kreisfeuerwehrbereitschaft des Landkreises Wittmund: Führungsstaffel mit TEL und Drohne sowie die Fachzüge Wasserförderung, Wassertransport, Gewässerschutz und Logistik."
+}

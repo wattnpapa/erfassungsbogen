@@ -60,6 +60,20 @@ const ORDNER_LABEL: Record<string, string> = {
   akkonia: "JUH OV Akkonia",
   johannesburg: "JUH OV Johannesburg",
   hannover: "Einlagen Kräfte Hannover",
+  // Kreiseinheiten der Kreisfeuerwehren Niedersachsen (scripts/kreisfeuerwehr-nds-beispielboegen.mts).
+  kreisfeuerwehren: "Kreisfeuerwehren (Bereitschaften und Kreiseinheiten)",
+  "landkreis-nienburg": "Landkreis Nienburg/Weser",
+  kfb: "Kreisfeuerwehrbereitschaft",
+  "kfb-1": "Kreisfeuerwehrbereitschaft 1",
+  "kfb-2": "Kreisfeuerwehrbereitschaft 2",
+  "kfb-3": "Kreisfeuerwehrbereitschaft 3",
+  "kfb-nord": "Kreisfeuerwehrbereitschaft Nord",
+  "kfb-sued": "Kreisfeuerwehrbereitschaft Süd",
+  "kfb-umwelt": "Kreisfeuerwehrbereitschaft Umwelt",
+  "rfb-iv": "Regionsfeuerwehrbereitschaft IV",
+  "rfb-v": "Regionsfeuerwehrbereitschaft V",
+  "cbrn-nord": "CBRN-Einheit Nord",
+  einsatzeinheiten: "Einsatzeinheiten",
 };
 
 function ordnerLabel(ordner: string): string {

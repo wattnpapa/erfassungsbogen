@@ -1,0 +1,336 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3565817,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Emsland",
+    "einheitsTyp": {
+      "freitext": "IuK-Gruppe / TEL"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Emsland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2476,
+    "zeitraumBis": 2478,
+    "ortAuftrag": "Brand auf einem Werftgelände in Papenburg — Einsatzleitung, Ordnung des Raumes, Einsatzdokumentation"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Werner",
+      "nachname": "Kracke",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Leiter/-in IuK-Gruppe/TEL (TEL)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "IuK-Gruppe / TEL Nord",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552007599"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verbandsführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Lameyer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stellv. Leiter/-in (TEL)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "IuK-Gruppe / TEL Nord",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551042282"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Jannik",
+      "nachname": "Stöver",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stellv. Leiter/-in (TEL)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "IuK-Gruppe / TEL Nord",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559243634"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Eggers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Sachgebiet S1 (TEL)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "IuK-Gruppe / TEL Nord",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556835552"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Siemers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Sachgebiet S2 (TEL)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "IuK-Gruppe / TEL Nord",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552679885"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Bammann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Sachgebiet S3 (TEL)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "IuK-Gruppe / TEL Nord",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553505418"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Kracke",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Sachgebiet S4 (TEL)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "IuK-Gruppe / TEL Nord",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551235974"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Albers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (TEL)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "IuK-Gruppe / TEL Nord",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Sonja",
+      "nachname": "Schierholz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (TEL)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "IuK-Gruppe / TEL Nord",
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Kevin",
+      "nachname": "Scharrelmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (TEL)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "IuK-Gruppe / TEL Nord",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Tim",
+      "nachname": "Buschmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (TEL)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "IuK-Gruppe / TEL Nord",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Heike",
+      "nachname": "Schierholz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (Lagekarte, Einsatztagebuch) (TEL)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "IuK-Gruppe / TEL Nord",
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Kfz-Mechatroniker (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Lameyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (Lagekarte, Einsatztagebuch) (TEL)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "IuK-Gruppe / TEL Nord",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [],
+  "sofortbedarf": {
+    "verpflegungPersonen": 13,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Technische Einsatzleitung Feuerwehr Nord mit IuK-Gruppe, gegründet 11.09.2001, 48 Mitglieder aus den Feuerwehren der Samtgemeinden im Altkreis Aschendorf-Hümmling. Die Seite nennt keine Fahrzeuge."
+}

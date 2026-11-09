@@ -1,0 +1,474 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3560138,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Nienburg/Weser",
+    "einheitsTyp": {
+      "freitext": "Zug II Mitte"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "KFB Umwelt"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Nienburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2472,
+    "zeitraumBis": 2474,
+    "ortAuftrag": "Gefahrstoffaustritt in einem Gewerbebetrieb in Nienburg — Menschenrettung unter CSA, Dekontamination, Messen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Kevin",
+      "nachname": "Albers",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (Führungstrupp)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Stadt Nienburg/Weser",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558721085"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Holle",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in (Führungstrupp)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Stadt Nienburg/Weser",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Führungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Rohlfs",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (Führungstrupp)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Stadt Nienburg/Weser",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Albers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Samtgemeinde Steimbke",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551107648"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Kfz-Mechatroniker (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Helge",
+      "nachname": "Scharrelmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Samtgemeinde Steimbke",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Fricke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Samtgemeinde Steimbke",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Kai",
+      "nachname": "Bösch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Steimbke",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Dreyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Steimbke",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Jens",
+      "nachname": "Bösch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Samtgemeinde Steimbke",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Simon",
+      "nachname": "Siemers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Samtgemeinde Steimbke",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Torben",
+      "nachname": "Brüning",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Steimbke",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Philipp",
+      "nachname": "Wöhler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Samtgemeinde Steimbke",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Dominik",
+      "nachname": "Gieschen",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Samtgemeinde Heemsen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555871323"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Martin",
+      "nachname": "Möhlmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Samtgemeinde Heemsen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Wessels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Heemsen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Jens",
+      "nachname": "Lohmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Heemsen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Antje",
+      "nachname": "Schierholz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Samtgemeinde Heemsen",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Kevin",
+      "nachname": "Wilkens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Heemsen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Sonja",
+      "nachname": "Wachendorf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Samtgemeinde Heemsen",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Jens",
+      "nachname": "Klenke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Heemsen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Grashorn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Samtgemeinde Heemsen",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [],
+  "sofortbedarf": {
+    "verpflegungPersonen": 21,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Zuständig im ersten Abmarsch: Stadt Nienburg/Weser, Samtgemeinden Steimbke und Heemsen. Stellvertretende Zugführung auf der Seite nicht genannt. Kreisfeuerwehrbereitschaft Umwelt des Landkreises Nienburg/Weser (Gefahrstoffkonzept seit 08.05.2018): Züge I Nord, II Mitte und III Süd mit je mindestens zwei ABC-Gruppen und einem Führungstrupp, Zug 4 als ABC-Zug mit Geräteeinheit."
+}

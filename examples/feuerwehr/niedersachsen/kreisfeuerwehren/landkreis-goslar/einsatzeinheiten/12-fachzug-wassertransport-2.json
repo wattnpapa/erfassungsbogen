@@ -1,0 +1,759 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3489554,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Goslar",
+    "einheitsTyp": {
+      "freitext": "Fachzug Wassertransport 2"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Goslar"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2423,
+    "zeitraumBis": 2425,
+    "ortAuftrag": "Waldbrand im Harz — Wassertransport im Pendelverkehr"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Marco",
+      "nachname": "Klenke",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (MTW 12-17-23)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555623665"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Helge",
+      "nachname": "Holle",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Zugführer/-in (MTW 12-17-23)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556147281"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Hauke",
+      "nachname": "Schierholz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in (MTW 12-17-23)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Führungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Malte",
+      "nachname": "Wilkens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTW 12-17-23)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Anna",
+      "nachname": "Blome",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (MTW 12-17-23)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Gesa",
+      "nachname": "Imsiecke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (MTW 12-17-23)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Maren",
+      "nachname": "Buschmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (MTW 12-17-23)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Barlag",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (MTW 12-17-23)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Nils",
+      "nachname": "Hespe",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in (TLF 16/25 15-23-59)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554455190"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Imsiecke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (TLF 16/25 15-23-59)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Gieschen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (TLF 16/25 15-23-59)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Werner",
+      "nachname": "Klöpper",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (TLF 16/25 15-23-59)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Fabian",
+      "nachname": "Holle",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (TLF 16/25 15-23-59)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Brüning",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (TLF 16/25 15-23-59)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Kastens",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (TLF 16/24 11-21-13)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556009830"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Hanna",
+      "nachname": "Buschmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (TLF 16/24 11-21-13)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Alexander",
+      "nachname": "Kastens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (TLF 16/24 11-21-13)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Stelljes",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (TLF 16/24 14-22-41)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557364678"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Sabine",
+      "nachname": "Warnke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (TLF 16/24 14-22-41)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Hannes",
+      "nachname": "Scharrelmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (TLF 16/24 14-22-41)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Antje",
+      "nachname": "Kastens",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (TLF 8/24 12-21-20)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556855638"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Bastian",
+      "nachname": "Cordes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (TLF 8/24 12-21-20)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Arne",
+      "nachname": "Klöpper",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (TLF 8/24 12-21-20)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Helge",
+      "nachname": "Bammann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (GW-L2 11-68-10)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553146957"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Eggers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (GW-L2 11-68-10)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Wessels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (GW-L2 11-68-10)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Wöhler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (GW-L2 16-64-62)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Ole",
+      "nachname": "Evers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (GW-L2 16-64-62)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen; Standort: Kreisfeuerwehr Goslar",
+      "kennzeichen": "GS-FW 372",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Goslar",
+        "teile": [
+          12,
+          17,
+          23
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "TLF 16/25"
+      },
+      "aenderungen": "Tanklöschfahrzeug 16/25; Standort: Kreisfeuerwehr Goslar",
+      "kennzeichen": "GS-FW 373",
+      "sitzplaetze": 6,
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Goslar",
+        "teile": [
+          15,
+          23,
+          59
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "TLF 16/24"
+      },
+      "aenderungen": "Tanklöschfahrzeug 16/24; Standort: Kreisfeuerwehr Goslar",
+      "kennzeichen": "GS-FW 374",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Goslar",
+        "teile": [
+          11,
+          21,
+          13
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "TLF 16/24"
+      },
+      "aenderungen": "Tanklöschfahrzeug 16/24; Standort: Kreisfeuerwehr Goslar",
+      "kennzeichen": "GS-FW 375",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Goslar",
+        "teile": [
+          14,
+          22,
+          41
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "TLF 8/24"
+      },
+      "aenderungen": "Tanklöschfahrzeug 8/24; Standort: Kreisfeuerwehr Goslar",
+      "kennzeichen": "GS-FW 376",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Goslar",
+        "teile": [
+          12,
+          21,
+          20
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-L2"
+      },
+      "aenderungen": "Gerätewagen Logistik 2; Standort: Kreisfeuerwehr Goslar",
+      "kennzeichen": "GS-FW 377",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Goslar",
+        "teile": [
+          11,
+          68,
+          10
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-L2"
+      },
+      "aenderungen": "Gerätewagen Logistik 2; Standort: Kreisfeuerwehr Goslar",
+      "kennzeichen": "GS-FW 378",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Goslar",
+        "teile": [
+          16,
+          64,
+          62
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 28,
+    "dieselLiter": 555,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Mannschaftsstärke laut Seite 1/6/21. Fachzug Wassertransport 2 der Kreisfeuerwehr Goslar."
+}

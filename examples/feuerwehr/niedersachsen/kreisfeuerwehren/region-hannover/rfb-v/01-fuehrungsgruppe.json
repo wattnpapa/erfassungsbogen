@@ -1,0 +1,376 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3549940,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Region Hannover",
+    "einheitsTyp": {
+      "freitext": "Führungsgruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "RFB V"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Region Hannover"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2465,
+    "zeitraumBis": 2467,
+    "ortAuftrag": "Überörtliche Hilfe Hochwasser Aller (Landkreis Celle) — Lenzen und Sandsackverbau"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Björn",
+      "nachname": "Wilkens",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Bereitschaftsführer/-in (ELW 2 Kaltenweide)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Kaltenweide",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556019627"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Wessels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (ELW 2 Kaltenweide)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Kaltenweide",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Stöver",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in (ELW 2 Kaltenweide)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Kaltenweide",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Führungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Felix",
+      "nachname": "Klöpper",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 Kaltenweide)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Kaltenweide",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Bammann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 Kaltenweide)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Kaltenweide",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Antje",
+      "nachname": "Dierks",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 Kaltenweide)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Ortsfeuerwehr Kaltenweide",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Julian",
+      "nachname": "Stöver",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 Kaltenweide)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Ortsfeuerwehr Kaltenweide",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Torben",
+      "nachname": "Schierholz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (MTW Neuwarmbüchen)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Neuwarmbüchen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550399793"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Landwirt — Erfahrung Großgeräte"
+        }
+      ]
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Klöpper",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTW Neuwarmbüchen)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Neuwarmbüchen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Imsiecke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTW Neuwarmbüchen)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Neuwarmbüchen",
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Stöver",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTW Neuwarmbüchen)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Neuwarmbüchen",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Jan",
+      "nachname": "Oetken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTW Neuwarmbüchen)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Neuwarmbüchen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Tim",
+      "nachname": "Klenke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTW Neuwarmbüchen)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Neuwarmbüchen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Windhorst",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stellv. Bereitschaftsführer/-in (KdoW FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557982389"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Hagedorn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (KdoW FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Heessel",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 2"
+      },
+      "aenderungen": "Einsatzleitwagen 2; Standort: Ortsfeuerwehr Kaltenweide",
+      "kennzeichen": "H-FW 386"
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen; Standort: Ortsfeuerwehr Neuwarmbüchen",
+      "kennzeichen": "H-FW 387"
+    },
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen; Standort: Ortsfeuerwehr Heessel; Fahrzeug der FTZ Burgdorf, besetzt von der Ortsfeuerwehr Heessel",
+      "kennzeichen": "H-FW 388",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Hannover Land",
+        "teile": [
+          87,
+          10,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 15,
+    "dieselLiter": 190,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Regionsfeuerwehrbereitschaft V (Brandschutzabschnitt V: Burgwedel, Langenhagen, Isernhagen, Wedemark): Führungsgruppe, 1. Zug Brandbekämpfung (Wedemark), 2. Zug Technische Hilfeleistung (Langenhagen), 3. Zug Wasserförderung (Isernhagen, SW 2000 KatS Schulenburg), 4. Zug Logistik (Burgwedel, FTZ)."
+}

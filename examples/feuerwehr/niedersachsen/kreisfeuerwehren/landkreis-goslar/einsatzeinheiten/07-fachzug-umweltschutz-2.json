@@ -1,0 +1,1237 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3528449,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Goslar",
+    "einheitsTyp": {
+      "freitext": "Fachzug Umweltschutz 2"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Goslar"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2450,
+    "zeitraumBis": 2452,
+    "ortAuftrag": "Überörtliche Hilfe Gefahrgutunfall Landkreis Wolfenbüttel — Dekontamination und Abdichten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Frank",
+      "nachname": "Dreyer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (MTW 11-17-13)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551223191"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Carina",
+      "nachname": "Eggers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Zugführer/-in (MTW 11-17-13)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554372622"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Philipp",
+      "nachname": "Nienaber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in (MTW 11-17-13)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Führungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Klenke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTW 11-17-13)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Landwirt — Erfahrung Großgeräte"
+        }
+      ]
+    },
+    {
+      "vorname": "Christina",
+      "nachname": "Gerken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (MTW 11-17-13)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Eike",
+      "nachname": "Blome",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (MTW 11-17-13)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Jannik",
+      "nachname": "Tiemann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (MTW 11-17-13)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Warnke",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (HLF 20 11-49-10)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551039494"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Niemeyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (HLF 20 11-49-10)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Katharina",
+      "nachname": "Oetken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (HLF 20 11-49-10)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Hauke",
+      "nachname": "Holle",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (HLF 20 11-49-10)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Philipp",
+      "nachname": "Bartels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (HLF 20 11-49-10)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Alexander",
+      "nachname": "Möhlmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (HLF 20 11-49-10)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Wilfried",
+      "nachname": "Gerken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (HLF 20 11-49-10)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Björn",
+      "nachname": "Imsiecke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (HLF 20 11-49-10)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Schnakenberg",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (HLF 20 11-49-10)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Eike",
+      "nachname": "Wulf",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (HLF 10 14-46-40)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551719820"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Heitmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (HLF 10 14-46-40)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Simon",
+      "nachname": "Holle",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (HLF 10 14-46-40)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Lohmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (HLF 10 14-46-40)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Klöpper",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (HLF 10 14-46-40)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Siemers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (HLF 10 14-46-40)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Gerd",
+      "nachname": "Hillmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (HLF 10 14-46-40)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Julian",
+      "nachname": "Dierks",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (HLF 10 14-46-40)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Harms",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (HLF 10 14-46-40)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Bartels",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (LF 10 12-45-20)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550464392"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Siemers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (LF 10 12-45-20)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Wendt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (LF 10 12-45-20)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Nils",
+      "nachname": "Oetken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (LF 10 12-45-20)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Malte",
+      "nachname": "Klöpper",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (LF 10 12-45-20)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Katrin",
+      "nachname": "Hagedorn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (LF 10 12-45-20)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Hillmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (LF 10 12-45-20)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Hauke",
+      "nachname": "Buschmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (LF 10 12-45-20)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Kevin",
+      "nachname": "Wöhler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (LF 10 12-45-20)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Heiko",
+      "nachname": "Windhorst",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (LF 10 16-46-60)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552689420"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hannes",
+      "nachname": "Blome",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (LF 10 16-46-60)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Hendrik",
+      "nachname": "Menke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (LF 10 16-46-60)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Philipp",
+      "nachname": "Evers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (LF 10 16-46-60)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Birgit",
+      "nachname": "Ehlers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (LF 10 16-46-60)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Stelljes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (LF 10 16-46-60)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Martin",
+      "nachname": "Vehrenkamp",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (LF 10 16-46-60)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Joachim",
+      "nachname": "Lohmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (LF 10 16-46-60)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Wilfried",
+      "nachname": "Hillmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (LF 10 16-46-60)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Gerd",
+      "nachname": "Kracke",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Staffelführer/-in (GW-L2 18-68-80)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557365641"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tim",
+      "nachname": "Lüdeke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (GW-L2 18-68-80)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Eggers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (GW-L2 18-68-80)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Antje",
+      "nachname": "Lüdeke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (GW-L2 18-68-80)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Stöver",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (GW-L2 18-68-80)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Bastian",
+      "nachname": "Warnke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (GW-L2 18-68-80)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Wilfried",
+      "nachname": "Hespe",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (GW-L1 Dekon 14-64-40)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555855586"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Alexander",
+      "nachname": "Gieschen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (GW-L1 Dekon 14-64-40)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Merle",
+      "nachname": "Gieschen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (GW-L1 Dekon 14-64-40)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen; Standort: Kreisfeuerwehr Goslar",
+      "kennzeichen": "GS-FW 331",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Goslar",
+        "teile": [
+          11,
+          17,
+          13
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "HLF 20"
+      },
+      "aenderungen": "Hilfeleistungslöschgruppenfahrzeug; Standort: Kreisfeuerwehr Goslar",
+      "kennzeichen": "GS-FW 332",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Goslar",
+        "teile": [
+          11,
+          49,
+          10
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "HLF 10"
+      },
+      "aenderungen": "Hilfeleistungslöschgruppenfahrzeug 10; Standort: Kreisfeuerwehr Goslar",
+      "kennzeichen": "GS-FW 333",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Goslar",
+        "teile": [
+          14,
+          46,
+          40
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "LF 10"
+      },
+      "aenderungen": "Löschgruppenfahrzeug 10; Standort: Kreisfeuerwehr Goslar",
+      "kennzeichen": "GS-FW 334",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Goslar",
+        "teile": [
+          12,
+          45,
+          20
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "LF 10"
+      },
+      "aenderungen": "Löschgruppenfahrzeug 10; Standort: Kreisfeuerwehr Goslar",
+      "kennzeichen": "GS-FW 335",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Goslar",
+        "teile": [
+          16,
+          46,
+          60
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-L2"
+      },
+      "aenderungen": "Gerätewagen Logistik 2; Standort: Kreisfeuerwehr Goslar",
+      "kennzeichen": "GS-FW 336",
+      "sitzplaetze": 6,
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Goslar",
+        "teile": [
+          18,
+          68,
+          80
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "GW-L1 Dekon"
+      },
+      "aenderungen": "Gerätewagen Logistik 1; Standort: Kreisfeuerwehr Goslar",
+      "kennzeichen": "GS-FW 337",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Goslar",
+        "teile": [
+          14,
+          64,
+          40
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 52,
+    "dieselLiter": 465,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Mannschaftsstärke laut Seite 1/7/44. Fachzug Umweltschutz 2 der Kreisfeuerwehr Goslar nach KatS-StAN NDS 011, wird auch überörtlich eingesetzt."
+}

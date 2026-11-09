@@ -1,0 +1,325 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3549999,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Nienburg/Weser",
+    "einheitsTyp": {
+      "freitext": "Technische Einsatzleitung (TEL)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Nienburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2465,
+    "zeitraumBis": 2467,
+    "ortAuftrag": "Flächenlage Starkregen im Landkreis Nienburg/Weser — Koordination der Einsatzkräfte, Verbindung zur Leitstelle"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Martin",
+      "nachname": "Gerken",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Leiter/-in TEL (FüKW TEL)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550265076"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verbandsführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Nicole",
+      "nachname": "Lameyer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "S3 Einsatz (FüKW TEL)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558255341"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Oetken",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "S2 Lage (FüKW TEL)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551567482"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Heiko",
+      "nachname": "Rohlfs",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (FüKW TEL)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Landwirt — Erfahrung Großgeräte"
+        }
+      ]
+    },
+    {
+      "vorname": "Martin",
+      "nachname": "Ehlers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "S1 Personal/Innerer Dienst (ELW 2 TEL)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551295540"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Lars",
+      "nachname": "Bammann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "S4 Versorgung (ELW 2 TEL)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551980003"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Imsiecke",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "S6 Information und Kommunikation (ELW 2 TEL)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551299338"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Joachim",
+      "nachname": "Lüdeke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sachbearbeiter/-in Lage (Einsatztagebuch) (ELW 2 TEL)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Nils",
+      "nachname": "Cordes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 TEL)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Menke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 TEL)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Ahrens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (ELW 2 TEL)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "FüKW"
+      },
+      "aenderungen": "Führungskraftwagen; Standort: Technische Einsatzleitung Nienburg",
+      "kennzeichen": "NI-FW 462",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nienburg",
+        "teile": [
+          85,
+          14,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "ELW 2"
+      },
+      "aenderungen": "Einsatzleitwagen 2; Standort: Technische Einsatzleitung Nienburg",
+      "kennzeichen": "NI-FW 463",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Nienburg",
+        "teile": [
+          85,
+          12,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 11,
+    "dieselLiter": 170,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Technische Einsatzleitung des Landkreises Nienburg/Weser (seit 1996 eine TEL für den ganzen Landkreis) aus Führungsgruppe und Funktionsgruppe; handelt im Katastrophenfall im Auftrag des Landkreises nach NKatSG, unterhalb der Katastrophenschwelle für die Kreisfeuerwehr. Fahrzeuge wie auf der Seite der KFB Nord."
+}

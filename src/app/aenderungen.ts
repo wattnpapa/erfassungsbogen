@@ -37,6 +37,7 @@ export const AENDERUNGEN: readonly Aenderung[] = [
   {
     datum: "2026-11-09",
     punkte: [
+      "Neue Beispielbögen unter „Feuerwehr › Niedersachsen › Kreisfeuerwehren“: die Kreisfeuerwehrbereitschaften und weiteren Kreiseinheiten (TEL, IuK, Gefahrgut, Versorgung, Logistik) aus Ammerland, Celle, Cloppenburg, Diepholz, Emsland, Goslar, Nienburg/Weser, Schaumburg, Vechta, Wittmund und der Region Hannover. Eine Bereitschaft ist ein Ordner mit einem Bogen je Führung und Fachzug, mit Fahrzeugen, Standorten und, wo veröffentlicht, Funkrufnamen und Stärken; jede Person trägt ihre Ortsfeuerwehr.",
       "Auf der Startseite steht der Offline-Kasten nur noch, solange Bogen, PDF, QR-Code und Empfang ohne Netz noch nicht gehen. Danach zeigt ein dünner Balken unter der Überschrift, wie weit Beispielbögen und Themenseiten geladen sind, und der Offline-Stand steht klein in der Fußzeile.",
       "Ausgefüllte THW-Word-Erfassungsbögen (.docx aus den Vorlagen 06-…_Erfassungsbogen) lassen sich über „Aus Datei laden…“ und „Bögen einlesen…“ übernehmen. Was keinem Feld zuzuordnen ist (etwa Fax, Zahl der Vegetarier), steht unter „Sonstiges“; eine Quittung nennt, was übernommen und was weggelassen wurde.",
       "PDF im Raster der THW-Word-Vorlage: gleiche Rahmen, Linien, Spaltenkanten, Zeilenhöhen und Seitenränder, Schrift 10 pt. Fahrzeuge und Sofortbedarf schließen wie auf dem Papierbogen direkt aneinander an.",

@@ -1,0 +1,257 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3505397,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Nienburg/Weser",
+    "einheitsTyp": {
+      "freitext": "Logistikgruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Nienburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2434,
+    "zeitraumBis": 2436,
+    "ortAuftrag": "Einrichtung eines Bereitstellungsraums mit Feldbetten für die Kreisfeuerwehrbereitschaften"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Helge",
+      "nachname": "Fricke",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (MTW Stöckse)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Stöckse",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559054991"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Silke",
+      "nachname": "Siemers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTW Stöckse)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Stöckse",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Nadine",
+      "nachname": "Menke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Logistik (MTW Stöckse)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Stöckse",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Bastian",
+      "nachname": "Kracke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Logistik (MTW Stöckse)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Ortsfeuerwehr Stöckse",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Imsiecke",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Gruppenführer/-in (MTW KJF)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisjugendfeuerwehr Nienburg/Weser",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556343775"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Klöpper",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTW KJF)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisjugendfeuerwehr Nienburg/Weser",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Meyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (WLF Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Kreisfeuerwehr Nienburg/Weser",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Helge",
+      "nachname": "Möhlmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Logistik (WLF Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Nienburg/Weser",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Bastian",
+      "nachname": "Möhlmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Teleskopladerfahrer/-in (Teleskoplader Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Nienburg/Weser",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Bedienberechtigung Teleskoplader"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen; Standort: Ortsfeuerwehr Stöckse",
+      "kennzeichen": "NI-FW 475"
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen; Standort: Kreisjugendfeuerwehr Nienburg/Weser",
+      "kennzeichen": "NI-FW 476"
+    },
+    {
+      "typ": {
+        "freitext": "WLF"
+      },
+      "aenderungen": "Wechselladerfahrzeug; Standort: Kreisfeuerwehr Nienburg/Weser; mit Anhänger",
+      "kennzeichen": "NI-FW 477"
+    },
+    {
+      "typ": {
+        "freitext": "Teleskoplader"
+      },
+      "aenderungen": "Teleskoplader (Manitou); Standort: Kreisfeuerwehr Nienburg/Weser",
+      "kennzeichen": "NI-FW 478",
+      "sitzplaetze": 1
+    },
+    {
+      "typ": {
+        "freitext": "AB Logistik"
+      },
+      "aenderungen": "Abrollbehälter Logistik (Festzeltgarnituren); Standort: Kreisfeuerwehr Nienburg/Weser"
+    },
+    {
+      "typ": {
+        "freitext": "AB Infrastruktur"
+      },
+      "aenderungen": "Abrollbehälter Infrastruktur; Standort: Kreisfeuerwehr Nienburg/Weser"
+    },
+    {
+      "typ": {
+        "freitext": "AB Aufenthalt"
+      },
+      "aenderungen": "Abrollbehälter Aufenthalt (Feldbetten, Decken, Kissen); Standort: Kreisfeuerwehr Nienburg/Weser"
+    },
+    {
+      "typ": {
+        "freitext": "Anh"
+      },
+      "aenderungen": "Anhänger; Standort: Kreisjugendfeuerwehr Nienburg/Weser",
+      "kennzeichen": "NI-FW 479"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 235,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Logistikgruppe der Kreisfeuerwehr (18 Mitglieder, überwiegend aus dem Brandschutzabschnitt Nord; 10 mit Berechtigung für den Teleskoplader, 8 mit Fahrerlaubnis C/CE). Aufgaben: Aufenthalt der Einsatzkräfte, Unterstützung des Verpflegungstrupps, Notstrom. Material: 80 Festzeltgarnituren, 130 Feldbetten (+75 Reserve der KJF)."
+}

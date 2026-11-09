@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3560063,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Nienburg/Weser",
+    "einheitsTyp": {
+      "freitext": "Bereitschaftsführung Umwelt"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "KFB Umwelt"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Nienburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2472,
+    "zeitraumBis": 2474,
+    "ortAuftrag": "Gefahrstoffaustritt in einem Gewerbebetrieb in Nienburg — Menschenrettung unter CSA, Dekontamination, Messen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Jan",
+      "nachname": "Siemers",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Kreisbereitschaftsführer/-in Umwelt (Bereitschaftsführung)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Nienburg/Weser",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555814237"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verbandsführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Ahrens",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stellv. Kreisbereitschaftsführer/-in Umwelt (Bereitschaftsführung)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Kreisfeuerwehr Nienburg/Weser",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559063663"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verbandsführer"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [],
+  "sofortbedarf": {
+    "verpflegungPersonen": 2,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Die Seite nennt für die Bereitschaftsführung keine Fahrzeuge. Kreisfeuerwehrbereitschaft Umwelt des Landkreises Nienburg/Weser (Gefahrstoffkonzept seit 08.05.2018): Züge I Nord, II Mitte und III Süd mit je mindestens zwei ABC-Gruppen und einem Führungstrupp, Zug 4 als ABC-Zug mit Geräteeinheit."
+}

@@ -1,0 +1,378 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3590323,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Wittmund",
+    "einheitsTyp": {
+      "freitext": "Technische Einsatzleitung und IuK"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Wittmund"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2493,
+    "zeitraumBis": 2495,
+    "ortAuftrag": "Katastrophenfall Sturmflut im Landkreis Wittmund — Einsatzleitung am Schadensort"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Matthias",
+      "nachname": "Kahrs",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Leiter/-in TEL (MTF TEL Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Schweindorf",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553885163"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verbandsführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Gerd",
+      "nachname": "Lüdeke",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stellv. Leiter/-in TEL (MTF TEL Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Blomberg",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552518450"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Jan",
+      "nachname": "Barlag",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Sachgebiet S1 (MTF TEL Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Wittmund",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557097308"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Katrin",
+      "nachname": "Schröder",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Sachgebiet S2 (MTF TEL Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Wittmund",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559672027"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Martin",
+      "nachname": "Stelljes",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Sachgebiet S3 (MTF TEL Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Kreisfeuerwehr Wittmund",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552378657"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Volker",
+      "nachname": "Klöpper",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTF TEL Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 6,
+      "dienststelle": "Kreisfeuerwehr Wittmund",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Helge",
+      "nachname": "Rippe",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Leiter/-in IuK (ELW 2 Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Ochtersum",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551045354"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Hannes",
+      "nachname": "Wendt",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Leiter/-in IuK (ELW 2 Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Ochtersum",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553652860"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Rabe",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Wittmund",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Silke",
+      "nachname": "Wachendorf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Kreisfeuerwehr Wittmund",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Nicole",
+      "nachname": "Meyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Kreisfeuerwehr Wittmund",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Nils",
+      "nachname": "Nienaber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Wittmund",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Kastens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (ELW 2 Kreisfeuerwehr)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Wittmund",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTF TEL"
+      },
+      "aenderungen": "Mannschaftstransportfahrzeug; Standort: Kreisfeuerwehr Wittmund",
+      "kennzeichen": "WTM-FW 595",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Wittmund",
+        "teile": [
+          80,
+          19,
+          2
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "ELW 2"
+      },
+      "aenderungen": "Einsatzleitwagen 2; Standort: Kreisfeuerwehr Wittmund",
+      "kennzeichen": "WTM-FW 596",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Wittmund",
+        "teile": [
+          80,
+          12,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "Anh TEL"
+      },
+      "aenderungen": "Anhänger Technische Einsatzleitung; Standort: Kreisfeuerwehr Wittmund",
+      "kennzeichen": "WTM-FW 597"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 13,
+    "dieselLiter": 145,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Technische Einsatzleitung und IuK/Fernmeldekomponente des Landkreises Wittmund: Fernmeldeverbindungen, Nachrichtenaufnahme und Dokumentation, Einrichten von Führungsstellen, Führungsgehilfen für die überörtliche Hilfe. Die IuK nutzt den ELW 2."
+}

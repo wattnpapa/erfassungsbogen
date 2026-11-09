@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3525518,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Ammerland",
+    "einheitsTyp": {
+      "freitext": "Technische Einsatzleitung (TEL)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Ammerland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2448,
+    "zeitraumBis": 2450,
+    "ortAuftrag": "Großschadenslage Sturm im Landkreis Ammerland — Führungsstelle Technische Zentrale Elmendorf"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Helge",
+      "nachname": "Wöhler",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Leiter/-in TEL (ELW 2 TZ)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Technische Einsatzleitung Ammerland",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559626489"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verbandsführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Stefan",
+      "nachname": "Evers",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "S1 Personal/Innerer Dienst (ELW 2 TZ)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Technische Einsatzleitung Ammerland",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551303376"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Eike",
+      "nachname": "Oetken",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "S2 Lage (ELW 2 TZ)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Einsatzleitung Ammerland",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552138427"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Maren",
+      "nachname": "Ahrens",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "S3 Einsatz (ELW 2 TZ)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Technische Einsatzleitung Ammerland",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559085581"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Malte",
+      "nachname": "Windhorst",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "S4 Versorgung (ELW 2 TZ)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Technische Einsatzleitung Ammerland",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553823010"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Wulf",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "S6 Information und Kommunikation (ELW 2 TZ)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Einsatzleitung Ammerland",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558698882"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Gruppenführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Alexander",
+      "nachname": "Bartels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (ELW 2 TZ)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Technische Einsatzleitung Ammerland",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW 2"
+      },
+      "aenderungen": "Einsatzleitwagen 2; Standort: Technische Einsatzleitung Ammerland",
+      "kennzeichen": "WST-FW 130",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Ammerland",
+        "teile": [
+          80,
+          12,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 7,
+    "dieselLiter": 100,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Führungsstab nach FwDV 100 aus Mitgliedern mehrerer Ortsfeuerwehren; bei Alarmierung der TEL rückt immer der ELW 2 aus. Als Führungsgruppe Bestandteil der Kreisfeuerwehrbereitschaft."
+}

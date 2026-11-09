@@ -1501,6 +1501,7 @@ Startseite lädt sie nach der Aktivierung nach (`src/app/offline-vorrat.ts`),
 der Service Worker legt sie über zwei Laufzeit-Routen in den Cache
 `eeb-zusatz` (Beispielbögen `CacheFirst`, Seiten `StaleWhileRevalidate` seit Runde 7, Liste `NetworkFirst`).
 *Hinweis 2026-10-24:* Mit `examples/praktische-ausbildung/` (41 Bögen, JSON) sind die Zusatzstufe um 41 Dateien und die Zahlen oben (474 Dateien, 4,0 MB) sowie die Bogenzählungen weiter unten (227/239/443 Beispielbögen) nicht mehr aktuell; beim nächsten Build neu messen.
+*Hinweis 2026-11-09 (Kreiseinheiten der Kreisfeuerwehren Niedersachsen):* `examples/feuerwehr/niedersachsen/kreisfeuerwehren/` (106 Bögen aus zehn Landkreisen und der Region Hannover, zusammen rund 1,4 MB JSON, erzeugt von `scripts/kreisfeuerwehr-nds-beispielboegen.mts`) liegt in der Zusatzstufe; ihre Datei- und Größenzahlen oben sind entsprechend höher, beim nächsten Build neu messen.
 *Nachgezogen 2026-11-08 (alle THW-Ortsverbände):* `examples/thw/ortsverbaende/` trägt 3.533 Übungsbögen
 (jede Einheit von 667 OVs, Landesverband › Regionalstelle › Ortsverband, immer StAN-Stärke, erzeugt von
 `scripts/thw-ov-beispielboegen.mts` aus der Momentaufnahme `scripts/quellen/thw-ov-einheiten.json` der OV-Karte

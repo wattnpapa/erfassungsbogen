@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3585953,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Emsland",
+    "einheitsTyp": {
+      "freitext": "Gruppe Dekontamination"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Einheit"
+        },
+        "name": "CBRN-Nord"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Emsland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2490,
+    "zeitraumBis": 2492,
+    "ortAuftrag": "Gefahrgutunfall Bahnstrecke Papenburg — Leckage, Dekontamination der Einsatzkräfte, Messfahrten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Sonja",
+      "nachname": "Evers",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (GW Dekon P1 Werpeloh)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Werpeloh",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551780607"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Möhlmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Gruppenführer/-in (GW Dekon P1 Werpeloh)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Lathen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551453851"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Heiko",
+      "nachname": "Lange",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (GW Dekon P1 Werpeloh)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Werpeloh",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Hannes",
+      "nachname": "Warnke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Dekon-Trupp (GW Dekon P1 Werpeloh)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Ortsfeuerwehr Werpeloh",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Heiko",
+      "nachname": "Hagedorn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Dekon-Trupp (GW Dekon P1 Werpeloh)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Werpeloh",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Pascal",
+      "nachname": "Albers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Dekon-Trupp (GW Dekon P1 Werpeloh)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Werpeloh",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW Dekon P1"
+      },
+      "aenderungen": "GW Dekon P1; Standort: Ortsfeuerwehr Werpeloh; Fahrzeug des Bundes; beheiztes Duschzelt",
+      "kennzeichen": "EL-FW 307",
+      "sitzplaetze": 6
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Gruppenführung aus Werpeloh, Stellvertretung aus Lathen. CBRN-Einheit Nord: rund 60 Kräfte mit 7 Fahrzeugen aus Ortsfeuerwehren, Landkreis und Bund, eingesetzt in der Regel im Abschnitt Emsland-Nord; Komponenten CBRN-Einsatz, Dekontamination, Messen/Spüren."
+}

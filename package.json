@@ -20,6 +20,7 @@
     "beispiele:kats-sl": "node --import tsx scripts/kats-saarland-beispielboegen.mts",
     "beispiele:dlrg": "node --import tsx scripts/dlrg-beispielboegen.mts",
     "beispiele:fw-nds": "node --import tsx scripts/fw-nds-beispielboegen.mts",
+    "beispiele:kreisfeuerwehr-nds": "node --import tsx scripts/kreisfeuerwehr-nds-beispielboegen.mts",
     "beispiele:drk-nds": "node --import tsx scripts/drk-nds-beispielboegen.mts",
     "beispiele:bbk": "node --import tsx scripts/bbk-bundeseinheiten-beispielboegen.mts",
     "beispiele:bundeswehr": "node --import tsx scripts/bundeswehr-beispielboegen.mts",

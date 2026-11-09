@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3549947,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Region Hannover",
+    "einheitsTyp": {
+      "freitext": "4. Zug Logistik (Anteil FTZ)"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "RFB V"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Region Hannover"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2465,
+    "zeitraumBis": 2467,
+    "ortAuftrag": "Überörtliche Hilfe Hochwasser Aller (Landkreis Celle) — Lenzen und Sandsackverbau"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Dominik",
+      "nachname": "Thöle",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Führer/-in FTZ-Komponente (GW-L1 FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Heessel",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557283119"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Werner",
+      "nachname": "Kastens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (GW-L1 FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Heessel",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Carina",
+      "nachname": "Scharrelmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (WLF FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Heessel",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558958355"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Christina",
+      "nachname": "Schierholz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (WLF FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Ortsfeuerwehr Heessel",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-L1"
+      },
+      "aenderungen": "Gerätewagen Logistik 1; Standort: Ortsfeuerwehr Heessel",
+      "kennzeichen": "H-FW 389",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Hannover Land",
+        "teile": [
+          87,
+          64,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "WLF"
+      },
+      "aenderungen": "Wechselladerfahrzeug; Standort: Ortsfeuerwehr Heessel",
+      "kennzeichen": "H-FW 390",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Hannover Land",
+        "teile": [
+          87,
+          66,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 170,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Auf dem Bogen steht nur der Anteil der FTZ Burgdorf, den die Ortsfeuerwehr Heessel besetzt; die Fahrzeuge der Stadtfeuerwehr Burgwedel nennt die Seite nicht. Regionsfeuerwehrbereitschaft V (Brandschutzabschnitt V: Burgwedel, Langenhagen, Isernhagen, Wedemark): Führungsgruppe, 1. Zug Brandbekämpfung (Wedemark), 2. Zug Technische Hilfeleistung (Langenhagen), 3. Zug Wasserförderung (Isernhagen, SW 2000 KatS Schulenburg), 4. Zug Logistik (Burgwedel, FTZ)."
+}

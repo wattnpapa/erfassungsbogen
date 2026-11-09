@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3528429,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Goslar",
+    "einheitsTyp": {
+      "freitext": "Fachberater CBRN"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Goslar"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2450,
+    "zeitraumBis": 2452,
+    "ortAuftrag": "Beratung der Einsatzleitung bei einem Gefahrstoffaustritt"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Karsten",
+      "nachname": "Bösch",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Fachberater/-in CBRN (Fachberatung)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550485984"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Fachberater CBRN"
+        }
+      ]
+    },
+    {
+      "vorname": "Arne",
+      "nachname": "Rippe",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Fachberater/-in CBRN (Fachberatung)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553115653"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Fachberater CBRN"
+        }
+      ]
+    },
+    {
+      "vorname": "Arne",
+      "nachname": "Grashorn",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Fachberater/-in CBRN (Fachberatung)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Goslar",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556514938"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Fachberater CBRN"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fachberater der Kreisfeuerwehr Goslar für chemische, biologische, radiologische und nukleare Gefahren. Die Seite nennt kein Fahrzeug."
+}

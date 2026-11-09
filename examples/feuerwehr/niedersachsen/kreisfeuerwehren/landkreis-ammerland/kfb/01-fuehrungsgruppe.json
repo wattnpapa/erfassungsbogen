@@ -1,0 +1,400 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3525564,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Ammerland",
+    "einheitsTyp": {
+      "freitext": "Führungsgruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "KFB Ammerland"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Ammerland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2448,
+    "zeitraumBis": 2450,
+    "ortAuftrag": "Überörtliche Hilfe Hochwasser Hunte (Stadt Oldenburg) — Deichverteidigung und Lenzen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Fabian",
+      "nachname": "Windhorst",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Verbandsführer/-in (KdoW TZ)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Technische Zentrale Ammerland (Elmendorf)",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559512077"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Klöpper",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (KdoW TZ)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Zentrale Ammerland (Elmendorf)",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Berufskraftfahrer (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Torben",
+      "nachname": "Albers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (MTW TZ)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Technische Zentrale Ammerland (Elmendorf)",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555065943"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Julian",
+      "nachname": "Bartels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTW TZ)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Zentrale Ammerland (Elmendorf)",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Malte",
+      "nachname": "Möhlmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTW TZ)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Technische Zentrale Ammerland (Elmendorf)",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Warnke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTW TZ)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Zentrale Ammerland (Elmendorf)",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Arne",
+      "nachname": "Imsiecke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTW TZ)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Technische Zentrale Ammerland (Elmendorf)",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Kevin",
+      "nachname": "Imsiecke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsgehilfe/-in (MTW TZ)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Zentrale Ammerland (Elmendorf)",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Gerken",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stellv. Verbandsführer/-in (ELW 2 TZ)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Technische Zentrale Ammerland (Elmendorf)",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559291070"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Bastian",
+      "nachname": "Stöver",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (ELW 2 TZ)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Technische Zentrale Ammerland (Elmendorf)",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Nicole",
+      "nachname": "Cordes",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in (ELW 2 TZ)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Zentrale Ammerland (Elmendorf)",
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Führungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Michael",
+      "nachname": "Hillmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 TZ)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Technische Zentrale Ammerland (Elmendorf)",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Hespe",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 TZ)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Technische Zentrale Ammerland (Elmendorf)",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Scharrelmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 TZ)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Technische Zentrale Ammerland (Elmendorf)",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Anna",
+      "nachname": "Plate",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (ELW 2 TZ)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Technische Zentrale Ammerland (Elmendorf)",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "KdoW"
+      },
+      "aenderungen": "Kommandowagen; Standort: Technische Zentrale Ammerland (Elmendorf)",
+      "kennzeichen": "WST-FW 101",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Ammerland",
+        "teile": [
+          81,
+          10,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "aenderungen": "Mannschaftstransportwagen; Standort: Technische Zentrale Ammerland (Elmendorf)",
+      "kennzeichen": "WST-FW 102",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Ammerland",
+        "teile": [
+          80,
+          17,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "ELW 2"
+      },
+      "aenderungen": "Einsatzleitwagen 2; Standort: Technische Zentrale Ammerland (Elmendorf)",
+      "kennzeichen": "WST-FW 103",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Ammerland",
+        "teile": [
+          80,
+          12,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 15,
+    "dieselLiter": 190,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Kreisfeuerwehrbereitschaft Ammerland: Führungsgruppe (TEL) und die Fachzüge Brandschutz 1, Technische Hilfeleistung, Vegetationsbrandbekämpfung, Brandschutz 2 sowie Verpflegung, Logistik, Eigenschutz. Treffpunkt Technische Zentrale Elmendorf, Anfahrt im Verband."
+}

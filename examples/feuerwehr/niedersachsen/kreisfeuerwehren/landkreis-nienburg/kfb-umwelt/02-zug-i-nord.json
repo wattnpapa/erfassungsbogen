@@ -1,0 +1,476 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3560141,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Nienburg/Weser",
+    "einheitsTyp": {
+      "freitext": "Zug I Nord"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "KFB Umwelt"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Nienburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2472,
+    "zeitraumBis": 2474,
+    "ortAuftrag": "Gefahrstoffaustritt in einem Gewerbebetrieb in Nienburg — Menschenrettung unter CSA, Dekontamination, Messen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Kai",
+      "nachname": "Thöle",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (Führungstrupp)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Samtgemeinde Grafschaft Hoya",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558444133"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Heike",
+      "nachname": "Plate",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Zugführer/-in (Führungstrupp)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Samtgemeinde Grafschaft Hoya",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553567860"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Wilfried",
+      "nachname": "Wachendorf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in (Führungstrupp)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Samtgemeinde Grafschaft Hoya",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Führungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Joachim",
+      "nachname": "Wessels",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Samtgemeinde Grafschaft Hoya",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550640357"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Hespe",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Samtgemeinde Grafschaft Hoya",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Arne",
+      "nachname": "Stöver",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Grafschaft Hoya",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Malte",
+      "nachname": "Blome",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Samtgemeinde Grafschaft Hoya",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Helge",
+      "nachname": "Kracke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Grafschaft Hoya",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Werner",
+      "nachname": "Ehlers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Grafschaft Hoya",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Imsiecke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Grafschaft Hoya",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Fabian",
+      "nachname": "Dreyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Samtgemeinde Grafschaft Hoya",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Jan",
+      "nachname": "Rippe",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Samtgemeinde Grafschaft Hoya",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Anna",
+      "nachname": "Nienaber",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Samtgemeinde Weser-Aue",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557545558"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Hauke",
+      "nachname": "Blome",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Samtgemeinde Weser-Aue",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Julian",
+      "nachname": "Kracke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Weser-Aue",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Sonja",
+      "nachname": "Thöle",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Samtgemeinde Weser-Aue",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Klenke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Samtgemeinde Weser-Aue",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Eike",
+      "nachname": "Lange",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Samtgemeinde Weser-Aue",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Simon",
+      "nachname": "Harms",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Weser-Aue",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Dominik",
+      "nachname": "Brüning",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Weser-Aue",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Windhorst",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Samtgemeinde Weser-Aue",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [],
+  "sofortbedarf": {
+    "verpflegungPersonen": 21,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Zuständig im ersten Abmarsch: Samtgemeinden Grafschaft Hoya und Weser-Aue. Kreisfeuerwehrbereitschaft Umwelt des Landkreises Nienburg/Weser (Gefahrstoffkonzept seit 08.05.2018): Züge I Nord, II Mitte und III Süd mit je mindestens zwei ABC-Gruppen und einem Führungstrupp, Zug 4 als ABC-Zug mit Geräteeinheit."
+}

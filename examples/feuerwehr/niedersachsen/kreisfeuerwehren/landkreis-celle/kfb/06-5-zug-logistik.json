@@ -1,0 +1,538 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3539987,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Celle",
+    "einheitsTyp": {
+      "freitext": "5. Zug Logistik"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "KFB Celle"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Celle"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2458,
+    "zeitraumBis": 2460,
+    "ortAuftrag": "Überörtliche Hilfe Hochwasser Elbe (Landkreis Lüchow-Dannenberg) — Deichverteidigung"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Stefan",
+      "nachname": "Rippe",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (MTF Nienhagen)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Ortsfeuerwehr Nienhagen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552931367"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Ehlers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Zugführer/-in (MTF Nienhagen)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Nienhagen",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557144462"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Philipp",
+      "nachname": "Wilkens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in (MTF Nienhagen)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Nienhagen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Führungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Brüning",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTF Nienhagen)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Nienhagen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Björn",
+      "nachname": "Oetken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (MTF Nienhagen)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Nienhagen",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Birgit",
+      "nachname": "Lameyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (MTF Nienhagen)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Nienhagen",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Albers",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (SW KatS FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Oldau",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550810331"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Tim",
+      "nachname": "Holle",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (SW KatS FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Oldau",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Sebastian",
+      "nachname": "Vehrenkamp",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (SW KatS FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Oldau",
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Julian",
+      "nachname": "Kastens",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (LKW FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Oldau",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556677421"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Lena",
+      "nachname": "Barlag",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (LKW FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Oldau",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Heitmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (LKW FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Oldau",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Dominik",
+      "nachname": "Warnke",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in (KTW DRK-OV Winsen (Aller))"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "DRK-OV Winsen (Aller)",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556835965"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Ole",
+      "nachname": "Gerken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sanitätshelfer/-in (KTW DRK-OV Winsen (Aller))"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "DRK-OV Winsen (Aller)",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitätshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Björn",
+      "nachname": "Lüdeke",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in Verpflegung (MTF DRK-KV Celle)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "DRK-KV Celle",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551286665"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Harms",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTF DRK-KV Celle)"
+        }
+      ],
+      "fahrerlaubnis": 6,
+      "dienststelle": "DRK-KV Celle",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Anja",
+      "nachname": "Oetken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung (MTF DRK-KV Celle)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "DRK-KV Celle",
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Hygieneschulung"
+        }
+      ]
+    },
+    {
+      "vorname": "Malte",
+      "nachname": "Harms",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTF DRK-KV Celle)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "DRK-KV Celle",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Anna",
+      "nachname": "Kastens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung (MTF DRK-KV Celle)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "DRK-KV Celle",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Hygieneschulung"
+        }
+      ]
+    },
+    {
+      "vorname": "Kerstin",
+      "nachname": "Albers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung (MTF DRK-KV Celle)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "DRK-KV Celle",
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Hygieneschulung"
+        }
+      ]
+    },
+    {
+      "vorname": "Helge",
+      "nachname": "Oetken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung (MTF DRK-KV Celle)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "DRK-KV Celle",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Hygieneschulung"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "aenderungen": "Mannschaftstransportfahrzeug; Standort: Ortsfeuerwehr Nienhagen",
+      "kennzeichen": "CE-FW 162"
+    },
+    {
+      "typ": {
+        "freitext": "SW KatS"
+      },
+      "aenderungen": "Schlauchwagen Katastrophenschutz; Standort: Ortsfeuerwehr Oldau; Fahrzeug der FTZ",
+      "kennzeichen": "CE-FW 163"
+    },
+    {
+      "typ": {
+        "freitext": "LKW"
+      },
+      "aenderungen": "Lastkraftwagen; Standort: Ortsfeuerwehr Oldau; Fahrzeug der FTZ mit Doppelkabine und Pritsche (Seite: „MTF mit Anhänger“)",
+      "kennzeichen": "CE-FW 164",
+      "sitzplaetze": 6
+    },
+    {
+      "typ": {
+        "freitext": "Anh"
+      },
+      "aenderungen": "Anhänger; Standort: Ortsfeuerwehr FTZ; Transportanhänger der FTZ",
+      "kennzeichen": "CE-FW 165"
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "aenderungen": "KTW; Standort: DRK-OV Winsen (Aller)",
+      "kennzeichen": "CE-RK 166"
+    },
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "aenderungen": "Mannschaftstransportfahrzeug; Standort: DRK-KV Celle",
+      "kennzeichen": "CE-RK 167"
+    },
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "aenderungen": "Mannschaftstransportfahrzeug; Standort: DRK-KV Celle",
+      "kennzeichen": "CE-RK 168"
+    },
+    {
+      "typ": {
+        "freitext": "FKH"
+      },
+      "aenderungen": "FKH; Standort: DRK-KV Celle; Feldküche (Anhänger)",
+      "kennzeichen": "CE-RK 169"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 21,
+    "dieselLiter": 350,
+    "benzinLiter": 0,
+    "gemischLiter": 10,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Kreisfeuerwehrbereitschaft des Landkreises Celle (seit 01.01.2005 in dieser Form): Führungsgruppe, zwei Züge Wassertransport, je ein Zug Technische Hilfeleistung, Wasserförderung und Logistik."
+}

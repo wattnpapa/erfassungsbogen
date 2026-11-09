@@ -1,0 +1,480 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3560059,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Nienburg/Weser",
+    "einheitsTyp": {
+      "freitext": "Zug III Süd"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "KFB Umwelt"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Nienburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2472,
+    "zeitraumBis": 2474,
+    "ortAuftrag": "Gefahrstoffaustritt in einem Gewerbebetrieb in Nienburg — Menschenrettung unter CSA, Dekontamination, Messen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Pascal",
+      "nachname": "Rabe",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (Führungstrupp)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Samtgemeinde Mittelweser",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556835695"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Berufskraftfahrer (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Oetken",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Zugführer/-in (Führungstrupp)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Samtgemeinde Mittelweser",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558909513"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Buschmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in (Führungstrupp)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Mittelweser",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Führungsassistent"
+        }
+      ]
+    },
+    {
+      "vorname": "Jana",
+      "nachname": "Hagedorn",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Stadt Rehburg-Loccum",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550076595"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Katrin",
+      "nachname": "Dreyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Stadt Rehburg-Loccum",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Eike",
+      "nachname": "Eggers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Stadt Rehburg-Loccum",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Jan",
+      "nachname": "Scharrelmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Stadt Rehburg-Loccum",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Ole",
+      "nachname": "Warnke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Stadt Rehburg-Loccum",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Evers",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Stadt Rehburg-Loccum",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Tanja",
+      "nachname": "Nienaber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Stadt Rehburg-Loccum",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Plate",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Stadt Rehburg-Loccum",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Antje",
+      "nachname": "Klöpper",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (1. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Stadt Rehburg-Loccum",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Wilfried",
+      "nachname": "Windhorst",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Samtgemeinde Uchte",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554481856"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ingo",
+      "nachname": "Menke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Samtgemeinde Uchte",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Barlag",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Uchte",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Markus",
+      "nachname": "Wessels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Samtgemeinde Uchte",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Schnakenberg",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Samtgemeinde Uchte",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Sabine",
+      "nachname": "Lameyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Uchte",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Nils",
+      "nachname": "Hagedorn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Samtgemeinde Uchte",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Ole",
+      "nachname": "Buschmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Uchte",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    },
+    {
+      "vorname": "Hendrik",
+      "nachname": "Niemeyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (2. ABC-Gruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Samtgemeinde Uchte",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "CSA-Träger"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [],
+  "sofortbedarf": {
+    "verpflegungPersonen": 21,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Zuständig im ersten Abmarsch: Stadt Rehburg-Loccum, Samtgemeinde Mittelweser, Flecken Steyerberg, Samtgemeinde Uchte. Kreisfeuerwehrbereitschaft Umwelt des Landkreises Nienburg/Weser (Gefahrstoffkonzept seit 08.05.2018): Züge I Nord, II Mitte und III Süd mit je mindestens zwei ABC-Gruppen und einem Führungstrupp, Zug 4 als ABC-Zug mit Geräteeinheit."
+}

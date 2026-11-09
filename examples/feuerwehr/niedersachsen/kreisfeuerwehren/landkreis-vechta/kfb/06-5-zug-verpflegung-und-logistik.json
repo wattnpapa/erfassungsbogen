@@ -1,0 +1,321 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3509590,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Vechta",
+    "einheitsTyp": {
+      "freitext": "5. Zug Verpflegung und Logistik"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "KFB Vechta"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Vechta"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2437,
+    "zeitraumBis": 2439,
+    "ortAuftrag": "Überörtliche Hilfe Großbrand Landkreis Cloppenburg — Brandbekämpfung, Wassertransport, technische Hilfe"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Frauke",
+      "nachname": "Scharrelmann",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (MTF DRK KV Vechta)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "DRK KV Vechta",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557006698"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Nils",
+      "nachname": "Wöhler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTF DRK KV Vechta)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "DRK KV Vechta",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Schierholz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung (MTF DRK KV Vechta)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "DRK KV Vechta",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Hygieneschulung"
+        }
+      ]
+    },
+    {
+      "vorname": "Helge",
+      "nachname": "Kastens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung (MTF DRK KV Vechta)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "DRK KV Vechta",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Hygieneschulung"
+        }
+      ]
+    },
+    {
+      "vorname": "Philipp",
+      "nachname": "Möhlmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung (MTF DRK KV Vechta)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "DRK KV Vechta",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Hygieneschulung"
+        }
+      ]
+    },
+    {
+      "vorname": "Laura",
+      "nachname": "Oetken",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Verpflegung (MTF DRK KV Vechta)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "DRK KV Vechta",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Hygieneschulung"
+        }
+      ]
+    },
+    {
+      "vorname": "Dirk",
+      "nachname": "Schnakenberg",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (BtrLKW DRK KV Vechta)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "DRK KV Vechta",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553258555"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Anja",
+      "nachname": "Ahrens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (BtrLKW DRK KV Vechta)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "DRK KV Vechta",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jan",
+      "nachname": "Ahrens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in Logistik (BtrLKW DRK KV Vechta)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "DRK KV Vechta",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Wilfried",
+      "nachname": "Niemeyer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Notfallsanitäter/-in (RTW DRK KV Vechta)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "DRK KV Vechta",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558970564"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Notfallsanitäter"
+        }
+      ]
+    },
+    {
+      "vorname": "Ingo",
+      "nachname": "Bösch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Rettungssanitäter/-in (RTW DRK KV Vechta)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "DRK KV Vechta",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Rettungssanitäter"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "aenderungen": "Mannschaftstransportfahrzeug; Standort: DRK KV Vechta",
+      "kennzeichen": "VEC-RK 567",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Vechta",
+        "teile": [
+          89,
+          17,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "BtrLKW"
+      },
+      "aenderungen": "BtrLKW; Standort: DRK KV Vechta",
+      "kennzeichen": "VEC-RK 568",
+      "sitzplaetze": 3,
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Vechta",
+        "teile": [
+          89,
+          64,
+          1
+        ]
+      }
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "aenderungen": "Rettungswagen; Standort: DRK KV Vechta",
+      "kennzeichen": "VEC-RK 569",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Vechta",
+        "teile": [
+          40,
+          85,
+          1
+        ]
+      }
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 11,
+    "dieselLiter": 135,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Gestellt vom DRK-Kreisverband Vechta, nicht von den Feuerwehren. Kreisfeuerwehrbereitschaft des Landkreises Vechta: Führungsstaffel, vier Züge der Feuerwehren und der 5. Zug (Verpflegung, Logistik) des DRK-Kreisverbands Vechta."
+}

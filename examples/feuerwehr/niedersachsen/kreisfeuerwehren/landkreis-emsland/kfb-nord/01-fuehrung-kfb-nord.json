@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3535623,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Emsland",
+    "einheitsTyp": {
+      "freitext": "Führung KFB Nord"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "KFB Nord"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Emsland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2455,
+    "zeitraumBis": 2457,
+    "ortAuftrag": "Überörtliche Hilfe Hochwasser Elbe — Sicherung eines Umspannwerks"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Heiko",
+      "nachname": "Blome",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Abschnittsleiter/-in (Führung)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Kreisfeuerwehr Emsland, Brandschutzabschnitt Nord",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550413729"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verbandsführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Hagedorn",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "KFB-Führer/-in (Führung)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Kreisfeuerwehr Emsland, Brandschutzabschnitt Nord",
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554910478"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verbandsführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Fabian",
+      "nachname": "Wendt",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "stellv. KFB-Führer/-in (Führung)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Kreisfeuerwehr Emsland, Brandschutzabschnitt Nord",
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556853186"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Verbandsführer"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Die Seite nennt für die Führung keine Fahrzeuge. Kreisfeuerwehrbereitschaft Nord des Landkreises Emsland (Altkreis Aschendorf-Hümmling): rund 120 Einsatzkräfte mit 20 Fahrzeugen in vier Zügen, ausgelegt auf drei Tage Einsatz."
+}

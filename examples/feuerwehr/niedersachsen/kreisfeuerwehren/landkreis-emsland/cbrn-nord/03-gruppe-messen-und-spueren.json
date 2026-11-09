@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3586016,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Emsland",
+    "einheitsTyp": {
+      "freitext": "Gruppe Messen und Spüren"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Einheit"
+        },
+        "name": "CBRN-Nord"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Emsland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2490,
+    "zeitraumBis": 2492,
+    "ortAuftrag": "Gefahrgutunfall Bahnstrecke Papenburg — Leckage, Dekontamination der Einsatzkräfte, Messfahrten"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Anja",
+      "nachname": "Klenke",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (GW Messtechnik Werlte)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Werlte",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552940242"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Birgit",
+      "nachname": "Wöhler",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Gruppenführer/-in (GW Messtechnik Werlte)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Ortsfeuerwehr Surwold",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558428360"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Kfz-Mechatroniker (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Eike",
+      "nachname": "Kahrs",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Messtrupp (GW Messtechnik Werlte)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Werlte",
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "ABC-Erkunder"
+        }
+      ]
+    },
+    {
+      "vorname": "Hauke",
+      "nachname": "Dierks",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Messtrupp (GW Messtechnik Werlte)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Ortsfeuerwehr Werlte",
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "ABC-Erkunder"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW Messtechnik"
+      },
+      "aenderungen": "GW Messtechnik; Standort: Ortsfeuerwehr Werlte",
+      "kennzeichen": "EL-FW 308",
+      "sitzplaetze": 4
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 70,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Gruppenführung aus Werlte, Stellvertretung aus Surwold. CBRN-Einheit Nord: rund 60 Kräfte mit 7 Fahrzeugen aus Ortsfeuerwehren, Landkreis und Bund, eingesetzt in der Regel im Abschnitt Emsland-Nord; Komponenten CBRN-Einsatz, Dekontamination, Messen/Spüren."
+}

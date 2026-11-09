@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3550047,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Nienburg/Weser",
+    "einheitsTyp": {
+      "freitext": "Drohnengruppe"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Nienburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2465,
+    "zeitraumBis": 2467,
+    "ortAuftrag": "Personensuche in einem Waldgebiet bei Steyerberg — Wärmebildsuche aus der Luft"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Karsten",
+      "nachname": "Bartels",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (Drohnengruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559893254"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "EU-Fernpilotenzeugnis A2"
+        }
+      ]
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Kastens",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Gruppenführer/-in (Drohnengruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555534139"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "EU-Fernpilotenzeugnis A2"
+        }
+      ]
+    },
+    {
+      "vorname": "Malte",
+      "nachname": "Bösch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Drohnenpilot/-in (Drohnengruppe)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "EU-Fernpilotenzeugnis A2"
+        }
+      ]
+    },
+    {
+      "vorname": "Hannes",
+      "nachname": "Behrens",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Drohnenpilot/-in (Drohnengruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "EU-Fernpilotenzeugnis A2"
+        }
+      ]
+    },
+    {
+      "vorname": "Heiko",
+      "nachname": "Lameyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Drohnenpilot/-in (Drohnengruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "EU-Fernpilotenzeugnis A2"
+        }
+      ]
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Blome",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Operator/-in (Bildauswerter) (Drohnengruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ingo",
+      "nachname": "Nienaber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Operator/-in (Bildauswerter) (Drohnengruppe)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Plate",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Operator/-in (Bildauswerter) (Drohnengruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Kfz-Mechatroniker (Beruf)"
+        }
+      ]
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Wendt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Sprechfunker/-in (Drohnengruppe)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Technische Einsatzleitung Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 0,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Drohnengruppe der Technischen Einsatzleitung (gegründet Januar 2019, etwa 20 Mitglieder), auch ohne die gesamte TEL alarmierbar. Einsatzdrohne DJI Matrice M400 mit Wärmebildkamera Zenmuse H30T und Suchscheinwerfer Zenmuse S1, geflogen mit Pilot und Operator. Die Seite nennt kein Fahrzeug."
+}

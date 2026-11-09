@@ -1,0 +1,274 @@
+{
+  "schemaVersion": 12,
+  "uebung": true,
+  "stand": 3560102,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Kreisfeuerwehr Landkreis Nienburg/Weser",
+    "einheitsTyp": {
+      "freitext": "Zug 4 ABC-Zug und Geräteeinheit"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Bereitschaft"
+        },
+        "name": "KFB Umwelt"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Nienburg"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2472,
+    "zeitraumBis": 2474,
+    "ortAuftrag": "Gefahrstoffaustritt in einem Gewerbebetrieb in Nienburg — Menschenrettung unter CSA, Dekontamination, Messen"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Joachim",
+      "nachname": "Behrens",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in ABC-Zug (GW-G FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Feuerwehrtechnische Zentrale Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558711833"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    },
+    {
+      "vorname": "Malte",
+      "nachname": "Bartels",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (GW-G FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Feuerwehrtechnische Zentrale Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Frauke",
+      "nachname": "Grashorn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Messtrupp (GW-G FTZ)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Feuerwehrtechnische Zentrale Nienburg",
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "ABC-Erkunder"
+        }
+      ]
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Vehrenkamp",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in Geräteeinheit (WLF Nienburg)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "dienststelle": "Ortsfeuerwehr Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551084720"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Melanie",
+      "nachname": "Lüdeke",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (WLF Nienburg)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Ortsfeuerwehr Nienburg",
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Niemeyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Gerätewart/-in Atemschutz (WLF Nienburg)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgerätewart"
+        }
+      ]
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Klenke",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Zugführer/-in (GW-L Nienburg)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "dienststelle": "Ortsfeuerwehr Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559477629"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ingo",
+      "nachname": "Gieschen",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (GW-L Nienburg)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "dienststelle": "Ortsfeuerwehr Nienburg",
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Antje",
+      "nachname": "Rippe",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Zugführer/-in (GW-L Nienburg)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "dienststelle": "Ortsfeuerwehr Nienburg",
+      "geschlecht": 1,
+      "ernaehrung": 2,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559077570"
+        }
+      ],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Zugführer"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "GW-G"
+      },
+      "aenderungen": "Gerätewagen Gefahrgut; Standort: Feuerwehrtechnische Zentrale Nienburg",
+      "kennzeichen": "NI-FW 459"
+    },
+    {
+      "typ": {
+        "freitext": "WLF"
+      },
+      "aenderungen": "Wechselladerfahrzeug; Standort: Ortsfeuerwehr Nienburg",
+      "kennzeichen": "NI-FW 460"
+    },
+    {
+      "typ": {
+        "freitext": "AB Atemschutz"
+      },
+      "aenderungen": "Abrollbehälter Atemschutz; Standort: Ortsfeuerwehr Nienburg"
+    },
+    {
+      "typ": {
+        "freitext": "GW-L"
+      },
+      "aenderungen": "Gerätewagen Logistik; Standort: Ortsfeuerwehr Nienburg; trägt den AB TroLF 750",
+      "kennzeichen": "NI-FW 461"
+    },
+    {
+      "typ": {
+        "freitext": "AB TroLF 750"
+      },
+      "aenderungen": "Abrollbehälter Trockenlöschmittel 750 kg; Standort: Ortsfeuerwehr Nienburg"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 240,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Der ABC-Zug hat laut seiner Seite 40 aktive Einsatzkräfte, 8 Fahrzeuge, 4 Abrollbehälter und 2 Anhänger (Standorte FTZ Nienburg und Gewerbegebiet Lemke); Aufgaben: Messen, Spüren, Proben nehmen, Dekontamination, Führungsunterstützung, Betreuung des AB Rüst/Rettung, Tierseuchenanlage. Abgebildet ist die Geräteeinheit, die die Seite der KFB Umwelt nennt. Kreisfeuerwehrbereitschaft Umwelt des Landkreises Nienburg/Weser (Gefahrstoffkonzept seit 08.05.2018): Züge I Nord, II Mitte und III Süd mit je mindestens zwei ABC-Gruppen und einem Führungstrupp, Zug 4 als ABC-Zug mit Geräteeinheit."
+}
