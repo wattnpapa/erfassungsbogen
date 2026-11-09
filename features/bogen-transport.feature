@@ -14,16 +14,12 @@ Funktionalität: Erfassungsbogen erstellen und offline transportieren
     Wenn ich auf "Neuen Bogen erstellen" klicke
     Dann sehe ich den Schritt "1. Einheit"
 
-  # Der Meldekopf-Weg der Startseite: „Einheit schnell erfassen" startet den
-  # Assistenten direkt in der Nur-Stärke-Erfassung, ohne Umweg über ein Radio
-  # in Schritt 3.
-  Szenario: Meldekopf-Schnellerfassung startet einen reinen Stärke-Bogen
+  # Gesammelt wird seit 2026-11-09 in der eigenen Meldekopf-App: Der zweite
+  # Weg der Startseite verweist dorthin.
+  Szenario: Der Meldekopf-Weg der Startseite führt in die Meldekopf-App
     Angenommen ich öffne die App
-    Wenn ich auf "Einheit schnell erfassen (nur Stärke)…" klicke
-    Dann sehe ich den Schritt "1. Einheit"
-    # R21: Die Schnellerfassung zählt ihre vier Schritte durch (1 Einheit, 2 Personal, 3 Fahrzeuge, 4 Übersicht).
-    Wenn ich zum Schritt "2. Personal" wechsle
-    Dann ist "Nur Stärke (Meldekopf-Schnellerfassung)" ausgewählt
+    Dann sehe ich die Überschrift "Bögen sammeln (Meldekopf)"
+    Und sehe ich den Hinweis "Für Meldeköpfe, Bereitstellungsräume und Zugführer gibt es eine eigene App"
 
   Szenario: Geteilter Link eines alten Bogens wird geladen und migriert
     Angenommen ich öffne einen geteilten Bogen-Link eines alten Bogens

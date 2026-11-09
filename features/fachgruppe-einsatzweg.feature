@@ -81,9 +81,9 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     Und sehe ich die Überschrift "Personal (12)"
     Und sehe ich die Überschrift "Fahrzeuge (4)"
 
-  # Die Ankunft: der Meldekopf nimmt den Bogen vom Display ab und führt ihn im
-  # Einsatz — mit Stärke, Fahrzeugzahl und dem Dieselbedarf aus dem Bogen.
-  Szenario: Die Meldung kommt per QR-Code am Meldekopf an und zählt in den Bedarf
+  # Die Ankunft: das empfangende Gerät nimmt den Bogen vom Display ab und zeigt
+  # ihn vollständig. Gesammelt wird in der Meldekopf-App (eigenes Repository).
+  Szenario: Die Meldung kommt per QR-Code auf dem anderen Gerät an
     Wenn ich zum Schritt "5. Sofortbedarf" wechsle
     Und ich "Sofortbedarf erfassen" ankreuze
     Und ich das Feld "Diesel (l)" mit "400" fülle
@@ -94,16 +94,6 @@ Funktionalität: Einsatzweg einer Fachgruppe — Vorbereitung, Fahrt, Meldekopf
     Und ich auf "QR-Code scannen…" klicke
     Und ich den gemerkten QR-Code über "QR aus Bild einlesen…" einlese
     Dann sehe ich die Übersicht mit dem Standort "Oldenburg (NI)"
-    Wenn ich auf "In Einsatz-Sammlung ablegen…" klicke
-    Und ich auf "Neue Sammlung anlegen…" klicke
-    Und ich im Dialog "Name" mit "Hochwasser Hunte" fülle
-    Und ich im Dialog auf "Einsatz anlegen" klicke
-    # Der Bogen trägt nur die vorbelegten Plätze (Sollstärke, keine Namen): Er zählt in die Lage, gilt aber seit R17-S1
-    # nicht als „gemeldet" — der Listenkopf sagt es.
-    Dann sehe ich die Überschrift "Einheiten (0 gemeldet · 1 nur Sollstärke · 1 anwesend)"
-    Und sehe ich den Hinweis "Stärke 0 / 3 / 9 // 12"
-    Und sehe ich zu "Kraftstoff" den Wert "Diesel 400 l"
-    Und sehe ich zu "Fahrzeuge" den Wert "4"
 
   # Am Bereitstellungsraum gibt es kein WLAN und oft kein Netz: die volle
   # QR-Runde — erzeugen, als Bild abnehmen, einlesen — muss offline laufen.

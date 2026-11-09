@@ -3,7 +3,7 @@ Funktionalität: Übungs-Kennzeichnung des Bogens
   Ein Übungsbogen darf niemals als echte Lage durchgehen. Die Kennzeichnung
   hängt am Bogen (nicht an einem Geräte-Modus) und reist im QR/Link mit —
   der Störer erscheint darum auch auf dem empfangenden Gerät, und in der
-  Einsatz-Sammlung bleibt der Bogen neben echten Meldungen markiert.
+  Meldekopf-App bleibt der Bogen neben echten Meldungen markiert.
 
   Grundlage:
     Angenommen ich öffne die App
@@ -54,12 +54,3 @@ Funktionalität: Übungs-Kennzeichnung des Bogens
     Wenn ich im Dialog auf "Meldung öffnen" klicke
     Dann sehe ich die Übersicht mit dem Standort "Musterhausen"
     Und sehe ich den Hinweis "Dieser Bogen ist als Übung gekennzeichnet"
-
-  Szenario: In der Einsatz-Sammlung bleibt der Übungsbogen markiert
-    Wenn ich zum Schritt "6. Übersicht" wechsle
-    Und ich auf "In Einsatz-Sammlung ablegen…" klicke
-    Und ich auf "Neue Sammlung anlegen…" klicke
-    Und ich im Dialog "Name" mit "Stabsrahmenübung Küste" fülle
-    Und ich im Dialog auf "Einsatz anlegen" klicke
-    Dann sehe ich die Überschrift "Einheiten (1 gemeldet"
-    Und sehe ich den Text "ÜBUNG"
