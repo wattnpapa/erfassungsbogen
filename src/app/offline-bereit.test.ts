@@ -7,7 +7,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("./nativ", () => ({ istNativ: () => false }));
 
-const { offlineText, installationAnstossen } = await import("./offline-bereit");
+const { offlineText, offlineRuhig, offlineFortschritt, installationAnstossen } = await import("./offline-bereit");
 
 describe("offlineText", () => {
   it("verspricht den Offline-Betrieb nur im Stand „bereit“", () => {
@@ -161,3 +161,22 @@ describe("offlineText(): Netz hakt beim Kern (R6-O4)", () => {
   });
 });
 
+
+/** Kasten auf der Startseite nur, solange er etwas verlangt; sonst Fußzeile und Balken. */
+describe("offlineRuhig und offlineFortschritt", () => {
+  it("lässt den Kasten weg, sobald der Kern im Gerät liegt", () => {
+    expect(offlineRuhig({ stand: "bereit", frischBereit: false, online: true, zusatz: { fertig: 502, gesamt: 549 } })).toBe(true);
+    expect(offlineRuhig({ stand: "bereit", frischBereit: false, online: true })).toBe(true);
+    expect(offlineRuhig({ stand: "laedt", frischBereit: false, online: true })).toBe(false);
+    expect(offlineRuhig({ stand: "ohne", frischBereit: false, online: true })).toBe(false);
+    expect(offlineRuhig({ stand: "bereit", frischBereit: false, online: true, speicherGesperrt: true })).toBe(false);
+  });
+
+  it("misst erst den Kern, dann die Zusatzstufe, und endet mit dem Laden", () => {
+    expect(offlineFortschritt({ stand: "laedt", frischBereit: false, online: true, kern: { geladen: 1, gesamt: 4 } })).toBe(0.25);
+    expect(offlineFortschritt({ stand: "laedt", frischBereit: false, online: true })).toBeNull();
+    expect(offlineFortschritt({ stand: "bereit", frischBereit: false, online: true, zusatz: { fertig: 274, gesamt: 548 } })).toBe(0.5);
+    expect(offlineFortschritt({ stand: "bereit", frischBereit: false, online: true, zusatz: { fertig: 548, gesamt: 548 } })).toBeNull();
+    expect(offlineFortschritt({ stand: "ohne", frischBereit: false, online: true })).toBeNull();
+  });
+});

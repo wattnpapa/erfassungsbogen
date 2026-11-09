@@ -238,7 +238,7 @@ export function beispielboegenOeffnen(): void {
   window.dispatchEvent(new Event(BEISPIELE_OEFFNEN));
 }
 
-export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
+export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false, offlineHinweis }: {
   /**
    * Beispielbogen in der App öffnen — wie ein frisch gescannter Bogen.
    * Rückgabe false = die Übernahme wurde abgelehnt (Rückfrage abgebrochen);
@@ -259,6 +259,8 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
    * sein; die Darstellung sitzt im Assistenten ohnehin schon im Seitenkopf.
    */
   kompakt?: boolean;
+  /** Stand des Offline-Vorrats, sobald er keinen Kasten auf der Startseite mehr braucht (offline-bereit.ts, offlineRuhig). */
+  offlineHinweis?: string;
 }) {
   // Eine PDF-Erzeugung läuft höchstens einmal, gleich von welcher Stelle (arbeitet.ts).
   const arbeitet = useArbeitet();
@@ -604,6 +606,7 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false }: {
           <AnzeigeSchalter />
         </div>
       </div>
+      {offlineHinweis && <p className="fuss-offline">{offlineHinweis}</p>}
       <p className="fuss-marke">
         Einheiten-Erfassungsbogen{" "}
         <button type="button" className="link" title="Was ist neu" onClick={() => void aenderungen.oeffnen()}>v{__APP_VERSION__}</button>

@@ -113,7 +113,7 @@ import {
   zeitLang,
 } from "./eintrag-zeiten";
 import { nummernHinweisLoeschen, nummernHinweisMerken } from "./nummern-hinweis";
-import { offlineLangText, offlineText, offlineZeileOffen, useOfflineStand } from "./offline-bereit";
+import { offlineFortschritt, offlineLangText, offlineRuhig, offlineText, offlineZeileOffen, useOfflineStand } from "./offline-bereit";
 import { uebergabeBestaetigen, uebergabeNachWeg, uebergabeText, type UebergabeStand } from "./uebergabe-stand";
 import type { Eingang } from "./einsaetze-ui";
 import { ART_LABEL, PAPIERKORB_OEFFNEN } from "./einsaetze-konstanten";
@@ -4852,12 +4852,14 @@ function AppInhalt() {
       </p>
     );
     // Unsichtbarer Platzhalter in der Höhe der längsten Fassung; der Text steht im Attribut, damit er weder vorgelesen noch gefunden wird.
-    const offlineHinweis = offlinePlatz ? (
+    // Liegt der Kern im Gerät, entfällt der Kasten: Der Text steht dann in der Fußzeile, der Fortschritt als Balken oben.
+    const offlineHinweis = offlineRuhig(offline) ? null : offlinePlatz ? (
       <div className="offline-platz">
         {offlineZeile}
         <p className="offline-badge offline-geist" aria-hidden="true" data-text={offlineLangText(offline)} />
       </div>
     ) : offlineZeile;
+    const ladeAnteil = offlineFortschritt(offline);
     return (
       <>
       <Aktualisierungshinweise />
@@ -4877,6 +4879,19 @@ function AppInhalt() {
         </div>
       </SeitenKopf>
       <main id="inhalt" tabIndex={-1} className="start">
+        {/* Dünner Balken, solange der Offline-Vorrat lädt; er nimmt keinen Platz ein, nichts darunter springt. */}
+        {ladeAnteil != null && (
+          <div
+            className="offline-fortschritt"
+            role="progressbar"
+            aria-label="Offline-Vorrat wird geladen"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(ladeAnteil * 100)}
+          >
+            <span style={{ width: `${(ladeAnteil * 100).toFixed(1)}%` }} />
+          </div>
+        )}
         {/* Die Werbezeile erklärt das Prinzip für den ersten Besuch. Mit
             eigenem Entwurf, Vorlagen oder Einsätzen ist sie längst bekannt und
             drängt sich nur noch vor die Karte, um die es jetzt geht — das
@@ -5316,7 +5331,7 @@ function AppInhalt() {
             dasselbe wie im statischen Gerüst von index.html. */}
         {erststart && imWebBrowser() && <StartInhalt />}
       </main>
-      <Fusszeile onBogenOeffnen={oeffneBeispiel} onAlsUebung={beispieleAlsUebung} />
+      <Fusszeile onBogenOeffnen={oeffneBeispiel} onAlsUebung={beispieleAlsUebung} offlineHinweis={offlineRuhig(offline) ? offlineText(offline) : undefined} />
       </>
     );
   }
