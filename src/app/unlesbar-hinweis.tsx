@@ -12,7 +12,7 @@
  */
 import { useState } from "react";
 import { ausgelasseneMeldungen, ausgelasseneMeldungenGesamt } from "./einsaetze-lesen";
-import { rettungOffenArten, rettungOffenText, unlesbarBestand, type RettungArt, type TextArt } from "./unlesbar";
+import { rettungOffenArten, rettungOffenText, unlesbarBestand, type TextArt } from "./unlesbar";
 import { beiseitegelegtesEntfernen, textBeschreiben } from "./unlesbar-aufraeumen";
 import { sicherungAlsDatei } from "./sicherung-datei";
 import { frageJaNein } from "./dialoge";

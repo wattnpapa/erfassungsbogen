@@ -1,12 +1,10 @@
 /** Runde 11, Block Zustand: reine Logik der Behebungen (E3, E4, E5, E6, E7, D3, O3). */
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { telefonAlsTabellenText, telefonBereinigen, telefonKurzHinweis } from "./telefon-eingabe";
 import { parseNamen } from "./personal-schnell";
 import { freitextQrHinweis, qrGroessePosten } from "./qr-posten";
-import { beginnHinweis } from "./lagemonitor-beginn";
 import { neuePerson, neuerBogen } from "./hilfen";
 import { ansprechWechselSatz } from "./schritte/personal";
-import { widerspruchLaden, widerspruchMerken, widerspruchVergessen } from "./widerspruch-merker";
 import { ortGeaendert } from "./schritte/einheit";
 import { KontaktArt } from "@bos/eeb-format/model";
 
@@ -65,16 +63,6 @@ describe("R11-E5 Freitext und QR", () => {
   });
 });
 
-describe("R11-E6 Einsatzbeginn", () => {
-  const jetzt = new Date(2026, 9, 25, 12, 0).getTime();
-  it("fragt bei Zukunft und altem Jahr", () => {
-    expect(beginnHinweis(new Date(2062, 9, 25).getTime(), jetzt)).toContain("Zukunft");
-    expect(beginnHinweis(new Date(2025, 9, 25).getTime(), jetzt)).toContain("Jahr prüfen");
-    expect(beginnHinweis(new Date(2026, 9, 24, 8).getTime(), jetzt)).toBe("");
-    expect(beginnHinweis(null, jetzt)).toBe("");
-  });
-});
-
 describe("R11-E1 Ortswechsel", () => {
   it("erkennt den geänderten Ort", () => {
     expect(ortGeaendert("Neustadtfeld", "Freiburg")).toBe(true);
@@ -88,25 +76,5 @@ describe("R11-D3 Ansprechperson", () => {
     const b = { ...neuePerson(), nachname: "Lehmann" };
     expect(ansprechWechselSatz([a, b])).toMatch(/Lehmann.*OHNE Erreichbarkeit/);
     expect(ansprechWechselSatz([a])).toContain("keine Ansprechperson");
-  });
-});
-
-describe("R11-O3 Widerspruchs-Merker", () => {
-  const daten = new Map<string, string>();
-  beforeEach(() => {
-    daten.clear();
-    vi.stubGlobal("localStorage", {
-      getItem: (k: string) => daten.get(k) ?? null,
-      setItem: (k: string, v: string) => void daten.set(k, v),
-      removeItem: (k: string) => void daten.delete(k),
-    });
-  });
-  afterEach(() => vi.unstubAllGlobals());
-  it("bleibt gespeichert, bis er erledigt ist", () => {
-    widerspruchMerken("e1", ["A Auftrag — hier x, in der Datei y"]);
-    widerspruchMerken("e1", ["A Auftrag — hier x, in der Datei y"]);
-    expect(widerspruchLaden("e1")).toHaveLength(1);
-    widerspruchVergessen("e1");
-    expect(widerspruchLaden("e1")).toEqual([]);
   });
 });

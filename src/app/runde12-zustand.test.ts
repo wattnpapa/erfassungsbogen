@@ -13,11 +13,7 @@ import { emailProblem, emailSatz } from "./email-pruefung";
 import { absenderHinweis } from "./absenderkarte";
 import { neuePerson, neuerBogen, plausibilitaet } from "./hilfen";
 import { zeitraumNachEingabe } from "./zeitraum-eingabe";
-import { VERGANGENHEIT_TOLERANZ_MS, zeitUnstimmigkeit } from "./eintrag-zeiten";
-import { AUSGABE_SPERRE_MS, LEERER_EINSATZ_TEXT, LEERE_DATEI_TEXT, ausgabeFrei, ausgabeSperreZuruecksetzen, einsatzLeer } from "./ausgabe-sperre";
 import { schluesselFrage } from "./schluessel-frage";
-import { verloreneEingabeText } from "./eingabe-verloren";
-import { loeschenErfassungSatz, selbstGeloeschtMeldung } from "./einsatz-geloescht";
 import { vorlageZahlenText } from "./vorlagen";
 
 /** Tippt Zeichen für Zeichen wie eine Bildschirmtastatur: Das Feld zeigt immer nur den gespeicherten Wert. */
@@ -129,35 +125,6 @@ describe("R12-E3 Zeitraum leeren", () => {
   });
 });
 
-describe("R12-E4 Eintreffzeit in der Vergangenheit", () => {
-  const jetzt = new Date("2026-10-26T12:00").getTime();
-  const bezug = { aufnahme: jetzt, zeitraumVon: new Date("2026-10-26T00:00").getTime() };
-  it("fragt bei Jahresdreher und Tag-Monat-Dreher nach", () => {
-    for (const z of ["2025-10-26T03:09", "2024-10-26T03:09", "2026-10-20T03:09", "2026-10-24T03:09"]) {
-      expect(zeitUnstimmigkeit({ eintreffen: new Date(z).getTime() }, jetzt, bezug), z).toMatch(/mehr als einen Tag vor der Aufnahme/);
-    }
-  });
-  it("lässt gestern Abend durch und Zeiten innerhalb des Einsatzzeitraums", () => {
-    expect(zeitUnstimmigkeit({ eintreffen: new Date("2026-10-25T20:30").getTime() }, jetzt, bezug)).toBeNull();
-    const langerEinsatz = { aufnahme: jetzt, zeitraumVon: new Date("2026-10-20T00:00").getTime() };
-    expect(zeitUnstimmigkeit({ eintreffen: new Date("2026-10-22T08:00").getTime() }, jetzt, langerEinsatz)).toBeNull();
-  });
-  it("ohne Bezug bleibt die Prüfung wie bisher", () => {
-    expect(zeitUnstimmigkeit({ eintreffen: new Date("2025-10-26T03:09").getTime() }, jetzt)).toBeNull();
-    expect(VERGANGENHEIT_TOLERANZ_MS).toBe(24 * 3_600_000);
-  });
-});
-
-describe("R12-E5 leerer Einsatz", () => {
-  it("erkennt den leeren Einsatz und nennt ihn in den Sätzen", () => {
-    expect(einsatzLeer({ eintraege: [] })).toBe(true);
-    expect(einsatzLeer({ eintraege: [{}] })).toBe(false);
-    expect(LEERER_EINSATZ_TEXT).toContain("Noch keine Einheit");
-    expect(LEERER_EINSATZ_TEXT).not.toContain("Sammel-PDF");
-    expect(LEERE_DATEI_TEXT).toContain("keine Zeilen");
-  });
-});
-
 describe("R12-D1 Vorlage ersetzen", () => {
   it("stellt die Zahlen beider Seiten gegenüber", () => {
     const alt = neuerBogen();
@@ -184,27 +151,6 @@ describe("R12-D3 Geräteschlüssel-Rückfrage", () => {
     expect(f.erster).toContain("wird gelöscht");
     expect(f.folgen?.rest).toContain("alten öffentlichen Schlüssel");
     expect(f.gefahr).toBe(true);
-  });
-});
-
-describe("R12-O1 verlorene Eingabe", () => {
-  it("nennt Einheit und Text", () => {
-    expect(verloreneEingabeText("THW Hatten", { notiz: "Pumpen Nord", zug: null })).toBe(
-      "Die Einheit „THW Hatten\" wurde in einem anderen Fenster entfernt — deine Eingabe Auftrag/Notiz „Pumpen Nord\" wurde nicht gespeichert.",
-    );
-    expect(verloreneEingabeText("X", { notiz: "  ", zug: "" })).toBe("");
-    expect(verloreneEingabeText("X", { notiz: "a", zug: "Zug 2" })).toContain("Auftrag/Notiz „a\" und Zug „Zug 2\"");
-  });
-});
-
-describe("R12-S1 Einsatz löschen mit angefangener Erfassung", () => {
-  it("Rückfrage und Meldung nennen die Erfassung, ohne anderes Fenster", () => {
-    expect(loeschenErfassungSatz(undefined)).toBe("");
-    expect(loeschenErfassungSatz("THW Wilhelmshaven")).toContain("angefangene Erfassung einer fremden Einheit „THW Wilhelmshaven\"");
-    const m = selbstGeloeschtMeldung("Hochwasser Test", "THW Wilhelmshaven");
-    expect(m).toContain("„Hochwasser Test\" in den Papierkorb gelegt");
-    expect(m).not.toContain("anderen Fenster");
-    expect(m).not.toContain("eigener Bogen");
   });
 });
 
@@ -238,20 +184,5 @@ describe("Stilregeln Runde 12 (Zustand)", () => {
   });
   it("R12-G1: das Rückgängig der Chip-Felder ist ein 44-px-Ziel in eigener Zeile", () => {
     expect(css).toMatch(/\.chips \.chip-rueckgaengig button\s*\{[^}]*min-height:\s*44px/);
-  });
-});
-
-describe("R12-G2 Tipp-Sperre der Ausgaben", () => {
-  it("lässt den ersten Tipp durch und sperrt jeden weiteren innerhalb der Sperrzeit", () => {
-    ausgabeSperreZuruecksetzen();
-    expect(ausgabeFrei("csv", 1_000, 2_000)).toBe(true);
-    expect(ausgabeFrei("csv", 1_150, 2_000)).toBe(false);
-    expect(ausgabeFrei("csv", 1_800, 2_000)).toBe(false);
-    expect(ausgabeFrei("lageblatt", 1_150, 2_000)).toBe(true); // andere Ausgabe, eigene Sperre
-    expect(ausgabeFrei("csv", 3_100, 2_000)).toBe(true);
-    ausgabeSperreZuruecksetzen();
-  });
-  it("sperrt länger als der späteste gemessene Doppeltipp (800 ms)", () => {
-    expect(AUSGABE_SPERRE_MS).toBeGreaterThan(800);
   });
 });

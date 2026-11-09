@@ -2,7 +2,7 @@
  * Runde 16, Block Zustand: Oberfläche — verworfene Tipps zeigen sich (D1).
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DaumenQuittung, QUITTUNG_ENDE_NACH_MS } from "./daumen-quittung";
 import { tippSchutzZuruecksetzen } from "./tipp-schutz";

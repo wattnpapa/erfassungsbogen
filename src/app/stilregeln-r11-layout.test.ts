@@ -42,15 +42,6 @@ describe("Einsatzansicht am Telefon (R11-M2, R11-M3, R11-M4, R11-M5)", () => {
   it("die Quittung nach „Abrücken“ darf vier Zeilen haben, der Name wird nicht gekürzt (R11-M3)", () => {
     expect(abschnitt).toMatch(/\.quittung-daumen\.quittung-mehrzeilig > \.quittung-text\s*\{\s*-webkit-line-clamp:\s*4/);
   });
-  it("die Quittung nach „Abrücken“ und „Wieder anwesend“ ist mehrzeilig (R11-M3, Markup)", () => {
-    const quelle = readFileSync(new URL("./einsaetze-ui.tsx", import.meta.url), "utf8");
-    expect(quelle).toMatch(/<DaumenQuittung\s+key=\{`status:[^\n]*\}`\}\s+prellschutz\s+mehrzeilig/);
-  });
-  it("beide Wege zurück in den offenen Bogen tragen die Knopf-Klasse bogen-weiter (R11-M4, Markup)", () => {
-    const quelle = readFileSync(new URL("./app.tsx", import.meta.url), "utf8");
-    expect(quelle).toMatch(/className="link bogen-weiter"[^\n]*>Bogen fortsetzen<\/button>/);
-    expect(quelle).toMatch(/className="link bogen-weiter"[^\n]*>Weiter erfassen<\/button>/);
-  });
   it("„Bogen fortsetzen“ ist ein Knopf in Zielhöhe (R11-M4)", () => {
     expect(abschnitt).toMatch(/button\.link\.bogen-weiter\s*\{[^}]*min-height:\s*calc\(var\(--ziel-basis\) \+ var\(--ziel\)\)/);
     expect(abschnitt).toMatch(/button\.link\.bogen-weiter\s*\{[^}]*border:\s*var\(--strich\) solid var\(--linie-stark\)/);

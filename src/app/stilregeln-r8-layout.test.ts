@@ -8,8 +8,6 @@ import { describe, expect, it } from "vitest";
 
 const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
 const css = html.replace(/\/\*[\s\S]*?\*\//g, "");
-const tabelle = readFileSync(new URL("./einheiten-tabelle.ts", import.meta.url), "utf8");
-const einsaetze = readFileSync(new URL("./einsaetze-ui.tsx", import.meta.url), "utf8");
 
 describe("Kontrast (R8-L2, R8-L6, R8-L7)", () => {
   it("abgewählte Musterungszeilen werden nicht über Deckkraft abgeblendet", () => {
@@ -51,17 +49,6 @@ describe("Startseite bei Zoom (R8-D4, R8-S3)", () => {
 });
 
 describe("Einsatzansicht (R8-K2, R8-K3, R8-M6, R8-M9, R8-N3)", () => {
-  it("Auftrag und Eingetroffen stehen vor dem Bedarf", () => {
-    const i = (s: string) => tabelle.indexOf(`schluessel: "${s}"`);
-    expect(i("auftrag")).toBeLessThan(i("eingetroffen"));
-    expect(i("eingetroffen")).toBeLessThan(i("bedarf"));
-    expect(css).toMatch(/\.einheiten-tabelle \.bedarf-zelle\s*\{\s*min-width:\s*8rem;\s*max-width:\s*14rem/);
-    expect(css).toMatch(/\.einheiten-tabelle \.bedarf-teil\s*\{\s*white-space:\s*nowrap/);
-  });
-  it("der Auftrag steht auf der Karte bis 80 Zeichen ungekürzt", () => {
-    expect(einsaetze).toMatch(/const AUFTRAG_KARTE_MAX = 80/);
-    expect(einsaetze).toMatch(/… \(mehr\)/);
-  });
   it("Namen in der klebenden Spalte brechen nicht im Wort; bei 180 px klebt sie nicht", () => {
     expect(css).toMatch(/table\.einheiten-tabelle tbody th\s*\{[^}]*overflow-wrap:\s*normal/);
     expect(css).toMatch(/@media \(max-width: 16rem\)\s*\{\s*table\.einheiten-tabelle > \* > tr > :first-child\s*\{\s*position:\s*static/);

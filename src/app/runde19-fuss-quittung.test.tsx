@@ -7,17 +7,11 @@
  * rechnet kein Layout. Hier stehen das Verhalten (Zustände, Zeiten, Texte, Sperren) und die Stilregeln in index.html.
  */
 import { readFileSync } from "node:fs";
-import { useState } from "react";
-import { act, cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { Erfassungsbogen } from "@bos/eeb-format/model";
-import { EinsatzArt, einsaetzeLaden, einsatzAnlegen, meldungHinzufuegen } from "@bos/meldekopf/einsaetze";
 import { Dialogschicht, frageWahl, prellschutzSetzen } from "./dialoge";
-import { EinsatzDetail } from "./einsaetze-ui";
 import { DaumenQuittung, QUITTUNG_DETAILS_ENDE_NACH_MS, QUITTUNG_ENDE_NACH_MS } from "./daumen-quittung";
-import { kenntnisVermerken } from "./export-stand";
-import { neuerBogen } from "./hilfen";
 import { ortSperren, tippSchutzZuruecksetzen } from "./tipp-schutz";
 import { App } from "./app";
 
@@ -59,23 +53,6 @@ describe("R19-K1/M1/O5/G1/H1/A4/W2/S1 „In Einsatz übernehmen“ steht ganz im
     // „← Zurück" wird auf schmaler Leiste zum Pfeil, damit die Leiste einzeilig bleibt; „Weiter →" bleibt ein Ziel von 44 px.
     expect(abschnitt).toMatch(/@container assistent-nav \(max-width: 22rem\)[^}]*\.nav-zurueck \.nav-wort\s*\{\s*display:\s*none/);
     expect(abschnitt).toMatch(/\.nav-weiter\s*\{\s*min-width:\s*calc\(44px \+ var\(--ziel\)\)/);
-  });
-
-  it("der Knopf trägt den vollen Namen und beide Wortteile (der CSS-Umbruch braucht beide im Text)", async () => {
-    localStorage.clear();
-    render(<App />);
-    const nutzer = userEvent.setup();
-    const s = einsatzAnlegen("Hochwasser Fußleiste", EinsatzArt.EINSATZ);
-    expect(s.id).toBeTruthy();
-    cleanup();
-    render(<App />);
-    await nutzer.click(await screen.findByRole("button", { name: /Öffnen/ }));
-    await nutzer.click(await screen.findByRole("button", { name: /Einheit manuell erfassen/ }));
-    const dialog = document.querySelector("dialog[open]");
-    if (dialog) await nutzer.click(within(dialog as HTMLElement).getAllByRole("button")[0]!);
-    const knopf = await screen.findByRole("button", { name: "In Einsatz übernehmen" });
-    expect(knopf.querySelector(".nav-einsatz")?.textContent).toBe("In Einsatz ");
-    expect(knopf.querySelector(".nav-ue")?.textContent).toBe("übernehmen");
   });
 });
 
@@ -173,86 +150,7 @@ describe("R19-A3/E5/H6/K5/M4/N12/O6/S4/G4/D4/L6/W12 kompakte Quittungsleiste", (
   });
 });
 
-type Props = Parameters<typeof EinsatzDetail>[0];
 
-function Wirt({ id }: { id: string }) {
-  const [einsatz, setEinsatz] = useState(() => einsaetzeLaden().find((s) => s.id === id)!);
-  const p: Props = {
-    einsatz,
-    onZurueck: () => {},
-    onGeaendert: () => setEinsatz(einsaetzeLaden().find((s) => s.id === id)!),
-    onScannen: () => {},
-    onManuell: () => {},
-    onDateiImport: () => {},
-    onBilderImport: () => {},
-    onExport: () => {},
-    onCsvExport: () => {},
-    onCsvDetailExport: () => {},
-    onSammelPdf: () => {},
-    onGeloescht: () => {},
-  };
-  return (
-    <>
-      <EinsatzDetail {...p} />
-      <Dialogschicht />
-    </>
-  );
-}
-
-function bogenMitName(name: string): Erfassungsbogen {
-  const b = neuerBogen();
-  b.einheit.hierarchie[0]!.name = name;
-  return b;
-}
-
-describe("R19-A3/K5/O6/S4 Quittungen der Einsatzansicht nennen eine Kurzfassung mit Nummer und Fundort", () => {
-  it("„Entfernen“: Kurzfassung „Nr. n entfernt · Papierkorb“, der volle Satz (Nummern, 7 Tage) hinter „Details“", async () => {
-    const nutzer = userEvent.setup();
-    prellschutzSetzen(0);
-    const s = einsatzAnlegen("Hochwasser Kurz", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogenMitName("Alpha"));
-    meldungHinzufuegen(s.id, bogenMitName("Beta"));
-    render(<Wirt id={s.id} />);
-    const karte = [...document.querySelectorAll<HTMLElement>("li.einheit-zeile")].find((k) => k.textContent!.includes("Alpha"))!;
-    await nutzer.click(within(karte).getByRole("button", { name: "Mehr…" }));
-    await nutzer.click(within(karte).getByRole("button", { name: "Entfernen" }));
-    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Meldung entfernen?']")!;
-    await nutzer.click(within(dialog).getByRole("button", { name: "Meldung entfernen" }));
-    const leiste = await waitFor(() => {
-      const l = document.querySelector<HTMLElement>(".quittung-daumen");
-      expect(l).not.toBeNull();
-      return l!;
-    });
-    expect(leiste.querySelector("[aria-hidden='true']")?.textContent).toMatch(/^Nr\. \d+ entfernt · Papierkorb$/);
-    expect(leiste.textContent).toContain("7 Tage im Papierkorb unter der Liste");
-    await nutzer.click(within(leiste).getByRole("button", { name: "Details" }));
-    expect(leiste.querySelector(".quittung-text")!.textContent).toMatch(/Entfernt: Meldung Nr\. \d+ „.*Alpha/);
-  });
-});
-
-describe("R19-G5 „Zur Kenntnis genommen“ lässt die Seite nicht springen", () => {
-  it("rollt um die Höhe des verschwundenen Kastens zurück, damit das Element dahinter an derselben Stelle bleibt", async () => {
-    const nutzer = userEvent.setup();
-    const s = einsatzAnlegen("Hochwasser Kenntnis", EinsatzArt.EINSATZ);
-    kenntnisVermerken(einsaetzeLaden().find((x) => x.id === s.id)!);
-    meldungHinzufuegen(s.id, bogenMitName("Alpha"));
-    meldungHinzufuegen(s.id, bogenMitName("Beta"));
-    render(<Wirt id={s.id} />);
-    const kasten = document.querySelector(".stapel-eingang");
-    expect(kasten).not.toBeNull();
-    const anker = kasten!.nextElementSibling ?? kasten!.previousElementSibling;
-    expect(anker).not.toBeNull();
-    // Der Anker liegt 520 px weiter oben, sobald der Kasten weg ist.
-    vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (this: Element) {
-      if (this === anker) return rechteck(300, 40, document.querySelector(".stapel-eingang") ? 700 : 180);
-      return rechteck(0, 0, 0);
-    });
-    const rollen = vi.spyOn(window, "scrollBy").mockImplementation(() => {});
-    await nutzer.click(screen.getByRole("button", { name: "Zur Kenntnis genommen" }));
-    expect(document.querySelector(".stapel-eingang")).toBeNull();
-    expect(rollen).toHaveBeenCalledWith(0, -520);
-  });
-});
 
 // ------------------------------------------------------------------------------------------------ Tipp-Sperre
 

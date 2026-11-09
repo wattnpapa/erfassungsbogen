@@ -3,23 +3,16 @@
  * eine Zählung der Schnellerfassung (A3, W3, E4, H3, G8, M3, L3, N2, O2, S2), Texte bei vollem Speicher (H6, H7, N7, S5, W6, A7),
  * Lageblatt (A8, A10), Pflichtfeld am Reiter (N3), Fachwörter (N6). Die Abläufe der ganzen App stehen in runde21-daten-texte-app.test.tsx.
  */
-import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { OrganisationsTyp } from "@bos/eeb-format/model";
-import { EinsatzArt, einsaetzeLaden, einsatzAnlegen, meldungHinzufuegen } from "@bos/meldekopf/einsaetze";
-import { Dialogschicht } from "./dialoge";
-import { EinsatzDetail, EinsatzListe } from "./einsaetze-ui";
+import { EinsatzArt, einsatzAnlegen, meldungHinzufuegen } from "@bos/meldekopf/einsaetze";
 import { Fehlerfaenger, istLadeFehler } from "./fehlerfaenger";
-import { neuePerson, neuerBogen } from "./hilfen";
-import { andereOrganisationImOrt, SCHNELL_ORGANISATION_SCHLUESSEL, schnellOrganisationLaden, schnellOrganisationMerken } from "./schnell-organisation";
-import { schnellKopfzeile, schnellNummer, SCHNELL_SCHRITTE } from "./schnell-zaehlung";
-import { notwegText } from "./einsatz-notweg";
-import { loeschenUmfangText } from "./einsatz-geloescht";
+import { neuerBogen } from "./hilfen";
+import { andereOrganisationImOrt } from "./schnell-organisation";
 import { SpeicherWarnung } from "./speicher-warnung";
 import { SPEICHER_GRENZE_ZEICHEN, speicherBelegung } from "./eintrag-zeiten";
-import { verpflegungText } from "./auswertung";
 
 afterEach(() => {
   cleanup();
@@ -32,18 +25,6 @@ afterEach(() => {
 // ---------------------------------------------------------------------------------------- W2, H2 Organisation
 
 describe("R21-W2, H2: Organisation der Schnellerfassung", () => {
-  it("merkt die letzte Wahl; ohne Wert oder mit Unsinn bleibt es das THW", () => {
-    expect(schnellOrganisationLaden()).toBe(OrganisationsTyp.THW);
-    schnellOrganisationMerken(OrganisationsTyp.DRK);
-    expect(localStorage.getItem(SCHNELL_ORGANISATION_SCHLUESSEL)).toBe(String(OrganisationsTyp.DRK));
-    expect(schnellOrganisationLaden()).toBe(OrganisationsTyp.DRK);
-    schnellOrganisationMerken(OrganisationsTyp.FEUERWEHR);
-    expect(schnellOrganisationLaden()).toBe(OrganisationsTyp.FEUERWEHR);
-    localStorage.setItem(SCHNELL_ORGANISATION_SCHLUESSEL, "9999");
-    expect(schnellOrganisationLaden()).toBe(OrganisationsTyp.THW);
-    localStorage.setItem(SCHNELL_ORGANISATION_SCHLUESSEL, "kaputt");
-    expect(schnellOrganisationLaden()).toBe(OrganisationsTyp.THW);
-  });
 
   it("erkennt eine andere Organisation am Anfang des Orts (DRK, Feuerwehr), aber nicht in Wortteilen", () => {
     expect(andereOrganisationImOrt("DRK Bremen", OrganisationsTyp.THW)).toBe(OrganisationsTyp.DRK);
@@ -126,47 +107,6 @@ describe("R21-L2, D2: Fehlerschirm nennt bei fehlendem Netz die Ursache und rät
   });
 });
 
-// ---------------------------------------------------------------------------------------- A3 … S2 Zählung
-
-describe("R21-A3, W3, E4, H3, G8, M3, L3, N2, O2, S2: eine Zählung in der Schnellerfassung", () => {
-  it("nummeriert die vier Schritte 1 bis 4; Einsatz und Sofortbedarf haben keine Nummer", () => {
-    expect(SCHNELL_SCHRITTE.map((s) => schnellNummer(s))).toEqual([1, 2, 3, 4]);
-    expect(schnellNummer(1)).toBeUndefined();
-    expect(schnellNummer(4)).toBeUndefined();
-    const namen = ["Einheit", "Einsatz", "Personal", "Fahrzeuge", "Sofortbedarf", "Übersicht"];
-    // Kopfzeile und Nummer sind dieselbe Zahl.
-    for (const s of SCHNELL_SCHRITTE) expect(schnellKopfzeile(s, namen)).toContain(`Schritt ${schnellNummer(s)} von 4`);
-  });
-});
-
-// ---------------------------------------------------------------------------------------- Einsatzansicht
-
-type Props = Parameters<typeof EinsatzDetail>[0];
-
-function Wirt({ id, extra }: { id: string; extra?: Partial<Props> }) {
-  const [einsatz, setEinsatz] = useState(() => einsaetzeLaden().find((s) => s.id === id)!);
-  return (
-    <>
-      <EinsatzDetail
-        einsatz={einsatz}
-        onZurueck={() => {}}
-        onGeaendert={() => setEinsatz(einsaetzeLaden().find((s) => s.id === id)!)}
-        onScannen={() => {}}
-        onManuell={() => {}}
-        onDateiImport={() => {}}
-        onBilderImport={() => {}}
-        onExport={() => {}}
-        onCsvExport={() => {}}
-        onCsvDetailExport={() => {}}
-        onSammelPdf={() => {}}
-        onGeloescht={() => {}}
-        {...extra}
-      />
-      <Dialogschicht />
-    </>
-  );
-}
-
 function bogenOrt(ort: string, aendern?: (b: ReturnType<typeof neuerBogen>) => void) {
   const b = neuerBogen();
   b.einheit.hierarchie[0]!.name = ort;
@@ -174,69 +114,6 @@ function bogenOrt(ort: string, aendern?: (b: ReturnType<typeof neuerBogen>) => v
   return b;
 }
 
-const karteVon = (text: string) => [...document.querySelectorAll<HTMLElement>(".einheit-zeile")].find((k) => k.textContent!.includes(text))!;
-
-describe("R21-K2: Das „Mehr“-Blatt schließt nach Ort ändern, Stärke ändern und Übung kennzeichnen", () => {
-  function lage() {
-    const s = einsatzAnlegen("Hochwasser Blatt", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(
-      s.id,
-      bogenOrt("Albstadt", (b) => {
-        b.personal = ["Rudolph", "Lang", "Weber"].map((nachname) => ({ ...neuePerson(), vorname: "T", nachname }));
-      }),
-    );
-    return s.id;
-  }
-  const blattOffen = (karte: HTMLElement) => within(karte).queryByRole("button", { name: "Weniger anzeigen" }) !== null;
-
-  it("Als Übung kennzeichnen…", async () => {
-    const nutzer = userEvent.setup();
-    render(<Wirt id={lage()} />);
-    await nutzer.click(within(karteVon("Albstadt")).getByRole("button", { name: "Mehr…" }));
-    expect(blattOffen(karteVon("Albstadt"))).toBe(true);
-    await nutzer.click(within(karteVon("Albstadt")).getByRole("button", { name: "Als Übung kennzeichnen…" }));
-    await nutzer.click(within(await screen.findByRole("dialog", { name: "Als Übung kennzeichnen?" })).getByRole("button", { name: "Als Übung kennzeichnen" }));
-    await waitFor(() => expect(document.body.textContent).toContain("Rückgängig"));
-    expect(blattOffen(karteVon("Albstadt"))).toBe(false);
-  });
-
-  it("Stärke ändern…", async () => {
-    const nutzer = userEvent.setup();
-    render(<Wirt id={lage()} />);
-    await nutzer.click(within(karteVon("Albstadt")).getByRole("button", { name: "Mehr…" }));
-    await nutzer.click(within(karteVon("Albstadt")).getByRole("button", { name: "Stärke ändern…" }));
-    const dialog = document.querySelector<HTMLDialogElement>("dialog[aria-label='Stärke ändern']")!;
-    const feld = within(dialog).getByLabelText("Mannschaft");
-    await nutzer.clear(feld);
-    await nutzer.type(feld, "2");
-    await nutzer.click(within(dialog).getByRole("button", { name: "Stärke übernehmen" }));
-    await waitFor(() => expect(document.querySelector(".quittung-daumen")).not.toBeNull());
-    expect(blattOffen(karteVon("Albstadt"))).toBe(false);
-  });
-
-  it("Ort der Einheit ändern…", async () => {
-    const nutzer = userEvent.setup();
-    render(<Wirt id={lage()} />);
-    await nutzer.click(within(karteVon("Albstadt")).getByRole("button", { name: "Mehr…" }));
-    await nutzer.click(within(karteVon("Albstadt")).getByRole("button", { name: "Ort der Einheit ändern…" }));
-    const dialog = await screen.findByRole("dialog", { name: "Ort der Einheit ändern" });
-    const feld = within(dialog).getByLabelText("Ort der Einheit");
-    await nutzer.clear(feld);
-    await nutzer.type(feld, "Husum");
-    await nutzer.click(within(dialog).getByRole("button", { name: "Ort übernehmen" }));
-    await waitFor(() => expect(document.body.textContent).toContain("Name geändert"), { timeout: 5000 });
-    await waitFor(() => expect(blattOffen(karteVon("Husum"))).toBe(false));
-  });
-
-  it("ein abgebrochener Dialog lässt das Blatt offen (es wurde nichts ausgeführt)", async () => {
-    const nutzer = userEvent.setup();
-    render(<Wirt id={lage()} />);
-    await nutzer.click(within(karteVon("Albstadt")).getByRole("button", { name: "Mehr…" }));
-    await nutzer.click(within(karteVon("Albstadt")).getByRole("button", { name: "Als Übung kennzeichnen…" }));
-    await nutzer.click(within(await screen.findByRole("dialog", { name: "Als Übung kennzeichnen?" })).getByRole("button", { name: "Abbrechen" }));
-    expect(blattOffen(karteVon("Albstadt"))).toBe(true);
-  });
-});
 
 // ---------------------------------------------------------------------------------------- Speicher voll
 
@@ -261,112 +138,5 @@ describe("R21-H7, S5: Warnzeile bei vollem Speicher", () => {
     expect(mehr.open).toBe(false);
     expect(mehr.textContent).toContain("Platz schafft nur Löschen");
     expect(mehr.textContent).toMatch(/Belegt: 100 % \(/);
-  });
-});
-
-describe("R21-N7, H7: „Nicht gelöscht“ nennt nur die Knöpfe darunter", () => {
-  it("mit Export-Weg: erst sichern, dann „Endgültig löschen…“; mit der Belegung", () => {
-    const t = notwegText("Hochwasser", 1, true, false);
-    expect(t).toBe(
-      "„Hochwasser\" ist nicht gelöscht: Der Speicher dieses Geräts ist voll (zu 100 % belegt), der Papierkorb braucht selbst Platz. Erst sichern, dann „Endgültig löschen…“ (nicht rückholbar).",
-    );
-    expect(t.split(". ").length).toBeLessThanOrEqual(3);
-    // Kein Weg, der nicht als Knopf dasteht.
-    expect(t).not.toMatch(/Entfernen|Alle Daten löschen|Papierkorb leeren/);
-  });
-
-  it("auf der Startseite heißt der Weg „Einsatz öffnen und sichern“; ohne Sicherungsweg bleibt nur das Löschen", () => {
-    expect(notwegText("X", 0.99, true, true)).toContain("Erst den Einsatz öffnen und sichern, dann „Endgültig löschen…“");
-    expect(notwegText("X", null, false, false)).toBe(
-      "„X\" ist nicht gelöscht: Der Speicher dieses Geräts ist voll, der Papierkorb braucht selbst Platz. „Endgültig löschen…“ schafft Platz (nicht rückholbar).",
-    );
-  });
-});
-
-describe("R21-A7: Einheiten und Meldungen erklären sich", () => {
-  it("nennt beide Zahlen, wo sie sich unterscheiden", () => {
-    expect(loeschenUmfangText(7, 8)).toBe("7 Einheiten (mit allen früheren Fassungen 8 Meldungen)");
-    expect(loeschenUmfangText(7, 7)).toBe("7 Einheiten");
-    expect(loeschenUmfangText(1, 1)).toBe("1 Einheit");
-    expect(loeschenUmfangText(1, 2)).toBe("1 Einheit (mit allen früheren Fassungen 2 Meldungen)");
-  });
-});
-
-describe("R21-H6, W6: Einsatz löschen bei vollem Speicher", () => {
-  it("Einsatzansicht: gleich die Notweg-Rückfrage, ohne die Zusage „wandert in den Papierkorb“", async () => {
-    const nutzer = userEvent.setup();
-    const s = einsatzAnlegen("Hochwasser Voll", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogenOrt("Albstadt"));
-    meldungHinzufuegen(s.id, bogenOrt("Biberach"));
-    render(<Wirt id={s.id} extra={{ onWeitergeben: vi.fn() }} />);
-    speicherVollFuellen();
-    await nutzer.click(screen.getByRole("button", { name: "Einsatz löschen…" }));
-    const notweg = await screen.findByRole("dialog", { name: "Nicht gelöscht" }, { timeout: 5000 });
-    expect(screen.queryByRole("dialog", { name: "Einsatz löschen?" })).toBeNull();
-    expect(notweg.textContent).toContain("ist nicht gelöscht");
-    expect(notweg.textContent).not.toContain("wandert in den Papierkorb");
-    expect(within(notweg).getByRole("button", { name: "Erst sichern (Sammel-PDF erzeugen)" })).toBeTruthy();
-    expect(einsaetzeLaden()).toHaveLength(1); // nichts gelöscht, nichts im Papierkorb
-    // Die zweite Rückfrage erklärt die Zahlen: 2 Einheiten, 2 Meldungen.
-    await nutzer.click(within(notweg).getByRole("button", { name: "Endgültig löschen…" }));
-    const zweite = await screen.findByRole("dialog", { name: /endgültig löschen\?/ });
-    expect(zweite.textContent).toContain("2 Einheiten sind danach weg");
-    await nutzer.click(within(zweite).getByRole("button", { name: "Einsatz behalten" }));
-    expect(einsaetzeLaden()).toHaveLength(1);
-  }, 20000);
-
-  it("Startseite: „Einsatz öffnen und sichern“ steht als erster Weg und öffnet den Einsatz", async () => {
-    const nutzer = userEvent.setup();
-    const s = einsatzAnlegen("Hochwasser Start", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogenOrt("Albstadt"));
-    const onOeffnen = vi.fn();
-    render(
-      <>
-        <EinsatzListe einsaetze={einsaetzeLaden()} onOeffnen={onOeffnen} onGeaendert={() => {}} />
-        <Dialogschicht />
-      </>,
-    );
-    speicherVollFuellen();
-    await nutzer.click(screen.getByRole("button", { name: "Löschen…" }));
-    const notweg = await screen.findByRole("dialog", { name: "Nicht gelöscht" }, { timeout: 5000 });
-    expect(screen.queryByRole("dialog", { name: "Einsatz löschen?" })).toBeNull();
-    const namen = within(notweg).getAllByRole("button").map((b) => b.textContent);
-    expect(namen[0]).toBe("Einsatz öffnen und sichern");
-    expect(namen).toContain("Endgültig löschen…");
-    await nutzer.click(within(notweg).getByRole("button", { name: "Einsatz öffnen und sichern" }));
-    await waitFor(() => expect(onOeffnen).toHaveBeenCalledTimes(1));
-    expect(einsaetzeLaden()).toHaveLength(1);
-  }, 20000);
-
-  it("ohne vollen Speicher bleibt es bei der ersten Rückfrage und dem Papierkorb", async () => {
-    const nutzer = userEvent.setup();
-    const s = einsatzAnlegen("Hochwasser Platz", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogenOrt("Albstadt"));
-    render(<Wirt id={s.id} />);
-    await nutzer.click(screen.getByRole("button", { name: "Einsatz löschen…" }));
-    const frage = await screen.findByRole("dialog", { name: "Einsatz löschen?" });
-    expect(frage.textContent).toContain("wandert in den Papierkorb");
-  });
-});
-
-// ---------------------------------------------------------------------------------------- A8, A10, N6
-
-describe("R21-N6: Fachwörter", () => {
-  it("Verpflegung ohne Anforderung heißt „kein Bedarf gemeldet“, nicht „keine angefordert“", () => {
-    const text = verpflegungText({
-      verpflegung: { gesamt: 9, fleisch: 9, vegetarisch: 0, vegan: 0 },
-      verpflegungAngefordert: 0,
-    });
-    expect(text).toBe("Verpflegung: kein Bedarf gemeldet (9 Personen vor Ort)");
-  });
-
-  it("die Legende unter der Tabelle unterscheidet „nicht erfasst“ von „kein Bedarf“", async () => {
-    const nutzer = userEvent.setup();
-    const s = einsatzAnlegen("Hochwasser Wörter", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogenOrt("Albstadt"));
-    meldungHinzufuegen(s.id, bogenOrt("Biberach"));
-    render(<Wirt id={s.id} />);
-    await nutzer.click(screen.getByRole("button", { name: "Tabelle" }));
-    expect(document.body.textContent).toContain("„Bedarf nicht erfasst“ = bei der Schnellerfassung nicht abgefragt, nicht „kein Bedarf“.");
   });
 });

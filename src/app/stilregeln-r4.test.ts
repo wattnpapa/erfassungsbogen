@@ -259,12 +259,6 @@ describe("Kleinere Sichtreste (R4-L4)", () => {
     expect(bloecke(".nacht-modus .scanner-handscanner").join("\n")).toMatch(/border-color:\s*var\(--text-2\)/);
   });
 
-  it("die Fehlerzeile nach „Bögen einlesen…“ trägt Rahmen und Zeichen wie die Erfolgsmeldung", () => {
-    expect(bloecke(".einlese-quittung > p.fehler").join("\n")).toMatch(/border:[^;]*var\(--alarm-linie\)/);
-    const quelle = readFileSync(new URL("./einlese-quittung.tsx", import.meta.url), "utf8");
-    expect(quelle).toContain('<span aria-hidden="true">⚠ </span>');
-  });
-
   it("die Alarmmarke ist auf dunklem Grund gefüllt, die Warnmarken bleiben Umrisse", () => {
     const b = bloecke(".dunkel-modus .signatur-marke, .nacht-modus .signatur-marke").join("\n");
     expect(b).toMatch(/background:\s*var\(--alarm\)/);

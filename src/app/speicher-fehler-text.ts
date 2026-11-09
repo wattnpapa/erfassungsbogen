@@ -39,10 +39,3 @@ export function speicherFehlerDetails(art: SpeicherFehlerArt, fremd: boolean, le
   return `${ausgang}${stand}`;
 }
 
-/**
- * Rat bei vollem Speicher, wenn das Ablegen eines Einsatzes im Papierkorb scheitert und der Papierkorb leer ist
- * (R13-O3): „Papierkorb leeren" gibt es dann nicht. Platz schafft, was den Bestand verkleinert.
- */
-export const PAPIERKORB_LEER_RAT =
-  "Der Speicher ist voll, der Papierkorb leer — der Einsatz ist nicht gelöscht. Erst sichern (Einsatz weitergeben / sichern). " +
-  "Platz schafft dann „Entfernen“ bei einer Einheit (mit „Endgültig entfernen“ in der Rückfrage), zuletzt „Alle Daten löschen“ (nach der Sicherung).";

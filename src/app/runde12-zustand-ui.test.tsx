@@ -9,14 +9,10 @@ import { useState } from "react";
 import type { Erfassungsbogen, VokabularWert } from "@bos/eeb-format/model";
 import { EinsatzArt, einsaetzeLaden, einsatzAnlegen, meldungHinzufuegen } from "@bos/meldekopf/einsaetze";
 import { Dialogschicht } from "./dialoge";
-import { EinsatzDetail } from "./einsaetze-ui";
 import { Fusszeile } from "./fusszeile";
 import { neuePerson, neuerBogen } from "./hilfen";
 import { Uebersicht } from "./schritte/uebersicht";
 import { vorlageAnlegen, vorlagenLaden, vorlageZuruecksetzen, type Vorlage } from "./vorlagen";
-import { einheitEntfernen } from "./eintrag-zeiten";
-import { ausgabeSperreSetzen, ausgabeSperreZuruecksetzen } from "./ausgabe-sperre";
-import { widerspruchLaden, widerspruchMerken } from "./widerspruch-merker";
 import { sicherungStandText } from "./sicherung";
 import { Feld, VokabListe } from "./schritte/bausteine";
 import { TelefonFeld } from "./schritte/telefon-feld";
@@ -27,33 +23,6 @@ function bogenMitName(name: string): Erfassungsbogen {
   const b = neuerBogen();
   b.einheit.hierarchie[0]!.name = name;
   return b;
-}
-
-type Props = Parameters<typeof EinsatzDetail>[0];
-
-function ansicht(einsatzId: string, extra: Partial<Props> = {}) {
-  const baum = () => (
-    <>
-      <EinsatzDetail
-        einsatz={einsaetzeLaden().find((s) => s.id === einsatzId)!}
-        onZurueck={() => {}}
-        onGeaendert={() => {}}
-        onScannen={() => {}}
-        onManuell={() => {}}
-        onDateiImport={() => {}}
-        onBilderImport={() => {}}
-        onExport={() => {}}
-        onCsvExport={() => {}}
-        onCsvDetailExport={() => {}}
-        onSammelPdf={() => {}}
-        onGeloescht={() => {}}
-        {...extra}
-      />
-      <Dialogschicht />
-    </>
-  );
-  const r = render(baum());
-  return { neuLaden: () => r.rerender(baum()) };
 }
 
 function einsatzMit(namen: string[]) {
@@ -211,143 +180,6 @@ describe("R12-D1 Vorlage ersetzen", () => {
     await nutzer.click(within(await screen.findByRole("dialog", { name: "Vorlage mit diesem Namen vorhanden" })).getByRole("button", { name: "Zusätzlich anlegen" }));
     expect(gespeichert.mock.calls[0]![1]).toBeUndefined();
     expect(vorlagenLaden()).toHaveLength(2);
-  });
-});
-
-describe("R12-G2 Doppeltipp auf die Ausgaben der Einsatzansicht", () => {
-  beforeEach(() => {
-    localStorage.clear();
-    ausgabeSperreSetzen(2000);
-  });
-  afterEach(() => {
-    ausgabeSperreSetzen(0);
-    ausgabeSperreZuruecksetzen();
-  });
-
-  it("zwei Tipps auf „Übersicht als CSV“ erzeugen eine Datei und zeigen sofort „wird erzeugt“", async () => {
-    const nutzer = userEvent.setup();
-    const csv = vi.fn();
-    ansicht(einsatzMit(["Wardenburg"]), { onCsvExport: csv });
-    const knopf = screen.getByRole("button", { name: "Übersicht als CSV" });
-    await nutzer.click(knopf);
-    expect(document.querySelector(".ausgabe-quittung")!.textContent).toMatch(/Die Übersicht als CSV wird erzeugt.*nicht noch einmal tippen/);
-    await nutzer.click(knopf);
-    expect(csv).toHaveBeenCalledTimes(1);
-  });
-
-  it("gilt für Lageblatt, Weitergabe und Alle Daten als CSV", async () => {
-    const nutzer = userEvent.setup();
-    const f = { lageblatt: vi.fn(), weitergeben: vi.fn(), detail: vi.fn() };
-    ansicht(einsatzMit(["Wardenburg"]), {
-      onLageblatt: f.lageblatt,
-      onWeitergeben: f.weitergeben,
-      onCsvDetailExport: f.detail,
-    });
-    for (const name of [/^Lageblatt/, /^Einsatz weitergeben/, "Alle Daten als CSV"]) {
-      const knopf = screen.getByRole("button", { name });
-      await nutzer.click(knopf);
-      await nutzer.click(knopf);
-    }
-    expect(f.lageblatt).toHaveBeenCalledTimes(1);
-    expect(f.weitergeben).toHaveBeenCalledTimes(1);
-    expect(f.detail).toHaveBeenCalledTimes(1);
-  });
-
-  it("nach Ablauf der Sperre geht der nächste bewusste Tipp wieder durch", async () => {
-    const nutzer = userEvent.setup();
-    const csv = vi.fn();
-    ansicht(einsatzMit(["Wardenburg"]), { onCsvExport: csv });
-    const knopf = screen.getByRole("button", { name: "Übersicht als CSV" });
-    await nutzer.click(knopf);
-    ausgabeSperreZuruecksetzen(); // entspricht dem Ablauf der Sperrzeit
-    await nutzer.click(knopf);
-    expect(csv).toHaveBeenCalledTimes(2);
-  });
-});
-
-describe("R12-D2 Historie-Aktionen", () => {
-  it("die Buttons der Historie tragen die Klasse für 44 px und Abstand", async () => {
-    const nutzer = userEvent.setup();
-    const angelegt = einsatzAnlegen("Hochwasser Ulm", EinsatzArt.EINSATZ);
-    const ulm = (stand: number) => {
-      const b = bogenMitName("Ulm");
-      b.stand = stand;
-      return b;
-    };
-    meldungHinzufuegen(angelegt.id, ulm(1000));
-    meldungHinzufuegen(angelegt.id, ulm(2000));
-    ansicht(angelegt.id);
-    const karte = document.querySelector<HTMLElement>(".einheit-zeile")!;
-    await nutzer.click(within(karte).getByRole("button", { name: "Historie (2)" }));
-    const historie = karte.querySelector<HTMLElement>("ul.historie")!;
-    const gilt = within(historie).getAllByRole("button", { name: "Diese Fassung gilt…" });
-    const verwerfen = within(historie).getAllByRole("button", { name: "Fassung verwerfen…" });
-    const aenderungen = within(historie).getAllByRole("button", { name: "Änderungen" });
-    for (const k of [...gilt, ...verwerfen, ...aenderungen]) expect(k.classList.contains("historie-aktion")).toBe(true);
-    for (const k of verwerfen) expect(k.classList.contains("historie-verwerfen")).toBe(true);
-  });
-});
-
-describe("R12-O1 Eingabe bei in anderem Fenster entfernter Einheit", () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
-
-  it("nennt Einheit und eingetippten Text, wenn die Karte verschwindet", async () => {
-    const nutzer = userEvent.setup();
-    const einsatzId = einsatzMit(["Wardenburg", "Hatten"]);
-    const { neuLaden } = ansicht(einsatzId);
-    const karte = [...document.querySelectorAll<HTMLElement>(".einheit-zeile")].find((k) => k.textContent!.includes("Hatten"))!;
-    await nutzer.click(within(karte).getByRole("button", { name: "Auftrag/Notiz" }));
-    await nutzer.type(within(karte).getByLabelText("Auftrag/Notiz"), "Pumpen Nord");
-
-    // Das andere Fenster entfernt die Einheit; dieses lädt neu (storage-Ereignis).
-    const schl = einsaetzeLaden().find((s) => s.id === einsatzId)!.eintraege.find((e) => e.bogen.einheit.hierarchie[0]!.name === "Hatten")!
-      .einheitSchluessel;
-    einheitEntfernen(einsatzId, schl);
-    neuLaden();
-
-    const hinweis = await screen.findByRole("alert");
-    expect(hinweis.textContent).toContain("Die Einheit „THW Hatten\" wurde in einem anderen Fenster entfernt");
-    expect(hinweis.textContent).toContain("Auftrag/Notiz „Pumpen Nord\"");
-    await nutzer.click(within(hinweis).getByRole("button", { name: "Verstanden" }));
-    expect(screen.queryByRole("alert")).toBeNull();
-  });
-
-  it("schweigt, wenn nur die Ansicht gewechselt wird und die Einheit bleibt", async () => {
-    const nutzer = userEvent.setup();
-    const einsatzId = einsatzMit(["Wardenburg"]);
-    const { neuLaden } = ansicht(einsatzId);
-    await nutzer.click(screen.getByRole("button", { name: "Auftrag/Notiz" }));
-    await nutzer.type(screen.getByLabelText("Auftrag/Notiz"), "Noch da");
-    neuLaden();
-    expect(screen.queryByRole("alert")).toBeNull();
-  });
-});
-
-describe("R12-O2 „Erledigt“ am Widerspruch hat einen Rückweg", () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
-
-  it("Rückgängig bringt den Widerspruch samt Eintrag im Speicher zurück", async () => {
-    const nutzer = userEvent.setup();
-    const einsatzId = einsatzMit(["Wardenburg"]);
-    const zeile = "Wardenburg: hier Auftrag „B“, in der Datei Auftrag „A“; der Stand dieses Geräts bleibt";
-    widerspruchMerken(einsatzId, [zeile]);
-    ansicht(einsatzId);
-
-    expect(screen.getByText(zeile)).toBeDefined();
-    await nutzer.click(screen.getByRole("button", { name: "Erledigt" }));
-    expect(widerspruchLaden(einsatzId)).toEqual([]);
-    expect(screen.queryByText(zeile)).toBeNull();
-    const quittung = document.querySelector(".widerspruch-erledigt")!;
-    expect(quittung.textContent).toMatch(/1 Widerspruch als erledigt weggeräumt/);
-
-    await nutzer.click(within(quittung as HTMLElement).getByRole("button", { name: "Rückgängig" }));
-    expect(widerspruchLaden(einsatzId)).toEqual([zeile]);
-    expect(screen.getByText(zeile)).toBeDefined();
-    expect(document.querySelector(".widerspruch-erledigt")).toBeNull();
   });
 });
 

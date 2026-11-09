@@ -258,11 +258,6 @@ describe("Überschriften, Zusammenfassungen und Fußzeilen-Links brechen im Wort
     expect(wert("footer.seite a", "max-width")).toBe("100%");
     expect(wert("footer.seite a", "overflow-wrap")).toBe("anywhere");
   });
-
-  it("die Überschrift der Zwischensummen steht in einer summary (die Regel greift dort)", () => {
-    const quelle = readFileSync(join(WURZEL, "src", "app", "einsaetze-ui.tsx"), "utf8");
-    expect(quelle).toMatch(/<summary><h2>Zwischensummen nach Zug/);
-  });
 });
 
 describe("Leiste des Assistenten: Raster statt Umbruch (R4-M2, R4-G2)", () => {

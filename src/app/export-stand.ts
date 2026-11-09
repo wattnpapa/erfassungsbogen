@@ -24,12 +24,17 @@
  */
 
 import type { Einsatzsammlung, MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import { zeitLang } from "./eintrag-zeiten";
-import { FELDER, STAND_FELDER, standGleichheit, vermerkFeld, vermerkKennung, type Feld, type StandFeld } from "./einsatz-abgleich";
+import {
+  STAND_FELDER,
+  standGleichheit,
+  vermerkFeld,
+  vermerkKennung,
+  type Feld,
+  type StandFeld,
+} from "./einsatz-abgleich";
 import { MeldeStatus } from "@bos/meldekopf/einsaetze";
 import { geltendeJeEinheit } from "./fassung-vorrang";
-import { nummernHinweisLoeschen } from "./nummern-hinweis";
-import { ORT_REGEL, abweichenderOrt } from "./einheiten-tabelle";
+import { ORT_REGEL } from "./einheiten-tabelle";
 
 /**
  * Stände des Exports je Einsatz UND Format (R4-W2). Bis Runde 4 gab es einen
@@ -42,15 +47,7 @@ import { ORT_REGEL, abweichenderOrt } from "./einheiten-tabelle";
  * liefern als einem Empfänger etwas vorzuenthalten.
  */
 const SPEICHER_SCHLUESSEL = "eeb.export-stand.v2";
-const ALTER_SCHLUESSEL = "eeb.export-stand.v1";
 
-/**
- * Kennzeile jeder Tabellendatei (Excel, CSV): zu welcher Lage sie gehört und wann sie erzeugt wurde — wie der
- * Kopf von Lageblatt und Sammel-PDF (R16-A1). Zwei Dateien vom selben Tag lassen sich so ordnen.
- */
-export function exportKennzeile(s: Pick<Einsatzsammlung, "name">, erstellt: number = Date.now()): string {
-  return `Einsatz „${s.name}“ · Erstellt ${zeitLang(erstellt)}`;
-}
 
 /** Ausgabewege mit eigenem Bezugspunkt für „nur neue Bögen". */
 export type ExportZiel = "pdf" | "csv" | "csv-detail";
@@ -61,14 +58,6 @@ export type ExportZiel = "pdf" | "csv" | "csv-detail";
  */
 export const EXPORT_ZIELE: readonly ExportZiel[] = ["pdf", "csv", "csv-detail"];
 
-/** Wie das Format in der Zeile unter dem Kästchen heißt. */
-export const EXPORT_ZIEL_NAME: Record<ExportZiel, string> = {
-  // „Sammel-PDF" meint auch die Datei von „Einsatz weitergeben / sichern" (an die
-  // Ablösung); die Zeile hier betrifft die Lieferung an den Stab (R5-W5).
-  pdf: "Sammel-PDF an den Stab",
-  csv: "Übersicht als CSV",
-  "csv-detail": "Alle Daten als CSV",
-};
 /**
  * Wann zuletzt ein Lageblatt erzeugt wurde, und was da in der Sammlung stand.
  * Getrennt vom Export-Stand: das Lageblatt ist Papier für die Wand, kein
@@ -194,19 +183,8 @@ function ablageSpeichern(ablage: Ablage | ZielAblage, schluessel: string): boole
   }
 }
 
-/** Ob der letzte Export-, Lageblatt- oder Weitergabe-Vermerk geschrieben werden konnte (R19-O4). */
-let vermerkGelungen = true;
 
-/** Zusatz für die Erfolgsquittung eines Exports, wenn der Vermerk am vollen Speicher scheiterte; sonst leer (R19-O4). */
-export function vermerkFehltZusatz(): string {
-  // Wer ohne Vermerk exportiert (Nachtrag, Weitergabe als Teil), hat ihn vorher mit vermerkNeuBeginnen() freigegeben.
-  return vermerkGelungen ? "" : " Vermerk nicht gespeichert (Speicher voll) — die Übergabe-Liste zeigt „noch nicht“.";
-}
 
-/** Vor jedem Export aufrufen: ein früherer Fehlschlag soll nicht an dieser Quittung hängen. */
-export function vermerkNeuBeginnen(): void {
-  vermerkGelungen = true;
-}
 
 function zielAblageLaden(): ZielAblage {
   const ablage: ZielAblage = {};
@@ -222,88 +200,20 @@ function zielAblageLaden(): ZielAblage {
   return ablage;
 }
 
-/** Stand des letzten Exports dieses Formats, oder null, wenn es noch keinen gab. */
-export function exportStandLaden(einsatzId: string, ziel: ExportZiel): ExportStand | null {
-  return zielAblageLaden()[einsatzId]?.[ziel] ?? null;
-}
 
 /** Die Stände aller Formate dieses Einsatzes (fehlend = noch nie in diesem Format exportiert). */
 export function exportStaendeLaden(einsatzId: string): Partial<Record<ExportZiel, ExportStand>> {
   return zielAblageLaden()[einsatzId] ?? {};
 }
 
-/** Zustand je Einheit (Prüfsummen) für einen neuen Stand. */
-function zustandVon(eintraege: MeldeEintrag[]): NonNullable<ExportStand["zustand"]> {
-  const z: NonNullable<ExportStand["zustand"]> = {};
-  for (const k of geltendeJeEinheit(eintraege)) {
-    const f: Partial<Record<StandFeld, string>> = {};
-    for (const feld of STAND_FELDER) f[feld] = pruefsumme(standGleichheit(feld, k));
-    z[k.einheitSchluessel] = f;
-  }
-  return z;
-}
 
-function neuerStand(einsatz: Einsatzsammlung, jetzt: number): ExportStand {
-  return { zeitpunkt: jetzt, eintragIds: einsatz.eintraege.map((e) => e.id), zustand: zustandVon(einsatz.eintraege) };
-}
 
-/**
- * Nach einem gelungenen Export in diesem Format: alles, was jetzt in der
- * Sammlung steht, gilt in DIESEM Format als übergeben — auch beim Teilexport,
- * denn der enthielt genau das, was vorher noch fehlte. Die anderen Formate
- * bleiben, wie sie waren (R4-W2). Stände zu Einsätzen, die es nicht mehr gibt
- * (endgültig gelöscht), fallen bei der Gelegenheit weg; `behalten` nennt die
- * IDs aller noch vorhandenen Einsätze samt Papierkorb.
- */
-export function exportVermerken(
-  einsatz: Einsatzsammlung,
-  ziel: ExportZiel,
-  behalten?: Iterable<string>,
-  jetzt = Date.now(),
-): ExportStand {
-  const stand = neuerStand(einsatz, jetzt);
-  const alt = zielAblageLaden();
-  const neu: ZielAblage = {};
-  if (behalten) {
-    for (const id of behalten) if (alt[id]) neu[id] = alt[id];
-  } else {
-    Object.assign(neu, alt);
-  }
-  neu[einsatz.id] = { ...neu[einsatz.id], [ziel]: stand };
-  vermerkGelungen = ablageSpeichern(neu, SPEICHER_SCHLUESSEL);
-  try {
-    speicher()?.removeItem(ALTER_SCHLUESSEL); // der gemeinsame Merker der Runden 1–3
-  } catch {
-    /* Komfort */
-  }
-  return stand;
-}
 
 /** Stand des zuletzt erzeugten Lageblatts dieses Einsatzes, oder null (R2-A3). */
 export function lageblattStandLaden(einsatzId: string): ExportStand | null {
   return ablageLaden(LAGEBLATT_SCHLUESSEL)[einsatzId] ?? null;
 }
 
-/**
- * Nach einem erzeugten Lageblatt: Zeitpunkt und die Meldungen, die darauf
- * standen. Stände verschwundener Einsätze räumt der nächste Aufruf mit
- * `behalten` weg — wie beim Export-Stand.
- */
-export function lageblattVermerken(einsatz: Einsatzsammlung, behalten?: Iterable<string>, jetzt = Date.now()): ExportStand {
-  const stand = neuerStand(einsatz, jetzt);
-  const alt = ablageLaden(LAGEBLATT_SCHLUESSEL);
-  const neu: Ablage = {};
-  if (behalten) {
-    for (const id of behalten) if (alt[id]) neu[id] = alt[id];
-  } else {
-    Object.assign(neu, alt);
-  }
-  neu[einsatz.id] = stand;
-  vermerkGelungen = ablageSpeichern(neu, LAGEBLATT_SCHLUESSEL);
-  // R20-D3: Das neue Lageblatt trägt die geltenden Nummern; der Hinweis auf geänderte Nummern hat seinen Zweck erfüllt.
-  nummernHinweisLoeschen(einsatz.id);
-  return stand;
-}
 
 /**
  * Wann die ganze Sammlung zuletzt über „Einsatz weitergeben / sichern"
@@ -320,20 +230,6 @@ export function weitergabeStandLaden(einsatzId: string): ExportStand | null {
   return ablageLaden(WEITERGABE_SCHLUESSEL)[einsatzId] ?? null;
 }
 
-/** Nach einer gelungenen Weitergabe der ganzen Sammlung (Sammel-PDF, alle Bögen). */
-export function weitergabeVermerken(einsatz: Einsatzsammlung, behalten?: Iterable<string>, jetzt = Date.now()): ExportStand {
-  const stand = neuerStand(einsatz, jetzt);
-  const alt = ablageLaden(WEITERGABE_SCHLUESSEL);
-  const neu: Ablage = {};
-  if (behalten) {
-    for (const id of behalten) if (alt[id]) neu[id] = alt[id];
-  } else {
-    Object.assign(neu, alt);
-  }
-  neu[einsatz.id] = stand;
-  vermerkGelungen = ablageSpeichern(neu, WEITERGABE_SCHLUESSEL);
-  return stand;
-}
 
 /** FNV-1a (32 Bit) — kurze Prüfsumme einer Vermerk-Kennung, kein Klartext im Stand. */
 function pruefsumme(text: string): string {
@@ -345,48 +241,6 @@ function pruefsumme(text: string): string {
   return (h >>> 0).toString(16).padStart(8, "0");
 }
 
-/**
- * Nach „Einsatz importieren…": Was von dort kam, hat das andere Gerät schon.
- * Ohne das zählte der Vermerk zurückimportierte Meldungen als „hier neu" und
- * schickte zum erneuten Weitergeben (Audit Runde 3, R3-W2). Nur wenn es schon
- * eine Weitergabe gab. `bekannt` nennt je Einheit die Felder, deren Wert jetzt
- * dem der Datei entspricht (R4-W7) — auch, was der Abgleich dabei auf diesem
- * Gerät geschrieben hat; `vermerke` (Vermerk-Kennungen) gelten nur noch für
- * Stände ohne Zustand.
- */
-export function weitergabeUmImportErgaenzen(
-  einsatzId: string,
-  eintragIds: string[],
-  vermerke: string[],
-  bekannt: Record<string, Partial<Record<StandFeld, string>>> = {},
-  jetzt = Date.now(),
-  /** Hat die Datei etwas gebracht? Eine ältere Datei übernimmt nichts, und der Kopf darf es nicht behaupten (R13-A4). */
-  uebernommen = true,
-): void {
-  const alt = ablageLaden(WEITERGABE_SCHLUESSEL);
-  const stand = alt[einsatzId];
-  if (!stand) return;
-  let zustand = stand.zustand;
-  if (zustand) {
-    zustand = { ...zustand };
-    for (const [schl, felder] of Object.entries(bekannt)) {
-      const f: Partial<Record<StandFeld, string>> = { ...zustand[schl] };
-      for (const feld of STAND_FELDER) {
-        const w = felder[feld];
-        if (w !== undefined) f[feld] = pruefsumme(w);
-      }
-      zustand[schl] = f;
-    }
-  }
-  alt[einsatzId] = {
-    ...stand,
-    eintragIds: [...new Set([...stand.eintragIds, ...eintragIds])],
-    ...(stand.vermerke ? { vermerke: [...new Set([...stand.vermerke, ...vermerke.map(pruefsumme)])] } : {}),
-    ...(zustand ? { zustand } : {}),
-    ...(uebernommen ? { uebernommenAm: jetzt } : {}),
-  };
-  ablageSpeichern(alt, WEITERGABE_SCHLUESSEL);
-}
 
 /** Was seit dem Stand HIER an bekannten Einheiten geändert wurde (R3-W2, R4-K1). */
 export interface AenderungenSeit {
@@ -475,62 +329,10 @@ export function aenderungenSeit(eintraege: MeldeEintrag[], stand: ExportStand): 
   };
 }
 
-/** „1 Änderung (Abrücken)" / „2 Änderungen (Zug, Auftrag)" — leer ohne Änderung. */
-export function aenderungText(a: AenderungenSeit): string {
-  if (a.anzahl === 0) return "";
-  return `${a.anzahl === 1 ? "1 Änderung" : `${a.anzahl} Änderungen`} (${a.arten.join(", ")})`;
-}
 
-/**
- * „seitdem 1 neue Meldung" / „seitdem keine neue Meldung" — für Export- und
- * Lageblatt-Zeile. Mit `aend` zählen auch Änderungen an bekannten Einheiten
- * mit („seitdem 1 neue Meldung und 1 Änderung (Abrücken)", R4-K1): Ein Blatt,
- * auf dem eine abgerückte Einheit noch steht, ist nicht „unverändert".
- */
-export function seitdemText(neu: number, aend?: AenderungenSeit): string {
-  const a = aend ? aenderungText(aend) : "";
-  if (neu === 0) return a ? `seitdem ${a}` : "seitdem keine neue Meldung";
-  const m = neu === 1 ? "1 neue Meldung" : `${neu} neue Meldungen`;
-  return a ? `seitdem ${m} und ${a}` : `seitdem ${m}`;
-}
 
-/** Meldungen, die beim letzten Export noch nicht in der Sammlung standen — ohne Stand: alle. */
-export function neueEintraege(eintraege: MeldeEintrag[], stand: ExportStand | null): MeldeEintrag[] {
-  if (!stand) return eintraege;
-  const bekannt = new Set(stand.eintragIds);
-  // Eine ältere Fassung, die erst nach dem Export eintraf und nur in der Historie
-  // liegt, ändert die Lage nicht: Sie zählte als „neuer Bogen" und brachte ihre
-  // alte Stärke in den Nachtrag (Audit Runde 6, R6-W1).
-  const geltend = new Set(geltendeJeEinheit(eintraege).map((e) => e.id));
-  return eintraege.filter((e) => !bekannt.has(e.id) && geltend.has(e.id));
-}
 
-/**
- * „Neu seit der letzten Kenntnisnahme": die neuen Meldungen ohne eigene Umbauten (Aufteilen, Zusammenführen) und
- * ohne abgerückte Einheiten. Wer abgerückt ist, ist abgefertigt — die Startseite zählte ihn noch als neu, die
- * Einsatzansicht nach dem Abrücken nicht mehr, und beim Wiederöffnen stand er wieder da (R13-W2).
- */
-export function neuZurKenntnis(eintraege: MeldeEintrag[], stand: ExportStand | null): MeldeEintrag[] {
-  return neueEintraege(eintraege, stand).filter(
-    (e) => e.quelle !== "aufteilung" && e.quelle !== "zusammenfuehrung" && !e.angaben?.kennzeichnung && e.status !== MeldeStatus.ABGERUECKT,
-  );
-}
 
-/**
- * Was ein Nachtrag seit dem Stand enthält: die neuen Meldungen und die geltende
- * Fassung jeder Einheit, an der sich seither etwas geändert hat (Abrücken, Zug,
- * Auftrag, Eintreffzeit). Ohne das ginge ein Abrücken nie in einen Teilexport
- * (R4-K1): Die Einheit stünde beim Stab weiter als anwesend in der Lage.
- */
-export function nachtragEintraege(eintraege: MeldeEintrag[], stand: ExportStand | null): MeldeEintrag[] {
-  if (!stand) return eintraege;
-  const neu = neueEintraege(eintraege, stand);
-  const geaendert = new Set(aenderungenSeit(eintraege, stand).einheiten);
-  if (geaendert.size === 0) return neu;
-  const ids = new Set(neu.map((e) => e.id));
-  for (const k of geltendeJeEinheit(eintraege)) if (geaendert.has(k.einheitSchluessel)) ids.add(k.id);
-  return eintraege.filter((e) => ids.has(e.id));
-}
 
 /** Warum eine Einheit im Nachtrag steht (R5-W7). */
 export interface NachtragGrund {
@@ -557,21 +359,6 @@ declare module "@bos/meldekopf/einsaetze" {
   }
 }
 
-/**
- * Einheiten, deren Bogen einen Ort/Auftrag nennt, der nicht zur Lage passt
- * (R5-K5), als Schlüssel → Text des Bogens. Dieselbe Regel wie die Marke „Anderer
- * Einsatz?" an der Karte; Lageblatt, Sammel-PDF, CSV und Excel tragen sie jetzt
- * ebenfalls. `fremdeOrte` der zugeschnittenen Sammlung geht vor.
- */
-export function ortHinweise(s: Einsatzsammlung, ganz: readonly MeldeEintrag[] = s.eintraege): Record<string, string> {
-  if (s.fremdeOrte) return s.fremdeOrte;
-  const aus: Record<string, string> = {};
-  for (const e of geltendeJeEinheit(s.eintraege)) {
-    const ort = abweichenderOrt(e, s, ganz);
-    if (ort != null) aus[e.einheitSchluessel] = ort;
-  }
-  return aus;
-}
 
 /** Der Hinweis in Worten, für Zellen und Zeilen der Ausgaben. */
 export function ortHinweisText(ort: string): string {
@@ -600,39 +387,8 @@ export function nachtragGruende(eintraege: MeldeEintrag[], stand: ExportStand): 
   return aus;
 }
 
-/** „neu" / „geändert: Zug, Auftrag" — der Grund als Wort für eine Zeile (R5-W7). */
-export function nachtragGrundText(g: NachtragGrund | undefined): string {
-  if (!g) return "";
-  return g.neu ? "neu" : `geändert: ${g.gruende.join(", ")}`;
-}
 
-/**
- * Die Sammlung auf den gewünschten Umfang zuschneiden. Die Exporte (CSV,
- * Excel, Sammel-PDF) rechnen alle auf einer `Einsatzsammlung`; sie bekommen
- * dieselbe Sammlung mit weniger Einträgen und müssen den Umfang nicht kennen.
- * Beim Nachtrag trägt sie dazu den Bezugszeitpunkt (`nachtragSeit`) und je
- * Einheit den Grund (`nachtragGruende`), damit jedes Format Zeilen und
- * Summen gleich kennzeichnet (R5-W7, R5-K6).
- */
-export function exportSammlung(einsatz: Einsatzsammlung, umfang: ExportUmfang, stand: ExportStand | null): Einsatzsammlung {
-  if (umfang === "alle") return einsatz;
-  const eintraege = nachtragEintraege(einsatz.eintraege, stand);
-  const fremdeOrte = ortHinweise({ ...einsatz, eintraege }, einsatz.eintraege);
-  if (!stand) return { ...einsatz, eintraege, fremdeOrte };
-  return { ...einsatz, eintraege, fremdeOrte, nachtragSeit: stand.zeitpunkt, nachtragGruende: nachtragGruende(einsatz.eintraege, stand) };
-}
 
-/**
- * Der Namensteil einer Lieferung — für alle Formate gleich (R5-W8):
- * `nachtrag` für einen Nachtrag, `erste-lieferung` für
- * „nur neue Bögen" ohne Bezugspunkt (das ist die ganze Lage und hieß bisher
- * wie die Gesamtdatei), sonst nichts.
- */
-export function lieferungsMarke(umfang: ExportUmfang, stand: ExportStand | null | undefined): string {
-  if (umfang !== "neue") return "";
-  // Der Bezugspunkt („seit …") steht in der Datei; im Namen steht nur der Zeitstempel der Erzeugung (R18-W6).
-  return stand ? "nachtrag" : "erste-lieferung";
-}
 
 /**
  * Stände vom anderen Gerät übernehmen (R5-W6): Die Sammel-PDF der Weitergabe
@@ -677,27 +433,6 @@ export function exportStaendeUebernehmen(einsatzId: string, staende: unknown, be
   ablageSpeichern(neu, SPEICHER_SCHLUESSEL);
 }
 
-/**
- * Das Format ab der letzten Weitergabe rechnen (R5-W5): Der Stab hat die
- * Sammel-PDF der Weitergabe ebenfalls bekommen. Auf ausdrücklichen Wunsch — die
- * Weitergabe zählt sonst nicht als Lieferung an den Stab (R4-W2). Null, wenn es
- * keine Weitergabe gibt.
- */
-export function exportStandAusWeitergabe(einsatzId: string, ziel: ExportZiel, behalten?: Iterable<string>): ExportStand | null {
-  const w = weitergabeStandLaden(einsatzId);
-  if (!w) return null;
-  const alt = zielAblageLaden();
-  const neu: ZielAblage = {};
-  if (behalten) {
-    for (const id of behalten) if (alt[id]) neu[id] = alt[id];
-  } else {
-    Object.assign(neu, alt);
-  }
-  const stand: ExportStand = { zeitpunkt: w.zeitpunkt, eintragIds: [...w.eintragIds], ...(w.zustand ? { zustand: w.zustand } : {}), herkunft: "weitergabe" };
-  neu[einsatzId] = { ...neu[einsatzId], [ziel]: stand };
-  ablageSpeichern(neu, SPEICHER_SCHLUESSEL);
-  return stand;
-}
 
 /**
  * Gibt es von dieser Sammlung irgendeinen Export, ein Lageblatt oder eine
@@ -712,44 +447,8 @@ export function exportVorhanden(einsatzId: string): boolean {
   );
 }
 
-/** Satz für Rückfragen vor dem Löschen: was von dieser Sammlung schon hinausging (R19-W10). */
-export function exportStandSatz(einsatzId: string): string {
-  const zeiten = [...Object.values(exportStaendeLaden(einsatzId)), lageblattStandLaden(einsatzId), weitergabeStandLaden(einsatzId)]
-    .filter((s): s is ExportStand => s != null)
-    .map((s) => s.zeitpunkt);
-  return zeiten.length === 0 ? "Noch nichts exportiert oder übergeben." : `Zuletzt herausgegangen: ${exportZeitKurz(Math.max(...zeiten))}.`;
-}
 
-/**
- * Wann zuletzt ein Export, ein Lageblatt oder eine Weitergabe dieser Sammlung
- * eine der Meldungen enthielt — `null`, wenn keine in irgendeinem Stand steht.
- * Für die Rückfrage vor dem Entfernen: Sie sagt, ob es von der Meldung noch
- * eine Kopie gibt (Audit Runde 4, R4-D3).
- */
-export function letzterStandMit(einsatzId: string, eintragIds: readonly string[]): number | null {
-  const ids = new Set(eintragIds);
-  const staende: (ExportStand | null | undefined)[] = [
-    ...Object.values(exportStaendeLaden(einsatzId)),
-    lageblattStandLaden(einsatzId),
-    weitergabeStandLaden(einsatzId),
-  ];
-  let zuletzt: number | null = null;
-  for (const st of staende) {
-    if (!st || !st.eintragIds.some((id) => ids.has(id))) continue;
-    if (zuletzt == null || st.zeitpunkt > zuletzt) zuletzt = st.zeitpunkt;
-  }
-  return zuletzt;
-}
 
-/**
- * Zeitpunkt von Export, Lageblatt und Weitergabe — in derselben Form wie auf
- * Karte und Lageblatt: „29.09.2026, 16:44". Vorher „Mo., 16:44", das über
- * eine Woche hinaus mehrdeutig war und neben „28.09.2026, 14:05" stand
- * (Audit Runde 2, R2-A6).
- */
-export function exportZeitKurz(zeitpunkt: number): string {
-  return zeitLang(zeitpunkt);
-}
 
 /**
  * Was die Führungsstelle an diesem Gerät zuletzt „zur Kenntnis genommen" hat:
@@ -769,10 +468,6 @@ export function exportZeitKurz(zeitpunkt: number): string {
  */
 const KENNTNIS_SCHLUESSEL = "eeb.kenntnis-stand.v1";
 
-/** Stand der letzten Kenntnisnahme dieses Einsatzes, oder null (noch nie geöffnet). */
-export function kenntnisStandLaden(einsatzId: string): ExportStand | null {
-  return ablageLaden(KENNTNIS_SCHLUESSEL)[einsatzId] ?? null;
-}
 
 /**
  * Alles, was jetzt in der Sammlung steht, gilt als gesehen. Beim ersten
@@ -809,19 +504,3 @@ export function kenntnisVermerkenGeprueft(
   return { stand, gespeichert: ablageSpeichern(neu, KENNTNIS_SCHLUESSEL) };
 }
 
-/**
- * Den Stand vor „Zur Kenntnis genommen" zurückschreiben (Rückgängig, R11-D1); `null` entfernt den Eintrag. Liefert
- * `false`, wenn der Speicher voll oder gesperrt ist.
- */
-export function kenntnisWiederherstellen(einsatzId: string, stand: ExportStand | null, behalten?: Iterable<string>): boolean {
-  const alt = ablageLaden(KENNTNIS_SCHLUESSEL);
-  const neu: Ablage = {};
-  if (behalten) {
-    for (const id of behalten) if (alt[id]) neu[id] = alt[id];
-  } else {
-    Object.assign(neu, alt);
-  }
-  if (stand) neu[einsatzId] = stand;
-  else delete neu[einsatzId];
-  return ablageSpeichern(neu, KENNTNIS_SCHLUESSEL);
-}

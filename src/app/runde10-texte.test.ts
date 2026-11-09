@@ -3,23 +3,10 @@
  * (R10-W1), Hinweise zum Ort der Einheit (R10-N3), Dateifehler beim Einsatzimport (R10-E6).
  */
 import { describe, expect, it } from "vitest";
-import { lueckenAlle, lueckeKurz } from "./einheiten-tabelle";
 import { namePapier, vereinfachtBetroffene, winAnsiText, zeichenVereinfacht } from "./pdf-dokument";
 import { dateiFehlerText } from "./datei-fehler";
 import { neuerBogen, neuePerson, pruefpunkte } from "./hilfen";
 import { speicherFehlerKurz } from "./speicher-fehler-text";
-
-describe("Lageblatt-Hinweise (R10-A4)", () => {
-  it("fasst gleiche Stichworte mit Anzahl zusammen", () => {
-    const t = ["Fahrzeug 1 hat noch kein Kennzeichen.", "Fahrzeug 2 hat noch kein Kennzeichen.", "Stärke ist 0."];
-    expect(lueckenAlle(t)).toBe("Kennzeichen fehlt (2); Stärke 0");
-  });
-
-  it("kürzt die Warnung zum Ort der Einheit (R10-N3)", () => {
-    expect(lueckeKurz("Zugehörigkeit: Der Ort der Einheit (unterste Ebene) fehlt.")).toBe("Ort der Einheit fehlt");
-    expect(lueckeKurz("Zugehörigkeit: Der Name der eigenen Einheit (unterste Ebene) fehlt.")).toBe("Ort der Einheit fehlt");
-  });
-});
 
 describe("Warnung zum Ort der Einheit (R10-N3, R10-M1)", () => {
   it("trägt dasselbe Wort wie das Feld und springt auf das Feld", () => {

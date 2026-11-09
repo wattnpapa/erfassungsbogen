@@ -49,26 +49,4 @@ export function einsatzFunkrufSetzen(einsatzId: string, name: string, bekannteId
   return funkrufe.setzen(einsatzId, sauber === "" ? null : sauber, bekannteIds);
 }
 
-/** Ab so vielen Tagen zurück fragt das Feld „Einsatzbeginn" nach dem Jahr (R11-E6). */
-export const BEGINN_ZURUECK_TAGE = 31;
-/** Wie weit ein Beginn in der Zukunft liegen darf, ohne zu fragen (Uhren gehen nach). */
-const BEGINN_ZUKUNFT_TOLERANZ_MS = 5 * 60_000;
 
-/**
- * Plausibilitätssatz zum eingetragenen Beginn („Jahr prüfen / liegt in der Zukunft", R11-E6): Ein Zahlendreher im
- * Jahr stand sonst erst auf dem Fernseher vor dem Stab („365 Tage" oder „Einsatz beginnt noch"). Leer, wenn der
- * Beginn passt oder fehlt.
- */
-export function beginnHinweis(beginn: number | null, jetzt: number): string {
-  if (beginn == null) return "";
-  const d = new Date(beginn);
-  const jahr = d.getFullYear();
-  if (beginn - jetzt > BEGINN_ZUKUNFT_TOLERANZ_MS) {
-    return `Der Beginn liegt in der Zukunft (${jahr}). Jahr prüfen — der Monitor zeigt bis dahin „Einsatz beginnt noch".`;
-  }
-  const tage = Math.floor((jetzt - beginn) / 86_400_000);
-  if (tage >= BEGINN_ZURUECK_TAGE) {
-    return `Der Beginn liegt ${tage} Tage zurück (${jahr}). Jahr prüfen — der Monitor zeigt „seit Beginn: ${tage} Tage …".`;
-  }
-  return "";
-}

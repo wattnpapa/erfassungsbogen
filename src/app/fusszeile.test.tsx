@@ -204,7 +204,7 @@ describe("Sicherung einspielen", () => {
     expect(within(dialog).getByText(/Sammlung „Heute Nacht Starkregen“ mit 1 Meldung/)).toBeDefined();
     expect(within(dialog).getByText(/In der Datei „eeb-sicherung.json“/)).toBeDefined();
     expect(within(dialog).getByText("1 Vorlage")).toBeDefined(); // aus der Datei
-    expect(within(dialog).getByText(/Anders als „Einsatz importieren…“ wird nichts ergänzt/)).toBeDefined();
+    expect(within(dialog).getByText(/Anders als „Einsatz importieren…“ in der Meldekopf-App wird nichts ergänzt/)).toBeDefined();
     expect(within(dialog).getByRole("button", { name: "Vorher Sicherung erstellen…" })).toBeDefined();
 
     const ersetzen = within(dialog).getByRole("button", { name: "Einspielen und ersetzen" });

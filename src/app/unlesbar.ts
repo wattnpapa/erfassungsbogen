@@ -329,11 +329,6 @@ function ablegen(neu: Partial<Omit<UnlesbarBestand, "am">>): "abgelegt" | "vorha
   }
 }
 
-/** Liegen unlesbare Sammlungen (ganze Texte oder Sammlungen ohne Kennung) beiseite? Für den Lagemonitor (R9-O2). */
-export function sammlungenBeiseitegelegt(): boolean {
-  const b = unlesbarBestand();
-  return !!b && (b.sammlungen.length > 0 || b.texte.some((t) => t.art === "sammlungen"));
-}
 
 /** Zusammenfassung für Hinweise: wie viel liegt beiseite? */
 export function unlesbarZahlen(): { sammlungen: number; meldungen: number; vorlagen: number; texte: number; gesamt: number } {

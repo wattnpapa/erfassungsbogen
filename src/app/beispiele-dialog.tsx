@@ -17,7 +17,7 @@ import { FehlerImBild } from "./fehler-im-bild";
 // Als Datei-URL, nicht als Modul: Der Index (rund 190 KB) lädt erst beim ersten Suchen
 // und zählt weder ins Start- noch ins JS-Bündel (scripts/beispiele-suchindex.mts).
 import SUCHINDEX_URL from "./beispiele-suchindex.json?url";
-import { suchNorm, treffer, woerterVon } from "./beispiele-suche";
+import { treffer, woerterVon } from "./beispiele-suche";
 
 // Anzeigenamen für die Ordner in examples/. Erste Ebene ist die Organisation
 // bzw. ein Thema (z. B. „Katastrophenschutz"), darunter können weitere Ebenen
@@ -474,7 +474,7 @@ function Dialog({ titel, dialogRef, klasse, onSchliessen, children }: {
   );
 }
 
-export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }: {
+export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
   /** Zählt mit jeder Anfrage zum Öffnen hoch (beispielboegenOeffnen in fusszeile.tsx). */
   anfrage: number;
   /**
@@ -483,8 +483,6 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
    * dann bleibt der Dialog stehen.
    */
   onBogenOeffnen: (bogen: Erfassungsbogen) => Promise<boolean>;
-  /** Alle Bögen des offenen Ordners in eine neue Übungs-Sammlung legen (BB-K1). Ohne Angabe fehlt der Knopf. */
-  onAlsUebung?: (boegen: { bogen: Erfassungsbogen; zug?: string }[], ordnerName: string) => Promise<boolean>;
 }) {
   const beispiele = useRef<HTMLDialogElement>(null);
   // Ordner-Navigation im Beispielbögen-Dialog: erst Organisation/Thema, ggf.
@@ -800,31 +798,6 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
     }
   }
 
-  /** Alle Bögen des offenen Ordners in eine neue Übungs-Sammlung (BB-K1, BB-W4, BB-A1). */
-  async function alleAlsUebung() {
-    if (!onAlsUebung) return;
-    // Ein Doppeltipp auf ein Register traf mit dem zweiten Tipp diesen Knopf und
-    // legte ohne Rückfrage eine Sammlung an (Runde 2, BB2-G2, BB2-E2).
-    if (performance.now() - Math.max(letzterWechsel.current, geoeffnetUm.current) < 800) return;
-    setBeispielFehler("");
-    setBeispielLaeuft("*alle*");
-    const sitzung = beispielSitzung.current;
-    try {
-      // Der Zug aus dem Dateinamen (2. TZ, FZ FK, FZ Log) reist mit: Ohne ihn legte die Sammlung
-      // die Einheiten des 2. TZ als Folgemeldung auf die des 1. (BB2-K1) und führte sie „ohne Zug".
-      const boegen = await Promise.all(
-        beispielBoegen.map(async ({ url, datei }) => ({ bogen: await beispielKopie(url), zug: zugHinweis(datei) || undefined })),
-      );
-      if (beispielSitzung.current !== sitzung) return;
-      // Kurzer Name: der offene Ordner, nicht der ganze Pfad (bis 161 Zeichen, BB2-K3, BB2-A4).
-      if (await onAlsUebung(boegen, ordnerLabel(beispielPfad[beispielPfad.length - 1] ?? ""))) beispiele.current?.close();
-    } catch (err) {
-      setBeispielFehler(`Sammlung konnte nicht angelegt werden: ${fehlerText(err)}`);
-    } finally {
-      setBeispielLaeuft("");
-    }
-  }
-
   function beispieleOeffnen() {
     // Dort weiter, wo man zuletzt war (BB-S3, BB-W3); einen nicht mehr
     // vorhandenen Ordner verwirft der Dialog. Der Ordner der Ortsverbände kommt
@@ -1048,16 +1021,6 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen, onAlsUebung }
               </span>
             )}
           </p>
-        )}
-        {onAlsUebung && !suchErgebnis && beispielBoegen.length > 1 && (
-          <div className="beispiel-sammelweg">
-            <button type="button" disabled={beispielLaeuft !== ""} onClick={() => void alleAlsUebung()}>
-              Alle {beispielBoegen.length.toLocaleString("de-DE")} in eine Übungs-Sammlung
-            </button>
-            <span className="hinweis">
-              Legt eine neue Sammlung der Art „Übung“ mit diesen Bögen an — mit Sammel-PDF, Lageblatt und Weitergabe. Dein offener Bogen bleibt, wie er ist.
-            </span>
-          </div>
         )}
         {beispielBoegen.length > 0 && (
           <div className="tabellen-scroll">

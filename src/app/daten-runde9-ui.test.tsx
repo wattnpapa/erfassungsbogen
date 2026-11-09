@@ -7,15 +7,11 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState, type ComponentType } from "react";
-import { EinsatzArt, einsatzAnlegen, meldungHinzufuegen } from "@bos/meldekopf/einsaetze";
 import { Dialogschicht } from "./dialoge";
-import { neuePerson, neuerBogen, neuesFahrzeug } from "./hilfen";
+import { neuerBogen, neuesFahrzeug } from "./hilfen";
 import { UnlesbarHinweis } from "./unlesbar-hinweis";
 import { sammlungenRetteZuruecksetzen, sammlungenRetten, unlesbarBestand } from "./unlesbar";
 import { einsaetzeLesenZuruecksetzen } from "./einsaetze-lesen";
-import { Lagemonitor } from "./lagemonitor-ui";
-import { EinsatzListe } from "./einsaetze-ui";
-import { einsaetzeLaden } from "./einsaetze-lesen";
 import { SchrittFahrzeuge } from "./schritte/fahrzeuge";
 import { SchrittEinheit } from "./schritte/einheit";
 import { entwurfAusJson, entwurfZuJson } from "./entwurf";
@@ -214,60 +210,5 @@ describe("Zettelangaben der manuellen Aufnahme bleiben im Entwurf (R9-S1)", () =
     expect(entwurfAusJson(JSON.stringify(bose))?.fremd?.zettel).toEqual({ zug: "x".repeat(80) });
     bose.fremd.zettel = { zeit: "", nr: " " };
     expect(entwurfAusJson(JSON.stringify(bose))?.fremd?.zettel).toBeUndefined();
-  });
-});
-
-describe("Lagemonitor bei unlesbarem Sammlungstext (R9-O2) und Sollstärke (R9-K1)", () => {
-  it("behält den letzten Stand und sagt „Sammlung nicht lesbar – letzter Stand von HH:MM“", () => {
-    const e = einsatzAnlegen("Hochwasser Süd", EinsatzArt.EINSATZ);
-    const b = neuerBogen();
-    b.einheit.hierarchie[0]!.name = "OV Musterstadt";
-    b.personal = [{ ...neuePerson(), vorname: "A", nachname: "B" }];
-    meldungHinzufuegen(e.id, b);
-    const { rerender } = render(<Lagemonitor einsatzId={e.id} />);
-    expect(screen.getByRole("heading", { name: "Hochwasser Süd" })).toBeTruthy();
-    // Ein anderes Fenster macht den Text unlesbar.
-    localStorage.setItem("eeb.einsaetze.v1", "xx");
-    einsaetzeLesenZuruecksetzen();
-    rerender(<Lagemonitor einsatzId={e.id} />);
-    expect(screen.getByRole("heading", { name: "Hochwasser Süd" })).toBeTruthy();
-    expect(screen.getByRole("alert").textContent).toMatch(/Sammlung nicht lesbar – letzter Stand von \d\d:\d\d Uhr/);
-    expect(screen.queryByText(/nicht \(mehr\) vorhanden/)).toBeNull();
-  });
-
-  it("sagt ohne früheren Stand „nicht lesbar“ statt „nicht mehr vorhanden“, wenn Sammlungen beiseite liegen", () => {
-    localStorage.setItem("eeb.einsaetze.v1", "xx");
-    render(<Lagemonitor einsatzId="unbekannt" />);
-    expect(screen.getByText(/nicht lesbar und liegen beiseite/)).toBeTruthy();
-  });
-
-  it("nennt unter der Gesamtstärke den Sollanteil und lässt die Zeile weg, wenn alles gezählt ist", () => {
-    const e = einsatzAnlegen("Lage", EinsatzArt.EINSATZ);
-    const soll = neuerBogen();
-    soll.einheit.hierarchie[0]!.name = "OV Soll";
-    soll.personal = [neuePerson(), neuePerson(), neuePerson()];
-    meldungHinzufuegen(e.id, soll);
-    render(<Lagemonitor einsatzId={e.id} />);
-    expect(document.body.textContent).toMatch(/davon 3 Sollstärke( \(S\))?, nicht gemeldet/);
-    cleanup();
-    const e2 = einsatzAnlegen("Gezählt", EinsatzArt.EINSATZ);
-    const ist = neuerBogen();
-    ist.einheit.hierarchie[0]!.name = "OV Ist";
-    ist.personal = [{ ...neuePerson(), vorname: "A", nachname: "B" }];
-    meldungHinzufuegen(e2.id, ist);
-    render(<Lagemonitor einsatzId={e2.id} />);
-    expect(document.body.textContent).not.toMatch(/Sollstärke/);
-  });
-});
-
-describe("Kachel der Sammlung (R9-K1)", () => {
-  it("nennt den Sollanteil an der Stärke und lässt ihn weg, wenn alles gezählt ist", () => {
-    const e = einsatzAnlegen("Lage", EinsatzArt.EINSATZ);
-    const soll = neuerBogen();
-    soll.einheit.hierarchie[0]!.name = "OV Soll";
-    soll.personal = [neuePerson(), neuePerson()];
-    meldungHinzufuegen(e.id, soll);
-    render(<EinsatzListe einsaetze={einsaetzeLaden()} onOeffnen={() => {}} onGeaendert={() => {}} />);
-    expect(document.body.textContent).toMatch(/davon 2 Sollstärke, nicht gemeldet/);
   });
 });

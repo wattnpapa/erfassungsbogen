@@ -58,14 +58,6 @@ export function aufgeraeumteLaden(speicher: Pick<Storage, "getItem"> | null = lo
   }
 }
 
-/** „Verstanden": die Nachricht ist gelesen und verschwindet. */
-export function aufgeraeumteQuittieren(speicher: Pick<Storage, "removeItem"> | null = lokalerSpeicher()): void {
-  try {
-    speicher?.removeItem(HINWEIS_SCHLUESSEL);
-  } catch {
-    // Speicher blockiert — die Nachricht kommt dann beim nächsten Start wieder.
-  }
-}
 
 /**
  * Welche Sammlungen im gespeicherten Text die Aufräumfrist überschritten haben

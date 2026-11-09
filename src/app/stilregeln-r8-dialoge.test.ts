@@ -41,12 +41,6 @@ describe("Rückfragen bei Zoom und großer Schrift (R8-G1, R8-M2, R8-G5, R8-M8)"
 });
 
 describe("Papier-Abgleich, Bogen übergeben, beiseitegelegter Bogen (R8-G6, R8-D6, R8-H4)", () => {
-  it("„Eingaben verwerfen…“ ist ein Knopf mit 44 px und 16 px Abstand zu „Später“", () => {
-    expect(css).toMatch(/\.papier-abgleich-weg\s*\{\s*gap:\s*var\(--r-4\)/);
-    expect(css).toMatch(/\.papier-abgleich-weg > button\s*\{\s*min-height:\s*calc\(44px \+ var\(--ziel\)\)/);
-    const quelle = readFileSync(new URL("./papier-abgleich-ui.tsx", import.meta.url), "utf8");
-    expect(quelle).toMatch(/className="gefahr" onClick=\{\(\) => void eingabenVerwerfen\(\)\}/);
-  });
 
   it("„Für neuen Einsatz vorbereiten“ steht am Ende des Dialogs „Bogen übergeben“, abgesetzt", () => {
     const quelle = readFileSync(new URL("./schritte/uebersicht.tsx", import.meta.url), "utf8");

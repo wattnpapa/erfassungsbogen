@@ -10,8 +10,6 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Dialogschicht } from "./dialoge";
 import { Fusszeile } from "./fusszeile";
-import { neuerBogen } from "./hilfen";
-import { SchrittEinheit } from "./schritte/einheit";
 import { Vollstaendigkeit } from "./schritte/bausteine";
 
 afterEach(() => {
@@ -28,19 +26,6 @@ const abschnitt = (() => {
   expect(bis).toBeGreaterThan(von);
   return html.slice(von, bis).replace(/\/\*[\s\S]*?\*\//g, "");
 })();
-
-describe("Aufnahme beginnt oben (R16-M1)", () => {
-  it("der Ort bekommt den Fokus, aber die Seite rollt an den Anfang statt zum Feld", () => {
-    const rollen = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
-    const mitte = vi.fn();
-    Element.prototype.scrollIntoView = mitte;
-    render(<SchrittEinheit bogen={neuerBogen()} aendern={() => {}} ortFokus />);
-    expect(document.activeElement?.id).toBe("feld-einheit-name");
-    expect(rollen).toHaveBeenCalledWith(0, 0);
-    expect(mitte).not.toHaveBeenCalled();
-    delete (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView;
-  });
-});
 
 describe("Rückfragen der Fußzeile (R16-M2)", () => {
   it("„Alle Daten löschen“: Haken, „Endgültig löschen“ und „Abbrechen“ stehen in einer klebenden Entscheidungsgruppe", async () => {

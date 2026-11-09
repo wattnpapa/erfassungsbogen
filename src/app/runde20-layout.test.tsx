@@ -8,14 +8,10 @@
  * das Verhalten (Bedienung, Reihenfolge, Texte) und die Stilregeln in index.html, Abschnitt „Runde 20 (Layout)".
  */
 import { readFileSync } from "node:fs";
-import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { EinsatzArt, einsaetzeLaden, einsatzAnlegen, meldungHinzufuegen } from "@bos/meldekopf/einsaetze";
 import { StaerkeRolle, type Person } from "@bos/eeb-format/model";
-import { Dialogschicht } from "./dialoge";
-import { EinsatzDetail, KERN_KOPF, kuerzeAnWortgrenze, tabellenSpaltenFuer } from "./einsaetze-ui";
 import { neuePerson, neuerBogen } from "./hilfen";
 import { QrScannerWeb, hinweiseGeoeffnet } from "./qr-scanner-web";
 import { KENNTNIS_SPERRE_MS, ORTSSPERRE_MS, ortFreigeben, ortSperren, tippSchutzZuruecksetzen } from "./tipp-schutz";
@@ -43,46 +39,8 @@ afterEach(() => {
   delete (window as { matchMedia?: unknown }).matchMedia;
 });
 
-function telefon() {
-  window.matchMedia = ((q: string) => ({
-    matches: true,
-    media: q,
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    addListener: () => {},
-    removeListener: () => {},
-  })) as unknown as typeof window.matchMedia;
-}
 
-function bogenMitName(name: string) {
-  const b = neuerBogen();
-  b.einheit.hierarchie[0]!.name = name;
-  return b;
-}
 
-function Wirt({ id }: { id: string }) {
-  const [einsatz, setEinsatz] = useState(() => einsaetzeLaden().find((s) => s.id === id)!);
-  return (
-    <>
-      <EinsatzDetail
-        einsatz={einsatz}
-        onZurueck={() => {}}
-        onGeaendert={() => setEinsatz({ ...einsaetzeLaden().find((s) => s.id === id)! })}
-        onScannen={() => {}}
-        onManuell={() => {}}
-        onDateiImport={() => {}}
-        onBilderImport={() => {}}
-        onExport={() => {}}
-        onCsvExport={() => {}}
-        onCsvDetailExport={() => {}}
-        onSammelPdf={() => {}}
-        onWeitergeben={() => {}}
-        onGeloescht={() => {}}
-      />
-      <Dialogschicht />
-    </>
-  );
-}
 
 describe("Runde 20 (Layout): die Stilregeln sind da", () => {
   it("der Abschnitt ist da", () => {
@@ -147,26 +105,6 @@ describe("Runde 20 (Layout): die Stilregeln sind da", () => {
 
   it("R20-H4, G4: „Ansicht“ steht im Kopf der Einsatzansicht", () => {
     expect(abschnitt).toMatch(/\.seiten-kopf\.einsatz-kopf \.anzeige-mit-name \{ display: inline-flex; \}/);
-  });
-});
-
-describe("R20-A4: gekürzte Bemerkungen enden an einer Wortgrenze", () => {
-  it("kürzt nie mitten im Wort und lässt kurze Texte stehen", () => {
-    const text = "2 Helfer über StAN-Soll (Reserve aktiviert). Anhänger nicht mit ausgerückt.";
-    expect(kuerzeAnWortgrenze("kurz", 40)).toBe("kurz");
-    for (const grenze of [20, 30, 40, 50]) {
-      const kurz = kuerzeAnWortgrenze(text, grenze);
-      expect(kurz.endsWith(" …")).toBe(true);
-      const stamm = kurz.slice(0, -2);
-      expect(text.startsWith(stamm)).toBe(true);
-      // Das nächste Zeichen im Original ist ein Leerzeichen: das letzte Wort ist ganz.
-      expect(/\s/.test(text.charAt(stamm.length))).toBe(true);
-    }
-    expect(kuerzeAnWortgrenze(text, 40)).toBe("2 Helfer über StAN-Soll (Reserve …");
-  });
-
-  it("hart kürzen, wenn es kein Leerzeichen gibt", () => {
-    expect(kuerzeAnWortgrenze("Wortohneleerzeichenundlang", 10)).toBe("Wortohnele …");
   });
 });
 
@@ -243,72 +181,6 @@ describe("R20-G3: nach „Zur Kenntnis genommen“ bleibt die Stelle unter dem F
   });
 });
 
-describe("R20-G2, M1: „Anderer Einsatz? Prüfen ▸“ bringt die Entscheidung ins Bild", () => {
-  it("klappt die Karte auf und setzt den Fokus auf „Gehört zu dieser Lage“", async () => {
-    telefon();
-    const nutzer = userEvent.setup();
-    const s = einsatzAnlegen("Lage", EinsatzArt.EINSATZ);
-    const liste = einsaetzeLaden();
-    liste.find((x) => x.id === s.id)!.ort = "Ulm Donau";
-    localStorage.setItem("eeb.einsaetze.v1", JSON.stringify(liste));
-    const g = bogenMitName("Gamma");
-    g.einsatz.ortAuftrag = "Waldbrand Cottbus";
-    meldungHinzufuegen(s.id, g);
-    meldungHinzufuegen(s.id, bogenMitName("Alpha"));
-    const rollen = vi.fn();
-    HTMLElement.prototype.scrollIntoView = rollen;
-    render(<Wirt id={s.id} />);
-    const karte = () => [...document.querySelectorAll<HTMLElement>(".einheit-zeile")].find((k) => k.textContent!.includes("Gamma"))!;
-    await nutzer.click(within(karte()).getByRole("button", { name: /Anderer Einsatz\? Prüfen/ }));
-    const knopf = await within(karte()).findByRole("button", { name: "Gehört zu dieser Lage" });
-    await waitFor(() => expect(document.activeElement).toBe(knopf));
-    expect(rollen).toHaveBeenCalledWith({ block: "center" });
-    delete (HTMLElement.prototype as { scrollIntoView?: unknown }).scrollIntoView;
-  });
-});
-
-describe("R20-N6, H11, H12: Kernspalten der Tabelle am Telefon", () => {
-  it("Köpfe ausgeschrieben, die leere Bedarfsspalte entfällt", () => {
-    expect(KERN_KOPF.gesamt).toBe("Stärke");
-    expect(KERN_KOPF.eingetroffen).toBe("Eingetroffen");
-    const kern = (auftrag: boolean, bedarf: boolean) => tabellenSpaltenFuer(false, true, true, auftrag, bedarf).map((s) => s.schluessel);
-    expect(kern(false, true)).toEqual(["einheit", "gesamt", "eingetroffen", "bedarf"]);
-    expect(kern(false, false)).toEqual(["einheit", "gesamt", "eingetroffen"]);
-    expect(kern(true, false)).toEqual(["einheit", "gesamt", "eingetroffen", "auftrag"]);
-  });
-
-  it("das Alter der Angaben steht beim Namen, nicht in der Spalte „Eingetroffen“", () => {
-    telefon();
-    localStorage.setItem("eeb.einheiten-ansicht", "tabelle");
-    const s = einsatzAnlegen("Hochwasser", EinsatzArt.EINSATZ);
-    const alt = bogenMitName("Alt");
-    alt.stand -= 300;
-    meldungHinzufuegen(s.id, alt);
-    render(<Wirt id={s.id} />);
-    const zeile = document.querySelector("table.tabelle-kern tbody tr")!;
-    expect(zeile.querySelector("th .alter-marke")).not.toBeNull();
-    expect(zeile.querySelector("td .alter-marke")).toBeNull();
-    const koepfe = [...document.querySelectorAll("table.tabelle-kern thead th")].map((th) => th.textContent!);
-    expect(koepfe.some((k) => /^Stärke/.test(k))).toBe(true);
-    expect(koepfe.some((k) => /^Eingetroffen/.test(k))).toBe(true);
-  });
-});
-
-describe("R20-H6: Sprungverweise unter den Kennzahlen", () => {
-  it("die zwei Verweise zu Ausgabe und Abschluss stehen in einem Absatz, der Erklärsatz ist eigens auszublenden", () => {
-    const s = einsatzAnlegen("Lage", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogenMitName("Alpha"));
-    render(<Wirt id={s.id} />);
-    const absaetze = [...document.querySelectorAll("p.ausgabe-sprung")];
-    expect(absaetze).toHaveLength(2);
-    expect(within(absaetze[0] as HTMLElement).getByRole("button", { name: /Zur Einheitenliste/ })).toBeDefined();
-    const zweiter = absaetze[1] as HTMLElement;
-    expect(within(zweiter).getByRole("button", { name: /Weitergeben, Lageblatt, Export/ })).toBeDefined();
-    expect(within(zweiter).getByRole("button", { name: /Übergabe, Abschluss/ })).toBeDefined();
-    expect(zweiter.querySelector(".sprung-erklaerung")).not.toBeNull();
-  });
-});
-
 describe("R20-E2: Personaltabelle der Übersicht", () => {
   it("die Erreichbarkeit steht unter dem Namen, eine eigene Spalte gibt es nicht mehr (OV Chemnitz, 11/2026)", () => {
     const bogen = neuerBogen();
@@ -345,29 +217,5 @@ describe("R20-N2: Ort der Einheit im Vollassistenten", () => {
     expect(screen.getAllByLabelText("Ort der Einheit (Pflicht)")).toHaveLength(1);
     const organisation = screen.getByLabelText("Organisation");
     expect(organisation.compareDocumentPosition(ort) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  });
-});
-
-describe("R20-A1: Startseite mit beendetem und übergebenem Einsatz", () => {
-  async function reihenfolge(erledigt: boolean) {
-    const s = einsatzAnlegen("Hochwasser Elbe", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogenMitName("Alpha"));
-    if (erledigt) {
-      const { abschlussSetzen } = await import("./einsatz-abschluss");
-      abschlussSetzen(s.id, { beendetAm: Date.now() - 3600_000, uebergabeAm: Date.now() - 1800_000, uebergabeAn: "Stab" }, [s.id]);
-    }
-    const { App } = await import("./app");
-    render(<App />);
-    const sammlung = screen.getByRole("heading", { name: "Einsatz-Sammlung (Meldekopf)" });
-    const wege = screen.getByRole("heading", { name: "Meinen Bogen ausfüllen" });
-    return sammlung.compareDocumentPosition(wege) & Node.DOCUMENT_POSITION_FOLLOWING ? "sammlung-zuerst" : "wege-zuerst";
-  }
-
-  it("ein laufender Einsatz steht über den beiden Wegen", async () => {
-    expect(await reihenfolge(false)).toBe("sammlung-zuerst");
-  });
-
-  it("ist er beendet und übergeben, stehen die Wege vor seiner langen Karte", async () => {
-    expect(await reihenfolge(true)).toBe("wege-zuerst");
   });
 });

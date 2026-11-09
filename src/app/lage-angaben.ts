@@ -10,30 +10,19 @@
  * gesetzter Wert wird nie überschrieben. Keine Personendaten.
  */
 
-import { einsatzFunkrufLaden, einsatzFunkrufSetzen, einsatzbeginnLaden, einsatzbeginnSetzen, FUNKRUF_MAX } from "./lagemonitor-beginn";
+import {
+  einsatzFunkrufLaden,
+  einsatzFunkrufSetzen,
+  einsatzbeginnLaden,
+  einsatzbeginnSetzen,
+} from "./lagemonitor-beginn";
 
 export interface LageAngaben {
   beginn?: number;
   funkruf?: string;
 }
 
-/** Was dieses Gerät für den Einsatz gesetzt hat, oder `undefined`, wenn nichts. */
-export function lageAngabenLaden(einsatzId: string): LageAngaben | undefined {
-  const beginn = einsatzbeginnLaden(einsatzId);
-  const funkruf = einsatzFunkrufLaden(einsatzId);
-  if (beginn == null && funkruf == null) return undefined;
-  return { ...(beginn != null ? { beginn } : {}), ...(funkruf != null ? { funkruf } : {}) };
-}
 
-/** Umschlagfeld prüfen; Unbrauchbares fällt weg. */
-export function lageAngabenPruefen(x: unknown): LageAngaben | undefined {
-  if (!x || typeof x !== "object" || Array.isArray(x)) return undefined;
-  const o = x as Record<string, unknown>;
-  const beginn = typeof o.beginn === "number" && Number.isFinite(o.beginn) ? o.beginn : undefined;
-  const funkruf = typeof o.funkruf === "string" && o.funkruf.trim() ? o.funkruf.trim().slice(0, FUNKRUF_MAX) : undefined;
-  if (beginn == null && funkruf == null) return undefined;
-  return { ...(beginn != null ? { beginn } : {}), ...(funkruf != null ? { funkruf } : {}) };
-}
 
 /**
  * Angaben aus der Datei übernehmen, soweit hier noch nichts gesetzt ist.

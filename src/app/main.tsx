@@ -8,11 +8,10 @@
 // statt von einem CDN: die App muss offline vollständig funktionieren.
 import "@fontsource-variable/archivo";
 
-import { StrictMode, Suspense, lazy, useEffect } from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./app";
 import { Fehlerfaenger } from "./fehlerfaenger";
-import { lagemonitorKennung } from "./lagemonitor-kennung";
 import { DebugLeiste, debugAktiv, wendePlattformKlasseAn, wendeRahmenAn } from "./debug-plattform";
 import { wendeAnzeigeModusAn } from "./anzeige-modus";
 import { tastaturWaechterStarten } from "./tastatur";
@@ -24,11 +23,9 @@ import { stempelZeitpunkt } from "./datenschutz-uhr";
 import { dialogVerlaufVerdrahten } from "./modal-overlay";
 import { anfuehrungWaechterStarten } from "./typografie";
 
-// Der Lagemonitor wird nur nachgeladen, wenn die Adresse ihn verlangt (Startbündel, ADR-003 Aufnahmeregel 5).
-const Lagemonitor = lazy(() => import("./lagemonitor-ui").then((m) => ({ default: m.Lagemonitor })));
-
-// Die Einsatz-Sammlung bekommt ihre Ablage hineingereicht (ADR-003); ohne
-// diese Zeile bliebe sie speicherlos. Muss vor dem ersten Lesen stehen.
+// Die Einsatz-Sammlungen aus der Zeit vor der Meldekopf-App liegen noch im Kern
+// (Altbestand, meldekopf-altbestand.ts): Er bekommt die Ablage und die Uhr
+// hineingereicht, damit Aufräum- und Datenschutzfrist weiter greifen (ADR-003).
 speicherVerdrahten();
 // Neue Stände werden mit der geprüften Uhr gestempelt (R5-E2); hilfen.ts importiert
 // sie bewusst nicht selbst (Startbündel, siehe dort).
@@ -50,13 +47,6 @@ schriftStufeStarten();
 
 // Im Debug-Modus eine schwebende Leiste zum Umschalten der Vorschau zeigen.
 function Wurzel() {
-  // R21-A2, E2: Die Klasse „einsatz-wiedereinstieg" (Skript in index.html) verdeckt nur das statische Start-Gerüst bis zum ersten Bild der App.
-  useEffect(() => {
-    document.documentElement.classList.remove("einsatz-wiedereinstieg");
-  }, []);
-  // Zweites Fenster mit der Lage für den Fernseher: nur Anzeige, ohne die App.
-  const monitorEinsatz = lagemonitorKennung();
-  if (monitorEinsatz) return <Suspense fallback={null}><Lagemonitor einsatzId={monitorEinsatz} /></Suspense>;
   return (
     <Fehlerfaenger>
       <App />

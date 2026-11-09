@@ -26,15 +26,11 @@ import {
   speicherhuelleSetzen,
 } from "@bos/meldekopf/einsaetze";
 import {
-  zeitUnstimmigkeit,
   zeitpunktZuMs,
-  SpeicherVollFehler,
   abrueckzeitSetzen,
-  eintragGespeichert,
   eintreffzeit,
   eintreffzeitSetzen,
   einheitEntfernen,
-  einheitVerschieben,
   folgemeldungErbt,
   istSpeicherVoll,
   meldungAufnehmen,
@@ -44,10 +40,7 @@ import {
   zeitKurz,
   zeitLang,
   zugSetzen,
-  nummerUndZugSetzen,
   speicherText,
-  HERKUNFT_TEXT,
-  speicherVollMeldung,
   speicherGroessteSammlungen,
   SPEICHER_GRENZE_ZEICHEN,
 } from "./eintrag-zeiten";
@@ -275,15 +268,6 @@ describe("Folgemeldung einer abgerückten Einheit (Audit Runde 5, R5-K1)", () =>
 });
 
 describe("Speicher voll", () => {
-  it("meldet einen vollen Speicher als SpeicherVollFehler", () => {
-    const { einsatzId, eintragId } = buehne();
-    mem.voll = true;
-    expect(() => sammlungenSchreiben(einsaetzeLaden())).toThrow(SpeicherVollFehler);
-    expect(() => statusMitZeitSetzen(einsatzId, eintragId, MeldeStatus.ABGERUECKT)).toThrow(SpeicherVollFehler);
-    // Der Speicher ist die Wahrheit, nicht der Aufruf: die Meldung steht noch.
-    expect(eintragGespeichert(einsatzId, eintragId)).toBe(true);
-    expect(eintrag(einsatzId, eintragId).status).toBe(MeldeStatus.ANWESEND);
-  });
 
   it("erkennt die verschiedenen Namen des vollen Speichers", () => {
     expect(istSpeicherVoll(Object.assign(new Error("x"), { name: "QuotaExceededError" }))).toBe(true);
@@ -313,33 +297,6 @@ describe("zeitKurz / zeitLang", () => {
 
   it("schreibt Datum und Uhrzeit aus", () => {
     expect(zeitLang(new Date("2026-09-27T20:19").getTime())).toBe("27.09.2026, 20:19");
-  });
-});
-
-describe("einheitVerschieben", () => {
-  it("nimmt alle Fassungen einer Einheit samt Notiz mit und verdoppelt nichts", () => {
-    const a = einsatzAnlegen("A", EinsatzArt.EINSATZ);
-    const b = einsatzAnlegen("B", EinsatzArt.EINSATZ);
-    const b0 = bogen("Wanderhausen");
-    const r1 = meldungHinzufuegen(a.id, b0)!;
-    meldungHinzufuegen(a.id, { ...b0, stand: 101, sonstiges: "zweite Fassung" });
-    notizSetzen(a.id, r1.eintrag.id, "Deich Nord");
-
-    const n = einheitVerschieben(a.id, b.id, r1.eintrag.einheitSchluessel);
-
-    expect(n).toBe(2);
-    const nachA = einsaetzeLaden().find((s) => s.id === a.id)!;
-    const nachB = einsaetzeLaden().find((s) => s.id === b.id)!;
-    expect(nachA.eintraege).toHaveLength(0);
-    expect(nachB.eintraege).toHaveLength(2);
-    expect(nachB.eintraege.find((e) => e.id === r1.eintrag.id)!.notiz).toBe("Deich Nord");
-  });
-
-  it("tut nichts, wenn Ziel und Quelle gleich sind", () => {
-    const a = einsatzAnlegen("A", EinsatzArt.EINSATZ);
-    const r = meldungHinzufuegen(a.id, bogen("Bleibhausen"))!;
-    expect(einheitVerschieben(a.id, a.id, r.eintrag.einheitSchluessel)).toBe(0);
-    expect(einsaetzeLaden()[0]!.eintraege).toHaveLength(1);
   });
 });
 
@@ -413,20 +370,6 @@ describe("Vermerke der Führungsstelle (Audit Runde 2, R2-K6)", () => {
     expect(r.eintrag.id).not.toBe(eintragId);
     expect(eintrag(einsatzId, r.eintrag.id).vermerke!.map((x) => x.text)).toEqual(["Auftrag/Notiz: Deich Nord"]);
   });
-
-  it("nennt die Herkunft überall gleich", () => {
-    expect(HERKUNFT_TEXT["pdf-import"]).toBe("Aus Datei");
-    expect(HERKUNFT_TEXT.scan).toBe("Empfangen");
-  });
-});
-
-describe("speicherVollMeldung (R3-O1)", () => {
-  it("nennt Zahl und Ursache und ist bei 0 leer", () => {
-    expect(speicherVollMeldung(0)).toBe("");
-    expect(speicherVollMeldung(1)).toMatch(/^Nicht aufgenommen: 1 Bogen — der Speicher dieses Geräts ist voll/);
-    expect(speicherVollMeldung(9)).toMatch(/9 Bögen/);
-    expect(speicherVollMeldung(9)).not.toMatch(/Keine Bögen/);
-  });
 });
 
 describe("speicherGroessteSammlungen (R3-O4)", () => {
@@ -438,32 +381,6 @@ describe("speicherGroessteSammlungen (R3-O4)", () => {
     expect(groesste!.name).toBe("Großschadenslage Archiv");
     expect(groesste!.anteil).toBeLessThanOrEqual(1);
     expect(groesste!.anteil).toBeGreaterThan(0.95);
-  });
-});
-
-describe("zeitUnstimmigkeit (R3-E5)", () => {
-  const jetzt = new Date("2026-10-04T20:39").getTime();
-  it("meldet Zeiten mehr als 15 Minuten in der Zukunft", () => {
-    expect(zeitUnstimmigkeit({ eintreffen: new Date("2026-10-14T18:22").getTime() }, jetzt)).toMatch(/^Eingetroffen 14\.10\.2026, 18:22 liegt in der Zukunft/);
-    expect(zeitUnstimmigkeit({ eintreffen: jetzt + 10 * 60_000 }, jetzt)).toBeNull();
-  });
-  it("meldet Abrücken vor dem Eintreffen", () => {
-    expect(zeitUnstimmigkeit({ eintreffen: jetzt - 60_000, abgerueckt: jetzt - 3_600_000 }, jetzt)).toMatch(/liegt vor dem Eintreffen/);
-    expect(zeitUnstimmigkeit({ eintreffen: jetzt - 3_600_000, abgerueckt: jetzt }, jetzt)).toBeNull();
-  });
-});
-
-describe("Zug aus der manuellen Aufnahme (R10-S1, R10-A1)", () => {
-  it("führt „2“, „Zug 2“ und „2.Zug“ auf „2. Zug“ und gleicht mit vorhandenen Zügen ab", () => {
-    const s = einsatzAnlegen("Hochwasser Zug", EinsatzArt.EINSATZ);
-    const a = meldungHinzufuegen(s.id, bogen("Emden"))!.eintrag;
-    const b = meldungHinzufuegen(s.id, bogen("Norden"))!.eintrag;
-    const c = meldungHinzufuegen(s.id, bogen("Aurich"))!.eintrag;
-    nummerUndZugSetzen(s.id, a.id, { zug: "2" });
-    nummerUndZugSetzen(s.id, b.id, { zug: "Zug 2" });
-    nummerUndZugSetzen(s.id, c.id, { zug: "2.Zug" });
-    expect([a, b, c].map((e) => eintrag(s.id, e.id).zugEtikett)).toEqual(["2. Zug", "2. Zug", "2. Zug"]);
-    expect(eintrag(s.id, b.id).vermerke?.some((v) => v.text === "Zug: 2. Zug")).toBe(true);
   });
 });
 

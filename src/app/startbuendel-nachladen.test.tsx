@@ -1,6 +1,6 @@
 /**
- * Startbündel verkleinern (Runde 20): Einsatzansicht und taktische Zeichen
- * werden nachgeladen. Geprüft wird mit frischem Modulspeicher, also so wie beim
+ * Startbündel verkleinern (Runde 20): Die taktischen Zeichen werden
+ * nachgeladen (die Einsatzansicht ist seit 2026-11-09 in der Meldekopf-App). Geprüft wird mit frischem Modulspeicher, also so wie beim
  * ersten Aufruf im Browser — das Setup der Oberflächentests lädt beide sonst vor.
  *
  *  - Bis zum Laden steht eine Fläche gleicher Höhe da (kein Layoutsprung,
@@ -9,9 +9,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 import { readFileSync } from "node:fs";
-import { EinsatzArt, einsatzAnlegen } from "@bos/meldekopf/einsaetze";
 import { neuerBogen } from "./hilfen";
 
 // Der erste Import der Einsatzansicht mit frischem Modulspeicher übersetzt ihren ganzen Baum neu und braucht einige Sekunden.
@@ -19,58 +18,6 @@ vi.setConfig({ testTimeout: 40_000 });
 
 beforeEach(() => {
   vi.resetModules();
-});
-
-describe("Einsatzliste und Einsatzansicht laden nach", () => {
-  it("die Liste hält bis zum Laden Platz für ihre Karten und zeigt dann den Einsatz", async () => {
-    const s = einsatzAnlegen("Hochwasser Elbe", EinsatzArt.EINSATZ, "Dömitz");
-    const { EinsatzListe } = await import("./einsaetze-lazy");
-    render(<EinsatzListe einsaetze={[s]} onOeffnen={() => {}} onGeaendert={() => {}} />);
-
-    const flaeche = screen.getByRole("status", { name: "Einsatzansicht wird geladen" });
-    expect(flaeche.getAttribute("aria-busy")).toBe("true");
-    expect(flaeche.style.getPropertyValue("--karten")).toBe("1");
-    expect(flaeche.className).toBe("einsatz-laedt");
-
-    expect(await screen.findByText(/Hochwasser Elbe/, {}, { timeout: 20000 })).toBeTruthy();
-    expect(screen.queryByRole("status", { name: "Einsatzansicht wird geladen" })).toBeNull();
-  });
-
-  it("die Detailansicht hält bis zum Laden eine Bildschirmhöhe frei und rendert dann", async () => {
-    const s = einsatzAnlegen("Sturmschäden", EinsatzArt.EINSATZ, "Celle");
-    const { EinsatzDetail } = await import("./einsaetze-lazy");
-    render(
-      <EinsatzDetail
-        einsatz={s}
-        onZurueck={() => {}}
-        onGeaendert={() => {}}
-        onScannen={() => {}}
-        onManuell={() => {}}
-        onDateiImport={() => {}}
-        onBilderImport={() => {}}
-        onExport={() => {}}
-        onCsvExport={() => {}}
-        onCsvDetailExport={() => {}}
-        onSammelPdf={() => {}}
-        onGeloescht={() => {}}
-      />,
-    );
-    const flaeche = screen.getByRole("status", { name: "Einsatzansicht wird geladen" });
-    expect(flaeche.className).toBe("einsatz-laedt detail");
-    // R21-M2: Der Name steht schon im Kopf des Platzhalters; fertig ist die Ansicht, wenn die Platzhalterfläche weicht.
-    await waitFor(() => expect(screen.queryByRole("status", { name: "Einsatzansicht wird geladen" })).toBeNull(), { timeout: 20000 });
-    expect(screen.getAllByText(/Sturmschäden/).length).toBeGreaterThan(0);
-    expect(screen.getByRole("button", { name: /Bogen scannen/ })).toBeTruthy();
-  });
-
-  it("nach dem ersten Laden erscheint die Liste ohne erneutes Warten", async () => {
-    const s = einsatzAnlegen("Übung Nord", EinsatzArt.UEBUNG, "Hannover");
-    const { EinsatzListe, einsatzUiLaden } = await import("./einsaetze-lazy");
-    await einsatzUiLaden();
-    render(<EinsatzListe einsaetze={[s]} onOeffnen={() => {}} onGeaendert={() => {}} />);
-    expect(screen.queryByRole("status", { name: "Einsatzansicht wird geladen" })).toBeNull();
-    expect(screen.getByText(/Übung Nord/)).toBeTruthy();
-  });
 });
 
 describe("Taktische Zeichen laden nach", () => {
@@ -114,16 +61,4 @@ describe("Startmodule ziehen die nachgeladenen Brocken nicht statisch herein", (
     expect(importe.some((i) => i!.includes("taktische-zeichen/"))).toBe(false);
   });
 
-  it("die Platzhalterfläche hat ihre Höhe im CSS der index.html (Karten und 70 vh)", () => {
-    const css = readFileSync("index.html", "utf8");
-    expect(css).toMatch(/\.einsatz-laedt \{[^}]*min-height: calc\(var\(--karten, 1\)/);
-    expect(css).toMatch(/\.einsatz-laedt\.detail \{ min-height: 70vh; \}/);
-  });
-
-  it("die Konstanten der Einsatzansicht stehen im kleinen Modul, die Ansicht führt sie unverändert aus", async () => {
-    const klein = await import("./einsaetze-konstanten");
-    const gross = await import("./einsaetze-ui");
-    expect(gross.ART_LABEL).toBe(klein.ART_LABEL);
-    expect(gross.PAPIERKORB_OEFFNEN).toBe(klein.PAPIERKORB_OEFFNEN);
-  });
 });

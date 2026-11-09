@@ -6,15 +6,7 @@
 import { UhrHinweis } from "../uhr-warnung";
 import { beispielRestText } from "../beispiel-herkunft";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import {
-  Erfassungsbogen,
-  KontaktArt,
-  PersonalErfassung,
-  datumZuIso,
-  staerke,
-  unterbringungMWD,
-  verpflegung,
-} from "@bos/eeb-format/model";
+import { Erfassungsbogen, PersonalErfassung, staerke, unterbringungMWD, verpflegung } from "@bos/eeb-format/model";
 import { vorlageAktualisieren, vorlageAnlegen, vorlageZahlenText, vorlagenLaden, type Vorlage } from "../vorlagen";
 import { unterschiedSatz, vorlageUnterschiede } from "../vorlagen-unterschied";
 import { TabellenScroll } from "../tabellen-scroll";
@@ -23,7 +15,6 @@ import {
   QrSatz,
   bogenDateiname,
   bogenSpeichern,
-  datumDeutsch,
   textAlsDatei,
   einheitAnzeigename,
   einheitOrt,
@@ -39,7 +30,6 @@ import {
   personUnbenannt,
   pruefpunkte,
   zeitraumDeutsch,
-  datumAnzeige,
   qrErzeugen,
   vokabText,
   vokabularFuer,
@@ -107,17 +97,6 @@ export function Uebersicht(props: {
    * gegen) — sonst stünde beim nächsten Empfänger das eigene Gerät als Ursprung.
    */
   herkunft?: Uint8Array | null;
-  /** Gesetzt, wenn der Bogen für eine Einsatz-Sammlung erfasst wird (Meldekopf/Zugführer). */
-  sammelAktion?: { label: string; onUebernehmen: () => void };
-  /** Fremde Erfassung (Schnellerfassung): Einsatz und Sofortbedarf entfallen, der Rückweg führt nicht dorthin (R15-N3). */
-  fremdeErfassung?: boolean;
-  /**
-   * Öffnet die Einsatz-Auswahl, um den offenen Bogen nachträglich in eine
-   * Sammlung zu legen — der Meldekopf scannt/öffnet oft erst und entscheidet
-   * dann, wohin der Bogen gehört. Im Sammelmodus überflüssig: dort führt
-   * `sammelAktion` bereits in den vorgewählten Einsatz.
-   */
-  onInEinsatzAufnehmen?: () => void;
   /**
    * Einsatzdaten zurücksetzen (Zeitraum heute, Ort/Auftrag und Sofortbedarf
    * leer) — angeboten, wenn der Einsatzzeitraum vorbei ist (R2-S1).
@@ -275,21 +254,14 @@ export function Uebersicht(props: {
   const nahDienst = nahbereichDienst();
   const org = bogen.einheit.organisation;
   const s = staerke(bogen);
-  // Schnellerfassung des Meldekopfs: Stärke als Summe, absichtlich ohne Namen.
+  // Nur Stärke: als Summe, absichtlich ohne Namen.
   const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
   const staerkeText = `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt}`;
-  // R13-S2: Schnellerfassung (nur Stärke) von der Startseite: Ablegen in die Sammlung ist der erste Weg.
-  // R14-H1: Auch ein empfangener, unveränderter Bogen einer fremden Einheit (Link ohne Sammlung auf diesem Gerät) gehört
-  // in eine Sammlung — nicht in „Mängel beheben und weitergeben".
   const empfangenFremd = props.signatur != null && props.signatur.zustand !== "unsigniert";
   // Prüfrunde Beispielbögen (BB-W6): Ein weitergegebener ÜBUNGS-Bogen (etwa ein Beispiel,
   // das der Ausbilder per Link verteilt) ist beim Teilnehmer der Bogen, den er am
-  // Meldekopf melden soll. Vorne steht deshalb „Bogen übergeben…", das Ablegen in
-  // eine Sammlung bleibt daneben.
+  // Meldekopf melden soll. Vorne steht deshalb „Bogen übergeben…".
   const uebungEmpfangen = empfangenFremd && !nurStaerke && bogen.uebung === true;
-  const schnellAblegen = (nurStaerke || (empfangenFremd && !uebungEmpfangen)) && !props.sammelAktion && !props.vorlageBearbeitung && props.onInEinsatzAufnehmen != null;
-  // Die Fortschrittsleiste führt Schritt 5 dann als „–" (entfällt); der Rückknopf nennt den Schritt davor (R15-N3).
-  const schnellOhneBedarf = nurStaerke && props.fremdeErfassung === true;
   const mwd = unterbringungMWD(bogen);
   const vp = verpflegung(bogen);
   /**
@@ -564,15 +536,6 @@ export function Uebersicht(props: {
               <button type="button" className="primaer" onClick={props.vorlageBearbeitung.onAktualisieren}>
                 Vorlage aktualisieren
               </button>
-            ) : props.sammelAktion ? (
-              <button type="button" className="primaer" onClick={props.sammelAktion.onUebernehmen}>
-                {props.sammelAktion.label}
-              </button>
-            ) : schnellAblegen ? (
-              // R13-S2: Die Schnellerfassung ist die Meldung einer fremden Einheit; der erste Weg ist das Ablegen.
-              <button type="button" className="primaer" onClick={props.onInEinsatzAufnehmen}>
-                In Einsatz-Sammlung ablegen…
-              </button>
             ) : (
               // Ein Weg zum Ziel: QR, Nahbereich (AirDrop/Quick Share), PDF,
               // Link und Datei tragen denselben Bogen — der Dialog bündelt sie.
@@ -581,11 +544,8 @@ export function Uebersicht(props: {
               </button>
             )}
             <span className="neben-aktionen">
-              {(props.sammelAktion || props.vorlageBearbeitung || schnellAblegen) && (
+              {props.vorlageBearbeitung && (
                 <button type="button" onClick={() => teilenDialog.current?.showModal()}>Bogen übergeben…</button>
-              )}
-              {!props.sammelAktion && !props.vorlageBearbeitung && !schnellAblegen && props.onInEinsatzAufnehmen && (
-                <button type="button" onClick={props.onInEinsatzAufnehmen}>In Einsatz-Sammlung ablegen…</button>
               )}
               <button type="button" onClick={alsVorlageSpeichern}>
                 {props.vorlageBearbeitung ? "Als neue Vorlage speichern" : "Als Vorlage speichern"}
@@ -597,17 +557,10 @@ export function Uebersicht(props: {
           </span>
         </div>
         {fehler && <p className="fehler">{fehler}</p>}
-        {uebungEmpfangen && !props.sammelAktion && !props.vorlageBearbeitung && (
+        {uebungEmpfangen && !props.vorlageBearbeitung && (
           <p className="hinweis uebung-empfangen-hinweis">
             Empfangener Übungsbogen: Zum Melden am Meldekopf „Bogen übergeben…“ (QR-Code, PDF oder Link). Wer den
-            Meldekopf spielt, legt ihn in eine Sammlung der Art „Übung“.
-          </p>
-        )}
-        {schnellAblegen && (
-          <p className="hinweis schnell-hinweis">
-            Meldung einer fremden Einheit: Sie gehört in eine Einsatz-Sammlung. „Bogen übergeben…“ gäbe sie mit dem Siegel
-            dieses Geräts weiter.
-            {empfangenFremd && !nurStaerke && " Ändern macht daraus einen eigenen Bogen dieses Geräts."}
+            Meldekopf spielt, liest ihn in der Meldekopf-App in eine Sammlung der Art „Übung“ ein.
           </p>
         )}
         {props.signatur && props.signatur.zustand !== "unsigniert" && (
@@ -684,7 +637,7 @@ export function Uebersicht(props: {
             </>
           );
         })()}
-        <Vollstaendigkeit punkte={offenePunkte} geheZu={geheZu} fremd={empfangenFremd && !nurStaerke && schnellAblegen} schnell={nurStaerke && schnellAblegen} typGesetzt={!!vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name")} />
+        <Vollstaendigkeit punkte={offenePunkte} geheZu={geheZu} />
       </section>
 
       {/* Einheit und Einsatz beantworten zusammen „wer, wo, wann" und tragen je
@@ -1001,8 +954,8 @@ export function Uebersicht(props: {
       {/* Die Übersicht hat keine feste Fußleiste: der Weg zurück steht am Ende
           der Seite, an der gewohnten Stelle (R7-N9). */}
       <p className="uebersicht-zurueck">
-        <button type="button" onClick={() => geheZu(schnellOhneBedarf ? 3 : 4)}>
-          {schnellOhneBedarf ? "← Zurück zu Schritt 3 (Fahrzeuge)" : "← Zurück zu Schritt 5 (Sofortbedarf)"}
+        <button type="button" onClick={() => geheZu(4)}>
+          {"← Zurück zu Schritt 5 (Sofortbedarf)"}
         </button>
       </p>
       </div>

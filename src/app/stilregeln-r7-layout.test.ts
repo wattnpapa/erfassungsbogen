@@ -10,14 +10,8 @@ import { describe, expect, it } from "vitest";
 const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
 const css = html.replace(/\/\*[\s\S]*?\*\//g, "");
 const vite = readFileSync(new URL("../../vite.config.ts", import.meta.url), "utf8");
-const einsaetze = readFileSync(new URL("./einsaetze-ui.tsx", import.meta.url), "utf8");
 
 describe("„Bedarf:“ bricht nicht im Wort (R7-M1, R7-G9)", () => {
-  it("die Beschriftung ist unteilbar und schrumpft nicht, die Werte brechen um", () => {
-    expect(css).toMatch(/details\.bedarf-block > summary > strong\s*\{[^}]*flex:\s*none[^}]*white-space:\s*nowrap/);
-    expect(css).toMatch(/details\.bedarf-block > summary > \.bedarf-werte\s*\{[^}]*min-width:\s*0/);
-    expect(einsaetze).toMatch(/<strong>Bedarf:<\/strong>\{" "\}[\s\S]{0,300}className="bedarf-werte"/);
-  });
 
   it("bei großer Schrift ist die Zeile gedeckelt", () => {
     expect(css).toMatch(/html\.schrift-gross details\.bedarf-block > summary\s*\{[^}]*font-size:\s*min\(var\(--t-s\), 16px\)/);

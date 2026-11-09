@@ -6,30 +6,16 @@
  */
 import { readFileSync } from "node:fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { useState } from "react";
-import { act, cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { jetztZeitpunkt, type Erfassungsbogen } from "@bos/eeb-format/model";
-import { EinsatzArt, MeldeStatus, einsaetzeLaden, einsatzAnlegen, meldungHinzufuegen, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { type Erfassungsbogen } from "@bos/eeb-format/model";
+import { MeldeStatus, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { neuerBogen, neuePerson, datumAnzeige, zeitraumDeutsch, pruefpunkte } from "./hilfen";
-import { Dialogschicht } from "./dialoge";
-import { EinsatzDetail } from "./einsaetze-ui";
 import { DaumenQuittung, QUITTUNG_ENDE_NACH_MS } from "./daumen-quittung";
 import { anfuehrung, anfuehrungWaechterStarten } from "./typografie";
 import { csvFeld, mitNachtragSpalte } from "./csv";
-import { winAnsiText, bemerkungKurz, einsatzPdfDokument, lageblattAenderungen } from "./pdf-dokument";
-import { bogenDiff, istMwdFeld } from "./diff-lage";
-import { nurStaerkeUebernehmen } from "./nur-staerke";
-import { einheitenSortieren } from "./einheiten-liste";
-import { einheitenZahl, folgeAenderung, vergleichKurztext } from "./einheiten-tabelle";
-import { angabenZeit, angabenAlterWort } from "./angaben-alter";
-import { meldungAufnehmen } from "./eintrag-zeiten";
+import { winAnsiText, bemerkungKurz } from "./pdf-dokument";
 import { dateiFehlerText } from "./datei-fehler";
-import { bewegungenMax } from "./lagemonitor-ui";
-import { einsatzCsvInhalt } from "./einsatz-csv";
-import { einsatzDetailCsvInhalt } from "./bogen-csv";
-import { einzelDateiname } from "./pdf";
-import { PRELLSCHUTZ_MS } from "./tipp-schutz";
 
 vi.mock("./pdf", async () => {
   const echt = await vi.importActual<typeof import("./pdf")>("./pdf");
@@ -91,181 +77,10 @@ function mitPersonen(b: Erfassungsbogen, n: number): void {
   b.personal = Array.from({ length: n }, (_, i) => ({ ...neuePerson(), nachname: `P${i}`, vorname: "X" }));
 }
 
-type Props = Parameters<typeof EinsatzDetail>[0];
 
-function Wirt({ id, extra }: { id: string; extra?: Partial<Props> }) {
-  const [einsatz, setEinsatz] = useState(() => einsaetzeLaden().find((s) => s.id === id)!);
-  return (
-    <>
-      <EinsatzDetail
-        einsatz={einsatz}
-        onZurueck={() => {}}
-        onGeaendert={() => setEinsatz(einsaetzeLaden().find((s) => s.id === id)!)}
-        onScannen={() => {}}
-        onManuell={() => {}}
-        onDateiImport={() => {}}
-        onBilderImport={() => {}}
-        onExport={() => {}}
-        onCsvExport={() => {}}
-        onCsvDetailExport={() => {}}
-        onSammelPdf={() => {}}
-        onGeloescht={() => {}}
-        {...extra}
-      />
-      <Dialogschicht />
-    </>
-  );
-}
 
-function karteVon(name: string): HTMLElement {
-  return [...document.querySelectorAll<HTMLElement>(".einheit-zeile")].find((k) => k.textContent!.includes(name))!;
-}
-
-/** Texte eines pdfmake-Baums. */
-function texte(node: unknown, acc: string[] = []): string[] {
-  if (typeof node === "string") acc.push(node);
-  else if (Array.isArray(node)) node.forEach((n) => texte(n, acc));
-  else if (node && typeof node === "object") Object.values(node).forEach((v) => texte(v, acc));
-  return acc;
-}
-
-const QR = {
-  teile: [{ datenUrl: "data:image/png;base64,QR", url: "https://x.example/#T", teilNr: 1, anzahl: 1, version: 7 }],
-  segmentiert: false,
-  zeichen: 1,
-  version: 7,
-  vollUrl: "https://x.example/#T",
-  stufen: 1,
-  weitergeleitet: false,
-};
-
-describe("R17-A1 Änderungsspalte: WC/Dusche statt erfundener Unterbringung", () => {
-  function paar(unterbringung: boolean): { vorher: Erfassungsbogen; nachher: Erfassungsbogen } {
-    const vorher = bogen("Crailsheim", (b) => {
-      mitPersonen(b, 12);
-      b.sofortbedarf = { verpflegungPersonen: 12, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung, ruhezeitErforderlich: false };
-    });
-    const nachher = nurStaerkeUebernehmen(vorher, { fuehrer: 0, unterfuehrer: 0, mannschaft: 9, gesamt: 9 }, vorher.stand + 5);
-    return { vorher, nachher };
-  }
-
-  it("nennt die M/W/D-Zeile „WC/Dusche“, wenn keine Unterbringung angefordert ist", () => {
-    const { vorher, nachher } = paar(false);
-    const d = bogenDiff(vorher, nachher);
-    const mwd = d.bedarf.filter((a) => istMwdFeld(a.feld));
-    expect(mwd.length).toBeGreaterThan(0);
-    expect(mwd.every((a) => a.feld === "WC/Dusche M/W/D")).toBe(true);
-    expect(d.bedarf.some((a) => a.feld === "Unterbringung M/W/D")).toBe(false);
-  });
-
-  it("belässt „Unterbringung M/W/D“, wenn die Einheit Unterbringung angefordert hat", () => {
-    const { vorher, nachher } = paar(true);
-    const mwd = bogenDiff(vorher, nachher).bedarf.filter((a) => istMwdFeld(a.feld));
-    expect(mwd.length).toBeGreaterThan(0);
-    expect(mwd.every((a) => a.feld === "Unterbringung M/W/D")).toBe(true);
-  });
-
-  it("das Lageblatt behauptet ohne Anforderung keine Änderung der Unterbringung", () => {
-    const { vorher, nachher } = paar(false);
-    const zeilen = lageblattAenderungen(bogenDiff(vorher, nachher)).join("\n");
-    expect(zeilen).not.toContain("Unterbringung");
-    expect(zeilen).toContain("WC/Dusche");
-  });
-});
-
-describe("R17-K1 Handänderung behält das Alter der Meldung", () => {
-  const vorStunden = (h: number) => jetztZeitpunkt() - h * 60;
-
-  it("„Als Einsatzmeldung zählen…“ lässt die Warnung „Stand vor 3 Std“ stehen, zählt nicht als Folgemeldung und erhält die Quelle", async () => {
-    const nutzer = userEvent.setup();
-    const s = einsatzAnlegen("Hochwasser Alt", EinsatzArt.EINSATZ);
-    meldungAufnehmen(s.id, bogen("Albstadt", (b) => { b.uebung = true; mitPersonen(b, 4); b.stand = vorStunden(3); }), { quelle: "pdf-import" });
-    render(<Wirt id={s.id} />);
-    expect(karteVon("Albstadt").textContent).toMatch(/⚠ (Stand|Meldung) vor 3 Std/);
-
-    await nutzer.click(within(karteVon("Albstadt")).getByRole("button", { name: "Mehr…" }));
-    await nutzer.click(within(karteVon("Albstadt")).getByRole("button", { name: "Als Einsatzmeldung zählen…" }));
-    const frage = await screen.findByRole("dialog", { name: "Als Einsatzmeldung zählen?" });
-    expect(frage.textContent).toContain("das Alter der Meldung bleibt");
-    await nutzer.click(within(frage).getByRole("button", { name: "Als Einsatzmeldung zählen" }));
-
-    await waitFor(() => expect(document.body.textContent).toContain("Zählt jetzt als Einsatzmeldung"));
-    const kopf = einsaetzeLaden().find((x) => x.id === s.id)!.eintraege.sort((a, b) => b.empfangenAm - a.empfangenAm)[0]!;
-    expect(kopf.bogen.uebung).toBeFalsy();
-    expect(kopf.quelle).toBe("pdf-import");
-    // Alter bleibt: drei Stunden, nicht „gerade eben“.
-    expect(Date.now() - angabenZeit(kopf)).toBeGreaterThanOrEqual(3 * 3_600_000 - 120_000);
-    expect(karteVon("Albstadt").textContent).toMatch(/⚠ (Stand|Meldung) vor 3 Std/);
-    // Inhaltlich keine Folgemeldung: keine Marke „Folgem.“, keine Folgeänderung.
-    expect(karteVon("Albstadt").textContent).not.toContain("Folgem.");
-    expect(folgeAenderung(kopf, einsaetzeLaden().find((x) => x.id === s.id)!.eintraege)).toBeNull();
-    // Quelle bleibt „aus Datei“, mit dem Zusatz der Handänderung.
-    await nutzer.click(within(karteVon("Albstadt")).getByRole("button", { name: /Historie|Fassungen/ }));
-    expect(karteVon("Albstadt").textContent).toContain("Meldung der Einheit");
-  }, 20000);
-
-  it("„Stärke ändern…“ setzt den Stand nicht auf „jetzt“: Alter und Wort bleiben (die letzte Meldung rückt vor, R18-K2)", async () => {
-    const s = einsatzAnlegen("Hochwasser Alt", EinsatzArt.EINSATZ);
-    const erste = meldungAufnehmen(s.id, bogen("Ulm", (b) => { mitPersonen(b, 6); b.stand = vorStunden(2); }), { quelle: "scan" })!.eintrag;
-    const alterVorher = angabenZeit(erste);
-    const wortVorher = angabenAlterWort(erste);
-    const { angabenVermerken } = await import("./fassung-vorrang");
-    const neu = nurStaerkeUebernehmen(erste.bogen, { fuehrer: 0, unterfuehrer: 0, mannschaft: 5, gesamt: 5 }, jetztZeitpunkt());
-    const r = meldungAufnehmen(s.id, neu, { quelle: "manuell", einheitSchluesselOverride: erste.einheitSchluessel })!;
-    angabenVermerken(s.id, r.eintrag.id, erste);
-    const gespeichert = einsaetzeLaden().find((x) => x.id === s.id)!.eintraege.find((e) => e.id === r.eintrag.id)!;
-    expect(angabenZeit(gespeichert)).toBe(alterVorher);
-    expect(angabenAlterWort(gespeichert)).toBe(wortVorher);
-    // Eine zweite Handänderung erbt dasselbe Alter.
-    const { angabenErben } = await import("./angaben-alter");
-    expect(angabenErben(gespeichert).seit).toBe(alterVorher);
-    const { letzteMeldung } = await import("./einheiten-tabelle");
-    // R18-K2: Die Stärkeänderung am Meldekopf ist eine Folgemeldung und zählt für „letzte Meldung" — wie in der Liste.
-    // (Nur das Umstellen der Kennzeichnung zählt nicht.)
-    expect(letzteMeldung(einsaetzeLaden().find((x) => x.id === s.id)!.eintraege)).toBe(r.eintrag.empfangenAm);
-  });
-
-  it("das Alter übersteht Weitergabe und Import der Sammlung (kein Schemawechsel, optionales Feld am Eintrag)", async () => {
-    const { einsatzDateiInhalt, einsatzAusDatei } = await import("./einsatz-transport");
-    const s = einsatzAnlegen("Hochwasser Weitergabe", EinsatzArt.EINSATZ);
-    const e = meldungAufnehmen(s.id, bogen("Ulm", (b) => mitPersonen(b, 3)), { quelle: "scan" })!.eintrag;
-    const { angabenVermerken } = await import("./fassung-vorrang");
-    const neu = nurStaerkeUebernehmen(e.bogen, { fuehrer: 0, unterfuehrer: 0, mannschaft: 2, gesamt: 2 }, jetztZeitpunkt());
-    const r = meldungAufnehmen(s.id, neu, { quelle: "manuell", einheitSchluesselOverride: e.einheitSchluessel })!;
-    angabenVermerken(s.id, r.eintrag.id, e);
-    const gesamt = einsaetzeLaden().find((x) => x.id === s.id)!;
-    const zurueck = einsatzAusDatei(einsatzDateiInhalt(gesamt));
-    const kopie = zurueck.eintraege.find((x) => x.id === r.eintrag.id)!;
-    expect(kopie.angaben).toEqual(gesamt.eintraege.find((x) => x.id === r.eintrag.id)!.angaben);
-    expect(kopie.angaben?.seit).toBe(angabenZeit(e));
-  });
-
-  it("das Lageblatt rechnet nach einer Handänderung mit dem Alter der Meldung", () => {
-    const b = bogen("Ulm", (x) => { mitPersonen(x, 3); });
-    const erstellt = Date.now();
-    const dd = einsatzPdfDokument("Lage", [{ bogen: b, qr: QR, empfangenAm: erstellt, angaben: { seit: erstellt - 5 * 3_600_000, wort: "Meldung", geaendertAm: erstellt } }]);
-    expect(texte(dd.content).join("\n")).toMatch(/5 Std|vor 5/);
-  });
-});
 
 describe("R17-K8 / R17-W4 eine Zahl, ein Wort", () => {
-  it("einheitenZahl kennt Einzahl und Mehrzahl", () => {
-    expect(einheitenZahl(1)).toBe("1 Einheit");
-    expect(einheitenZahl(0)).toBe("0 Einheiten");
-    expect(einheitenZahl(3)).toBe("3 Einheiten");
-  });
-
-  it("das Blatt schreibt „1 Einheit“ im Kasten Bedarf gesamt und bei der Ruhezeit", () => {
-    const b = bogen("Müllheim", (x) => {
-      mitPersonen(x, 2);
-      x.sofortbedarf = { verpflegungPersonen: 2, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: true };
-    });
-    const t = texte(einsatzPdfDokument("Lage", [{ bogen: b, qr: QR }]).content).join("\n");
-    expect(t).toContain("Bedarf gesamt (1 Einheit, 2 Personen)");
-    expect(t).toContain("Ruhezeit erforderlich bei 1 Einheit");
-    expect(t).not.toContain("Einheit(en)");
-    expect(t).not.toContain("1 Einheiten");
-  });
 
   it("kürzt die Bemerkung an der Wortgrenze und setzt keine Klammer in die Klammer", () => {
     const lang = "(2 Helfer über StAN-Soll (Reserve aktiviert). Verpflegung zusätzlich über Staffelkommandant angefordert, Rest folgt später)";
@@ -348,116 +163,8 @@ describe("R17-A3 / W2 / K9 Nachtrag-CSV: der Vermerk steht in Zeile 1", () => {
     return { alt: mk("a", alt), neu: mk("b", neu) };
   }
 
-  it("die Kopfzeile bleibt Zeile 1, trägt aber in der ersten Spalte den Vermerk; jede Datenzeile hat „NACHTRAG“; alle Zeilen gleich breit", async () => {
-    const { einheitSchluessel } = await import("@bos/meldekopf/einsaetze");
-    const { alt, neu } = nachtragSammlung();
-    alt.einheitSchluessel = einheitSchluessel(alt.bogen.einheit);
-    neu.einheitSchluessel = einheitSchluessel(neu.bogen.einheit);
-    const s = {
-      id: "e", name: "Lage", art: EinsatzArt.EINSATZ, angelegt: 1, geaendert: 1, eintraege: [alt, neu], nachtragSeit: 5000,
-      nachtragGruende: { [alt.einheitSchluessel]: { neu: false, gruende: ["Zug"] }, [neu.einheitSchluessel]: { neu: true, gruende: ["neu"] } },
-    };
-    const zeilen = einsatzCsvInhalt(s).replace(/^﻿/, "").split("\r\n");
-    expect(zeilen[0]!.startsWith("NACHTRAG seit")).toBe(true);
-    expect(zeilen[0]).toContain("nicht die ganze Lage;");
-    // Die eigentliche Kopfzeile folgt in derselben Zeile ab Spalte 2 — Tabellenprogramme finden sie in Zeile 1.
-    expect(zeilen[0]).toContain(";Nr.;");
-    expect(zeilen[1]!.startsWith("NACHTRAG;")).toBe(true);
-    expect(zeilen[2]!.startsWith("NACHTRAG;")).toBe(true);
-    // Summenzeile: leere erste Zelle und der Zusatz „kein Gesamtstand“.
-    const summe = zeilen.find((z) => z.includes("Summe Nachtrag"))!;
-    expect(summe.startsWith(";")).toBe(true);
-    expect(summe).toContain("kein Gesamtstand");
-    // Die Datenzeilen haben genauso viele Spalten wie die Kopfzeile.
-    expect(zeilen[1]!.split(";").length).toBe(zeilen[0]!.split(";").length);
-  });
-
-  it("die Alle-Daten-CSV macht es genauso", async () => {
-    const { einheitSchluessel } = await import("@bos/meldekopf/einsaetze");
-    const { alt } = nachtragSammlung();
-    alt.einheitSchluessel = einheitSchluessel(alt.bogen.einheit);
-    const s = {
-      id: "e", name: "Lage", art: EinsatzArt.EINSATZ, angelegt: 1, geaendert: 1, eintraege: [alt], nachtragSeit: 5000,
-      nachtragGruende: { [alt.einheitSchluessel]: { neu: true, gruende: ["neu"] } },
-    };
-    const zeilen = einsatzDetailCsvInhalt(s).replace(/^﻿/, "").split("\r\n");
-    expect(zeilen[0]!.startsWith("NACHTRAG seit")).toBe(true);
-    expect(zeilen[1]!.startsWith("NACHTRAG;")).toBe(true);
-    expect(zeilen[0]!.split(";").length).toBe(zeilen[1]!.split(";").length);
-  });
-
-  it("die erste Lieferung (kein Nachtrag) bleibt unverändert", async () => {
-    const { alt } = nachtragSammlung();
-    const { einheitSchluessel } = await import("@bos/meldekopf/einsaetze");
-    alt.einheitSchluessel = einheitSchluessel(alt.bogen.einheit);
-    const s = { id: "e", name: "Lage", art: EinsatzArt.EINSATZ, angelegt: 1, geaendert: 1, eintraege: [alt] };
-    const kopf = einsatzCsvInhalt(s).replace(/^﻿/, "").split("\r\n")[0]!;
-    expect(kopf).not.toContain("NACHTRAG");
-  });
-
   it("mitNachtragSpalte setzt die Vorspalte nur vor Kopf, Daten und Schlusszeilen", () => {
     expect(mitNachtragSpalte(["k", "d1", "d2", "s"], "VERMERK", 2)).toEqual(["VERMERK;k", "NACHTRAG;d1", "NACHTRAG;d2", ";s"]);
-  });
-});
-
-describe("R17-E6 / K4 Abgerückte am Ende der Liste", () => {
-  function e(name: string, status: MeldeStatus, nr: number, zug?: string): MeldeEintrag {
-    const b = bogen(name);
-    return { id: name, einheitSchluessel: name, empfangenAm: nr, quelle: "scan", status, bogen: b, zugEtikett: zug } as MeldeEintrag;
-  }
-
-  it("stellt in jeder Sortierung die Anwesenden vor die Abgerückten, innerhalb der Gruppen in der gewählten Reihenfolge", () => {
-    const liste = [e("A", MeldeStatus.ANWESEND, 1, "1. Zug"), e("B", MeldeStatus.ABGERUECKT, 2, "1. Zug"), e("C", MeldeStatus.ANWESEND, 3, "2. Zug")];
-    const nummern = new Map([["A", 1], ["B", 2], ["C", 3]]);
-    for (const s of ["nummer", "zuletzt", "aelteste", "eintreffzeit", "zug", "organisation", "name"] as const) {
-      const namen = einheitenSortieren(liste, s, nummern).map((x) => x.id);
-      expect(namen[namen.length - 1], s).toBe("B");
-    }
-    expect(einheitenSortieren(liste, "zug").map((x) => x.id)).toEqual(["A", "C", "B"]);
-  });
-
-  it("die Einsatzansicht zeigt unter den Anwesenden die Überschrift „Abgerückt (1)“ und danach die Karte", async () => {
-    const s = einsatzAnlegen("Hochwasser Liste", EinsatzArt.EINSATZ);
-    const ids = ["Alpha", "Beta", "Gamma"].map((n) => meldungHinzufuegen(s.id, bogen(n))!.eintrag);
-    const { meldungStatusSetzen } = await import("@bos/meldekopf/einsaetze");
-    meldungStatusSetzen(s.id, ids[1]!.id, MeldeStatus.ABGERUECKT);
-    render(<Wirt id={s.id} />);
-    const reihe = [...document.querySelectorAll("ul.einheiten-liste > li")].map((li) => li.textContent!);
-    expect(reihe[0]).toContain("Alpha");
-    expect(reihe[1]).toContain("Gamma");
-    expect(reihe[2]).toBe("Abgerückt (1)");
-    expect(reihe[3]).toContain("Beta");
-    expect(abschnitt).toContain("li.einheiten-trenner");
-  });
-});
-
-describe("R17-A2 Einzelbogen mit sprechendem Namen", () => {
-  it("der Dateiname nennt Stand und Einheit; zwei Stände derselben Einheit unterscheiden sich", () => {
-    const b1 = bogen("Wardenburg");
-    b1.stand = 100_000;
-    const b2 = { ...b1, stand: 100_000 + 95 };
-    const n1 = einzelDateiname(b1);
-    const n2 = einzelDateiname(b2);
-    expect(n1).toMatch(/^\d{4}-\d{2}-\d{2}_\d{4}_eeb_[\w-]*Wardenburg[\w-]*\.pdf$/);
-    expect(n1).not.toBe(n2);
-    expect(n1).not.toMatch(/[0-9a-f]{8}-[0-9a-f]{4}/);
-  });
-
-  it("der Knopf lädt ohne Tab herunter und nennt die Datei in der Bestätigung", async () => {
-    const nutzer = userEvent.setup();
-    const oeffnen = vi.fn(() => null);
-    vi.stubGlobal("open", oeffnen);
-    const s = einsatzAnlegen("Hochwasser PDF", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogen("Wardenburg"));
-    render(<Wirt id={s.id} />);
-    await nutzer.click(within(karteVon("Wardenburg")).getByRole("button", { name: "Bogen als PDF" }));
-    const zeile = await waitFor(() => {
-      const z = [...document.querySelectorAll("p.hinweis[role=status]")].find((p) => p.textContent!.startsWith("✓ Bogen als PDF"));
-      expect(z).toBeTruthy();
-      return z!;
-    });
-    expect(oeffnen).not.toHaveBeenCalled();
-    expect(zeile.textContent).toContain("eeb-test.pdf");
   });
 });
 
@@ -510,57 +217,9 @@ describe("R17-W1 → R18-S2/W1 Die Quittung nennt Einheit und Folge vollständig
     expect(document.querySelector(".quittung-daumen")!.className).not.toContain("quittung-kompakt");
     expect(document.querySelector(".quittung-text")!.textContent).toContain("THW Biberach");
   });
-
-  it("die Quittung des Abrückens in der Einsatzansicht trägt Nummer und Namen und ist nach 30 s weg", async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    const nutzer = userEvent.setup({ advanceTimers: (ms) => vi.advanceTimersByTime(ms) });
-    const s = einsatzAnlegen("Hochwasser Abrücken", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogen("Crailsheim"));
-    render(<Wirt id={s.id} />);
-    await nutzer.click(within(karteVon("Crailsheim")).getByRole("button", { name: "Mehr…" }));
-    await nutzer.click(within(karteVon("Crailsheim")).getByRole("button", { name: "Abrücken" }));
-    await waitFor(() => expect(document.querySelector(".quittung-daumen")).not.toBeNull());
-    expect(document.querySelector(".quittung-text")!.textContent).toMatch(/Abgerückt .*Nr\. \d+ „.*Crailsheim/);
-    await act(async () => { vi.advanceTimersByTime(QUITTUNG_ENDE_NACH_MS - 1000); });
-    expect(document.querySelector(".quittung-text")!.textContent).toMatch(/Nr\. \d+ „.*Crailsheim/);
-    await act(async () => { vi.advanceTimersByTime(1500); });
-    expect(document.querySelector(".quittung-daumen")).toBeNull();
-  }, 20000);
-});
-
-describe("R17-K2 Kurzzeile nach „Stärke ändern…“", () => {
-  it("nennt Verpflegung und WC/Dusche als folgend, nicht „Bedarf übernommen“", () => {
-    const s = einsatzAnlegen("Hochwasser Kurz", EinsatzArt.EINSATZ);
-    const alt = meldungHinzufuegen(s.id, bogen("Biberach", (b) => {
-      mitPersonen(b, 11);
-      b.sofortbedarf = { verpflegungPersonen: 11, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false };
-      b.fahrzeuge = [{ ...bogen("x").fahrzeuge[0]!, kennzeichen: "THW-1" } as never].filter(Boolean);
-    }))!.eintrag;
-    const neu = nurStaerkeUebernehmen(alt.bogen, { fuehrer: 0, unterfuehrer: 0, mannschaft: 8, gesamt: 8 }, alt.bogen.stand + 5);
-    const r = meldungAufnehmen(s.id, neu, { quelle: "manuell", einheitSchluesselOverride: alt.einheitSchluessel })!;
-    const kurz = vergleichKurztext(alt, r.eintrag);
-    expect(kurz).toContain("Stärke 11 → 8");
-    expect(kurz).not.toContain("Bedarf übernommen");
-    expect(kurz).toMatch(/Verpflegung und WC\/Dusche folgen der Stärke|Namen, Fahrzeuge, Bedarf/);
-  });
 });
 
 describe("R17-K3 / K11 Lagemonitor", () => {
-  it("zeigt am 720p-Fernseher und am Telefon nur eine Bewegungszeile, sonst zwei bzw. drei", () => {
-    expect(bewegungenMax(1280, 720)).toBe(1);
-    expect(bewegungenMax(390, 844)).toBe(1);
-    expect(bewegungenMax(1280, 900)).toBe(2);
-    expect(bewegungenMax(1920, 1080)).toBe(3);
-  });
-
-  it("der Monitor bleibt aus dem Startbündel: main.tsx und die Einsatzansicht laden ihn nach (ADR-003 Aufnahmeregel 5)", () => {
-    const main = readFileSync(`${process.cwd()}/src/app/main.tsx`, "utf8");
-    const ui = readFileSync(`${process.cwd()}/src/app/einsaetze-ui.tsx`, "utf8");
-    expect(main).not.toMatch(/import\s*\{[^}]*\bLagemonitor\b[^}]*\}\s*from\s*"\.\/lagemonitor-ui"/);
-    expect(main).toMatch(/lazy\(\(\) => import\("\.\/lagemonitor-ui"\)/);
-    expect(ui).not.toMatch(/^import[^\n]*from "\.\/lagemonitor-ui"/m);
-    expect(ui).toMatch(/lazy\(\(\) => import\("\.\/lagemonitor-ui"\)/);
-  });
 
   it("die Lageleiste des Telefons steht am Ende, die Angaben der Lagezeile bleiben ungeteilt", () => {
     expect(lmCss).toMatch(/\.lm-stufenleiste \{ order: 99;/);
@@ -583,38 +242,5 @@ describe("R17-K12 / K10 Einsatzansicht am Telefon", () => {
   it("„Angaben vom Zettel (optional)“ trägt ein Aufklappzeichen", () => {
     expect(abschnitt).toMatch(/details\.zettel-angaben > summary::before \{ content: "▸"/);
     expect(abschnitt).toMatch(/details\.zettel-angaben\[open\] > summary::before \{ content: "▾"/);
-  });
-});
-
-describe("R17-A7 / K5 / N2 ein Einsatz, ein Eintrag auf der Startseite", () => {
-  it("läuft ein Einsatz, steht er einmal da: als Karte über der Weiche, ohne zweiten Schnelleinstieg", () => {
-    const s = einsatzAnlegen("Hochwasser Elbe", EinsatzArt.EINSATZ);
-    for (const ort of ["Alpha", "Beta", "Gamma"]) meldungHinzufuegen(s.id, bogen(ort));
-    render(<App />);
-    expect(document.querySelectorAll("button.sammlung-oeffnen")).toHaveLength(0);
-    const treffer = [...document.querySelectorAll("h2")].filter((h) => h.textContent === "Hochwasser Elbe");
-    expect(treffer).toHaveLength(1);
-    expect(document.body.textContent!.match(/Hochwasser Elbe/g)).toHaveLength(1);
-    expect(document.body.textContent!.match(/3 Einheiten anwesend/g)).toHaveLength(1);
-    // Die Karte steht vor der Weiche.
-    const karte = treffer[0]!.closest(".karte")!;
-    const weiche = document.querySelector(".weiche")!;
-    expect(karte.compareDocumentPosition(weiche) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(screen.getByRole("heading", { name: "Einsatz-Sammlung (Meldekopf)" })).toBeTruthy();
-  }, 20000);
-
-  it("ohne Einsatz bleibt der erklärende Abschnitt an seiner Stelle", () => {
-    render(<App />);
-    expect(screen.getByRole("heading", { name: "Einsatz-Sammlung (Meldekopf)" })).toBeTruthy();
-    // R19-N10: Der lange Erklärsatz ist weg; Überschrift und die Weiche genügen.
-    expect(document.body.textContent).not.toContain("Fremde Bögen zu einem Einsatz");
-  });
-
-  it("öffnet den Einsatz über „Öffnen“ der Karte", async () => {
-    const nutzer = userEvent.setup();
-    einsatzAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
-    render(<App />);
-    await nutzer.click(screen.getByRole("button", { name: "Öffnen" }));
-    await screen.findByRole("heading", { level: 1, name: "Sammelhausen" });
   });
 });

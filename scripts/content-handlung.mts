@@ -44,6 +44,11 @@ const publicDir = join(wurzel, "public");
 
 interface SeitenPlan {
   /**
+   * Ziel beider Knöpfe; ohne Angabe die App selbst („./"). Die Seite zum Meldekopf
+   * führt seit 2026-11-09 in die eigene Meldekopf-App.
+   */
+  ziel?: string;
+  /**
    * Beschriftung beider neuer Knöpfe. Abgeleitet aus dem bereits vorhandenen
    * ersten `.start` der Seite: Wo der schon kontextspezifisch war
    * („Einsatz-Sammlung in der App öffnen", „Bogen für die FGr R ausfüllen"),
@@ -92,7 +97,7 @@ const SEITEN: Record<string, SeitenPlan> = {
   "dlrg.html": { knopf: "DLRG-Bogen jetzt ausfüllen" },
   "bbk.html": { knopf: "BBK-Bogen jetzt ausfüllen" },
   "bundeswehr.html": { knopf: "Bundeswehr-Bogen jetzt ausfüllen" },
-  "meldekopf.html": { knopf: "Einsatz-Sammlung in der App öffnen" },
+  "meldekopf.html": { knopf: "Meldekopf-App öffnen", ziel: "https://meldekopf.erfassungsbogen.app/" },
   "vorlage.html": { knopf: "Bogen digital ausfüllen", anker: "Weitergabe ohne Internet" },
   "papier-oder-digital.html": { knopf: "Bogen digital ausfüllen", anker: "Ausprobieren kostet nichts" },
   "staerkemeldung-feuerwehr.html": { knopf: "Stärkemeldung direkt erfassen" },
@@ -153,14 +158,14 @@ function mitteHtml(plan: SeitenPlan): string {
   return `<!-- HANDLUNG:MITTE:START -->
 ${DATENHOHEIT}
 
-    <p><a class="start" href="./">${plan.knopf}</a></p>
+    <p><a class="start" href="${plan.ziel ?? "./"}">${plan.knopf}</a></p>
     <!-- HANDLUNG:MITTE:END -->`;
 }
 
 function abschlussHtml(plan: SeitenPlan): string {
   return `<!-- HANDLUNG:ABSCHLUSS:START -->
     <div class="abschluss">
-      <a class="start" href="./">${plan.knopf}</a>
+      <a class="start" href="${plan.ziel ?? "./"}">${plan.knopf}</a>
       <p class="zusicherung">${ZUSICHERUNG}</p>
     </div>
     <!-- HANDLUNG:ABSCHLUSS:END -->`;

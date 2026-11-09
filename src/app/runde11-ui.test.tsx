@@ -5,12 +5,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
-import { PersonalErfassung } from "@bos/eeb-format/model";
-import { MeldeStatus, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import { AufteilenPanel } from "./aufteilen-ui";
 import { DaumenQuittung } from "./daumen-quittung";
-import { EintreffzeitFeld } from "./nacherfassung";
-import { neuePerson, neuerBogen } from "./hilfen";
+import { neuerBogen } from "./hilfen";
 import { VorschlagFeld } from "./schritte/bausteine";
 import { SchrittEinheit } from "./schritte/einheit";
 
@@ -55,38 +51,8 @@ describe("Eingabetaste in Vorschlagsfeldern (R11-G1)", () => {
   });
 });
 
-function eintrag(): MeldeEintrag {
-  const bogen = neuerBogen();
-  bogen.personal = [{ ...neuePerson(), vorname: "Anna", nachname: "Beck" }];
-  bogen.personalErfassung = PersonalErfassung.VOLLSTAENDIG;
-  return { id: "e1", bogen, status: MeldeStatus.ANWESEND } as unknown as MeldeEintrag;
-}
-
-describe("„Aufteilen…“ (R11-G2)", () => {
-  it("setzt den Fokus nicht ins Textfeld (keine Tastatur vor der Personenliste)", () => {
-    render(<AufteilenPanel eintrag={eintrag()} onAbbrechen={() => {}} onAufteilen={() => {}} />);
-    const feld = screen.getByLabelText("Bezeichnung des abgeteilten Teils");
-    expect(document.activeElement).not.toBe(feld);
-    expect(document.activeElement?.tagName).toBe("H4");
-  });
-});
 
 describe("Aufnahme (R11-M1)", () => {
-  it("die Zettelfelder stehen in einem zugeklappten Aufklapper, solange nichts eingetragen ist", () => {
-    render(<EintreffzeitFeld wert="" onAendern={() => {}} nummer="" onNummer={() => {}} zug="" onZug={() => {}} />);
-    const d = document.querySelector<HTMLDetailsElement>("details.zettel-angaben")!;
-    expect(d.open).toBe(false);
-    expect(d.querySelector("summary")?.textContent).toMatch(/Angaben vom Zettel \(optional\)/);
-    expect(d.contains(screen.getByLabelText(/Eingetroffen um/))).toBe(true);
-  });
-  it("ist etwas eingetragen, steht er offen", () => {
-    render(<EintreffzeitFeld wert="08:15" onAendern={() => {}} />);
-    expect(document.querySelector<HTMLDetailsElement>("details.zettel-angaben")!.open).toBe(true);
-  });
-  it("„Ort der Einheit“ bekommt beim Öffnen den Fokus, solange er leer ist", () => {
-    render(<SchrittEinheit bogen={neuerBogen()} aendern={() => {}} ortFokus />);
-    expect(document.activeElement?.id).toBe("feld-einheit-name");
-  });
   it("ohne ortFokus bleibt der Fokus unberührt", () => {
     render(<SchrittEinheit bogen={neuerBogen()} aendern={() => {}} />);
     expect(document.activeElement?.id).not.toBe("feld-einheit-name");

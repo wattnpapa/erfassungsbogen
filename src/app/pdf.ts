@@ -13,24 +13,18 @@ import * as pdfFonts from "pdfmake/build/vfs_fonts";
 // „File 'data/Helvetica-Bold.afm' not found in virtual file system" ab.
 import helvetica from "pdfmake/build/standard-fonts/Helvetica";
 import type { Erfassungsbogen } from "@bos/eeb-format/model";
-import { base64UrlDekodieren } from "@bos/eeb-format/codec";
-import { absenderLabel } from "@bos/eeb-format/signatur";
-import { artMitMarke, ausgabeDateiname, dateiZeitstempel, dateinameTeil, einheitAnzeigename, qrErzeugen } from "./hilfen";
+import { ausgabeDateiname, dateinameTeil, einheitAnzeigename, qrErzeugen } from "./hilfen";
 import { istNativ, binaerTeilen } from "./nativ";
-import { fortschrittMelden } from "./arbeitet";
-import { entfernteNummernText } from "./meldungs-papierkorb";
-import { einsatzLageblattSeiteFuellen, einsatzPdfDokumentGesetzt, einzelPdfDokument, lueckenZeileSetzen, nichtDarstellbareBetroffene, nichtDarstellbareNamen, pdfDokument, umschriftBetroffene, vereinfachtBetroffene, type SammelBogen, type UebersichtEintrag } from "./pdf-dokument";
-import { einsatzDateiInhalt } from "./einsatz-transport";
-import { lageAngabenLaden } from "./lage-angaben";
+import {
+  einzelPdfDokument,
+  nichtDarstellbareBetroffene,
+  nichtDarstellbareNamen,
+  pdfDokument,
+  umschriftBetroffene,
+  vereinfachtBetroffene,
+} from "./pdf-dokument";
 import { BLANKO_DATEINAME, BLANKO_INFO, BLANKO_ZEILEN, leererBogen } from "./blanko";
-import { MeldeStatus, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import { geltendeJeEinheit, fassungenJeEinheit } from "./fassung-vorrang";
-import { zaehltInLage } from "./auswertung";
-import { eintreffzeit, zeitEingelesen, zeitpunktZuMs } from "./eintrag-zeiten";
-import { standLiegtNachEintreffen } from "./stand-uhr";
-import { exportStaendeLaden, lageblattVermerken, weitergabeVermerken } from "./export-stand";
-import { abweichenderOrt } from "./einheiten-tabelle";
-import { meldungsNummern } from "./einheiten-tabelle";
+import { zeitEingelesen } from "./eintrag-zeiten";
 import { kaestchenZeichnen } from "./pdf-kaestchen";
 
 interface FontContainer {
@@ -118,153 +112,15 @@ export async function pdfBlobUrl(b: Erfassungsbogen, herkunft?: Uint8Array | nul
   return URL.createObjectURL(await pdfMake.createPdf(kaestchenZeichnen(dd)).getBlob());
 }
 
-/**
- * Sammel-PDF eines Einsatzes: Übergabe-Übersicht mit Änderungsspalte, dahinter
- * die übergebenen Meldungen als vollständige Bögen (inkl. QR), plus alle Bögen
- * als eingebettetes JSON UND die komplette Einsatz-Sammlung (Züge, Status,
- * Historie) — die PDF ist damit die vollständige Schichtübergabe in einer Datei.
- *
- * Erwartet die Meldungen (nicht nur die Bögen), weil die Änderungsspalte je
- * Einheit die vorherige Revision aus der Sammlung braucht.
- */
-/**
- * Empfangene Rohbytes einer Meldung — Grundlage fürs Gegenzeichnen, damit eine
- * unverändert weitergegebene Meldung die Original-Signatur behält. Ältere
- * Sammlungen haben sie nicht; ein beschädigter Eintrag darf das PDF nicht
- * verhindern (dann wird wie früher selbst signiert).
- */
-function herkunftBytes(m: MeldeEintrag): Uint8Array | null {
-  if (!m.herkunft) return null;
-  try {
-    return base64UrlDekodieren(m.herkunft);
-  } catch {
-    return null;
-  }
-}
 
-/**
- * Einzelbogen einer Meldung anzeigen — der Blick auf genau eine Einheit, ohne
- * den Umweg über die Sammel-PDF.
- *
- * Im Browser landet er in dem Tab, den der Aufrufer schon geöffnet hat: das
- * muss im Klick selbst passieren, denn bis pdfmake nachgeladen und der Satz
- * gerechnet ist, vergehen Sekunden — ein danach geöffnetes Fenster hält der
- * Popup-Blocker für ungefragt. Ohne Fenster (Popup-Blocker, App, Electron)
- * bleibt der gewohnte Weg: Download bzw. Share-Sheet.
- */
-export async function meldungPdfAnzeigen(m: MeldeEintrag, fenster: Window | null = null): Promise<string> {
-  const herkunft = herkunftBytes(m);
-  // Der Dateiname nennt Einheit und Stand des Bogens, wie bei Sammel-PDF und Lageblatt (R17-A2): Zwei Einzelbögen derselben
-  // Einheit vor und nach der Stärkekorrektur sind im Ordner so zu unterscheiden. Ein Tab hätte nur eine Zufalls-ID als Namen.
-  const dateiname = einzelDateiname(m.bogen);
-  if (!fenster) {
-    await pdfErzeugen(m.bogen, dateiname, herkunft);
-    return dateiname;
-  }
-  const qr = await qrErzeugen(m.bogen, herkunft);
-  await pdfMake.createPdf(kaestchenZeichnen(await einzelDokument(m.bogen, qr))).open(fenster);
-  tabNachErzeugung(fenster);
-  return dateiname;
-}
 
-/**
- * `<Erzeugung>_eeb_<Einheit>_Stand_<Stand des Bogens>.pdf` — vorn der Zeitpunkt der Erzeugung wie bei allen anderen
- * Ausgaben (R20-G8), der Stand des Bogens dahinter, damit zwei Stände derselben Einheit unterscheidbar bleiben (R17-A2).
- */
-export function einzelDateiname(b: Erfassungsbogen, jetzt: Date = new Date()): string {
-  const stand = dateiZeitstempel(new Date(zeitpunktZuMs(b.stand)));
-  return ausgabeDateiname("", `${dateinameTeil(einheitAnzeigename(b.einheit))}_Stand_${stand}`, "pdf", jetzt);
-}
 
-/** Text des Platzhalter-Tabs, solange der Bogen entsteht. */
-export const TAB_ERZEUGT_TEXT = "Bogen wird erzeugt…";
-export const TAB_FERTIG_TEXT = "Fertig — der Bogen liegt im Download-Ordner. Dieser Tab kann geschlossen werden.";
 
-/**
- * Ein Browser ohne PDF-Anzeige legt das PDF als Download ab und lässt den Tab bei „Bogen wird erzeugt…" stehen (R15-A5).
- * Zeigt der Tab nach kurzer Zeit noch den eigenen Platzhalter, sagt er jetzt, dass es fertig ist; zeigt er das PDF,
- * ist der Zugriff darauf nicht möglich oder der Text ein anderer — dann bleibt alles, wie es ist.
- */
-export function tabNachErzeugung(fenster: Window, nach = 2500): void {
-  setTimeout(() => {
-    try {
-      if (fenster.closed) return;
-      if (fenster.document.body?.textContent === TAB_ERZEUGT_TEXT) fenster.document.body.textContent = TAB_FERTIG_TEXT;
-    } catch {
-      /* Fremder Ursprung (PDF-Anzeige geladen): nichts zu tun */
-    }
-  }, nach);
-}
 
 export { zeitEingelesen };
 
-/**
- * Was die Übersichtsseite über eine Meldung wissen muss — Zeiten, Status,
- * Auftrag, Vorfassung. Gemeinsam für Sammel-PDF und Lageblatt. `historie`
- * ist die ganze Sammlung: beim Teilexport („nur neue Bögen") steckt die
- * Vorfassung einer Folgemeldung nur noch dort.
- */
-function uebersichtEintrag(
-  einsatz: Einsatzsammlung,
-  m: MeldeEintrag,
-  historie: MeldeEintrag[] = einsatz.eintraege,
-): UebersichtEintrag {
-  // revisionen() liefert neueste zuerst — die Vorfassung steht direkt hinter
-  // dieser Meldung. Fehlt sie, ist es eine Erstmeldung.
-  const revs = fassungenJeEinheit(historie, m.einheitSchluessel);
-  const idx = revs.findIndex((r) => r.id === m.id);
-  const vorher = idx >= 0 ? revs[idx + 1]?.bogen : undefined;
-  const fremderOrt = einsatz.fremdeOrte ? einsatz.fremdeOrte[m.einheitSchluessel] : abweichenderOrt(m, einsatz, historie);
-  return {
-    bogen: m.bogen,
-    vorher,
-    zugEtikett: m.zugEtikett,
-    teil: m.teilEtikett,
-    eingetroffenAm: eintreffzeit(m),
-    empfangenAm: m.empfangenAm,
-    abgerueckAm: m.abgerueckAm,
-    abgerueckt: m.status !== MeldeStatus.ANWESEND,
-    zaehlt: m.status === MeldeStatus.ANWESEND && zaehltInLage(einsatz.art, m.bogen),
-    notiz: m.notiz,
-    ...(absenderLabel(m.signatur?.absender) ? { absender: absenderLabel(m.signatur?.absender) } : {}),
-    ...(m.rueckkehr ? { rueckkehr: m.rueckkehr } : {}),
-    ...(m.angaben ? { angaben: m.angaben } : {}),
-    ...(m.standAbsender ? { standAbsender: m.standAbsender } : {}),
-    ...(m.vomPapier != null ? { zeitUnbestaetigt: true } : {}),
-    // Eintreffzeit = Zeit des Einlesens am Gerät, nie von Hand gesetzt (R14-A1): nicht vom Absender, nicht vom Meldeblock.
-    ...(m.vomPapier == null && zeitEingelesen(m, revs) ? { zeitEingelesen: true } : {}),
-    // Stand nach dem Eingang: falsche Geräteuhr (R13-A3) — gehört auch aufs Papier (R14-A2).
-    ...(standLiegtNachEintreffen(m) ? { standNachEintreffen: true } : {}),
-    ...(m.signatur?.zustand === "ungueltig" ? { signaturUngueltig: true } : {}),
-    // Anderer Einsatz? wie an der Karte (R5-K5); beim Nachtrag aus der ganzen Sammlung gerechnet.
-    ...(fremderOrt != null ? { fremderOrt } : {}),
-    // Beim Nachtrag: warum die Einheit dabei ist, und ob ihre Kräfte zur Summe
-    // der letzten Lieferung dazukommen oder die frühere Zeile ersetzen (R5-W7).
-    ...(einsatz.nachtragGruende?.[m.einheitSchluessel]
-      ? { nachtragGrund: einsatz.nachtragGruende[m.einheitSchluessel]!.gruende, nachtragNeu: einsatz.nachtragGruende[m.einheitSchluessel]!.neu }
-      : {}),
-    // Über die ganze Sammlung gezählt — auch im Nachtrag „nur neue Bögen"
-    // dieselbe Nummer wie am Gerät (R2-A6).
-    nummer: meldungsNummern(historie).get(m.einheitSchluessel),
-  };
-}
 
-/**
- * Alle aktuellen Meldungen des Einsatzes — neueste Fassung je Einheit, auch
- * abgerückte und Übungen — nach Anzeigename geordnet. Die Auswahl „nur
- * anwesende" war der Fehler: Papier und eingebettete Datei sagten Verschiedenes
- * (Analog-Audit A1), und bei null Anwesenden gab es gar keine Datei (W2).
- */
-export function alleAktuellen(einsatz: Einsatzsammlung): MeldeEintrag[] {
-  return geltendeJeEinheit(einsatz.eintraege).sort((a, b) =>
-    einheitAnzeigename(a.bogen.einheit).localeCompare(einheitAnzeigename(b.bogen.einheit), "de"),
-  );
-}
 
-/** Dateiname-tauglicher Rumpf aus dem Einsatznamen. */
-function dateiRumpf(einsatz: Einsatzsammlung): string {
-  return dateinameTeil(einsatz.name || "sammlung");
-}
 
 /**
  * Fertiges Dokument ausgeben: Download im Browser, Share-Sheet in der App.
@@ -280,83 +136,7 @@ async function dokumentAusgeben(dd: Parameters<typeof pdfMake.createPdf>[0], dat
   return true;
 }
 
-/**
- * Sammel-PDF: Übergabe-Übersicht plus Bögen plus eingebettete Sammlung.
- * Ohne `meldungen` gehen ALLE aktuellen Meldungen je Einheit hinein (inkl.
- * abgerückte und Übungen) — auch bei null anwesenden Einheiten entsteht ein
- * Dokument. Beim Teilexport ist `einsatz` schon auf die neuen Bögen
- * zugeschnitten (export-stand.ts); `historie` ist dann die ganze Sammlung,
- * aus der die Vorfassung einer Folgemeldung für den Diff kommt.
- */
-export async function einsatzPdfErzeugen(
-  einsatz: Einsatzsammlung,
-  meldungen: MeldeEintrag[] = alleAktuellen(einsatz),
-  historie: MeldeEintrag[] = einsatz.eintraege,
-  /** Nachtrag seit dem Stand des letzten Sammel-PDF (Date.now()) — Kopf, Summen und Umschlag sagen es (R4-W4). */
-  nachtragSeit?: number,
-  /**
-   * Namensteil der Lieferung (export-stand.ts `lieferungsMarke`): für alle
-   * Formate gleich, „nachtrag" bzw. „erste-lieferung" (R5-W8). Ohne
-   * Angabe (oder leer) heißt ein Nachtrag „nachtrag".
-   */
-  dateiMarke?: string,
-): Promise<boolean> {
-  const boegenMitQr: SammelBogen[] = [];
-  // Zwischenstand „Bogen n von m" für die Oberfläche (R17-O1, R17-D4, R17-A4); ohne laufende Aktion ohne Wirkung.
-  for (const [i, m] of meldungen.entries()) {
-    await fortschrittMelden("Bögen vorbereitet (QR-Code, Übersicht)", i, meldungen.length);
-    boegenMitQr.push({
-      ...uebersichtEintrag(einsatz, m, historie),
-      qr: await qrErzeugen(m.bogen, herkunftBytes(m)),
-    });
-  }
-  await fortschrittMelden("Seiten werden gesetzt — bei vielen Bögen der längste Schritt, Seite offen lassen");
-  const nachtrag = historie !== einsatz.eintraege;
-  const marke = dateiMarke ?? (nachtrag ? "nachtrag" : "");
-  // Ein Probesatz ohne Bilder misst, welche Bögen mit ihrer letzten Zeile allein
-  // auf einer Seite stünden, und setzt diese enger (R4-A7).
-  lueckenZeileSetzen(entfernteNummernText(einsatz.id)); // R19-A2: entfernte Nummern benennen
-  const dd = await einsatzPdfDokumentGesetzt(
-    einsatz.name,
-    boegenMitQr,
-    // Die Stände der Exporte reisen mit (R5-W6): auf der Ablösung weiß der
-    // erste Nachtrag dann, was der Stab schon hat.
-    einsatzDateiInhalt(nachtrag && nachtragSeit != null ? { ...einsatz, nachtragSeit } : einsatz, exportStaendeLaden(einsatz.id), lageAngabenLaden(einsatz.id)),
-    Date.now(),
-    nachtrag ? nachtragSeit : undefined,
-    (probe) => pdfMake.createPdf(kaestchenZeichnen(probe)).getBuffer(),
-  );
-  lueckenZeileSetzen("");
-  await fortschrittMelden("Datei wird geschrieben …");
-  // Teilexport („nur neue Bögen") mit eigenem Dateinamen — sonst hießen
-  // Nachtrag und ganze Sammlung gleich (Audit Runde 2, R2-A3).
-  const ok =await dokumentAusgeben(dd, ausgabeDateiname(artMitMarke("einsatz-sammel-pdf", marke), dateiRumpf(einsatz), "pdf")); // R20-N8: Sammel-PDF und Übersicht-CSV unterscheiden sich im Namen
-  // Die ganze Sammlung ging heraus — womöglich an die nächste Schicht. Die
-  // Einsatzansicht sagt danach, wann, und was seitdem nur hier dazukam
-  // (Audit Runde 2, R2-W5). Der Nachtrag „nur neue Bögen" ist keine Übergabe.
-  if (ok && !nachtrag) weitergabeVermerken(einsatz);
-  return ok;
-}
 
-/**
- * Lageblatt: nur die Übersichtsseite (Einheiten mit Zeiten, Bedarf, Züge) als
- * A4 quer — ohne Bögen und ohne QR-Codes, deshalb in Sekundenbruchteilen
- * fertig. Das Blatt für die Wand (Analog-Audit A3/A4). Immer der ganze
- * Einsatz: die Wand braucht die Lage, nicht die Lieferung.
- */
-export async function einsatzLageblattErzeugen(einsatz: Einsatzsammlung): Promise<boolean> {
-  const eintraege = alleAktuellen(einsatz).map((m) => uebersichtEintrag(einsatz, m));
-  // Zwei Sätze: der erste misst, wie viel Platz unter dem Inhalt bleibt, der
-  // zweite füllt ihn mit Nachtragszeilen (Audit Runde 3, R3-A5).
-  lueckenZeileSetzen(entfernteNummernText(einsatz.id)); // R19-A2
-  const dd = await einsatzLageblattSeiteFuellen(einsatz.name, eintraege, (probe) => pdfMake.createPdf(kaestchenZeichnen(probe)).getBuffer());
-  lueckenZeileSetzen("");
-  const ok = await dokumentAusgeben(dd, ausgabeDateiname("lageblatt", dateiRumpf(einsatz), "pdf"));
-  // Merken, wann das Blatt entstand — die Einsatzansicht sagt dann „Lageblatt
-  // 16:30 · seitdem 1 neue Meldung" (Audit Runde 2, R2-A3).
-  if (ok) lageblattVermerken(einsatz);
-  return ok;
-}
 
 /**
  * Blanko-Vordruck: der leere Bogen zum Ausfüllen mit der Hand, aus derselben

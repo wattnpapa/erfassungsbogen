@@ -5,17 +5,12 @@
  * N1/H5 (Namen einfügen) liegen im Block Zustand und werden dort getestet (runde17-zustand-ui.test.tsx).
  */
 import { readFileSync } from "node:fs";
-import { useState } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { EinsatzArt, MeldeStatus, einsaetzeLaden, einsatzAnlegen, meldungHinzufuegen } from "@bos/meldekopf/einsaetze";
 import { neuerBogen } from "./hilfen";
 import { Dialogschicht, frageFelder } from "./dialoge";
-import { EinsatzDetail } from "./einsaetze-ui";
-import { statusMitZeitSetzen } from "./eintrag-zeiten";
 import { QrScannerWeb } from "./qr-scanner-web";
-import { Lagemonitor } from "./lagemonitor-ui";
 import { SchrittBuehne } from "../test/schritt-buehne";
 import { SchrittEinsatz } from "./schritte/einsatz";
 import { Uebersicht } from "./schritte/uebersicht";
@@ -42,42 +37,8 @@ const abschnitt = (() => {
   return html.slice(von, bis).replace(/\/\*[\s\S]*?\*\//g, "");
 })();
 
-type Props = Parameters<typeof EinsatzDetail>[0];
 
-function Wirt({ id }: { id: string }) {
-  const [einsatz, setEinsatz] = useState(() => einsaetzeLaden().find((s) => s.id === id)!);
-  const extra: Partial<Props> = {};
-  return (
-    <>
-      <EinsatzDetail
-        einsatz={einsatz}
-        onZurueck={() => {}}
-        onGeaendert={() => setEinsatz(einsaetzeLaden().find((s) => s.id === id)!)}
-        onScannen={() => {}}
-        onManuell={() => {}}
-        onDateiImport={() => {}}
-        onBilderImport={() => {}}
-        onExport={() => {}}
-        onCsvExport={() => {}}
-        onCsvDetailExport={() => {}}
-        onSammelPdf={() => {}}
-        onGeloescht={() => {}}
-        {...extra}
-      />
-      <Dialogschicht />
-    </>
-  );
-}
 
-function bogen(ort: string) {
-  const b = neuerBogen();
-  b.einheit.hierarchie[0]!.name = ort;
-  return b;
-}
-
-function karteVon(name: string): HTMLElement {
-  return [...document.querySelectorAll<HTMLElement>(".einheit-zeile")].find((k) => k.textContent!.includes(name))!;
-}
 
 describe("R17-H2 keine Autokorrektur bei Funkrufname, Einsatzname, Ort und Auftrag", () => {
   it("die Felder einer Rückfrage (Name, Ort/Auftrag) schalten Autokorrektur und Rechtschreibprüfung ab", async () => {
@@ -98,73 +59,9 @@ describe("R17-H2 keine Autokorrektur bei Funkrufname, Einsatzname, Ort und Auftr
       expect(f.getAttribute("spellcheck")).toBe("false");
     }
   });
-
-  it("das Feld „Auftrag/Notiz“ der Karte hat Autokorrektur und Prüfung aus", async () => {
-    const nutzer = userEvent.setup();
-    const s = einsatzAnlegen("Hochwasser Notiz", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogen("Crailsheim"));
-    render(<Wirt id={s.id} />);
-    await nutzer.click(within(karteVon("Crailsheim")).getByRole("button", { name: "Auftrag/Notiz" }));
-    const feld = screen.getByLabelText("Auftrag/Notiz");
-    expect(feld.getAttribute("autocorrect")).toBe("off");
-    expect(feld.getAttribute("spellcheck")).toBe("false");
-  });
-
-  it("das Feld „Funkrufname (optional)“ am Lagemonitor hat Autokorrektur und Prüfung aus", async () => {
-    const s = einsatzAnlegen("Hochwasser Funk", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogen("Crailsheim"));
-    render(<Wirt id={s.id} />);
-    const feld = await screen.findByLabelText(/Funkrufname \(optional\)/, undefined, { timeout: 5000 });
-    expect(feld.getAttribute("autocorrect")).toBe("off");
-    expect(feld.getAttribute("spellcheck")).toBe("false");
-  });
-});
-
-describe("R17-N4 / H4 „✓ Abgerückt“ ist eine Bestätigung, kein Knopf", () => {
-  beforeEach(() => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-  });
-
-  it("steht nach dem Abrücken gesperrt am Platz des Wechselknopfs und ist ohne Rahmen und Grund gestaltet", async () => {
-    const nutzer = userEvent.setup({ advanceTimers: (ms) => vi.advanceTimersByTime(ms) });
-    const s = einsatzAnlegen("Hochwasser Abrücken", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogen("Crailsheim"));
-    render(<Wirt id={s.id} />);
-    await nutzer.click(within(karteVon("Crailsheim")).getByRole("button", { name: "Abrücken" }));
-    const bestaetigung = within(karteVon("Crailsheim")).getByRole("button", { name: "✓ Abgerückt" }) as HTMLButtonElement;
-    expect(bestaetigung.disabled).toBe(true);
-    expect(bestaetigung.className).toContain("wechsel-quittiert");
-    // Das Stylesheet nimmt dem gesperrten Knopf Rahmen und Grund — er sieht aus wie eine Anzeige.
-    expect(abschnitt).toMatch(/button\.wechsel-knopf\.wechsel-quittiert:disabled\s*\{[^}]*border-color:\s*transparent[^}]*background:\s*transparent/);
-    // Danach folgt der benannte Rückweg.
-    await waitFor(() => expect(within(karteVon("Crailsheim")).getByRole("button", { name: "Wieder anwesend" })).toBeTruthy(), { timeout: 4000 });
-  }, 20000);
-
-  it("eine zurückgeholte Einheit trägt nicht erneut die Marke „neu“", () => {
-    const s = einsatzAnlegen("Hochwasser Neu", EinsatzArt.EINSATZ);
-    const a = meldungHinzufuegen(s.id, bogen("Crailsheim"))!.eintrag;
-    meldungHinzufuegen(s.id, bogen("Aalen"));
-    statusMitZeitSetzen(s.id, a.id, MeldeStatus.ABGERUECKT, Date.now());
-    statusMitZeitSetzen(s.id, a.id, MeldeStatus.ANWESEND, Date.now());
-    render(<Wirt id={s.id} />);
-    expect(karteVon("Aalen").querySelector(".neu-badge")).not.toBeNull(); // Vergleich: die unberührte Einheit bleibt „neu"
-    expect(karteVon("Crailsheim").querySelector(".neu-badge")).toBeNull();
-  });
 });
 
 describe("R17-N5 Strich im Reiter und Modus-Marke", () => {
-  it("die Schnellerfassung erklärt auf Schritt 1 den Strich und nennt ihn „entfällt“ für Vorlesesoftware", async () => {
-    const nutzer = userEvent.setup();
-    render(<App />);
-    await nutzer.click(screen.getByRole("button", { name: "Einheit schnell erfassen (nur Stärke)…" }));
-    // R21-E4: Die Leiste zeigt nur die vier Schritte der Schnellerfassung, durchgezählt; Striche gibt es nicht mehr.
-    expect(document.querySelector(".schritte-erklaerung")).toBeNull();
-    expect(screen.queryByRole("button", { name: /entfällt in der Schnellerfassung$/ })).toBeNull();
-    const reiter = [...document.querySelectorAll(".schritte button")].map((b) => b.textContent);
-    expect(reiter).toHaveLength(4);
-    await nutzer.click(screen.getByRole("button", { name: /^2\. Personal/ }));
-    expect(document.querySelector(".schritte-erklaerung")).toBeNull();
-  });
 
   it("der volle Bogen zeigt die Erklärzeile nicht", () => {
     render(<SchrittBuehne komponente={SchrittEinsatz} />);
@@ -217,17 +114,6 @@ describe("R17-N8 Scanner ohne Kamera: der Bildweg steht zuerst", () => {
   });
 });
 
-describe("R17-N9 die zwei CSV-Dateien sind erklärt", () => {
-  it("nennt unter den Knöpfen, was „Übersicht“ und „Alle Daten“ enthalten und ob Namen dabei sind", () => {
-    const s = einsatzAnlegen("Hochwasser CSV", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogen("Crailsheim"));
-    render(<Wirt id={s.id} />);
-    const text = document.querySelector(".csv-erklaerung")!.textContent!;
-    expect(text).toMatch(/Übersicht.*eine Zeile je Einheit.*ohne Namen/);
-    expect(text).toMatch(/Alle Daten.*je Person.*Namen und Rufnummern.*je Fahrzeug/);
-  });
-});
-
 describe("R17-N10 Zeitraum und Uhrzeit von Beginn und Ende", () => {
   it("Schritt 2 benennt beide Gruppen und stellt den Erklärsatz über die Kästchen", () => {
     render(<SchrittBuehne komponente={SchrittEinsatz} />);
@@ -245,17 +131,5 @@ describe("R17-N10 Zeitraum und Uhrzeit von Beginn und Ende", () => {
     expect(screen.getByText("Zeitraum")).toBeTruthy();
     expect(screen.getByText(/, 08:00 – .*, 18:00$/)).toBeTruthy();
     expect(screen.getByText("Uhrzeit Beginn / Ende")).toBeTruthy();
-  });
-});
-
-describe("R17-N11 Lagemonitor: Stärke ausgeschrieben", () => {
-  it("schreibt Führer / Unterführer / Mannschaft = gesamt statt F / U / M // gesamt", () => {
-    const s = einsatzAnlegen("Lage Stärke", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogen("Crailsheim"));
-    render(<Lagemonitor einsatzId={s.id} />);
-    const zeile = document.querySelector(".lm-r3")!;
-    expect(zeile.textContent).toContain("Stärke Führer / Unterführer / Mannschaft = gesamt");
-    expect(zeile.textContent).not.toContain("//");
-    expect(zeile.textContent).toMatch(/\d+ \/ \d+ \/ \d+ = \d+/);
   });
 });

@@ -3,17 +3,12 @@
  * in den letzten Einsatz (K12), Dateinamen der Ausgaben im Download (W6, H9), Quittung der Tabellen mit Dateiname (A4).
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { EinsatzArt, einsatzAnlegen, meldungHinzufuegen } from "@bos/meldekopf/einsaetze";
 import { OrganisationsTyp, PersonalErfassung } from "@bos/eeb-format/model";
 import { neuePerson, neuerBogen } from "./hilfen";
 import { entwurfSpeichern } from "./entwurf";
 
-/** Wie die App den zuletzt offenen Einsatz merkt (app.tsx `eeb.letzterEinsatz.v1`). */
-function letztenEinsatzMerken(id: string): void {
-  localStorage.setItem("eeb.letzterEinsatz.v1", JSON.stringify({ id, um: Date.now() }));
-}
 
 const geladen: { name: string }[] = [];
 vi.mock("./pdf", () => ({
@@ -79,65 +74,5 @@ describe("R18-N7 Entwurfskarte", () => {
     expect(document.querySelectorAll("p.meldung").length === 0 || ![...document.querySelectorAll("p.meldung")].some((p) => p.textContent!.startsWith("Entwurf vom "))).toBe(true);
     expect(karte.textContent).toMatch(/9 Sollplätze, noch ohne Namen/);
     expect(karte.textContent).not.toMatch(/Stärke \d+ \/ \d+/);
-  });
-});
-
-describe("R18-K12 Kaltstart in den letzten Einsatz", () => {
-  it("legt unter den Einsatz einen Verlaufseintrag „Startseite“: Zurück zeigt zuerst die Startseite", async () => {
-    const s = einsatzAnlegen("Hochwasser Weser", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, (() => { const b = neuerBogen(); b.einheit.hierarchie[0]!.name = "Albstadt"; return b; })());
-    letztenEinsatzMerken(s.id);
-    const vorher = window.history.length;
-    render(<App />);
-    await waitFor(() => expect(document.querySelector("#einheiten-liste")).not.toBeNull());
-    // Zwei Einträge statt einem: Startseite darunter, Einsatz oben.
-    expect(window.history.length).toBe(vorher + 1);
-    const oben = (window.history.state as { eeb?: { einsatz: string | null } }).eeb!;
-    expect(oben.einsatz).toBe(s.id);
-    window.history.back();
-    await waitFor(() => expect(document.querySelector("#einheiten-liste")).toBeNull());
-    expect(screen.getByRole("button", { name: "Neuen Bogen erstellen" })).toBeDefined();
-    expect((window.history.state as { eeb?: { einsatz: string | null } }).eeb!.einsatz).toBeNull();
-  });
-
-  it("nach dem Neuladen (Marke schon da) kommt kein weiterer Eintrag dazu", async () => {
-    const s = einsatzAnlegen("Hochwasser Weser", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, (() => { const b = neuerBogen(); b.einheit.hierarchie[0]!.name = "Albstadt"; return b; })());
-    letztenEinsatzMerken(s.id);
-    window.history.replaceState({ eeb: { schritt: 0, zeigeStart: true, einsatz: s.id, scanner: false, muster: false, lauf: "alt" }, eebErste: true }, "");
-    const vorher = window.history.length;
-    render(<App />);
-    await waitFor(() => expect(document.querySelector("#einheiten-liste")).not.toBeNull());
-    expect(window.history.length).toBe(vorher);
-  });
-});
-
-describe("R18-W6/A4 Ausgaben der Einsatzansicht", () => {
-  it("die Übersicht als CSV heißt „JJJJ-MM-TT_HHMM_eeb-einsatz-uebersicht_<Einsatz>.csv“, und die Quittung nennt den Namen", async () => {
-    const nutzer = userEvent.setup();
-    const s = einsatzAnlegen("Hochwasser Weser", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, (() => { const b = neuerBogen(); b.einheit.hierarchie[0]!.name = "Albstadt"; return b; })());
-    letztenEinsatzMerken(s.id);
-    render(<App />);
-    await nutzer.click(await screen.findByRole("button", { name: /^Übersicht als CSV/ }));
-    await waitFor(() => expect(geladen).toHaveLength(1));
-    expect(geladen[0]!.name).toMatch(/^\d{4}-\d{2}-\d{2}_\d{4}_eeb-einsatz-uebersicht_Hochwasser_Weser\.csv$/);
-    // R19-O10: Die Quittung ist eine Leiste mit Kurzfassung; der volle Satz steht für Vorleser in `.nur-sr`.
-    const quittung = (await screen.findAllByText(/^✓ Gespeichert: /))[0]!;
-    expect(quittung.textContent).toContain(geladen[0]!.name);
-    expect(quittung.textContent).toContain("Download-Ordner");
-  });
-
-  it("Excel und alle Daten: eigene Art im Namen, Quittung mit Namen", async () => {
-    const nutzer = userEvent.setup();
-    const s = einsatzAnlegen("Hochwasser Weser", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, (() => { const b = neuerBogen(); b.einheit.hierarchie[0]!.name = "Albstadt"; return b; })());
-    letztenEinsatzMerken(s.id);
-    render(<App />);
-    await nutzer.click(await screen.findByRole("button", { name: /^Alle Daten als CSV/ }));
-    await waitFor(() => expect(geladen).toHaveLength(1));
-    expect(geladen[0]!.name).toMatch(/^\d{4}-\d{2}-\d{2}_\d{4}_eeb-einsatz-alle-daten_Hochwasser_Weser\.csv$/);
-    await waitFor(() => expect(screen.queryAllByText(/^✓ Gespeichert: /).length).toBeGreaterThan(0));
-    expect(within(screen.getAllByText(/^✓ Gespeichert: /)[0]!.closest("[role=status]") as HTMLElement).getAllByText(/alle-daten/).length).toBeGreaterThan(0);
   });
 });

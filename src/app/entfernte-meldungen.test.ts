@@ -5,8 +5,8 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { OrganisationsTyp, PersonalErfassung, SCHEMA_VERSION, type Erfassungsbogen } from "@bos/eeb-format/model";
-import { EinsatzArt, einsaetzeLaden, einsatzAnlegen, meldungHinzufuegen, speicherhuelleSetzen } from "@bos/meldekopf/einsaetze";
-import { entfernteLaden, entfernteMerken, entfernteVergessen, zurueckkehrende } from "./entfernte-meldungen";
+import { EinsatzArt, einsatzAnlegen, meldungHinzufuegen, speicherhuelleSetzen } from "@bos/meldekopf/einsaetze";
+import { entfernteLaden, entfernteMerken } from "./entfernte-meldungen";
 import { einheitEntfernen } from "./eintrag-zeiten";
 
 class MemStorage {
@@ -50,40 +50,10 @@ describe("entfernte Meldungen merken", () => {
     expect(entfernteLaden()[s.id]).toEqual(weg.map((e) => e.id));
   });
 
-  it("„Rückgängig“ vergisst die Kennungen wieder; leere Listen verschwinden", () => {
-    const s = einsatzAnlegen("A", EinsatzArt.EINSATZ);
-    entfernteMerken(s.id, ["x", "y"]);
-    entfernteVergessen(s.id, ["x"]);
-    expect(entfernteLaden()[s.id]).toEqual(["y"]);
-    entfernteVergessen(s.id, ["y"]);
-    expect(entfernteLaden()).toEqual({});
-  });
-
   it("vergisst Sammlungen, die es nicht mehr gibt", () => {
     const s = einsatzAnlegen("A", EinsatzArt.EINSATZ);
     entfernteMerken("gibt-es-nicht", ["x"]);
     entfernteMerken(s.id, ["y"]);
     expect(Object.keys(entfernteLaden())).toEqual([s.id]);
-  });
-});
-
-describe("zurueckkehrende()", () => {
-  it("findet genau die hier entfernten Einträge der Datei", () => {
-    const s = einsatzAnlegen("Hochwasser Ulm", EinsatzArt.EINSATZ);
-    const alb = meldungHinzufuegen(s.id, bogen("Albstadt"))!;
-    meldungHinzufuegen(s.id, bogen("Crailsheim"));
-    const datei = structuredClone(einsaetzeLaden()[0]!); // Export vor dem Entfernen
-
-    einheitEntfernen(s.id, alb.eintrag.einheitSchluessel);
-    const vorhanden = einsaetzeLaden()[0]!;
-
-    const zurueck = zurueckkehrende(datei, vorhanden, entfernteLaden());
-    expect(zurueck.map((e) => e.id)).toEqual([alb.eintrag.id]);
-  });
-
-  it("fragt nichts bei einer Sammlung, die es hier nicht gibt", () => {
-    const s = einsatzAnlegen("X", EinsatzArt.EINSATZ);
-    const datei = einsaetzeLaden()[0]!;
-    expect(zurueckkehrende(datei, undefined, { [s.id]: ["a"] })).toEqual([]);
   });
 });

@@ -31,7 +31,6 @@
 import { MeldeStatus, neuesteJeEinheit, revisionen, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 import { einsaetzeLaden as kernEinsaetzeLaden, einsaetzePapierkorb as kernEinsaetzePapierkorb } from "@bos/meldekopf/einsaetze";
 import { sammlungenSchreiben } from "./eintrag-zeiten";
-import { angabenErben } from "./angaben-alter";
 
 declare module "@bos/meldekopf/einsaetze" {
   interface MeldeEintrag {
@@ -79,15 +78,7 @@ export function fassungenJeEinheit(eintraege: readonly MeldeEintrag[], einheitSc
   return [...vorn, ...revs.filter((e) => verdraengt(e, ids))];
 }
 
-/** Ist diese Fassung von der Führungsstelle verdrängt worden (für die Historie)? */
-export function istVerdraengt(e: MeldeEintrag, eintraege: readonly MeldeEintrag[]): boolean {
-  return e.ersetztDurch != null && eintraege.some((x) => x.id === e.ersetztDurch && x.id !== e.id);
-}
 
-/** Schnellerfassung, Stärkeänderung von Hand — eine Fassung, die der Meldekopf schrieb, nicht die Einheit. */
-export function istPlatzhalterFassung(e: MeldeEintrag): boolean {
-  return e.quelle === "manuell";
-}
 
 /**
  * Wie eine eben aufgenommene Fassung zur bisher geltenden steht — Grundlage
@@ -113,44 +104,7 @@ export interface FassungsPruefung {
   bisher: MeldeEintrag;
 }
 
-/**
- * Prüft eine eben aufgenommene Fassung gegen die vorher geltende derselben
- * Einheit. `vorher` ist die Meldungsliste VOR der Aufnahme, `nachher` die
- * danach (mit der neuen Fassung).
- */
-export function fassungPruefen(
-  vorher: readonly MeldeEintrag[],
-  nachher: readonly MeldeEintrag[],
-  neuId: string,
-): FassungsPruefung | null {
-  const neu = nachher.find((e) => e.id === neuId);
-  if (!neu) return null;
-  const bisher = geltendeJeEinheit(vorher.filter((e) => e.einheitSchluessel === neu.einheitSchluessel))[0];
-  if (!bisher || bisher.id === neu.id) return null;
-  const jetzt = geltendeJeEinheit(nachher.filter((e) => e.einheitSchluessel === neu.einheitSchluessel))[0];
-  if (neu.bogen.stand === bisher.bogen.stand) {
-    // Inhaltsgleich wäre dieselbe ID — hier unterscheiden sich die Fassungen.
-    return { lage: "gleiche-minute", neu, bisher };
-  }
-  if (jetzt?.id === neu.id) return null; // jüngerer Stand: normale Folgemeldung
-  if (istPlatzhalterFassung(bisher) && !istPlatzhalterFassung(neu)) return { lage: "ersetzt-platzhalter", neu, bisher };
-  return { lage: "aelter", neu, bisher };
-}
 
-/**
- * Ein nachgereichter Bogen der Einheit, der hinter einer Schnellerfassung in
- * der Historie liegt — für den Hinweis an der Karte (R4-W1). `fassungen` sind
- * die Fassungen der Einheit ({@link fassungenJeEinheit}). Gesucht wird die
- * zuletzt eingegangene Fassung, die nicht von Hand erfasst wurde, nach dem
- * geltenden Kopf einging und nicht ausdrücklich verdrängt wurde.
- */
-export function nachgereichterBogen(kopf: MeldeEintrag, fassungen: readonly MeldeEintrag[]): MeldeEintrag | null {
-  if (!istPlatzhalterFassung(kopf)) return null;
-  const kandidaten = fassungen.filter(
-    (e) => e.id !== kopf.id && !istPlatzhalterFassung(e) && e.empfangenAm >= kopf.empfangenAm && !istVerdraengt(e, fassungen),
-  );
-  return [...kandidaten].sort((a, b) => b.empfangenAm - a.empfangenAm)[0] ?? null;
-}
 
 /** Ergebnis von {@link fassungGiltSetzen} — für „Rückgängig". */
 export interface VorrangAenderung {
@@ -229,66 +183,8 @@ export function fassungGiltSetzen(einsatzId: string, eintragId: string, jetzt = 
   return aenderung;
 }
 
-/**
- * Eine Fassung, die der Helfer eben selbst gemacht hat („Stärke ändern…"),
- * gilt vor allen anderen Fassungen ihrer Einheit (Audit Runde 5, R5-E2).
- *
- * Der Kern entscheidet nach `stand`, bei Gleichstand nach der Empfangszeit.
- * Der Stand einer Handänderung ist das Maximum aus Jetzt und der bisherigen
- * Fassung; nach einer zurückgestellten oder falsch gestellten Uhr ist er mit
- * dem der bisherigen Fassung gleich, und die Empfangszeit der neuen Fassung
- * lag davor — die Quittung meldete Erfolg, die Karte zeigte die alte Zahl.
- * Hier rückt die Empfangszeit mindestens eine Millisekunde hinter die jüngste
- * Fassung der Einheit (wie der Kern es für Aufteilen und Zusammenführen tut,
- * `ablosendeEmpfangszeit`). Rückgabe: ob etwas zu tun war.
- */
-export function fassungObenauf(einsatzId: string, eintragId: string): boolean {
-  const liste = alleSammlungen();
-  const s = liste.find((x) => x.id === einsatzId);
-  const e = s?.eintraege.find((x) => x.id === eintragId);
-  if (!s || !e) return false;
-  const andere = s.eintraege.filter((x) => x.einheitSchluessel === e.einheitSchluessel && x.id !== e.id);
-  if (andere.length === 0) return false;
-  const stand = Math.max(...andere.map((x) => x.bogen.stand));
-  if (e.bogen.stand < stand) return false; // der Stand entscheidet allein; hier hilft nur „Diese Fassung gilt"
-  const hinter = Math.max(...andere.filter((x) => x.bogen.stand === e.bogen.stand).map((x) => x.empfangenAm), -Infinity) + 1;
-  if (e.empfangenAm >= hinter) return false;
-  e.empfangenAm = hinter;
-  sammlungenSchreiben(liste);
-  return true;
-}
 
-/**
- * Die Handänderung `eintragId` („Stärke ändern…", Kennzeichnung) übernimmt das Alter der Angaben von `vorgaengerin`
- * (R17-K1): Karte, Kopf, Monitor und Lageblatt messen weiter ab der Meldung der Einheit, nicht ab dem Tippen am Meldekopf.
- */
-export function angabenVermerken(einsatzId: string, eintragId: string, vorgaengerin: MeldeEintrag, kennzeichnung: boolean | "name" = false): boolean {
-  const liste = alleSammlungen();
-  const e = liste.find((x) => x.id === einsatzId)?.eintraege.find((x) => x.id === eintragId);
-  if (!e) return false;
-  e.angaben = angabenErben(vorgaengerin, kennzeichnung);
-  sammlungenSchreiben(liste);
-  return true;
-}
 
-/**
- * Die eben eingelesene Fassung `neuId` liegt nur in der Historie, `bisherId` gilt weiter
- * (Audit Runde 8, R8-W2): Sie wird als verdrängt vermerkt — dann ist sie keine „Folgemeldung",
- * Karte und Quittung tragen weder „neue Fassung" noch einen Vergleich bisher → neu. Über
- * „Diese Fassung gilt" lässt sie sich jederzeit holen. Rückgabe: ob etwas zu tun war.
- */
-export function fassungInHistorieLegen(einsatzId: string, neuId: string, bisherId: string, jetzt = Date.now()): boolean {
-  const liste = alleSammlungen();
-  const s = liste.find((x) => x.id === einsatzId);
-  const neu = s?.eintraege.find((e) => e.id === neuId);
-  if (!s || !neu || neuId === bisherId || neu.ersetztDurch === bisherId) return false;
-  if (!s.eintraege.some((e) => e.id === bisherId)) return false;
-  neu.ersetztDurch = bisherId;
-  neu.ersetztAm = jetzt;
-  s.geaendert = Date.now();
-  sammlungenSchreiben(liste);
-  return true;
-}
 
 /** {@link fassungGiltSetzen} zurücknehmen: die Verweise wie vorher. */
 export function vorrangZuruecknehmen(a: VorrangAenderung): void {

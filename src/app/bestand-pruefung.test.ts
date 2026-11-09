@@ -76,31 +76,6 @@ describe("Unlesbares zählen und beiseitelegen (R7-N3, R7-E2)", () => {
   const eintrag = (id: string, bogen: unknown) => ({ id, einheitSchluessel: id, empfangenAm: Date.now(), quelle: 0, status: 0, bogen });
   const sammlung = (id: string, eintraege: unknown) => ({ id, name: `Sammlung ${id}`, art: 0, angelegt: Date.now(), geaendert: Date.now(), eintraege });
 
-  it("zählt eine Meldung ohne Organisation, statt sie still wegzulassen", async () => {
-    const ohneOrg = beispiel();
-    delete ohneOrg.einheit.organisation;
-    localStorage.setItem("eeb.einsaetze.v1", JSON.stringify([sammlung("s1", [eintrag("e1", beispiel()), eintrag("e2", ohneOrg)])]));
-    const { ausgelasseneMeldungen, ausgelasseneMeldungenGesamt } = await import("./einsaetze-lesen");
-    const { letzteMeldungText } = await import("./einsaetze-ui");
-    const liste = einsaetzeLaden();
-    expect(liste[0]!.eintraege).toHaveLength(1);
-    expect(ausgelasseneMeldungen("s1")).toBe(1);
-    expect(ausgelasseneMeldungenGesamt()).toBe(1);
-    expect(letzteMeldungText(liste[0]!)).toContain("1 Meldung nicht lesbar — Daten sichern");
-    // Im Speicher bleibt sie liegen (der Kern schreibt sie mit zurück).
-    expect(JSON.parse(localStorage.getItem("eeb.einsaetze.v1")!)[0].eintraege).toHaveLength(2);
-  });
-
-  it("sagt bei einer Sammlung nur mit Unbrauchbarem nicht „Noch keine Meldung“", async () => {
-    const ohneOrg = beispiel();
-    delete ohneOrg.einheit.organisation;
-    localStorage.setItem("eeb.einsaetze.v1", JSON.stringify([sammlung("s1", [eintrag("e1", ohneOrg), eintrag("e2", ohneOrg)])]));
-    const { letzteMeldungText } = await import("./einsaetze-ui");
-    const text = letzteMeldungText(einsaetzeLaden()[0]!);
-    expect(text).not.toContain("Noch keine Meldung");
-    expect(text).toContain("2 Meldungen nicht lesbar");
-  });
-
   it("legt eine Sammlung ohne Eintragsliste beiseite, bevor der Kern sie beim Schreiben verliert", async () => {
     const { unlesbarBestand } = await import("./unlesbar");
     const { einsatzAnlegen, EinsatzArt } = await import("@bos/meldekopf/einsaetze");

@@ -22,7 +22,7 @@ export interface Aenderung {
  */
 export const MONATE: Readonly<Record<string, string>> = {
   "2026-11":
-    "Rückmeldungen aus der Erprobung (FAG THW, OV Chemnitz): Stärke als 0 / 2 / 9 // 11, PDF im Raster der THW-Word-Vorlage mit Logo der Organisation und gezeichneten Kästchen, Fachzug Logistik nach StAN mit einzeln meldbaren Trupps, Ladungsträger wie Abrollbehälter, Funkrufname als Erreichbarkeit, Import ausgefüllter THW-Word-Bögen und dieser Änderungsverlauf. Die Excel-Liste „Oldenburg“ entfällt.",
+    "Rückmeldungen aus der Erprobung (FAG THW, OV Chemnitz): Stärke als 0 / 2 / 9 // 11, PDF im Raster der THW-Word-Vorlage mit Logo der Organisation und gezeichneten Kästchen, Fachzug Logistik nach StAN mit einzeln meldbaren Trupps, Ladungsträger wie Abrollbehälter, Funkrufname als Erreichbarkeit, Import ausgefüllter THW-Word-Bögen und dieser Änderungsverlauf. Die Excel-Liste „Oldenburg“ entfällt. Die Einsatz-Sammlung für den Meldekopf ist jetzt eine eigene App (meldekopf.erfassungsbogen.app).",
   "2026-10":
     "Viele Prüfrunden aus Sicht von Helfern, Führungskräften und Meldekopf: sicherere Bedienung, Lagemonitor für den Bildschirm im Führungsfahrzeug, Dienststelle und Beruf je Person, USB-Handscanner überall, Einsatzzeitraum mit Uhrzeit und ein schnellerer Start.",
   "2026-09":
@@ -37,6 +37,9 @@ export const AENDERUNGEN: readonly Aenderung[] = [
   {
     datum: "2026-11-09",
     punkte: [
+      "Die Einsatz-Sammlung ist in die eigene Meldekopf-App umgezogen (meldekopf.erfassungsbogen.app): Sammeln, Lagemonitor, Sammel-PDF, Lageblatt und Weitermeldung gibt es dort. Auf der Startseite steht an ihrer Stelle der Weg dorthin.",
+      "Ein gescannter, per Link empfangener oder aus einer Datei geladener Bogen öffnet sich wieder direkt, ohne die Frage „Wohin damit?“.",
+      "Liegen auf dem Gerät noch Sammlungen aus der Zeit davor, nennt die Startseite sie mit Zahl: per Datensicherung in die Meldekopf-App bringen oder mit Rückfrage vom Gerät löschen. Die Datenschutzfrist von 90 Tagen gilt für sie weiter.",
       "Neue Beispielbögen unter „Feuerwehr › Niedersachsen › Kreisfeuerwehren“: die Kreisfeuerwehrbereitschaften und weiteren Kreiseinheiten (TEL, IuK, Gefahrgut, Versorgung, Logistik) aus Ammerland, Celle, Cloppenburg, Diepholz, Emsland, Goslar, Nienburg/Weser, Schaumburg, Vechta, Wittmund und der Region Hannover. Eine Bereitschaft ist ein Ordner mit einem Bogen je Führung und Fachzug, mit Fahrzeugen, Standorten und, wo veröffentlicht, Funkrufnamen und Stärken; jede Person trägt ihre Ortsfeuerwehr.",
       "Auf der Startseite steht der Offline-Kasten nur noch, solange Bogen, PDF, QR-Code und Empfang ohne Netz noch nicht gehen. Danach zeigt ein dünner Balken unter der Überschrift, wie weit Beispielbögen und Themenseiten geladen sind, und der Offline-Stand steht klein in der Fußzeile.",
       "Ausgefüllte THW-Word-Erfassungsbögen (.docx aus den Vorlagen 06-…_Erfassungsbogen) lassen sich über „Aus Datei laden…“ und „Bögen einlesen…“ übernehmen. Was keinem Feld zuzuordnen ist (etwa Fax, Zahl der Vegetarier), steht unter „Sonstiges“; eine Quittung nennt, was übernommen und was weggelassen wurde.",

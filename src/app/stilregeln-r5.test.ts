@@ -72,13 +72,6 @@ describe("Moduswechsel in der Einsatzansicht: feste Leiste statt schwebendem Kno
     // Nichts „schwebt" mehr: kein Schatten auf dem Knopf, der Text überdeckt.
     expect(css).not.toMatch(/\.anzeige-schwebe/);
   });
-
-  it("der Knopf trägt Text und ein Tippziel in Handschuhmaß", () => {
-    expect(bloecke(".anzeige-balken .anzeige-leiste-knopf").join("\n")).toMatch(/min-height:\s*min\([^;]*44px/);
-    const q = quelle("./anzeige-schalter.tsx");
-    expect(q).toMatch(/\{mitText && <span className="anzeige-leiste-text">Ansicht: \{aktuell\}<\/span>\}/);
-    expect(quelle("./einsaetze-ui.tsx")).toMatch(/<AnzeigeLeistenKnopf mitText \/>/);
-  });
 });
 
 describe("Deckel-Regel für Dialog, Startseite, Kopf und Leiste (R5-M1, R5-M2, R5-M3, R5-G6, R5-M7)", () => {
@@ -93,16 +86,6 @@ describe("Deckel-Regel für Dialog, Startseite, Kopf und Leiste (R5-M1, R5-M2, R
     const q = quelle("./schritte/uebersicht.tsx");
     expect(q.indexOf("QR-Code im Vollbild zeigen\n          </button>")).toBeGreaterThan(0);
     expect(q.indexOf("QR-Code im Vollbild zeigen\n          </button>")).toBeLessThan(q.indexOf("Für neuen Einsatz vorbereiten\n            </button>"));
-  });
-
-  it("die Startseite deckelt Themenleiste, Einleitung und Überschrift und kürzt die Einleitung am Telefon", () => {
-    expect(css).toMatch(/\.kopfnav-logo, \.kopfnav-links a\s*\{\s*min-height:\s*min\(var\(--ziel-basis\), 44px\)/);
-    expect(bloecke(".start > p.start-intro").join("\n")).toMatch(/min\(var\(--t-l\), 20px\)/);
-    expect(bloecke(".weiche > .weiche-weg > h2").join("\n")).toMatch(/min\(var\(--t-xl\), 28px\)/);
-    expect(css).toMatch(/@media \(max-width: 640px\)\s*\{\s*\.start-intro-lang\s*\{\s*display:\s*none/);
-    // Beim Erstbesuch steht der Offline-Hinweis unter den Aktionen beider Wege, nicht zwischen ihnen (R16-H3).
-    expect(quelle("./app.tsx")).toMatch(/\{erststart && offlineHinweis\}/);
-    expect(quelle("./app.tsx")).toMatch(/\{!bogen && !erststart && offlineHinweis\}/);
   });
 
   it("bei niedrigem Fenster (quer) und bei großer Schrift (Hochformat) verdichtet sich der Kopf in px-Deckeln", () => {

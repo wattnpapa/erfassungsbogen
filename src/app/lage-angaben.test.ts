@@ -3,8 +3,8 @@
  * noch nichts steht (Audit Runde 7, R7-K5).
  */
 import { beforeEach, describe, expect, it } from "vitest";
-import { einsatzbeginnLaden, einsatzbeginnSetzen, einsatzFunkrufLaden, einsatzFunkrufSetzen } from "./lagemonitor-beginn";
-import { lageAngabenLaden, lageAngabenPruefen, lageAngabenUebernehmen } from "./lage-angaben";
+import { einsatzbeginnLaden, einsatzFunkrufLaden, einsatzFunkrufSetzen } from "./lagemonitor-beginn";
+import { lageAngabenUebernehmen } from "./lage-angaben";
 
 class MemStorage {
   private m = new Map<string, string>();
@@ -21,19 +21,6 @@ beforeEach(() => {
 });
 
 describe("Lage-Angaben der Übergabe", () => {
-  it("liest, was das Gerät gesetzt hat, und nichts, wenn nichts gesetzt ist", () => {
-    expect(lageAngabenLaden("e1")).toBeUndefined();
-    einsatzbeginnSetzen("e1", 1_000, ["e1"]);
-    einsatzFunkrufSetzen("e1", "Salus Führung 1", ["e1"]);
-    expect(lageAngabenLaden("e1")).toEqual({ beginn: 1_000, funkruf: "Salus Führung 1" });
-  });
-
-  it("prüft das Umschlagfeld", () => {
-    expect(lageAngabenPruefen({ beginn: 5, funkruf: "  A  " })).toEqual({ beginn: 5, funkruf: "A" });
-    expect(lageAngabenPruefen({ beginn: "x", funkruf: "" })).toBeUndefined();
-    expect(lageAngabenPruefen(null)).toBeUndefined();
-    expect(lageAngabenPruefen([1])).toBeUndefined();
-  });
 
   it("setzt beides auf dem zweiten Gerät und sagt es in der Quittung", () => {
     const satz = lageAngabenUebernehmen("e1", { beginn: Date.UTC(2026, 9, 23, 8, 0), funkruf: "Salus Führung 1" }, ["e1"]);

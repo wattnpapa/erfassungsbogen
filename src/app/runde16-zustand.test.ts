@@ -5,38 +5,6 @@ import { describe, expect, it } from "vitest";
 import { StaerkeRolle } from "@bos/eeb-format/model";
 import { namenVerdachtGruende, parseNamen } from "./personal-schnell";
 import { telefonBereinigen } from "./telefon-eingabe";
-import { BildNichtLesbar } from "./qr-bild";
-import { qrStapelLesen } from "./qr-stapel";
-
-describe("R16-E5 Datei, die kein Bild ist", () => {
-  it("nennt eine nicht lesbare Bilddatei als solche; ein Bild ohne Code behält seinen Satz", async () => {
-    const erg = await qrStapelLesen(
-      [
-        { name: "fake.png", blob: new Blob(["kein bild"]) },
-        { name: "foto.png", blob: new Blob(["bild"]) },
-      ],
-      {
-        lesen: async (blob: Blob) => {
-          if ((await blob.text()) === "kein bild") throw new BildNichtLesbar();
-          return [];
-        },
-      },
-    );
-    expect(erg.fehler).toEqual([
-      expect.objectContaining({ datei: "fake.png", grund: "kein-bild", text: expect.stringContaining("nicht als Bild öffnen") }),
-      expect.objectContaining({ datei: "foto.png", grund: "kein-code", text: "Kein QR-Code im Bild gefunden." }),
-    ]);
-  });
-
-  it("jeder andere Lesefehler zählt weiter als „kein Code“", async () => {
-    const erg = await qrStapelLesen([{ name: "x.png", blob: new Blob(["x"]) }], {
-      lesen: async () => {
-        throw new Error("Leser nicht geladen");
-      },
-    });
-    expect(erg.fehler[0]?.grund).toBe("kein-code");
-  });
-});
 
 describe("R16-E3 Telefonfeld: Ziffern aus einem Zusatz wachsen nicht an die Nummer", () => {
   it("„0441 123456 App 12“ bleibt 0441123456, der Hinweis nennt den Zusatz als Ganzes", () => {

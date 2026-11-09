@@ -26,7 +26,6 @@ import {
   zeitpunktAusIso,
   type Erfassungsbogen,
   KontaktArt,
-  type Fahrzeug,
   type Person,
 } from "@bos/eeb-format/model";
 import {

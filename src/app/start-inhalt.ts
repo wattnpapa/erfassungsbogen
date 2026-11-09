@@ -147,13 +147,15 @@ export const START_ABSCHNITTE: Abschnitt[] = [
         teile: [
           "Am ",
           { text: "Meldekopf", ziel: "./meldekopf.html" },
-          ", im Bereitstellungsraum und beim Zugführer laufen viele Bögen zusammen. Dafür gibt es die Einsatz-Sammlung: Eintreffende Bögen werden gescannt oder als Datei übernommen, die Stärke aller anwesenden Einheiten wird laufend summiert — mit Zwischensummen je Zug. Wer eine Einheit nur durchwinken muss, nimmt die Schnellerfassung mit Stärke, Führungskraft und Fahrzeugen.",
+          ", im Bereitstellungsraum und beim Zugführer laufen viele Bögen zusammen. Dafür gibt es eine eigene App, die ",
+          { text: "Meldekopf-App", ziel: "./meldekopf.html" },
+          ": Eintreffende Bögen werden gescannt oder als Datei übernommen, die Stärke aller anwesenden Einheiten wird laufend summiert — mit Zwischensummen je Zug. Wer eine Einheit nur durchwinken muss, nimmt dort die Schnellerfassung mit Stärke, Führungskraft und Fahrzeugen.",
         ],
       },
       {
         art: "absatz",
         teile: [
-          "Jede Meldung landet in einer Historie; ein Vergleich zeigt zur Schichtübergabe, was sich seit der letzten Meldung geändert hat. Für die Weitermeldung erzeugt die Sammlung ein Sammel-PDF und CSV-Listen je Einsatz.",
+          "Jede Meldung landet dort in einer Historie; ein Vergleich zeigt zur Schichtübergabe, was sich seit der letzten Meldung geändert hat. Für die Weitermeldung erzeugt die Meldekopf-App ein Sammel-PDF, ein Lageblatt und CSV-Listen je Einsatz. Sie liest die QR-Codes, Links und PDF-Dateien dieses Bogens.",
         ],
       },
     ],

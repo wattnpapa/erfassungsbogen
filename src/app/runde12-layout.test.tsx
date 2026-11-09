@@ -11,8 +11,6 @@ import { SchrittBuehne } from "../test/schritt-buehne";
 import { SchrittEinheit } from "./schritte/einheit";
 import { SchrittFahrzeuge } from "./schritte/fahrzeuge";
 import { SchrittPersonal } from "./schritte/personal";
-import { LagemonitorBlock } from "./lagemonitor-ui";
-import { Dialogschicht } from "./dialoge";
 import { kennzeichenSchreibweise } from "./schreibweise";
 
 afterEach(() => {
@@ -121,29 +119,6 @@ describe("Schritt 1: der Knopf nennt, was er anlegt (R12-N4)", () => {
   });
 });
 
-describe("Lagemonitor: Zweck und Wirkung von Beginn, „Jetzt“ und „Beginn entfernen“ (R12-N5)", () => {
-  it("ein Satz erklärt die Dauer seit Beginn und beide Knöpfe; „Löschen“ heißt „Beginn entfernen“", async () => {
-    const nutzer = userEvent.setup();
-    render(
-      <>
-        <LagemonitorBlock einsatzId="e1" alleIds={["e1"]} />
-        <Dialogschicht />
-      </>,
-    );
-    const satz = document.querySelector(".lm-beginn-erklaerung")!.textContent!;
-    expect(satz).toContain("Dauer seit dem Einsatzbeginn");
-    expect(satz).toContain("„Jetzt“");
-    expect(satz).toContain("„Beginn entfernen“");
-    expect(screen.queryByRole("button", { name: "Löschen" })).toBeNull();
-    await nutzer.click(screen.getByRole("button", { name: "Jetzt" }));
-    await nutzer.click(screen.getByRole("button", { name: "Beginn entfernen" }));
-    // Seit R13-D1 fragt „Beginn entfernen“ nach, wie „Jetzt“ bei vorhandenem Beginn.
-    const frage = await screen.findByRole("dialog", { name: "Einsatzbeginn entfernen?" });
-    await nutzer.click(within(frage).getByRole("button", { name: "Beginn entfernen" }));
-    expect(screen.queryByRole("button", { name: "Beginn entfernen" })).toBeNull();
-  });
-});
-
 describe("Namen einfügen lässt die gewählte Ansicht stehen (R12-N6)", () => {
   it("Karten gewählt, Namen übernommen: weiter Karten", async () => {
     const nutzer = userEvent.setup();
@@ -226,11 +201,5 @@ describe("Stilregeln der Einsatzansicht am Telefon (R12-M1, R12-M2, R12-M3, R12-
     expect(abschnitt).toMatch(/\.einheit-zeile button\.wechsel-knopf\s*\{\s*min-width:\s*9rem/);
     // Der gestrichelte Rand der abgerückten Karte hat dieselben Maße wie der durchsichtige.
     expect(html).toMatch(/\.einheit-zeile\.gestrichen\s*\{\s*border-left:\s*3px dashed var\(--linie-stark\);\s*padding-left:\s*var\(--r-2\)/);
-  });
-  it("alle drei Zustände des Statusknopfes tragen die Klasse wechsel-knopf (R12-G3, Markup)", () => {
-    const quelle = lies("./einsaetze-ui.tsx");
-    expect(quelle).toMatch(/className="wechsel-knopf" aria-describedby=\{nameId\} disabled=\{prellt\} onClick=\{\(\) => void statusSetzen\(MeldeStatus\.ABGERUECKT\)\}/);
-    expect(quelle).toMatch(/className="wechsel-knopf" aria-describedby=\{nameId\} disabled=\{prellt\} onClick=\{\(\) => void statusSetzen\(MeldeStatus\.ANWESEND\)\}/);
-    expect(quelle).toContain('className="wechsel-knopf wechsel-quittiert"');
   });
 });

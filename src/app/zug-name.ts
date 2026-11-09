@@ -52,13 +52,3 @@ export function zugNormalisiert(eingabe: string, vorhandene: Iterable<string | u
   return [...zaehler.entries()].sort((a, b) => b[1] - a[1])[0]![0];
 }
 
-/** Vorhandene Züge, einmal je Schreibweise, sortiert — Vorschlagsliste fürs Zugfeld. */
-export function vorhandeneZuege(etiketten: Iterable<string | undefined>): string[] {
-  const nach = new Map<string, string>();
-  for (const e of etiketten) {
-    if (!e) continue;
-    const k = zugSchluessel(e);
-    if (!nach.has(k)) nach.set(k, e);
-  }
-  return [...nach.values()].sort((a, b) => a.localeCompare(b, "de", { numeric: true }));
-}

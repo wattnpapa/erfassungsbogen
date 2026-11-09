@@ -5,7 +5,6 @@
  */
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { weicheTrennstellen } from "./einheiten-tabelle";
 
 const lies = (pfad: string) => readFileSync(new URL(pfad, import.meta.url), "utf8");
 const html = lies("../../index.html");
@@ -18,18 +17,6 @@ const abschnitt = (() => {
   expect(bis).toBeGreaterThan(von);
   return html.slice(von, bis).replace(/\/\*[\s\S]*?\*\//g, "");
 })();
-
-describe("Namen in der Tabelle (R14-M2)", () => {
-  const zw = String.fromCharCode(0x200b);
-  it("erlaubt einen Umbruch nach dem Schrägstrich, ohne den Text zu ändern", () => {
-    const t = weicheTrennstellen("Fachgruppe Wasserschaden/Pumpen (A)");
-    expect(t).toContain(`/${zw}Pumpen`);
-    expect(t.split(String.fromCharCode(0xad)).join("").split(zw).join("")).toBe("Fachgruppe Wasserschaden/Pumpen (A)");
-  });
-  it("lässt Zahlen- und Datumsbrüche unberührt", () => {
-    expect(weicheTrennstellen("Zug 1/2")).toBe("Zug 1/2");
-  });
-});
 
 describe("Stilregeln Runde 14 (Layout)", () => {
   it("Tabellenrahmen ohne Seitenpolster, Namensspalte fest, Spalten rasten nach der Namensspalte (R14-M1)", () => {

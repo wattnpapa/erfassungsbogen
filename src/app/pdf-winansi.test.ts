@@ -16,14 +16,7 @@ import { fileURLToPath } from "node:url";
 import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import type { QrSatz } from "./hilfen";
 import { BLANKO_ZEILEN, leererBogen } from "./blanko";
-import {
-  winAnsiText,
-  einsatzLageblattDokument,
-  einsatzPdfDokument,
-  pdfDokument,
-  type SammelBogen,
-  type UebersichtEintrag,
-} from "./pdf-dokument";
+import { winAnsiText, pdfDokument } from "./pdf-dokument";
 
 /** Alle Zeichen, die Windows-1252 (und damit WinAnsi) kennt, dazu Zeilenumbruch und Nullbreiten-Leerzeichen (Umbruchhilfe). */
 const WINANSI = (() => {
@@ -104,38 +97,6 @@ describe("PDF-Texte nur in WinAnsi (R5-K2)", () => {
     expect(WINANSI.has("…")).toBe(true);
   });
 
-  it("Lageblatt und Sammel-PDF aller Beispielbögen, mit Vorfassung und allen Marken", () => {
-    const eintraege: UebersichtEintrag[] = boegen.map((b, i) => {
-      // Vorfassung mit weniger Personal, anderem Auftrag und mehr Verpflegung: füllt die Spalte „Veränderung".
-      const vorher = structuredClone(b);
-      vorher.personal = vorher.personal.slice(1);
-      vorher.einsatz = { ...vorher.einsatz, ortAuftrag: "anderer Ort" };
-      if (vorher.sofortbedarf) vorher.sofortbedarf = { ...vorher.sofortbedarf, verpflegungPersonen: 99, dieselLiter: 7 };
-      return {
-        bogen: b,
-        ...(i % 2 === 0 ? { vorher } : {}),
-        zugEtikett: `${1 + (i % 3)}. Zug`,
-        eingetroffenAm: Date.UTC(2026, 9, 5, 8, 0),
-        nummer: i + 1,
-        abgerueckt: i % 7 === 0,
-        zeitUnbestaetigt: i % 5 === 0,
-        notiz: "Pumpe 2 defekt – Ersatzpumpe „unterwegs“ …",
-        ...(i % 11 === 0 ? { rueckkehr: { abgerueckAm: Date.UTC(2026, 9, 5, 9, 0) } } : {}),
-        ...(i % 13 === 0 ? { fremderOrt: "Hochwasser Weser" } : {}),
-      };
-    });
-    const lage = einsatzLageblattDokument("Großlage – Übung „Weser“", eintraege);
-    expect(fremdzeichen(lage)).toEqual([]);
-    const sammel = einsatzPdfDokument(
-      "Großlage",
-      eintraege.map((e) => ({ ...e, qr: QR }) as SammelBogen),
-      undefined,
-      Date.UTC(2026, 9, 5, 12, 0),
-      Date.UTC(2026, 9, 5, 10, 0),
-    );
-    expect(fremdzeichen(sammel)).toEqual([]);
-  }, 60_000);
-
   it("Einzel-PDF aller Beispielbögen und der Blanko-Vordruck", () => {
     const funde = new Set<string>();
     for (const b of boegen) for (const f of fremdzeichen(pdfDokument(b, QR))) funde.add(f);
@@ -149,23 +110,5 @@ describe("PDF-Texte nur in WinAnsi (R5-K2)", () => {
     expect(winAnsiText("Łódź, Gyöngyös, ć")).toBe("Lódz, Gyöngyös, c");
     expect(winAnsiText("Übung „Weser“ – 5 € · ½ … ß")).toBe("Übung „Weser“ – 5 € · ½ … ß");
     expect(winAnsiText("Lage 🚒 offen")).toBe("Lage ? offen");
-  });
-
-  it("das Lageblatt druckt den Verpflegungshinweis ohne „≠“ (R5-K2)", () => {
-    const b = structuredClone(beispiele()[0]!);
-    b.sofortbedarf = { ...b.sofortbedarf!, verpflegungPersonen: b.personal.length + 4 };
-    const lage = pdfTexte(einsatzLageblattDokument("Lage", [{ bogen: b }])).join("\n").replace(/\u200B/g, "");
-    expect(lage).toMatch(/Verpflegung \d+ statt Stärke \d+/);
-    expect(lage).not.toContain("≠");
-  });
-
-  it("die Kurzformen der Prüfpunkte kennen keine Fremdzeichen", async () => {
-    const { lueckeKurz } = await import("./einheiten-tabelle");
-    const proben = [
-      "Verpflegung für 12 Personen angefordert, die Gesamtstärke ist aber 8.",
-      "Aufteilung nach Geschlecht: 3 weicht von der Gesamtstärke ab",
-      "Stärke: 5 + 1 + 2 ergibt nicht die Gesamtstärke 9.",
-    ];
-    for (const p of proben) for (const z of lueckeKurz(p)) expect(WINANSI.has(z), `${z} in ${lueckeKurz(p)}`).toBe(true);
   });
 });

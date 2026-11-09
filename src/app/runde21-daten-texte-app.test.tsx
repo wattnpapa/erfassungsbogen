@@ -4,13 +4,11 @@
  * vollem Speicher (H6). Jeder Test lädt die App neu (`vi.resetModules`), weil sie den Entwurf beim Laden des Moduls liest.
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { OrganisationsTyp } from "@bos/eeb-format/model";
-import { EinsatzArt, einsaetzeLaden, einsatzAnlegen } from "@bos/meldekopf/einsaetze";
-import { einheitAnzeigename, neuePerson, neuerBogen } from "./hilfen";
+import { EinsatzArt, einsatzAnlegen } from "@bos/meldekopf/einsaetze";
+import { neuePerson, neuerBogen } from "./hilfen";
 import { entwurfSpeichern, entwurfUeberschreibenErlauben } from "./entwurf";
-import { SCHNELL_ORGANISATION_SCHLUESSEL } from "./schnell-organisation";
 import { SPEICHER_GRENZE_ZEICHEN, speicherBelegung } from "./eintrag-zeiten";
 
 vi.mock("./pdf", () => ({
@@ -79,110 +77,8 @@ async function appStarten() {
 }
 
 const ortFeld = () => screen.getByLabelText("Ort der Einheit (Pflicht)");
-const orgFeld = () => screen.getByLabelText("Organisation") as HTMLSelectElement;
-
-describe("R21-W2, H2: Schnellerfassung, Organisation sichtbar und nie still THW", () => {
-  it("steht im ersten Bild, nicht im Aufklapper, und wird mit der letzten Wahl vorbelegt", async () => {
-    const nutzer = userEvent.setup();
-    await appStarten();
-    await nutzer.click(screen.getByRole("button", { name: "Einheit schnell erfassen (nur Stärke)…" }));
-    const feld = orgFeld();
-    expect(feld.closest("details.schnell-mehr")).toBeNull(); // sichtbar, nicht unter „Organisation, Ebene, Kontakt (optional)“
-    expect(feld.value).toBe(String(OrganisationsTyp.THW)); // erste Nutzung: THW, aber sichtbar
-    await nutzer.selectOptions(feld, String(OrganisationsTyp.DRK));
-    expect(localStorage.getItem(SCHNELL_ORGANISATION_SCHLUESSEL)).toBe(String(OrganisationsTyp.DRK));
-    expect(orgFeld().value).toBe(String(OrganisationsTyp.DRK));
-
-    // Eine neue Schnellerfassung beginnt mit DRK.
-    cleanup();
-    localStorage.removeItem("eeb.entwurf.v1");
-    await appStarten();
-    await nutzer.click(screen.getByRole("button", { name: "Einheit schnell erfassen (nur Stärke)…" }));
-    expect(orgFeld().value).toBe(String(OrganisationsTyp.DRK));
-  }, 30000);
-
-  it("„DRK Bremen“ wird als DRK abgelegt, nicht als „THW DRK Bremen“ (Test mit DRK)", async () => {
-    const nutzer = userEvent.setup();
-    const einsatz = einsatzAnlegen("Sammelhausen", EinsatzArt.EINSATZ);
-    await appStarten();
-    await nutzer.click(screen.getByRole("button", { name: "Einheit schnell erfassen (nur Stärke)…" }));
-    await nutzer.click(within(await screen.findByRole("dialog", { name: "Einheit schnell erfassen — für welche Sammlung?" })).getByRole("button", { name: /Für „Sammelhausen" erfassen/ }));
-    await nutzer.selectOptions(orgFeld(), String(OrganisationsTyp.DRK));
-    await nutzer.type(ortFeld(), "Bremen");
-    await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
-    await nutzer.click(within(await screen.findByRole("dialog", { name: "Stärke fehlt" })).getByRole("button", { name: "Trotzdem mit Stärke 0 übernehmen" }));
-    await screen.findByRole("heading", { level: 1, name: "Sammelhausen" });
-    const bogen = einsaetzeLaden().find((x) => x.id === einsatz.id)!.eintraege[0]!.bogen;
-    expect(bogen.einheit.organisation).toBe(OrganisationsTyp.DRK);
-    expect(einheitAnzeigename(bogen.einheit)).toBe("DRK Bremen");
-    expect(document.body.textContent).not.toContain("THW DRK");
-  }, 30000);
-
-  it("„Feuerwehr Husum“ bei Organisation THW: die Zeile fragt und stellt auf Feuerwehr um, nichts geschieht still", async () => {
-    const nutzer = userEvent.setup();
-    await appStarten();
-    await nutzer.click(screen.getByRole("button", { name: "Einheit schnell erfassen (nur Stärke)…" }));
-    await nutzer.type(ortFeld(), "Feuerwehr Husum");
-    await nutzer.tab(); // das Feld verlassen
-    const hinweis = await waitFor(() => {
-      const p = document.querySelector<HTMLElement>("p.organisation-im-ort");
-      expect(p).not.toBeNull();
-      return p!;
-    });
-    expect(hinweis.textContent).toContain("klingt nach Feuerwehr");
-    expect(hinweis.textContent).toContain("die Organisation steht auf THW");
-    expect(orgFeld().value).toBe(String(OrganisationsTyp.THW)); // noch unverändert
-    await nutzer.click(within(hinweis).getByRole("button", { name: "Auf Feuerwehr stellen" }));
-    expect(orgFeld().value).toBe(String(OrganisationsTyp.FEUERWEHR));
-    expect((ortFeld() as HTMLInputElement).value).toBe("Husum"); // der Ort geht beim Umstellen nicht verloren, die Organisation steht nicht doppelt
-    expect(document.querySelector("p.organisation-im-ort")).toBeNull();
-    expect(localStorage.getItem(SCHNELL_ORGANISATION_SCHLUESSEL)).toBe(String(OrganisationsTyp.FEUERWEHR));
-  }, 30000);
-});
 
 describe("R21-A3 … S2: Kopf, Überschrift, Reiter und Rücklink zählen gleich", () => {
-  it("Schnellerfassung: „Schritt n von 4“ im Kopf, Überschrift „n.“, vier Reiter, Rücklink in der Übersicht", async () => {
-    const nutzer = userEvent.setup();
-    const einsatz = einsatzAnlegen("Zählhausen", EinsatzArt.EINSATZ);
-    void einsatz;
-    await appStarten();
-    await nutzer.click(screen.getByRole("button", { name: "Einheit schnell erfassen (nur Stärke)…" }));
-    await nutzer.click(within(await screen.findByRole("dialog", { name: "Einheit schnell erfassen — für welche Sammlung?" })).getByRole("button", { name: /Für „Zählhausen" erfassen/ }));
-    await nutzer.type(ortFeld(), "Schnellhausen");
-    const kopf = () => document.querySelector(".schritte-schnell-kurz")!.textContent!;
-    const ueberschrift = () => document.querySelector("main h2")!.textContent!;
-    const reiter = () => [...document.querySelectorAll(".schritte button")].map((b) => b.textContent!.replace(/\s+/g, " ").trim());
-    expect(kopf()).toBe("Schritt 1 von 4: Einheit");
-    expect(ueberschrift()).toBe("1. Einheit");
-    expect(reiter().map((t) => t.slice(0, 2))).toEqual(["1.", "2.", "3.", "4."]);
-    await nutzer.click(screen.getByRole("button", { name: "Weiter →" }));
-    expect(kopf()).toBe("Schritt 2 von 4: Personal");
-    expect(ueberschrift()).toBe("2. Personal");
-    await nutzer.click(screen.getByRole("button", { name: "Weiter →" }));
-    expect(kopf()).toBe("Schritt 3 von 4: Fahrzeuge");
-    expect(ueberschrift()).toBe("3. Fahrzeuge");
-    // Der Reiter trägt dieselbe Nummer und denselben Namen wie die Überschrift.
-    expect(screen.getByRole("button", { name: /^3\. Fahrzeuge/ }).getAttribute("aria-current")).toBe("step");
-    await nutzer.click(screen.getByRole("button", { name: "Zur Übersicht →" }));
-    expect(screen.getByRole("button", { name: "← Zurück zu Schritt 3 (Fahrzeuge)" })).toBeDefined();
-    expect(kopf()).toBe("Schritt 4 von 4: Übersicht");
-  }, 30000);
-
-  it("Rückfrage „Stärke fehlt“ springt zum Personal, ohne eine Nummer zu nennen, die es in der Schnellerfassung nicht gibt", async () => {
-    const nutzer = userEvent.setup();
-    const s = einsatzAnlegen("Rückfragehausen", EinsatzArt.EINSATZ);
-    void s;
-    await appStarten();
-    await nutzer.click(screen.getByRole("button", { name: "Einheit schnell erfassen (nur Stärke)…" }));
-    await nutzer.click(within(await screen.findByRole("dialog", { name: "Einheit schnell erfassen — für welche Sammlung?" })).getByRole("button", { name: /Für „Rückfragehausen" erfassen/ }));
-    await nutzer.type(ortFeld(), "Nullhausen");
-    await nutzer.click(screen.getByRole("button", { name: "In Einsatz übernehmen" }));
-    const frage = await screen.findByRole("dialog", { name: "Stärke fehlt" });
-    expect(frage.textContent).not.toMatch(/3\. Personal/);
-    expect(frage.textContent).toContain("Springt zum Personal.");
-    await nutzer.click(within(frage).getByRole("button", { name: "Stärke eintragen" }));
-    expect(await screen.findByRole("heading", { level: 2, name: "2. Personal" })).toBeDefined();
-  }, 30000);
 
   it("der volle Bogen zählt weiter 1 bis 6", async () => {
     const nutzer = userEvent.setup();

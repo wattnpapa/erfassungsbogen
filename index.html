@@ -176,22 +176,6 @@
         document.querySelector('meta[name="theme-color"]').content = "#221f16";
     } catch (e) { /* Privatmodus/blockierter Speicher: Standard-Darstellung */ }
 
-    // Wiedereinstieg in einen Einsatz (R21-A2, E2): Wer zuletzt eine Einsatz-Sammlung offen hatte (app.tsx, LETZTER_EINSATZ_SCHLUESSEL: höchstens
-    // zwölf Stunden her) und ohne Bogen im Link startet, bekommt statt des Start-Gerüsts einen ruhigen Kopf „Einsatz wird geladen …" — die
-    // Startseite blitzte sonst kurz auf, und ein früher Tipp traf ihre Knöpfe. Nur eine Klasse; die App entscheidet danach selbst.
-    try {
-      var eebLetzter = JSON.parse(localStorage.getItem("eeb.letzterEinsatz.v1") || "null");
-      if (eebLetzter && typeof eebLetzter.id === "string" && Date.now() - eebLetzter.um <= 12 * 60 * 60 * 1000 && !location.hash)
-        document.documentElement.classList.add("einsatz-wiedereinstieg");
-    } catch (e) { /* ohne Speicher eben das Start-Gerüst */ }
-
-    // Lagemonitor (?lagemonitor=…): schwarz von der ersten Sekunde an. Bis das
-    // Bundle da ist, stünde sonst der helle Grund des App-Modus auf dem
-    // Fernseher im abgedunkelten Fahrzeug (Audit Runde 6, R6-L3).
-    try {
-      if (/[?&]lagemonitor=/.test(location.search)) document.documentElement.classList.add("lagemonitor-start");
-    } catch (e) { /* ohne Adresse eben ohne */ }
-
     // Installierte Fassung (Desktop-App, iOS, Android) VOR dem ersten Malen
     // kennzeichnen: Der erklärende Text unten ist Web-Inhalt für Erstbesucher
     // und Suchmaschinen. React blendet ihn dort ohnehin aus (imWebBrowser() in
@@ -206,9 +190,6 @@
     } catch (e) { /* Im Zweifel bleibt es beim Web-Verhalten. */ }
   </script>
   <style>
-    html.lagemonitor-start, html.lagemonitor-start body { background: #000 !important; }
-    html.lagemonitor-start body { visibility: hidden; }
-    html.lagemonitor-start main.lm { visibility: visible; }
     /* ===============================================================
        Design-Token — die eine Quelle für Farbe, Schrift, Maß und Form der
        Web-Oberfläche. Die Plattform-Layer (.platform-ios/.platform-android)
@@ -613,6 +594,10 @@
     }
     @media (hover: hover) { button:hover, .datei-knopf:hover { border-color: var(--akzent); color: var(--akzent); } }
     button.primaer, .datei-knopf.primaer { background: var(--akzent); color: var(--auf-akzent); border-color: var(--akzent); }
+    /* Verweis im Kleid eines Knopfs: „Meldekopf-App öffnen" auf der Startseite (seit 2026-11-09). */
+    a.datei-knopf { text-decoration: none; }
+    .meldekopf-altbestand { margin-top: var(--r-4); }
+    .meldekopf-altbestand > p { margin: 0 0 var(--r-2); }
     @media (hover: hover) { button.primaer:hover { background: var(--akzent-hell); border-color: var(--akzent-hell); color: var(--auf-akzent); } }
     button:disabled { opacity: 0.4; cursor: default; }
     /* Sichtbarer Tastaturfokus in der Kennfarbe — überall gleich. */
@@ -7174,18 +7159,6 @@
       }
       :root:root.feld-modus .schritt-inhalt > .karte .feld { margin-top: 3px; }
     }
-    /* R21-M2, N5, E2, A2: Platzhalter der Einsatzansicht mit sichtbarem Ladehinweis; Kopf und Rückweg stehen schon darüber (einsaetze-lazy.tsx).
-       Er hält eine ganze Bildschirmhöhe: Die Fußzeile steht beim Austausch unter dem Bild und springt nicht. */
-    .einsatz-laedt.detail { min-height: 100vh; }
-    .einsatz-laedt-text { margin: 0; padding: 16px 4px; font-size: var(--t-m); color: var(--text-2); }
-    /* Wiedereinstieg: Hat das Gerät zuletzt einen Einsatz offen gehabt, zeigt das statische Gerüst nicht die Startseite, sondern nur einen Kopf
-       „Einsatz wird geladen …" (das Skript im Kopf der Seite setzt die Klasse; die App zeigt gleich danach den Einsatz). */
-    html.einsatz-wiedereinstieg #app > .kopfnav,
-    html.einsatz-wiedereinstieg #app > main.start > p,
-    html.einsatz-wiedereinstieg #app > main.start > .start-seo { display: none; }
-    html.einsatz-wiedereinstieg #app > header.start-kopf { min-height: 8.75rem; }
-    html.einsatz-wiedereinstieg #app > header.start-kopf h1 { font-size: 0; line-height: 0; }
-    html.einsatz-wiedereinstieg #app > header.start-kopf h1::after { content: "Einsatz wird geladen …"; font-size: var(--t-l); line-height: 1.3; }
     /* ===== Ende Runde 21 (Layout) ===== */
     /* ===== Runde 21 (Daten und Texte) ===== */
     /* R21-A9: Die Speicherzeile im Kopf des Assistenten hat ihren Platz von Anfang an (leer und unsichtbar), damit sie nach der ersten
@@ -7326,8 +7299,8 @@
         <p>Alle Daten bleiben auf dem Gerät. Es gibt keinen Server, an den ein Bogen geschickt würde, keine Anmeldung und kein Konto. Nach dem ersten Aufruf läuft die Seite offline und lässt sich auf dem Startbildschirm ablegen; daneben gibt es Fassungen für Windows, macOS, Linux und Android. Wie gezählt wird, wer die Seite aufruft, steht im <a href="./datenschutz.html">Datenschutzhinweis</a>.</p>
         <p>Die App ist kostenlos und quelloffen unter der EUPL-1.2. Ein übergebener Bogen trägt ein Echtheits-Siegel des ausstellenden Geräts, das die Gegenstelle beim Einlesen prüft — wer möchte, hinterlegt zusätzlich Name und Rückkanal als Absender.</p>
         <h2>Vom Erfassungsbogen zur Kräfteübersicht</h2>
-        <p>Am <a href="./meldekopf.html">Meldekopf</a>, im Bereitstellungsraum und beim Zugführer laufen viele Bögen zusammen. Dafür gibt es die Einsatz-Sammlung: Eintreffende Bögen werden gescannt oder als Datei übernommen, die Stärke aller anwesenden Einheiten wird laufend summiert — mit Zwischensummen je Zug. Wer eine Einheit nur durchwinken muss, nimmt die Schnellerfassung mit Stärke, Führungskraft und Fahrzeugen.</p>
-        <p>Jede Meldung landet in einer Historie; ein Vergleich zeigt zur Schichtübergabe, was sich seit der letzten Meldung geändert hat. Für die Weitermeldung erzeugt die Sammlung ein Sammel-PDF und CSV-Listen je Einsatz.</p>
+        <p>Am <a href="./meldekopf.html">Meldekopf</a>, im Bereitstellungsraum und beim Zugführer laufen viele Bögen zusammen. Dafür gibt es eine eigene App, die <a href="./meldekopf.html">Meldekopf-App</a>: Eintreffende Bögen werden gescannt oder als Datei übernommen, die Stärke aller anwesenden Einheiten wird laufend summiert — mit Zwischensummen je Zug. Wer eine Einheit nur durchwinken muss, nimmt dort die Schnellerfassung mit Stärke, Führungskraft und Fahrzeugen.</p>
+        <p>Jede Meldung landet dort in einer Historie; ein Vergleich zeigt zur Schichtübergabe, was sich seit der letzten Meldung geändert hat. Für die Weitermeldung erzeugt die Meldekopf-App ein Sammel-PDF, ein Lageblatt und CSV-Listen je Einsatz. Sie liest die QR-Codes, Links und PDF-Dateien dieses Bogens.</p>
         <h2>Häufige Fragen</h2>
         <h3>Was kostet der digitale Erfassungsbogen?</h3>
         <p>Nichts. Die App ist kostenlos und als freie Software unter der EUPL-1.2 veröffentlicht — ohne Anmeldung, ohne Konto, ohne Testzeitraum.</p>

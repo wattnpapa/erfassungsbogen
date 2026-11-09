@@ -30,28 +30,11 @@
  * die schon heute mit Sammel-PDF und Einsatz-Transport reisen.
  */
 
-import {
-  MeldeStatus,
-  einsaetzeLaden,
-  einsaetzePapierkorb,
-  einsatzImportieren,
-  type Einsatzsammlung,
-  type MeldeEintrag,
-} from "@bos/meldekopf/einsaetze";
-import { staerke } from "@bos/eeb-format/model";
-import { geltendeJeEinheit, istPlatzhalterFassung } from "./fassung-vorrang";
-import { einheitAnzeigename, zeitpunktDeutsch } from "./hilfen";
-import { zugNormalisiert } from "./zug-name";
-import { sammlungenSchreiben, zeitKurz, type FuehrungsVermerk } from "./eintrag-zeiten";
+import { MeldeStatus, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
+import { zeitKurz, type FuehrungsVermerk } from "./eintrag-zeiten";
 
 export type Feld = "status" | "zug" | "notiz" | "eintreffzeit";
 
-const FELD_NAME: Record<Feld, string> = {
-  status: "Status",
-  zug: "Zug",
-  notiz: "Auftrag/Notiz",
-  eintreffzeit: "Eintreffzeit",
-};
 
 /**
  * Zu welchem Feld gehört ein Vermerk? Die Texte schreibt eintrag-zeiten.ts
@@ -71,40 +54,9 @@ export function vermerkKennung(einheitSchl: string, v: FuehrungsVermerk): string
   return `${einheitSchl}|${v.zeit}|${v.text}`;
 }
 
-/** Alle Vermerke einer Sammlung als Kennungen (je Einheit, über alle Fassungen). */
-export function vermerkKennungen(eintraege: MeldeEintrag[]): Set<string> {
-  const k = new Set<string>();
-  for (const e of eintraege) for (const v of e.vermerke ?? []) k.add(vermerkKennung(e.einheitSchluessel, v));
-  return k;
-}
 
-interface Seite {
-  kopf: MeldeEintrag;
-  vermerke: FuehrungsVermerk[];
-  kennungen: Set<string>;
-}
 
-function seite(eintraege: MeldeEintrag[], schl: string): Seite | null {
-  const eigene = eintraege.filter((e) => e.einheitSchluessel === schl);
-  const kopf = geltendeJeEinheit(eigene)[0];
-  if (!kopf) return null;
-  const vermerke = vereinigeVermerke(eigene.map((e) => e.vermerke ?? []));
-  return { kopf, vermerke, kennungen: new Set(vermerke.map((v) => vermerkKennung(schl, v))) };
-}
 
-function vereinigeVermerke(listen: FuehrungsVermerk[][]): FuehrungsVermerk[] {
-  const gesehen = new Set<string>();
-  const alle: FuehrungsVermerk[] = [];
-  for (const l of listen) {
-    for (const v of l) {
-      const k = `${v.zeit}|${v.text}`;
-      if (gesehen.has(k)) continue;
-      gesehen.add(k);
-      alle.push({ zeit: v.zeit, text: v.text });
-    }
-  }
-  return alle.sort((a, b) => a.zeit - b.zeit);
-}
 
 /** Wert eines Felds als Vergleichs- und Anzeigegröße. */
 interface Wert {
@@ -167,70 +119,9 @@ function wert(feld: Feld, e: MeldeEintrag): Wert {
   }
 }
 
-/** Änderungszeitpunkt des Status ohne Vermerk: Abrücken bzw. Zusammenführen. */
-function statusZeit(e: MeldeEintrag): number | undefined {
-  if (e.status === MeldeStatus.ABGERUECKT) return e.abgerueckAm;
-  if (e.status === MeldeStatus.AUFGEGANGEN) return e.aufgegangenIn?.zusammengefuehrtAm;
-  return undefined;
-}
 
-interface Entscheidung {
-  von: "hier" | "datei";
-  widerspruch: boolean;
-}
 
-function entscheide(feld: Feld, hier: Seite, datei: Seite): Entscheidung | null {
-  if (wert(feld, hier.kopf).gleichheit === wert(feld, datei.kopf).gleichheit) return null;
-  const neuSeit = (a: Seite, b: Seite) =>
-    a.vermerke
-      .filter((v) => vermerkFeld(v.text) === feld && !b.kennungen.has(vermerkKennung(b.kopf.einheitSchluessel, v)))
-      .reduce<number | undefined>((m, v) => (m == null || v.zeit > m ? v.zeit : m), undefined);
-  const hierT = neuSeit(hier, datei);
-  const dateiT = neuSeit(datei, hier);
-  if (dateiT != null && hierT == null) return { von: "datei", widerspruch: false };
-  if (hierT != null && dateiT == null) return { von: "hier", widerspruch: false };
-  if (hierT != null && dateiT != null) return { von: dateiT > hierT ? "datei" : "hier", widerspruch: true };
-  // Ohne Vermerk auf beiden Seiten.
-  if (feld === "status") {
-    const h = statusZeit(hier.kopf);
-    const d = statusZeit(datei.kopf);
-    if (d != null && h == null) return { von: "datei", widerspruch: false };
-    if (h != null && d == null) return { von: "hier", widerspruch: false };
-    if (h != null && d != null) return { von: d > h ? "datei" : "hier", widerspruch: true };
-    return { von: "hier", widerspruch: true };
-  }
-  const hierLeer = wert(feld, hier.kopf).leer;
-  const dateiLeer = wert(feld, datei.kopf).leer;
-  if (hierLeer && !dateiLeer) return { von: "datei", widerspruch: false };
-  if (!hierLeer && dateiLeer) return { von: "hier", widerspruch: false };
-  return { von: "hier", widerspruch: true };
-}
 
-/** Wert eines Felds von `quelle` auf `ziel` übertragen (Zug: alle Fassungen). */
-function uebertrage(feld: Feld, quelle: MeldeEintrag, ziel: MeldeEintrag, alleFassungen: MeldeEintrag[]): void {
-  switch (feld) {
-    case "status":
-      ziel.status = quelle.status;
-      if (quelle.abgerueckAm != null) ziel.abgerueckAm = quelle.abgerueckAm;
-      else delete ziel.abgerueckAm;
-      if (quelle.aufgegangenIn) ziel.aufgegangenIn = { ...quelle.aufgegangenIn };
-      else delete ziel.aufgegangenIn;
-      break;
-    case "zug":
-      for (const e of alleFassungen) {
-        if (quelle.zugEtikett) e.zugEtikett = quelle.zugEtikett;
-        else delete e.zugEtikett;
-      }
-      break;
-    case "notiz":
-      if (quelle.notiz) ziel.notiz = quelle.notiz;
-      else delete ziel.notiz;
-      break;
-    case "eintreffzeit":
-      ziel.eingetroffenAm = quelle.eingetroffenAm ?? quelle.empfangenAm;
-      break;
-  }
-}
 
 /** Was sich an einer Einheit durch den Abgleich geändert hat. */
 export interface AbgleichAenderung {
@@ -270,188 +161,17 @@ export interface AbgleichErgebnis {
   bekannt: Record<string, Partial<Record<StandFeld, string>>>;
 }
 
-/**
- * Hat das Einspielen einer Datei etwas verändert? Neue Meldungen oder aktualisierte Werte ja; eine ältere Datei,
- * deren Inhalt hier schon steht (oder überholt ist), nicht (R13-A4).
- */
-export function importUebernahm(r: Pick<AbgleichErgebnis, "neuerEinsatz" | "hinzugefuegt" | "aktualisiert">): boolean {
-  return r.neuerEinsatz || r.hinzugefuegt > 0 || r.aktualisiert.length > 0;
-}
 
-/** Satz der Quittung, wenn die Datei nichts Neueres enthielt. */
-export const NICHTS_UEBERNOMMEN_SATZ = "Datei war älter oder gleich: keine Änderung übernommen, dieser Stand bleibt.";
 
-function kurzname(e: MeldeEintrag): string {
-  const ort = e.bogen.einheit.hierarchie[0]?.name?.trim();
-  const basis = ort || einheitAnzeigename(e.bogen.einheit);
-  return e.teilEtikett ? `${basis} (${e.teilEtikett})` : basis;
-}
 
-function alleSammlungen(): Einsatzsammlung[] {
-  return [...einsaetzeLaden(), ...einsaetzePapierkorb()];
-}
 
 export const FELDER: Feld[] = ["status", "zug", "notiz", "eintreffzeit"];
 
 /** Alle Felder der Stände: {@link FELDER} und die geltende Fassung (R5-W1). */
 export const STAND_FELDER: StandFeld[] = [...FELDER, "fassung"];
 
-/** „Bogen der Einheit gilt (Stärke 10 → 12)" — der Wechsel der geltenden Fassung in Worten (R5-W4). */
-export function fassungWechselText(alt: MeldeEintrag, neu: MeldeEintrag): string {
-  const von = staerke(alt.bogen).gesamt;
-  const nach = staerke(neu.bogen).gesamt;
-  const kopf =
-    istPlatzhalterFassung(alt) && !istPlatzhalterFassung(neu)
-      ? "Bogen der Einheit gilt, ersetzt die Schnellerfassung"
-      : `Fassung vom ${zeitpunktDeutsch(neu.bogen.stand)} gilt`;
-  return von !== nach ? `${kopf} (Stärke ${von} → ${nach})` : kopf;
-}
 
-/**
- * Sammlung importieren und mit dem Stand dieses Geräts abgleichen. Ersetzt
- * überall dort, wo eine Sammlung von einem anderen Gerät kommt, den direkten
- * Aufruf von `einsatzImportieren`.
- */
-export function einsatzAbgleichen(importiert: Einsatzsammlung, jetzt = Date.now()): AbgleichErgebnis {
-  const vorherRoh = alleSammlungen().find((s) => s.id === importiert.id);
-  // Tiefe Kopie: der Kern verändert die geladene Liste nicht, aber wir lesen
-  // danach neu und wollen den Stand VOR dem Import sicher in der Hand haben.
-  const vorher: Einsatzsammlung | undefined = vorherRoh ? JSON.parse(JSON.stringify(vorherRoh)) : undefined;
-  const r = einsatzImportieren(importiert);
-  const ergebnis: AbgleichErgebnis = {
-    neuerEinsatz: r.neuerEinsatz,
-    hinzugefuegt: r.hinzugefuegt,
-    aktualisiert: [],
-    widersprueche: [],
-    neueIds: [],
-    neueVermerke: [],
-    bekannt: {},
-  };
-  const liste = alleSammlungen();
-  const s = liste.find((x) => x.id === importiert.id);
-  if (!s) return ergebnis;
-  const vorherIds = new Set(vorher?.eintraege.map((e) => e.id) ?? []);
-  ergebnis.neueIds = s.eintraege.filter((e) => !vorherIds.has(e.id)).map((e) => e.id);
-  // Was die Datei an Zuständen trägt und hier jetzt genauso gilt (R4-W7).
-  const bekanntBuchen = () => {
-    for (const schl of new Set(importiert.eintraege.map((e) => e.einheitSchluessel))) {
-      const datei = seite(importiert.eintraege, schl);
-      const jetztKopf = seite(s.eintraege, schl);
-      if (!datei || !jetztKopf) continue;
-      const felder: Partial<Record<StandFeld, string>> = {};
-      for (const feld of STAND_FELDER) {
-        const g = standGleichheit(feld, jetztKopf.kopf);
-        if (g === standGleichheit(feld, datei.kopf)) felder[feld] = g;
-      }
-      ergebnis.bekannt[schl] = felder;
-    }
-  };
-  if (!vorher) {
-    ergebnis.neueVermerke = [...vermerkKennungen(s.eintraege)];
-    bekanntBuchen();
-    return ergebnis;
-  }
-  const vorherVermerke = vermerkKennungen(vorher.eintraege);
 
-  const einheiten = new Set(importiert.eintraege.map((e) => e.einheitSchluessel));
-  let geschrieben = false;
-  // Welche Fassung gilt, hat womöglich das andere Gerät entschieden (R4-W1):
-  // ein dort bestätigter Vorrang kommt mit, solange hier keiner gesetzt ist.
-  for (const e of importiert.eintraege) {
-    if (e.ersetztDurch == null) continue;
-    const lokal = s.eintraege.find((x) => x.id === e.id);
-    if (!lokal || lokal.ersetztDurch != null) continue;
-    lokal.ersetztDurch = e.ersetztDurch;
-    if (e.ersetztAm != null) lokal.ersetztAm = e.ersetztAm;
-    geschrieben = true;
-  }
-  for (const schl of einheiten) {
-    const hier = seite(vorher.eintraege, schl);
-    const datei = seite(importiert.eintraege, schl);
-    if (!hier || !datei) continue; // nur hier oder nur in der Datei: nichts abzugleichen
-    const fassungen = s.eintraege.filter((e) => e.einheitSchluessel === schl);
-    const ziel = geltendeJeEinheit(fassungen)[0];
-    if (!ziel) continue;
-    const vorZiel = JSON.stringify(ziel) + fassungen.map((e) => e.zugEtikett ?? "").join("|");
-    const was: string[] = [];
-    const notizen: FuehrungsVermerk[] = [];
-    // Hat das andere Gerät entschieden, welche vorhandene Fassung gilt (Vorrang),
-    // wechselt hier der Kopf, ohne dass ein Eintrag dazukam: auch das nennt die
-    // Quittung (R5-W4).
-    if (ziel.id !== hier.kopf.id && vorherIds.has(ziel.id)) was.push(fassungWechselText(hier.kopf, ziel));
-    for (const feld of FELDER) {
-      const ent = entscheide(feld, hier, datei);
-      if (!ent) continue; // beide Köpfe gleich — der neue Kopf ist einer davon
-      // Gilt der Wert dieses Geräts, muss er trotzdem auf den neuen Kopf: kam
-      // mit der Datei eine Folgemeldung, trägt sie den Stand des anderen Geräts.
-      uebertrage(feld, ent.von === "hier" ? hier.kopf : datei.kopf, ziel, fassungen);
-      const hierWert = wert(feld, hier.kopf).text;
-      const dateiWert = wert(feld, datei.kopf).text;
-      if (ent.von === "datei") was.push(dateiWert);
-      // Dieselbe Anzeige auf beiden Seiten (nur die Sekunden unterscheiden sich): kein Widerspruch, den jemand prüfen
-      // könnte — „hier 08:39, dort 08:39" lehrte, die Hinweise zu übergehen (R14-W2).
-      if (ent.widerspruch && hierWert !== dateiWert) {
-        ergebnis.widersprueche.push({
-          einheitSchluessel: schl,
-          einheit: kurzname(ziel),
-          feld: FELD_NAME[feld],
-          hier: hierWert,
-          datei: dateiWert,
-          gilt: ent.von,
-        });
-        notizen.push({
-          zeit: jetzt,
-          text:
-            `Abgleich mit anderem Gerät: ${FELD_NAME[feld]} dort ${dateiWert}, hier ${hierWert} — ` +
-            (ent.von === "datei" ? "von dort übernommen (jünger)" : "hier behalten"),
-        });
-      }
-    }
-    const vermerke = vereinigeVermerke([hier.vermerke, datei.vermerke, ziel.vermerke ?? [], notizen]);
-    if (vermerke.length > 0) ziel.vermerke = vermerke;
-    if (was.length > 0) ergebnis.aktualisiert.push({ einheitSchluessel: schl, einheit: kurzname(ziel), was });
-    if (JSON.stringify(ziel) + fassungen.map((e) => e.zugEtikett ?? "").join("|") !== vorZiel) geschrieben = true;
-  }
-  if (geschrieben) {
-    s.geaendert = jetzt;
-    sammlungenSchreiben(liste);
-  }
-  ergebnis.neueVermerke = [...vermerkKennungen(s.eintraege)].filter((k) => !vorherVermerke.has(k));
-  bekanntBuchen();
-  return ergebnis;
-}
-
-/**
- * Quittungstext für den Abgleich: „3 Meldungen aktualisiert: Ulm abgerückt
- * 20:47; Biberach Zug „2. TZ“." und — falls vorhanden — die Widersprüche.
- * Leer, wenn nichts abzugleichen war.
- */
-export function abgleichText(r: Pick<AbgleichErgebnis, "aktualisiert" | "widersprueche">): string {
-  const teile: string[] = [];
-  if (r.aktualisiert.length > 0) {
-    const n = r.aktualisiert.length;
-    teile.push(
-      `${n === 1 ? "1 Meldung" : `${n} Meldungen`} aktualisiert: ` +
-        r.aktualisiert.map((a) => `${a.einheit} ${a.was.join(", ")}`).join("; ") +
-        ".",
-    );
-  }
-  if (r.widersprueche.length > 0) {
-    const n = r.widersprueche.length;
-    teile.push(
-      `${n === 1 ? "1 Widerspruch" : `${n} Widersprüche`} zwischen den Geräten: ` +
-        r.widersprueche
-          .map(
-            (w) =>
-              `${w.einheit} ${w.feld} — hier ${w.hier}, in der Datei ${w.datei}; ` +
-              (w.gilt === "datei" ? "der jüngere Stand aus der Datei gilt" : "der Stand dieses Geräts bleibt"),
-          )
-          .join("; ") +
-        ". Bitte prüfen (steht auch im Verlauf der Einheit).",
-    );
-  }
-  return teile.join(" ");
-}
 
 /** Ein eingeklappter Abschnitt einer Quittung. */
 export interface Einzelheit {
@@ -459,84 +179,6 @@ export interface Einzelheit {
   zeilen: string[];
 }
 
-/**
- * Die Quittung des Abgleichs gegliedert (Audit Runde 5, R5-K3): oben das, was
- * eine Entscheidung verlangt — aktualisierte Meldungen (Abrücken, Zug, Fassung)
- * und inhaltliche Widersprüche, jeweils die ersten drei —, dahinter eingeklappt
- * alles Übrige und die kleinen Abweichungen der Eintreffzeit, die zwei Geräte
- * beim Empfang je selbst vergeben. Vorher war es ein Absatz von 14 Widersprüchen,
- * in dem „Cottbus abgerückt" unterging.
- */
-/** Eine Zeile zum Widerspruch; auch für die Merkliste an der Einsatzansicht (R11-O3). */
-export function widerspruchZeile(w: AbgleichWiderspruch): string {
-  return (
-    `${w.einheit} ${w.feld} — hier ${w.hier}, in der Datei ${w.datei}; ` +
-    (w.gilt === "datei" ? "der jüngere Stand aus der Datei gilt" : "der Stand dieses Geräts bleibt")
-  );
-}
 
-/** Die Widersprüche, die gemerkt werden: ohne die kleinen Eintreffzeit-Abweichungen. */
-export function widerspruecheZumMerken(r: Pick<AbgleichErgebnis, "widersprueche">): string[] {
-  return r.widersprueche.filter((w) => w.feld !== FELD_NAME.eintreffzeit).map(widerspruchZeile);
-}
 
-export function abgleichGliederung(r: Pick<AbgleichErgebnis, "aktualisiert" | "widersprueche">): { kurz: string[]; einzelheiten: Einzelheit[] } {
-  const kurz: string[] = [];
-  const einzelheiten: Einzelheit[] = [];
-  const BIS = 3;
-  if (r.aktualisiert.length > 0) {
-    const n = r.aktualisiert.length;
-    const zeile = (a: AbgleichAenderung) => `${a.einheit} ${a.was.join(", ")}`;
-    kurz.push(`${n === 1 ? "1 Meldung" : `${n} Meldungen`} aktualisiert: ${r.aktualisiert.slice(0, BIS).map(zeile).join("; ")}${n > BIS ? ` und ${n - BIS} weitere` : ""}.`);
-    if (n > BIS) einzelheiten.push({ titel: `Alle ${n} aktualisierten Meldungen`, zeilen: r.aktualisiert.map(zeile) });
-  }
-  const wid = widerspruchZeile;
-  const wichtig = r.widersprueche.filter((w) => w.feld !== FELD_NAME.eintreffzeit);
-  const klein = r.widersprueche.filter((w) => w.feld === FELD_NAME.eintreffzeit);
-  if (wichtig.length > 0) {
-    const n = wichtig.length;
-    kurz.push(`${n === 1 ? "1 Widerspruch" : `${n} Widersprüche`} zwischen den Geräten: ${wichtig.slice(0, BIS).map(wid).join("; ")}${n > BIS ? ` und ${n - BIS} weitere` : ""}.`);
-    if (n > BIS) einzelheiten.push({ titel: `Alle ${n} Widersprüche`, zeilen: wichtig.map(wid) });
-  }
-  if (klein.length > 0) {
-    kurz.push(`${klein.length === 1 ? "1 kleine Abweichung" : `${klein.length} kleine Abweichungen`} bei der Eintreffzeit (Minuten, weil beide Geräte sie beim Empfang selbst vergeben).`);
-    // Der Titel wiederholt nicht die Zahl aus dem Satz darüber (R6-W3: stand doppelt, auch „1 Abweichungen").
-    einzelheiten.push({ titel: "Einzelheiten zur Eintreffzeit", zeilen: klein.map(wid) });
-  }
-  return { kurz, einzelheiten };
-}
 
-/**
- * Sammlung eines anderen Geräts (z. B. die Sammel-PDF des Zugführers) für die
- * Übernahme in eine ANDERE, laufende Sammlung vorbereiten: dieselben
- * Meldungen mit Eintreffzeit, Status, Auftrag, Siegel und Verlauf, aber unter
- * der Kennung des Ziels — `einsatzAbgleichen` legt sie dann dort ab, statt
- * eine zweite Sammlung anzulegen (Audit Runde 3, R3-W3). Einheiten, die im
- * Ziel noch fehlen und keinen Zug tragen, bekommen `zug` (Vorschlag: der
- * Name der Quell-Sammlung, „1. TZ Albstadt"), mit Vermerk. Bekannte Einheiten
- * behalten ihren Zug — den gleicht der Abgleich nach seinen Regeln ab.
- */
-export function sammlungFuerZiel(
-  quelle: Einsatzsammlung,
-  ziel: Einsatzsammlung,
-  zug = "",
-  jetzt = Date.now(),
-): Einsatzsammlung {
-  const bekannt = new Set(ziel.eintraege.map((e) => e.einheitSchluessel));
-  const eintraege: MeldeEintrag[] = JSON.parse(JSON.stringify(quelle.eintraege));
-  // Eine Schreibweise je Zug, auch für den vorgeschlagenen Zug aus der Quell-Sammlung (R10-S1).
-  const wert = zugNormalisiert(zug, [...ziel.eintraege, ...eintraege].map((e) => e.zugEtikett));
-  if (wert) {
-    const neueEinheiten = new Set(
-      eintraege.filter((e) => !bekannt.has(e.einheitSchluessel) && !e.zugEtikett).map((e) => e.einheitSchluessel),
-    );
-    for (const schl of neueEinheiten) {
-      const fassungen = eintraege.filter((e) => e.einheitSchluessel === schl);
-      if (fassungen.some((e) => e.zugEtikett)) continue;
-      for (const e of fassungen) e.zugEtikett = wert;
-      const kopf = geltendeJeEinheit(fassungen)[0];
-      if (kopf) (kopf.vermerke ??= []).push({ zeit: jetzt, text: `Zug: ${wert} (aus Sammlung „${quelle.name}“ übernommen)` });
-    }
-  }
-  return { ...ziel, eintraege };
-}

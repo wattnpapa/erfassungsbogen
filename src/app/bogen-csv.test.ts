@@ -12,7 +12,7 @@ import {
   type Person,
 } from "@bos/eeb-format/model";
 import { MeldeStatus, bogenInhaltsId, einheitSchluessel, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import { bogenCsvInhalt, einsatzDetailCsvInhalt } from "./bogen-csv";
+import { bogenCsvInhalt } from "./bogen-csv";
 
 function person(over: Partial<Person> = {}): Person {
   return {
@@ -57,21 +57,7 @@ function bogen(name = "Oldenburg", over: Partial<Erfassungsbogen> = {}): Erfassu
   };
 }
 
-function meldung(b: Erfassungsbogen, over: Partial<MeldeEintrag> = {}): MeldeEintrag {
-  return {
-    id: bogenInhaltsId(b),
-    einheitSchluessel: einheitSchluessel(b.einheit),
-    empfangenAm: 1000,
-    quelle: "scan",
-    status: MeldeStatus.ANWESEND,
-    bogen: b,
-    ...over,
-  };
-}
 
-function sammlung(eintraege: MeldeEintrag[], name = "Sturmflut 26"): Einsatzsammlung {
-  return { id: "e1", name, art: 0, angelegt: 0, geaendert: 0, eintraege };
-}
 
 /** BOM abtrennen und in Zeilen zerlegen (CRLF). */
 function zeilen(csv: string): string[] {
@@ -259,84 +245,5 @@ describe("bogenCsvInhalt()", () => {
     const einheitZeile = zeilen(csv)[1]!;
     expect(einheitZeile).toContain('"Achtung; Anhänger hat ""Sonderlast"""');
     expect(einheitZeile.split(";")).toContain("12,5");
-  });
-});
-
-describe("einsatzDetailCsvInhalt()", () => {
-  it("reiht die Bögen aller Einheiten hintereinander, nach Anzeigename sortiert", () => {
-    const csv = einsatzDetailCsvInhalt(
-      sammlung([meldung(bogen("Zeta")), meldung(bogen("Alpha"), { id: "a" })]),
-    );
-    const einheiten = zeilen(csv)
-      .slice(1)
-      .filter((z) => felder(z)[7] === "Einheit")
-      .map((z) => felder(z)[2]);
-    expect(einheiten).toEqual(["THW Alpha Media Team", "THW Zeta Media Team"]);
-  });
-
-  it("trägt Sammlungsname, Zug, Teil, Quelle und Status in jede Zeile bzw. Einheitszeile", () => {
-    const csv = einsatzDetailCsvInhalt(
-      sammlung([meldung(bogen(), { zugEtikett: "1. Zug", teilEtikett: "Fachberater", quelle: "aufteilung" })]),
-    );
-    expect(spalte(csv, 1, "Einsatz")).toBe("Sturmflut 26");
-    expect(spalte(csv, 2, "Einsatz")).toBe("Sturmflut 26"); // auch auf der Personenzeile
-    expect(spalte(csv, 2, "Zug")).toBe("1. Zug");
-    expect(spalte(csv, 2, "Teil")).toBe("Fachberater");
-    expect(spalte(csv, 1, "Quelle")).toBe("Aufteilung");
-    expect(spalte(csv, 1, "Status")).toBe("Anwesend");
-  });
-
-  it("führt Meldungsnummer, Eintreff-/Abrückzeit und Auftrag der Führungsstelle (R3-K7)", () => {
-    const csv = einsatzDetailCsvInhalt(
-      sammlung([
-        meldung(bogen("Alpha"), {
-          eingetroffenAm: new Date("2026-09-26T09:40").getTime(),
-          abgerueckAm: new Date("2026-09-27T15:10").getTime(),
-          status: MeldeStatus.ABGERUECKT,
-          notiz: "Deichabschnitt Nord",
-        }),
-      ]),
-    );
-    expect(spalte(csv, 1, "Meldung Nr.")).toBe("1");
-    expect(spalte(csv, 2, "Meldung Nr.")).toBe("1"); // auch auf der Personenzeile
-    expect(spalte(csv, 1, "Eingetroffen")).toBe("26.09.2026, 09:40");
-    expect(spalte(csv, 1, "Abgerückt")).toBe("27.09.2026, 15:10");
-    expect(spalte(csv, 1, "Auftrag/Notiz (Führungsstelle)")).toBe("Deichabschnitt Nord");
-  });
-
-  it("nimmt abgerückte Einheiten mit auf und weist sie in der Status-Spalte aus", () => {
-    const csv = einsatzDetailCsvInhalt(
-      sammlung([
-        meldung(bogen("Alpha")),
-        meldung(bogen("Zeta"), { id: "z", status: MeldeStatus.ABGERUECKT }),
-      ]),
-    );
-    const status = zeilen(csv)
-      .slice(1)
-      .filter((z) => felder(z)[7] === "Einheit")
-      .map((z) => felder(z)[felder(zeilen(csv)[0]!).indexOf("Status")]);
-    expect(status).toEqual(["Anwesend", "Abgerückt"]);
-  });
-
-  it("führt je Einheit nur die neueste Revision", () => {
-    const alt = bogen("Alpha");
-    const neu = bogen("Alpha", { stand: 200 * 1440, personal: [person({ nachname: "Neu" })] });
-    const csv = einsatzDetailCsvInhalt(sammlung([meldung(alt), meldung(neu, { empfangenAm: 2000 })]));
-    const personen = zeilen(csv)
-      .slice(1)
-      .filter((z) => felder(z)[7] === "Person");
-    expect(personen).toHaveLength(1);
-    expect(spalte(csv, 2, "Nachname")).toBe("Neu");
-  });
-
-  it("weist eine geprüfte Signatur aus", () => {
-    const csv = einsatzDetailCsvInhalt(
-      sammlung([meldung(bogen(), { signatur: { zustand: "gueltig", kurzform: "AB12-CD34" } })]),
-    );
-    expect(spalte(csv, 1, "Signatur")).toBe("gültig (AB12-CD34)");
-  });
-
-  it("liefert bei leerer Sammlung nur die Kopfzeile und die Kennzeile (R16-A1)", () => {
-    expect(zeilen(einsatzDetailCsvInhalt(sammlung([])))).toHaveLength(2);
   });
 });

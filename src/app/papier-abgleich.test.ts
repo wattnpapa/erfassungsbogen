@@ -4,10 +4,8 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { OrganisationsTyp, PersonalErfassung, SCHEMA_VERSION, type Erfassungsbogen } from "@bos/eeb-format/model";
-import { EinsatzArt, MeldeStatus, einsaetzeLaden, einsatzAnlegen, speicherhuelleSetzen } from "@bos/meldekopf/einsaetze";
-import { aggregiere } from "./auswertung";
-import { eintreffzeitSetzen, meldungAufnehmen, papierAbgleichUebernehmen, vomPapierMarkieren } from "./eintrag-zeiten";
-import { offenVomPapier } from "./papier-abgleich-ui";
+import { EinsatzArt, einsaetzeLaden, einsatzAnlegen, speicherhuelleSetzen } from "@bos/meldekopf/einsaetze";
+import { meldungAufnehmen } from "./eintrag-zeiten";
 import { meldungsNummern } from "./einheiten-tabelle";
 
 class MemStorage {
@@ -41,104 +39,13 @@ function bogen(ort: string, mannschaft = 3, stand = 100): Erfassungsbogen {
 
 const sammlung = (id: string) => einsaetzeLaden().find((s) => s.id === id)!;
 
-describe("vomPapierMarkieren / papierAbgleichUebernehmen", () => {
-  it("markiert nur neue Einheiten und übernimmt Zeiten, Status und Zug in einem Schritt", () => {
-    const s = einsatzAnlegen("Hochwasser", EinsatzArt.EINSATZ);
-    const alt = meldungAufnehmen(s.id, bogen("Ulm"), { quelle: "scan" })!;
-    const ids = [
-      meldungAufnehmen(s.id, bogen("Ansbach", 17), { quelle: "scan" })!.eintrag.id,
-      meldungAufnehmen(s.id, bogen("Kirchehrenbach", 7), { quelle: "scan" })!.eintrag.id,
-      // Folgemeldung einer bekannten Einheit: erbt, braucht keinen Abgleich.
-      meldungAufnehmen(s.id, bogen("Ulm", 5, 110), { quelle: "scan" })!.eintrag.id,
-    ];
-    vomPapierMarkieren(s.id, ids, 999);
-    const offen = offenVomPapier(sammlung(s.id).eintraege);
-    expect(offen.map((e) => e.bogen.einheit.hierarchie[0]!.name).sort()).toEqual(["Ansbach", "Kirchehrenbach"]);
-    expect(sammlung(s.id).eintraege.find((e) => e.id === alt.eintrag.id)!.vomPapier).toBeUndefined();
-
-    const vorher = aggregiere(sammlung(s.id).eintraege, EinsatzArt.EINSATZ);
-    expect(vorher.staerke.gesamt).toBe(6 + 18 + 8);
-    papierAbgleichUebernehmen(s.id, [
-      { eintragId: ids[0]!, eingetroffenAm: 1000, status: MeldeStatus.ABGERUECKT, abgerueckAm: 5000, zug: "1. TZ" },
-      { eintragId: ids[1]!, eingetroffenAm: 2000, status: MeldeStatus.ANWESEND, zug: "2. TZ" },
-    ]);
-    const e = sammlung(s.id).eintraege;
-    expect(offenVomPapier(e)).toEqual([]);
-    const ansbach = e.find((x) => x.id === ids[0])!;
-    expect(ansbach).toMatchObject({ eingetroffenAm: 1000, status: MeldeStatus.ABGERUECKT, abgerueckAm: 5000, zugEtikett: "1. TZ" });
-    expect(ansbach.vermerke!.map((v) => v.text)).toEqual(expect.arrayContaining(["Abgerückt", "Zug: 1. TZ"]));
-    expect(e.find((x) => x.id === ids[1])!).toMatchObject({ eingetroffenAm: 2000, zugEtikett: "2. TZ" });
-    expect(aggregiere(e, EinsatzArt.EINSATZ).staerke.gesamt).toBe(6 + 8);
-  });
-
-  it("lässt die Marke stehen, solange die Eintreffzeit nicht vom Blatt eingetragen wurde (R5-A1)", () => {
-    const s = einsatzAnlegen("Hochwasser", EinsatzArt.EINSATZ);
-    const a = meldungAufnehmen(s.id, bogen("Ansbach"), { quelle: "scan" })!;
-    const b = meldungAufnehmen(s.id, bogen("Ulm", 4), { quelle: "scan" })!;
-    vomPapierMarkieren(s.id, [a.eintrag.id, b.eintrag.id]);
-    const zeitDavor = sammlung(s.id).eintraege.find((e) => e.id === a.eintrag.id)!.eingetroffenAm;
-    papierAbgleichUebernehmen(s.id, [
-      { eintragId: a.eintrag.id, status: MeldeStatus.ANWESEND, zug: "1. TZ", nummer: 4 },
-      { eintragId: b.eintrag.id, eingetroffenAm: 3000, status: MeldeStatus.ANWESEND, zug: "" },
-    ]);
-    const e = sammlung(s.id).eintraege;
-    const ansbach = e.find((x) => x.id === a.eintrag.id)!;
-    expect(ansbach).toMatchObject({ zugEtikett: "1. TZ", nummer: 4 });
-    expect(ansbach.vomPapier).toBeDefined();
-    expect(ansbach.eingetroffenAm).toBe(zeitDavor);
-    expect(e.find((x) => x.id === b.eintrag.id)!.vomPapier).toBeUndefined();
-    expect(offenVomPapier(e).map((x) => x.id)).toEqual([a.eintrag.id]);
-  });
-
-  it("nimmt die Marke weg, wenn die Eintreffzeit an der Karte korrigiert wird", () => {
-    const s = einsatzAnlegen("Hochwasser", EinsatzArt.EINSATZ);
-    const r = meldungAufnehmen(s.id, bogen("Ansbach"), { quelle: "scan" })!;
-    vomPapierMarkieren(s.id, [r.eintrag.id]);
-    expect(offenVomPapier(sammlung(s.id).eintraege)).toHaveLength(1);
-    eintreffzeitSetzen(s.id, r.eintrag.id, 1234);
-    expect(offenVomPapier(sammlung(s.id).eintraege)).toHaveLength(0);
-  });
-});
-
 describe("Notiz und Nummer vom Blatt (Audit Runde 4, R4-A1, R4-A2)", () => {
   function lage() {
     const s = einsatzAnlegen("Hochwasser", EinsatzArt.EINSATZ);
     // Eingang in Alphabet-fremder Reihenfolge: Crailsheim, Albstadt, Ulm.
     const ids = ["Crailsheim", "Albstadt", "Ulm"].map((n) => meldungAufnehmen(s.id, bogen(n), { quelle: "scan" })!.eintrag);
-    vomPapierMarkieren(s.id, ids.map((e) => e.id), 999);
     return { id: s.id, ids: ids.map((e) => e.id) };
   }
-
-  it("übernimmt die Notiz vom Blatt mit Vermerk und lässt eine leere Zeile die Notiz nicht löschen, wenn sie fehlt", () => {
-    const { id, ids } = lage();
-    papierAbgleichUebernehmen(id, [
-      { eintragId: ids[2]!, eingetroffenAm: 1_700_000_000_000, status: MeldeStatus.ANWESEND, zug: "2. TZ", notiz: "Pumpe 2 defekt" },
-      { eintragId: ids[1]!, eingetroffenAm: 1_700_000_100_000, status: MeldeStatus.ANWESEND, zug: "" },
-    ]);
-    const e = sammlung(id).eintraege;
-    const ulm = e.find((x) => x.id === ids[2])!;
-    expect(ulm.notiz).toBe("Pumpe 2 defekt");
-    expect(ulm.vermerke?.some((v) => v.text === "Auftrag/Notiz: Pumpe 2 defekt")).toBe(true);
-    expect(e.find((x) => x.id === ids[1])!.notiz).toBeUndefined();
-  });
-
-  it("hält die Nummern vom Blatt fest, die übrigen rücken um sie herum", () => {
-    const { id, ids } = lage();
-    const vorher = meldungsNummern(sammlung(id).eintraege);
-    expect([...vorher.values()].sort()).toEqual([1, 2, 3]);
-    // Auf dem Blatt war Ulm Nr. 1 und Crailsheim Nr. 3; Albstadt hat keine Nr. eingetragen.
-    papierAbgleichUebernehmen(id, [
-      { eintragId: ids[2]!, eingetroffenAm: 1, status: MeldeStatus.ANWESEND, zug: "", nummer: 1 },
-      { eintragId: ids[0]!, eingetroffenAm: 2, status: MeldeStatus.ANWESEND, zug: "", nummer: 3 },
-      { eintragId: ids[1]!, eingetroffenAm: 3, status: MeldeStatus.ANWESEND, zug: "" },
-    ]);
-    const e = sammlung(id).eintraege;
-    const nr = meldungsNummern(e);
-    const von = (n: string) => nr.get(e.find((x) => x.bogen.einheit.hierarchie[0]!.name === n)!.einheitSchluessel);
-    expect(von("Ulm")).toBe(1);
-    expect(von("Crailsheim")).toBe(3);
-    expect(von("Albstadt")).toBe(2);
-  });
 
   it("zählt ohne feste Nummern wie bisher und vergibt eine doppelte nur einmal", () => {
     const { id } = lage();

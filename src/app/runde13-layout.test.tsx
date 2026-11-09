@@ -5,8 +5,6 @@
 import { readFileSync } from "node:fs";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { weicheTrennstellen } from "./einheiten-tabelle";
-import { KontaktLink } from "./kontakt-link";
 import { SchrittPersonal } from "./schritte/personal";
 import { SchrittBuehne } from "../test/schritt-buehne";
 import { neuePerson, neuerBogen } from "./hilfen";
@@ -22,19 +20,6 @@ const abschnitt = (() => {
   expect(bis).toBeGreaterThan(von);
   return html.slice(von, bis).replace(/\/\*[\s\S]*?\*\//g, "");
 })();
-
-describe("Namen in der Tabelle (R13-M2)", () => {
-  it("setzt vor „gefahren“ eine weiche Trennstelle, nicht mitten im Wort", () => {
-    const t = weicheTrennstellen("Fachgruppe Wassergefahren (A)");
-    const shy = String.fromCharCode(0xad);
-    expect(t).toBe(`Fachgruppe Wasser${shy}gefahren (A)`);
-    expect(t.split(shy).join("")).toBe("Fachgruppe Wassergefahren (A)");
-  });
-  it("lässt kurze Wörter und Namen ohne Baustein unverändert", () => {
-    expect(weicheTrennstellen("Bergung 2")).toBe("Bergung 2");
-    expect(weicheTrennstellen("Ortsverband Aalen")).toBe("Ortsverband Aalen");
-  });
-});
 
 describe("Stilregeln Runde 13", () => {
   it("Kopfzellen ohne Sperrung, zweite Spalte mit Abstand zur klebenden Namensspalte (R13-M3)", () => {
@@ -52,10 +37,6 @@ describe("Stilregeln Runde 13", () => {
   });
   it("Kontakt-Verknüpfungen in „Details“ mit 4 px Rand je Seite, also 8 px Abstand (R13-G3)", () => {
     expect(abschnitt).toMatch(/dl\.paare dd a\.kontakt-link\s*\{\s*margin-block:\s*4px/);
-  });
-  it("Verknüpfung rendert als kontakt-link (Träger der Abstandsregel)", () => {
-    render(<KontaktLink art="tel" wert="0170 5551234" />);
-    expect(document.querySelector("dl.paare dd a.kontakt-link, a.kontakt-link")).not.toBeNull();
   });
 });
 

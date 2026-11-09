@@ -18,9 +18,7 @@ import {
   type Staerke,
   type VerpflegungSplit,
 } from "@bos/eeb-format/model";
-import { EinsatzArt, MeldeStatus, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import { geltendeJeEinheit } from "./fassung-vorrang";
-import { angabenZeit } from "./angaben-alter";
+import { type MeldeEintrag } from "@bos/meldekopf/einsaetze";
 
 export interface EinsatzSummen {
   /** Anzahl anwesender Einheiten (nicht Personen). */
@@ -73,40 +71,8 @@ export function bedarfNichtErfasst(b: Erfassungsbogen): boolean {
   );
 }
 
-/**
- * Zählt diese Meldung in die Lage der Sammlung?
- *
- * Ein als Übung gekennzeichneter Bogen gehört nicht in die Zahlen eines echten
- * Einsatzes: Er beschreibt Kräfte, die für die Lage nicht verfügbar sind. In
- * einer Übungssammlung ist er dagegen genau richtig. Die Startseite sichert
- * das ausdrücklich zu („wird am Meldekopf nicht versehentlich zur Lage
- * gezählt"); bis hierher galt die Zusage nur für das Etikett auf der Karte,
- * nicht für die Summen.
- */
-export function zaehltInLage(art: EinsatzArt, bogen: Erfassungsbogen): boolean {
-  return art === EinsatzArt.UEBUNG || !bogen.uebung;
-}
 
-/**
- * Aktuell zählende Meldungen: neueste Revision je Einheit, nur anwesende —
- * und, sobald die Einsatzart mitgegeben wird, ohne die Übungsmeldungen, die
- * nicht in diese Lage gehören. Reihenfolge folgt {@link neuesteJeEinheit}.
- */
-export function aktuelleMeldungen(eintraege: MeldeEintrag[], art?: EinsatzArt): MeldeEintrag[] {
-  const anwesend = geltendeJeEinheit(eintraege).filter((e) => e.status === MeldeStatus.ANWESEND);
-  return art == null ? anwesend : anwesend.filter((e) => zaehltInLage(art, e.bogen));
-}
 
-/**
- * Die Gegenprobe: anwesende Meldungen, die wegen ihrer Übungskennzeichnung
- * NICHT in die Lage zählen. Die Oberfläche sagt damit, was sie weglässt —
- * eine stillschweigend kleinere Summe wäre so falsch wie die zu große.
- */
-export function uebungenAusserhalbDerLage(eintraege: MeldeEintrag[], art: EinsatzArt): MeldeEintrag[] {
-  return geltendeJeEinheit(eintraege).filter(
-    (e) => e.status === MeldeStatus.ANWESEND && !zaehltInLage(art, e.bogen),
-  );
-}
 
 function leereSummen(): EinsatzSummen {
   return {
@@ -152,17 +118,6 @@ export function verpflegungAngefordertLage(b: Erfassungsbogen): number {
   return b.sofortbedarf ? Math.max(0, b.sofortbedarf.verpflegungPersonen) : 0;
 }
 
-/**
- * Verpflegung für Kopfzeile und Lageblatt: Stimmen angefordert und Stärke überein, steht eine Zahl
- * („Verpflegung 9"); sonst beide benannt („Verpflegung angefordert 0 (Stärke 9)", R11-W1).
- */
-export function verpflegungText(s: Pick<EinsatzSummen, "verpflegung" | "verpflegungAngefordert">): string {
-  if (s.verpflegungAngefordert === s.verpflegung.gesamt) return `Verpflegung ${s.verpflegung.gesamt}`;
-  // R20-N5: ein Satz, kein „angefordert 0 … nicht erfasst": was angefordert ist, gegen die Zahl der Personen vor Ort.
-  return s.verpflegungAngefordert === 0
-    ? `Verpflegung: kein Bedarf gemeldet (${s.verpflegung.gesamt} Personen vor Ort)` // R21-N6: „keine angefordert" klang nach „nichts nötig"
-    : `Verpflegung: ${s.verpflegungAngefordert} angefordert (${s.verpflegung.gesamt} Personen vor Ort)`;
-}
 
 /**
  * Unterbringung M/W/D eines Bogens für die Lage — bei Schnellerfassung ohne
@@ -271,25 +226,12 @@ export function betriebsstoffText(sb: { dieselLiter: number; benzinLiter: number
     .join(" / ");
 }
 
-/**
- * „6 Einheiten, 66 Personen (M 56 / W 10 / D 0)" — die Zahl fürs Quartier
- * (R3-K4). Leer, wenn niemand Unterbringung angefordert hat.
- */
-export function unterbringungAngefordertText(s: EinsatzSummen): string {
-  if (s.unterbringungBenoetigt === 0) return "";
-  const a = s.unterbringungAngefordert;
-  return `${s.unterbringungBenoetigt} ${s.unterbringungBenoetigt === 1 ? "Einheit" : "Einheiten"}, ${a.personen} ${a.personen === 1 ? "Person" : "Personen"} (${mwdText(a)})`;
-}
 
 /** Summiert eine bereits gefilterte Meldungsliste (neueste je Einheit, anwesend). */
 function summiere(meldungen: MeldeEintrag[]): EinsatzSummen {
   return summiereBoegen(meldungen.map((m) => m.bogen));
 }
 
-/** Gesamtsummen über alle aktuell anwesenden Einheiten des Einsatzes. */
-export function aggregiere(eintraege: MeldeEintrag[], art?: EinsatzArt): EinsatzSummen {
-  return summiere(aktuelleMeldungen(eintraege, art));
-}
 
 export interface ZugGruppe {
   /** Zug-/Verbands-Etikett; undefined = Einheiten ohne Etikett („Einzeln"). */
@@ -299,26 +241,3 @@ export interface ZugGruppe {
   aeltesteMeldungAm?: number;
 }
 
-/**
- * Summen gruppiert nach Zug-Etikett (optionale Verbands-Zwischensumme).
- * Nur aktuell anwesende Einheiten. Gruppen sind alphabetisch sortiert,
- * Einheiten ohne Etikett kommen zuletzt.
- */
-export function aggregiereNachZug(eintraege: MeldeEintrag[], art?: EinsatzArt): ZugGruppe[] {
-  const nach = new Map<string, MeldeEintrag[]>();
-  for (const m of aktuelleMeldungen(eintraege, art)) {
-    const k = m.zugEtikett ?? "";
-    (nach.get(k) ?? nach.set(k, []).get(k)!).push(m);
-  }
-  return [...nach.entries()]
-    .sort(([a], [b]) => {
-      if (a === "") return 1; // „ohne Etikett" ans Ende
-      if (b === "") return -1;
-      return a.localeCompare(b, "de");
-    })
-    .map(([k, ms]) => ({
-      zugEtikett: k || undefined,
-      summen: summiere(ms),
-      aeltesteMeldungAm: Math.min(...ms.map(angabenZeit)),
-    }));
-}

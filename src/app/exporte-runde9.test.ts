@@ -14,8 +14,6 @@ import {
   type Person,
 } from "@bos/eeb-format/model";
 import { MeldeStatus, bogenInhaltsId, einheitSchluessel, type Einsatzsammlung, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import { einsatzCsvInhalt } from "./einsatz-csv";
-import { einsatzDetailCsvInhalt } from "./bogen-csv";
 import { erreichbarkeitZeilen, namePapier, nichtDarstellbareBetroffene, nichtDarstellbareNamen, umschriftBetroffene } from "./pdf-dokument";
 import { neuePerson } from "./hilfen";
 
@@ -43,32 +41,10 @@ function bogen(name: string, personal: Person[]): Erfassungsbogen {
   };
 }
 
-function meldung(b: Erfassungsbogen, empfangen: number): MeldeEintrag {
-  return { id: bogenInhaltsId(b), einheitSchluessel: einheitSchluessel(b.einheit), empfangenAm: empfangen, quelle: "scan", status: MeldeStatus.ANWESEND, bogen: b };
-}
 
 const soll = () => bogen("Zulauf Soll", [neuePerson(), neuePerson(), neuePerson()]);
 const gemeldet = () => bogen("Ahlen", [person(), person()]);
 
-function sammlung(eintraege: MeldeEintrag[]): Einsatzsammlung {
-  return { id: "e1", name: "Testlage", art: 0, angelegt: 0, geaendert: 0, eintraege };
-}
-
-describe("Sollstärke im Wort (R9-A2)", () => {
-  it("Übersicht-CSV: Marke in der Zeile und Anteil in der Summenzeile", () => {
-    const csv = einsatzCsvInhalt(sammlung([meldung(gemeldet(), 1000), meldung(soll(), 2000)]));
-    expect(csv).toContain("Sollstärke, nicht gemeldet");
-    expect(csv).toMatch(/Summe \(2 Einheiten, davon 3 Personen Sollstärke, nicht gemeldet\)/);
-  });
-  it("Übersicht-CSV ohne Sollstärke bleibt ohne das Wort", () => {
-    const csv = einsatzCsvInhalt(sammlung([meldung(gemeldet(), 1000)]));
-    expect(csv).not.toContain("Sollstärke");
-  });
-  it("„Alle Daten“-CSV trägt es in der Spalte Personalerfassung", () => {
-    const csv = einsatzDetailCsvInhalt(sammlung([meldung(soll(), 2000)]));
-    expect(csv).toContain("Sollstärke, nicht gemeldet");
-  });
-});
 
 describe("Rückruf einer Soll-Einheit (R9-A3)", () => {
   it("kennzeichnet Funkrufname und OV-Nummer als Vorbelegung", () => {

@@ -18,8 +18,6 @@ export type SchrittProps = {
   aendern: (patch: Partial<Erfassungsbogen>) => void;
   /** Sprung zu einem anderen Assistenten-Schritt — Hinweise, die dorthin zeigen, werden damit antippbar. */
   geheZu?: (schritt: number) => void;
-  /** Nummer der Überschrift, wenn sie von der des Vollassistenten abweicht (Schnellerfassung zählt 1 bis 4, R21-A3). */
-  nummer?: number;
 };
 
 /** Feldname des umschließenden <Feld> — Auswahllisten beschriften sich daraus. */
@@ -895,33 +893,13 @@ export function Vollstaendigkeit(props: {
   geheZu: (schritt: number, feld?: string) => void;
   /** Satz unter der Liste — im Übergabe-Dialog sagt er, dass nichts gesperrt ist. */
   nachsatz?: string;
-  /** Empfangene Meldung einer fremden Einheit: Die Punkte sind Hinweise an die Einheit, kein Auftrag an dieses Gerät (R14-H1). */
-  fremd?: boolean;
-  /** Schnellerfassung (nur Stärke): „vollständig" gilt nur für das, was dort erfragt wird (R14-N3). */
-  schnell?: boolean;
-  /** Der Einheitstyp ist gesetzt: Er „fehlt" in der Schnellerfassung dann nicht (R17-S12). */
-  typGesetzt?: boolean;
 }) {
   const { punkte, geheZu, nachsatz } = props;
   if (punkte.length === 0) {
     return (
       <p className="vollstaendig-ok" role="status">
-        {props.schnell ? `✓ Für die Schnellerfassung vollständig (${props.typGesetzt ? "" : "Typ, "}Fahrzeuge, Bedarf fehlen bewusst).` : "✓ Alle Angaben vollständig und plausibel."}
+        ✓ Alle Angaben vollständig und plausibel.
       </p>
-    );
-  }
-  if (props.fremd) {
-    return (
-      <div className="vollstaendigkeit" role="status">
-        <p className="vollstaendigkeit-titel">
-          Hinweise an die Einheit ({punkte.length}) — hier nichts zu beheben:
-        </p>
-        <ul>
-          {punkte.map((p) => (
-            <li key={p.text}>{p.text}</li>
-          ))}
-        </ul>
-      </div>
     );
   }
   return (

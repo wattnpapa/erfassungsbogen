@@ -40,10 +40,3 @@ describe("Schrittleiste bei großer Schrift (R6-M2)", () => {
     expect(css).toMatch(/:root \.seiten-kopf\.assistent-kopf \.schritte button\s*\{[^}]*flex:\s*1 1 0[^}]*min-width:\s*0/);
   });
 });
-
-describe("Lagemonitor (R6-L3)", () => {
-  it("beginnt schwarz, noch bevor das Bundle da ist", () => {
-    expect(css).toMatch(/html\.lagemonitor-start,\s*html\.lagemonitor-start body\s*\{\s*background:\s*#000/);
-    expect(html).toMatch(/lagemonitor=.*lagemonitor-start/s);
-  });
-});

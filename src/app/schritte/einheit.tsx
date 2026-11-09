@@ -12,7 +12,6 @@ import {
   OrganisationsTyp,
   PersonalErfassung,
   staerke,
-  type Fahrzeug,
   type Person,
 } from "@bos/eeb-format/model";
 import type { ThwOrtsverband } from "@bos/vokabulare/thw-ov";
@@ -319,24 +318,10 @@ function SchnellMehr({ children }: { children?: ReactNode }) {
   );
 }
 
-export function SchrittEinheit({ bogen, aendern: aendernRoh, ortFokus = false }: SchrittProps & { ortFokus?: boolean }) {
+export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
   const e = bogen.einheit;
   const schnell = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
   const Mehr = schnell ? SchnellMehr : Fragment;
-  // Schnell- und manuelle Erfassung für eine Sammlung (R11-M1): Das einzige Pflichtfeld liegt sonst zwei Bildschirme
-  // unter dem Kopf. Beim Öffnen (nur solange der Ort noch leer ist, nicht beim Zurückblättern) steht der Fokus dort.
-  useEffect(() => {
-    if (!ortFokus || (bogen.einheit.hierarchie[0]?.name ?? "").trim() !== "") return;
-    const feld = document.getElementById("feld-einheit-name");
-    // R16-M1: Die Seite bleibt am Anfang (Kopf, Marke „Aufnahme für: …", „1. Einheit"); der Fokus springt nicht mehr hinunter.
-    try {
-      window.scrollTo(0, 0);
-    } catch {
-      /* Testumgebung ohne Layout */
-    }
-    feld?.focus({ preventScroll: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   // Vorbelegung und Typwechsel verändern die Personalliste — der Verpflegungs-
   // Bedarf in Schritt 5 zieht mit (siehe verpflegungMitziehen).
   // Jede weitere Änderung verwirft den Rückweg der Vorbelegung, damit

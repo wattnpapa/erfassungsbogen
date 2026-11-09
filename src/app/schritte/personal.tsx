@@ -71,7 +71,6 @@ import {
   MWD_LEGENDE,
   STAERKE_LEGENDE,
   Stepper,
-  ZahlFeld,
   VokabListe,
   type FreitextVorschlag,
   staerkeVorlesen,
@@ -1285,7 +1284,6 @@ function wegLesen(
 export function SchrittPersonal({
   bogen,
   aendern: aendernRoh,
-  nummer = 3,
 }: SchrittProps) {
   /**
    * Rückweg nach einer Handlung, die Erfasstes wegnimmt: Person entfernen,
@@ -1809,7 +1807,7 @@ export function SchrittPersonal({
 
   return (
     <section className="karte">
-      <h2>{nummer}. Personal</h2>
+      <h2>3. Personal</h2>
       {/* Der Assistent fragt Personal vor Fahrzeugen, das Papier hat sie in
           umgekehrter Reihenfolge — wer abtippt, blättert sonst (R4-A8). */}
       {!nurStaerke && (

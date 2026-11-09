@@ -118,14 +118,14 @@ const NEU_ANFORDERN_BOGEN = "Bitte beim Absender neu anfordern oder den QR-Code 
 
 /** Wohin eine Datei gehört, die über den falschen Knopf kam. */
 const RICHTIGER_KNOPF: Partial<Record<DateiArt, string>> = {
-  einsatz: "eine Einsatz-Sammlung. Sie wird auf der Startseite über „Einsatz importieren…“ eingelesen.",
+  einsatz: "eine Einsatz-Sammlung. Sie gehört in die Meldekopf-App (meldekopf.erfassungsbogen.app) und wird dort über „Einsatz importieren…“ eingelesen.",
   vorlage: "eine Vorlage. Sie wird auf der Startseite über „Aus Datei laden…“ übernommen.",
   sicherung:
     "eine Datensicherung. Sie wird über die Fußzeile „Datensicherung“ eingespielt — Achtung: das ersetzt alle Daten auf diesem Gerät.",
-  bogen: "ein einzelner Bogen. Er wird auf der Startseite über „Aus Datei laden…“ geöffnet oder in einer Sammlung über „Bögen einlesen…“ aufgenommen.",
-  boegen: "eine Liste von Bögen. Sie wird in einer Einsatz-Sammlung über „Bögen einlesen…“ aufgenommen.",
+  bogen: "ein einzelner Bogen. Er wird auf der Startseite über „Aus Datei laden…“ geöffnet; in eine Sammlung nimmt ihn die Meldekopf-App über „Bögen einlesen…“ auf.",
+  boegen: "eine Liste von Bögen. Sie gehört in die Meldekopf-App und wird dort über „Bögen einlesen…“ aufgenommen.",
   entwurf: "ein gesicherter Entwurf. Er wird auf der Startseite über „Aus Datei laden…“ geöffnet.",
-  pdf: "eine PDF. Bögen daraus werden über „Aus Datei laden…“ oder „Bögen einlesen…“ gelesen, eine Sammel-PDF über „Einsatz importieren…“.",
+  pdf: "eine PDF. Ein Bogen daraus wird über „Aus Datei laden…“ geöffnet; eine Sammel-PDF liest die Meldekopf-App über „Einsatz importieren…“ ein.",
 };
 
 /** Welche Arten ein Weg selbst verarbeitet — für sie gibt es keinen „falscher Knopf"-Hinweis. */
@@ -168,7 +168,7 @@ export function dateiFehlerText(name: string, art: DateiArt, weg: DateiWeg, ursa
       if (/^(\d{4}-\d{2}-\d{2}_\d{4}_)?eeb-(einsatz|lageblatt)[-_].*\.(csv|xlsx?)$/i.test(name)) {
         return (
           `${datei} hat diese App selbst als Auswertung für den Stab erzeugt (Tabelle) — zum Weiterarbeiten ist sie nicht gedacht. ` +
-          "Dafür die Sammel-PDF des Einsatzes („Einsatz weitergeben / sichern“) über „Einsatz importieren…“ einlesen oder die Datensicherung einspielen."
+          "Dafür die Sammel-PDF des Einsatzes in der Meldekopf-App über „Einsatz importieren…“ einlesen oder die Datensicherung einspielen."
         );
       }
       if (art === "tabelle") return (

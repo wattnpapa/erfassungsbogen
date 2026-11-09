@@ -5,51 +5,17 @@
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { EinsatzArt, MeldeStatus, einsaetzeLaden, einsatzAnlegen, meldungAufteilen, meldungHinzufuegen } from "@bos/meldekopf/einsaetze";
-import { arbeiten, arbeitetZuruecksetzen, NACHLAUF_MS, tippWaehrendLauf } from "./arbeitet";
-import { ausgabeFreiBeiTipp, ausgabeSperreZuruecksetzen } from "./ausgabe-sperre";
+import { beforeEach, describe, expect, it } from "vitest";
 import { sicherungEinspielen, sicherungInhalt, ZUSATZ_STAND_SCHLUESSEL } from "./sicherung";
 import { absenderHinweis, telefonProblem } from "./absenderkarte";
-import { entfernenBezug, adresseUmbrechbar } from "./einsaetze-ui";
 import { BEISPIEL_HERKUNFT_SCHLUESSEL, beispielMerken, beispielRestText, beispielVergessen } from "./beispiel-herkunft";
-import { ANSICHT_STELLE_SCHLUESSEL, STELLE_MAX_ALTER_MS, ansichtSchluessel, stelleLaden, stelleMerken } from "./ansicht-stelle";
+import { ANSICHT_STELLE_SCHLUESSEL, stelleLaden } from "./ansicht-stelle";
 import { neuePerson, neuerBogen } from "./hilfen";
 import { KontaktArt } from "@bos/eeb-format/model";
-import { abgeteiltDoppeltImStapel } from "./abgeteilt-doppelt";
-import { geltendeJeEinheit } from "./fassung-vorrang";
 
 beforeEach(() => {
   localStorage.clear();
   sessionStorage.clear();
-});
-
-describe("R14-G1 Doppeltipp: Tipps kurz nach dem Ende des Laufs gehören noch dazu", () => {
-  afterEach(() => {
-    arbeitetZuruecksetzen();
-    ausgabeSperreZuruecksetzen();
-  });
-
-  it("ein Tipp innerhalb des Nachlaufs nach dem Lauf tut nichts, ein bewusster späterer geht durch", async () => {
-    let fertig: (() => void) | undefined;
-    const lauf = arbeiten("weitergeben", () => new Promise<void>((r) => (fertig = r)));
-    // `arbeiten` startet die Aktion erst nach dem nächsten Bild: Auf einem langsamen Runner reichten feste
-    // 20 ms nicht, und `fertig` war noch nicht gesetzt (CI-Ausfall am 26.10.). Deshalb warten, bis sie läuft.
-    for (let i = 0; !fertig && i < 200; i++) await new Promise((r) => setTimeout(r, 10));
-    if (!fertig) throw new Error("Die Aktion wurde nicht gestartet");
-    expect(ausgabeFreiBeiTipp("weitergeben", { timeStamp: performance.now() }, tippWaehrendLauf, 2000)).toBe(false);
-    fertig();
-    await lauf;
-    const ende = performance.now();
-    // Der Prüfer wartet, bis der Knopf wieder frei ist, und tippt sofort — 50 ms nach dem Ende.
-    ausgabeSperreZuruecksetzen();
-    expect(tippWaehrendLauf(ende + 50)).toBe(true);
-    expect(ausgabeFreiBeiTipp("weitergeben", { timeStamp: ende + 50 }, tippWaehrendLauf, 2000)).toBe(false);
-    // Nach der Quittung (> Nachlauf) ist es eine neue, bewusste Ausgabe.
-    ausgabeSperreZuruecksetzen();
-    expect(tippWaehrendLauf(ende + NACHLAUF_MS + 500)).toBe(false);
-    expect(ausgabeFreiBeiTipp("weitergeben", { timeStamp: ende + NACHLAUF_MS + 500 }, tippWaehrendLauf, 2000)).toBe(true);
-  });
 });
 
 describe("R14-O2 Sicherung einspielen lässt den Vorratsstand beim Gerät", () => {
@@ -99,62 +65,6 @@ describe("R14-E5 Telefonnummer der Absenderkarte wie im Assistenten prüfen", ()
   });
 });
 
-describe("R14-D1 Entfernen: Nummer, Teil und Stärke unterscheiden den Trupp von der Stammeinheit", () => {
-  function aufgeteilt() {
-    const s = einsatzAnlegen("Hochwasser Weser", EinsatzArt.EINSATZ);
-    const b = neuerBogen();
-    b.einheit.hierarchie[0]!.name = "Sinsheim";
-    b.personal = Array.from({ length: 11 }, (_, i) => ({ ...neuePerson(), nachname: `Person${i}`, vorname: "Max" }));
-    const r = meldungHinzufuegen(s.id, b);
-    expect(r).toBeTruthy();
-    const kopf = einsaetzeLaden()[0]!.eintraege[0]!;
-    const teil = meldungAufteilen(s.id, kopf.id, { teilEtikett: "Trupp 2", personal: [0, 1, 2, 3], fahrzeuge: [] }, {});
-    expect(teil).toBeTruthy();
-    return einsaetzeLaden()[0]!.eintraege;
-  }
-
-  it("der Teil nennt „Trupp 2“ und 4 Personen und sagt, dass sie danach nirgends mehr zählen", () => {
-    const alle = aufgeteilt();
-    const teil = geltendeJeEinheit(alle).find((e) => e.teilEtikett === "Trupp 2" && e.status === MeldeStatus.ANWESEND)!;
-    const { bezug, folge } = entfernenBezug(alle, teil);
-    expect(bezug).toBe('Teil „Trupp 2", 4 Personen');
-    expect(folge).toContain("zählen danach nirgends mehr");
-    expect(folge).toContain("Zusammenführen");
-  });
-
-  it("die Stammeinheit nennt den stehenden Trupp", () => {
-    const alle = aufgeteilt();
-    const stamm = geltendeJeEinheit(alle).find((e) => !e.teilEtikett && e.status === MeldeStatus.ANWESEND)!;
-    const { bezug, folge } = entfernenBezug(alle, stamm);
-    expect(bezug).toBe("7 Personen");
-    expect(folge).toContain('„Trupp 2" (4 Personen)');
-    expect(folge).toContain("Abgeteilt bleibt stehen");
-  });
-});
-
-describe("R14-D2 Folgemeldung einer aufgeteilten Einheit im Stapel", () => {
-  it("nennt je Folgemeldung die schon abgeteilten Personen, damit sie nicht still doppelt zählen", () => {
-    const s = einsatzAnlegen("Hochwasser Weser", EinsatzArt.EINSATZ);
-    const b = neuerBogen();
-    b.einheit.hierarchie[0]!.name = "Sinsheim";
-    b.personal = Array.from({ length: 11 }, (_, i) => ({ ...neuePerson(), nachname: `Person${i}`, vorname: "Max" }));
-    meldungHinzufuegen(s.id, b);
-    const kopf = einsaetzeLaden()[0]!.eintraege[0]!;
-    meldungAufteilen(s.id, kopf.id, { teilEtikett: "Trupp 2", personal: [0, 1, 2, 3], fahrzeuge: [] }, {});
-    const vorher = einsaetzeLaden()[0]!.eintraege;
-    const neu = structuredClone(b);
-    neu.stand = b.stand + 30;
-    meldungHinzufuegen(s.id, neu);
-    const nachher = einsaetzeLaden()[0]!.eintraege;
-    const neueIds = nachher.filter((e) => !vorher.some((v) => v.id === e.id)).map((e) => e.id);
-    expect(neueIds.length).toBe(1);
-    const zeilen = abgeteiltDoppeltImStapel(vorher, nachher, neueIds);
-    expect(zeilen).toHaveLength(1);
-    expect(zeilen[0]).toContain("Trupp 2");
-    expect(zeilen[0]).toContain("zählen jetzt doppelt");
-  });
-});
-
 describe("R14-E6 Beispieldaten im Bogen", () => {
   function bogenMit(namen: [string, string][], nummer?: string) {
     const b = neuerBogen();
@@ -191,34 +101,10 @@ describe("R14-E6 Beispieldaten im Bogen", () => {
 });
 
 describe("R14-S2 Bildlaufstelle über das Neuladen", () => {
-  it("merkt Ansicht und Stelle, gibt sie nur für dieselbe Ansicht und nur kurz zurück", () => {
-    const einsatz = ansichtSchluessel({ schritt: 0, zeigeStart: false, einsatz: "e1", scanner: false });
-    expect(einsatz).toBe("einsatz:e1");
-    expect(ansichtSchluessel({ schritt: 2, zeigeStart: false, einsatz: null, scanner: false })).toBe("schritt:2");
-    expect(ansichtSchluessel({ schritt: 0, zeigeStart: true, einsatz: null, scanner: false })).toBe("start");
-    expect(ansichtSchluessel({ schritt: 0, zeigeStart: false, einsatz: null, scanner: true })).toBeNull();
-    const jetzt = 1_000_000;
-    stelleMerken("einsatz:e1", 2017.4, jetzt);
-    expect(sessionStorage.getItem(ANSICHT_STELLE_SCHLUESSEL)).toBeTruthy();
-    expect(stelleLaden("einsatz:e1", jetzt + 5000)).toBe(2017);
-    expect(stelleLaden("einsatz:e2", jetzt + 5000)).toBeNull();
-    expect(stelleLaden("einsatz:e1", jetzt + STELLE_MAX_ALTER_MS + 1)).toBeNull();
-    stelleMerken("einsatz:e1", 40, jetzt);
-    expect(stelleLaden("einsatz:e1", jetzt)).toBeNull(); // ganz oben: nichts zu rollen
-  });
 
   it("kaputter Wert im Speicher ergibt keine Stelle statt eines Fehlers", () => {
     sessionStorage.setItem(ANSICHT_STELLE_SCHLUESSEL, "{kaputt");
     expect(stelleLaden("start")).toBeNull();
-  });
-});
-
-describe("R14-S4 Adressen brechen nur an Umbruchstellen", () => {
-  it("setzt <wbr> hinter „@“ und „.“ und lässt den Text unverändert", () => {
-    const teile = adresseUmbrechbar("Poststelle.RSt_Freiburg@thw.de");
-    const text = teile.filter((t): t is string => typeof t === "string").join("");
-    expect(text).toBe("Poststelle.RSt_Freiburg@thw.de");
-    expect(teile.filter((t) => typeof t !== "string")).toHaveLength(3);
   });
 });
 

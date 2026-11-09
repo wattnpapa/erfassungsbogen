@@ -10,7 +10,6 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 import { PersonalErfassung } from "@bos/eeb-format/model";
 import { neuerBogen } from "./hilfen";
-import { dauerText } from "./lagemonitor";
 import { telefonTippen } from "./telefon-eingabe";
 import { SchrittEinheit } from "./schritte/einheit";
 import { TelefonFeld } from "./schritte/telefon-feld";
@@ -66,12 +65,6 @@ describe("Telefonfeld (E12) und Dauer (K11)", () => {
   it("meldet Entferntes nur, wenn etwas entfernt wurde", () => {
     expect(telefonTippen("", "0441", undefined).entfernt).toBeUndefined();
     expect(telefonTippen("", "04x", undefined).entfernt).toEqual(["x"]);
-  });
-
-  it("schreibt unter einer Stunde nur die Minuten", () => {
-    const t0 = 1_700_000_000_000;
-    expect(dauerText(t0, t0 + 9 * 60_000)).toBe("9 Minuten");
-    expect(dauerText(t0, t0 + 61 * 60_000)).toBe("1 Stunde, 1 Minute");
   });
 });
 

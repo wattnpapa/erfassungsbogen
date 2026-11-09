@@ -4,15 +4,11 @@
  */
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { neuePerson, neuerBogen } from "./hilfen";
+import { neuerBogen } from "./hilfen";
 import { sicherungEinspielen, sicherungEinspielFehlerText, sicherungInhalt } from "./sicherung";
 import { mitGeltendemWert, zahlLesen } from "./zahl-eingabe";
-import { restLeer } from "./aufteilen-ui";
 import { unterschiedSatz, vorlageUnterschiede } from "./vorlagen-unterschied";
 import { NEULADEN_RUECKFALL_MS, neuLadenMitRueckfall } from "./aktualisierung";
-import { arbeiten, arbeitetZuruecksetzen, tippWaehrendLauf } from "./arbeitet";
-import { ausgabeFreiBeiTipp, ausgabeSperreZuruecksetzen } from "./ausgabe-sperre";
-import { PAPIERKORB_LEER_RAT } from "./speicher-fehler-text";
 
 const voll = () => new DOMException("The quota has been exceeded.", "QuotaExceededError");
 
@@ -86,15 +82,6 @@ describe("R13-O1 Sicherung einspielen: bei Fehlschlag bleibt der Bestand", () =>
   });
 });
 
-describe("R13-O3 Rat bei vollem Speicher und leerem Papierkorb", () => {
-  it("nennt Wege, die es gibt, und keinen Papierkorb zum Leeren", () => {
-    expect(PAPIERKORB_LEER_RAT).toContain("Papierkorb leer");
-    expect(PAPIERKORB_LEER_RAT).toContain("entfernen");
-    expect(PAPIERKORB_LEER_RAT).not.toMatch(/Papierkorb leeren/);
-    expect(PAPIERKORB_LEER_RAT).not.toContain("endgültig löschen");
-  });
-});
-
 describe("R13-O4 „Neu laden“ im Update-Hinweis", () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
@@ -115,19 +102,6 @@ describe("R13-O4 „Neu laden“ im Update-Hinweis", () => {
     expect(neuladen).toHaveBeenCalledTimes(1);
     await vi.advanceTimersByTimeAsync(NEULADEN_RUECKFALL_MS * 2);
     expect(neuladen).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe("R13-D3 Aufteilen ohne Rest", () => {
-  it("erkennt eine Restmeldung ohne Personen, auch wenn noch Fahrzeuge bleiben", () => {
-    const leer = neuerBogen();
-    expect(restLeer(leer)).toBe(true);
-    const nurFahrzeug = neuerBogen();
-    nurFahrzeug.fahrzeuge = [{ typ: { code: 3 } }];
-    expect(restLeer(nurFahrzeug)).toBe(true);
-    const mitPerson = neuerBogen();
-    mitPerson.personal = [{ ...neuePerson(), nachname: "Muster", vorname: "Max" }];
-    expect(restLeer(mitPerson)).toBe(false);
   });
 });
 
@@ -165,36 +139,6 @@ describe("R13-E1 Zahlfelder: Satz und gespeicherter Wert passen zusammen", () =>
   it("lässt übernommene Eingaben und unbekannte Vorwerte unverändert", () => {
     expect(mitGeltendemWert(zahlLesen("12"), 5)).toEqual({ wert: 12, meldung: "" });
     expect(mitGeltendemWert(zahlLesen("x"), undefined).meldung).toBe("„x“ ist keine Zahl — nicht übernommen.");
-  });
-});
-
-describe("R13-G1 Doppeltipp während der Erzeugung", () => {
-  afterEach(() => {
-    arbeitetZuruecksetzen();
-    ausgabeSperreZuruecksetzen();
-  });
-
-  it("ein Tipp, der in den Lauf fiel, tut nichts — auch wenn er erst nach dem Lauf bearbeitet wird", async () => {
-    const erster = { timeStamp: performance.now() - 1 };
-    // Kurze Sperrzeit: Allein die Zeit zwischen den Tipps (≥ 30 ms) würde den zweiten durchlassen — das Zeitfenster des Laufs hält ihn auf.
-    expect(ausgabeFreiBeiTipp("weitergeben", erster, tippWaehrendLauf, 10)).toBe(true);
-    let fertig!: () => void;
-    const lauf = arbeiten("weitergeben", () => new Promise<void>((r) => (fertig = r)));
-    await new Promise((r) => setTimeout(r, 30));
-    const zweiter = { timeStamp: performance.now() }; // 150 ms nach dem ersten, während die Erzeugung läuft
-    fertig();
-    await lauf;
-    // Bearbeitet wird er erst jetzt, lange nach der Sperrzeit gemessen an der Uhr — aber die Ereigniszeit verrät ihn.
-    expect(zweiter.timeStamp - erster.timeStamp).toBeGreaterThan(10);
-    expect(ausgabeFreiBeiTipp("weitergeben", zweiter, tippWaehrendLauf, 10)).toBe(false);
-    // Ein bewusster neuer Tipp nach dem Lauf geht durch.
-    ausgabeSperreZuruecksetzen();
-    expect(ausgabeFreiBeiTipp("weitergeben", { timeStamp: performance.now() + 5000 }, tippWaehrendLauf, 10)).toBe(true);
-  });
-
-  it("ohne Sperrzeit (Prüfstand) ändert sich nichts", () => {
-    expect(ausgabeFreiBeiTipp("x", { timeStamp: 10 }, () => true, 0)).toBe(true);
-    expect(ausgabeFreiBeiTipp("x", { timeStamp: 11 }, () => true, 0)).toBe(true);
   });
 });
 

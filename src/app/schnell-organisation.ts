@@ -7,7 +7,6 @@
  * wandert mit der Datensicherung und fällt mit „Alle Daten löschen"). Ohne Speicher oder mit einem unbekannten
  * Wert gilt das THW, und die Auswahl zeigt es sichtbar an.
  */
-import { ORG_OPTIONEN } from "./hilfen";
 import { OrganisationsTyp } from "@bos/eeb-format/model";
 
 export const SCHNELL_ORGANISATION_SCHLUESSEL = "eeb.schnellOrganisation.v1";
@@ -45,13 +44,3 @@ export function andereOrganisationImOrt(ort: string, aktuell: OrganisationsTyp):
   return undefined;
 }
 
-export function schnellOrganisationLaden(): OrganisationsTyp {
-  try {
-    const roh = localStorage.getItem(SCHNELL_ORGANISATION_SCHLUESSEL);
-    if (roh === null) return OrganisationsTyp.THW;
-    const wert = Number(roh);
-    return ORG_OPTIONEN.some((o) => o.wert === wert) ? (wert as OrganisationsTyp) : OrganisationsTyp.THW;
-  } catch {
-    return OrganisationsTyp.THW;
-  }
-}

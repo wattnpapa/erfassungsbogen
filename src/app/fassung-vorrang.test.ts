@@ -10,19 +10,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { OrganisationsTyp, PersonalErfassung, SCHEMA_VERSION, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { EinsatzArt, einsaetzeLaden, einsatzAnlegen, meldungHinzufuegen, speicherhuelleSetzen, type MeldeEintrag } from "@bos/meldekopf/einsaetze";
-import {
-  fassungGiltSetzen,
-  fassungInHistorieLegen,
-  fassungObenauf,
-  fassungPruefen,
-  fassungenJeEinheit,
-  geltendeJeEinheit,
-  istVerdraengt,
-  nachgereichterBogen,
-  vorrangZuruecknehmen,
-} from "./fassung-vorrang";
-import { notizSetzen, zugSetzen, meldungAufnehmen } from "./eintrag-zeiten";
-import { nurStaerkeUebernehmen } from "./nur-staerke";
+import { fassungGiltSetzen, geltendeJeEinheit } from "./fassung-vorrang";
 
 class MemStorage {
   private m = new Map<string, string>();
@@ -73,65 +61,7 @@ function schnellUndBogen() {
   return { id: s.id, schnell, echt, vorher };
 }
 
-describe("fassungPruefen", () => {
-  it("erkennt den nachgereichten Bogen hinter der Schnellerfassung", () => {
-    const { id, echt, vorher } = schnellUndBogen();
-    const p = fassungPruefen(vorher, eintraege(id), echt.id);
-    expect(p?.lage).toBe("ersetzt-platzhalter");
-    // Ohne Entscheidung gilt nach der Kern-Regel weiter die Schnellerfassung.
-    expect(gesamt(geltendeJeEinheit(eintraege(id))[0])).toBe(12);
-  });
-
-  it("fragt bei zwei verschiedenen Fassungen derselben Minute", () => {
-    const s = einsatzAnlegen("Lage", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogen(2000, 4), { quelle: "pdf-import" });
-    const vorher = eintraege(s.id).map((e) => ({ ...e }));
-    const alt = meldungHinzufuegen(s.id, bogen(2000, 3), { quelle: "pdf-import" })!.eintrag;
-    expect(fassungPruefen(vorher, eintraege(s.id), alt.id)?.lage).toBe("gleiche-minute");
-  });
-
-  it("nennt einen älteren Bogen nach einem jüngeren, ohne dass er gilt", () => {
-    const s = einsatzAnlegen("Lage", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogen(2041, 4), { quelle: "scan" });
-    const vorher = eintraege(s.id).map((e) => ({ ...e }));
-    const alt = meldungHinzufuegen(s.id, bogen(2038, 3), { quelle: "pdf-import" })!.eintrag;
-    expect(fassungPruefen(vorher, eintraege(s.id), alt.id)?.lage).toBe("aelter");
-    expect(gesamt(geltendeJeEinheit(eintraege(s.id))[0])).toBe(4);
-  });
-
-  it("lässt eine gewöhnliche Folgemeldung in Ruhe", () => {
-    const s = einsatzAnlegen("Lage", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogen(2000, 4), { quelle: "scan" });
-    const vorher = eintraege(s.id).map((e) => ({ ...e }));
-    const neu = meldungHinzufuegen(s.id, bogen(2010, 5), { quelle: "scan" })!.eintrag;
-    expect(fassungPruefen(vorher, eintraege(s.id), neu.id)).toBeNull();
-  });
-});
-
 describe("fassungGiltSetzen", () => {
-  it("lässt den Bogen der Einheit gelten — Zug und Auftrag der Schnellerfassung bleiben", () => {
-    const { id, schnell, echt } = schnellUndBogen();
-    zugSetzen(id, schnell.einheitSchluessel, schnell.id, "1. Zug");
-    notizSetzen(id, schnell.id, "Deich Nord");
-    expect(nachgereichterBogen(geltendeJeEinheit(eintraege(id))[0]!, fassungenJeEinheit(eintraege(id), schnell.einheitSchluessel))?.id).toBe(echt.id);
-
-    const a = fassungGiltSetzen(id, echt.id, 9_000)!;
-    expect(a).not.toBeNull();
-    const kopf = geltendeJeEinheit(eintraege(id))[0]!;
-    expect(kopf.id).toBe(echt.id);
-    expect(gesamt(kopf)).toBe(11);
-    expect(kopf.bogen.fahrzeuge).toHaveLength(4);
-    expect(kopf.zugEtikett).toBe("1. Zug");
-    expect(kopf.notiz).toBe("Deich Nord");
-    // Die Historie behält beide, die Schnellerfassung als ersetzt.
-    const revs = fassungenJeEinheit(eintraege(id), schnell.einheitSchluessel);
-    expect(revs.map((r) => r.id)).toEqual([echt.id, schnell.id]);
-    expect(istVerdraengt(revs[1]!, revs)).toBe(true);
-    expect(nachgereichterBogen(kopf, revs)).toBeNull();
-
-    vorrangZuruecknehmen(a);
-    expect(geltendeJeEinheit(eintraege(id))[0]!.id).toBe(schnell.id);
-  });
 
   it("eine spätere Folgemeldung der Einheit löst die bestätigte Fassung normal ab", () => {
     const { id, echt } = schnellUndBogen();
@@ -155,62 +85,5 @@ describe("fassungGiltSetzen", () => {
       fassungGiltSetzen(s.id, vier.id);
       expect(gesamt(geltendeJeEinheit(eintraege(s.id))[0])).toBe(4);
     }
-  });
-});
-
-describe("fassungObenauf — eigene Handlung gilt nach einer Uhr, die zurückspringt (R5-E2)", () => {
-  /** Wie „Stärke ändern…": neue Fassung aus der geltenden, Stand = Maximum, obenauf legen. */
-  function staerkeAendern(id: string, zahl: number, stand: number, mitObenauf: boolean) {
-    const kopf = geltendeJeEinheit(eintraege(id))[0]!;
-    const neu = nurStaerkeUebernehmen(kopf.bogen, { fuehrer: 0, unterfuehrer: 0, mannschaft: zahl, gesamt: zahl }, stand);
-    const r = meldungAufnehmen(id, neu, { quelle: "manuell", einheitSchluesselOverride: kopf.einheitSchluessel })!;
-    if (mitObenauf && r.neu) fassungObenauf(id, r.eintrag.id);
-    return r;
-  }
-
-  it.each([5, 30])("Uhr %i Minuten vor, dann zurück: die zweite Änderung gilt", (minuten) => {
-    const s = einsatzAnlegen("Hochwasser Donau", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogen(2000, 8), { quelle: "pdf-import" });
-    vi.setSystemTime(new Date("2026-10-06T12:00:00Z"));
-    staerkeAendern(s.id, 7, 2000 + minuten, true); // Uhr geht vor: Stand in der Zukunft
-    vi.setSystemTime(new Date("2026-10-06T11:55:00Z")); // Uhr stimmt wieder: die Empfangszeit liegt davor
-    staerkeAendern(s.id, 6, 1990, true);
-    expect(gesamt(geltendeJeEinheit(eintraege(s.id))[0])).toBe(6);
-    expect(gesamt(fassungenJeEinheit(eintraege(s.id), geltendeJeEinheit(eintraege(s.id))[0]!.einheitSchluessel)[0])).toBe(6);
-  });
-
-  it("ohne die Schicht bliebe die alte Zahl obenauf (der Befund)", () => {
-    const s = einsatzAnlegen("Hochwasser Donau", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogen(2000, 8), { quelle: "pdf-import" });
-    vi.setSystemTime(new Date("2026-10-06T12:00:00Z"));
-    staerkeAendern(s.id, 7, 2005, false);
-    vi.setSystemTime(new Date("2026-10-06T11:55:00Z"));
-    staerkeAendern(s.id, 6, 1990, false);
-    expect(gesamt(geltendeJeEinheit(eintraege(s.id))[0])).toBe(7);
-  });
-
-  it("tut nichts, wenn die neue Fassung ohnehin vorn liegt", () => {
-    const s = einsatzAnlegen("Lage", EinsatzArt.EINSATZ);
-    meldungHinzufuegen(s.id, bogen(2000, 8), { quelle: "pdf-import" });
-    const r = staerkeAendern(s.id, 7, 2010, false);
-    expect(fassungObenauf(s.id, r.eintrag.id)).toBe(false);
-  });
-});
-
-describe("fassungInHistorieLegen (R8-W2)", () => {
-  it("vermerkt die ältere Fassung als verdrängt; die Folge ist keine Folgemeldung, „Diese Fassung gilt“ holt sie zurück", async () => {
-    const s = einsatzAnlegen("Lage", EinsatzArt.EINSATZ);
-    const bisher = meldungHinzufuegen(s.id, bogen(2000, 4), { quelle: "scan" })!.eintrag;
-    const aelter = meldungHinzufuegen(s.id, bogen(1900, 6), { quelle: "scan" })!.eintrag;
-    expect(fassungInHistorieLegen(s.id, aelter.id, bisher.id, 5_000)).toBe(true);
-    expect(fassungInHistorieLegen(s.id, aelter.id, bisher.id, 5_000)).toBe(false);
-    const revs = fassungenJeEinheit(eintraege(s.id), bisher.einheitSchluessel);
-    expect(revs.map((r) => r.id)).toEqual([bisher.id, aelter.id]);
-    expect(istVerdraengt(revs[1]!, revs)).toBe(true);
-    expect(geltendeJeEinheit(eintraege(s.id))[0]!.id).toBe(bisher.id);
-    const { folgeAenderung } = await import("./einheiten-tabelle");
-    expect(folgeAenderung(revs[0]!, eintraege(s.id))).toBeNull();
-    fassungGiltSetzen(s.id, aelter.id);
-    expect(geltendeJeEinheit(eintraege(s.id))[0]!.id).toBe(aelter.id);
   });
 });

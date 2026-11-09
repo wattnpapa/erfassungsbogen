@@ -20,7 +20,6 @@ import {
   meldungHinzufuegen,
   type Einsatzsammlung,
   type MeldeEintrag,
-  type MeldeQuelle,
   type MeldungAufnahme,
   type MeldungOptionen,
 } from "@bos/meldekopf/einsaetze";
@@ -30,7 +29,7 @@ import {
   einsaetzePapierkorb as kernEinsaetzePapierkorb,
 } from "@bos/meldekopf/einsaetze";
 import { entfernteMerken } from "./entfernte-meldungen";
-import { fassungenJeEinheit, geltendeJeEinheit } from "./fassung-vorrang";
+import { geltendeJeEinheit } from "./fassung-vorrang";
 import { zugNormalisiert } from "./zug-name";
 import { EEB_EPOCHE_MS, type EebZeitpunkt } from "@bos/eeb-format/model";
 
@@ -99,20 +98,6 @@ export interface FuehrungsVermerk {
   text: string;
 }
 
-/**
- * Herkunft einer Meldung — EIN Wortlaut für Karte, Historie und alle CSV-
- * Exporte. Bisher hieß derselbe JSON-Import auf der Karte „Aus Datei" und in
- * der CSV „PDF-Import", ein Scan hier „Empfangen", dort „Scan" (Audit Runde 2,
- * R2-K6). „Empfangen" statt „Scan" bleibt, weil Scan, Link und Übertragung
- * dasselbe sind: die Einheit hat selbst gemeldet (Arbeitsablauf-Audit W7).
- */
-export const HERKUNFT_TEXT: Record<MeldeQuelle, string> = {
-  scan: "Empfangen",
-  manuell: "Manuell erfasst",
-  "pdf-import": "Aus Datei",
-  aufteilung: "Aufteilung",
-  zusammenfuehrung: "Zusammenführung",
-};
 
 function vermerken(e: MeldeEintrag, text: string, zeit = Date.now()): void {
   (e.vermerke ??= []).push({ zeit, text });
@@ -149,57 +134,9 @@ export function zeitEingelesen(m: MeldeEintrag, fassungenNeuesteZuerst: MeldeEin
   return eintreffzeit(m) === erste.empfangenAm;
 }
 
-/** Fußnote zur Eintreffzeit: Lageblatt, Sammel-PDF, Excel und CSV sagen dasselbe (R16-A1). */
-export const EINTREFF_HINWEIS = "Eintreffzeit = Zeit des Einlesens am Gerät, nicht vom Absender oder Meldeblock bestätigt.";
 
-/**
- * Ist die Eintreffzeit dieser Meldung vom Gerät und nicht vom Absender bestätigt (Einlesen oder vom Papier)?
- * `historie` ist die ganze Sammlung: Beim Teilexport fehlt die erste Fassung sonst (R16-A1).
- */
-export function eintreffzeitUnbestaetigt(m: MeldeEintrag, historie: readonly MeldeEintrag[]): boolean {
-  return m.vomPapier != null || zeitEingelesen(m, fassungenJeEinheit(historie, m.einheitSchluessel));
-}
 
-/** Spielraum für „in der Zukunft": Uhren zweier Geräte gehen nie gleich. */
-export const ZUKUNFT_TOLERANZ_MS = 15 * 60_000;
-/** Wie weit vor der Aufnahme eine Eintreffzeit liegen darf, ohne dass nachgefragt wird (R12-E4). */
-export const VERGANGENHEIT_TOLERANZ_MS = 24 * 3_600_000;
 
-/**
- * Passt die Zeit zusammen? Eintreff- oder Abrückzeit mehr als eine
- * Viertelstunde in der Zukunft oder Abrücken vor dem Eintreffen — typisch
- * für einen Tag- oder Monatsdreher beim Nachtragen vom Meldeblock. Vorher
- * gingen beide ohne Hinweis durch (Audit Runde 3, R3-E5). Nur ein Hinweis,
- * gesperrt wird nichts. `null` heißt: plausibel.
- */
-export function zeitUnstimmigkeit(
-  z: { eintreffen: number; abgerueckt?: number | null },
-  jetzt = Date.now(),
-  /**
-   * Bezug für die Gegenrichtung (R12-E4): Aufnahmezeit der Meldung und Beginn des Einsatzzeitraums in ms. Eine
-   * Eintreffzeit, die mehr als einen Tag vor der Aufnahme UND vor dem Zeitraum liegt, ist meist ein Dreher im
-   * Jahr oder bei Tag und Monat.
-   */
-  bezug?: { aufnahme: number; zeitraumVon?: number },
-): string | null {
-  if (z.eintreffen > jetzt + ZUKUNFT_TOLERANZ_MS) {
-    return `Eingetroffen ${zeitLang(z.eintreffen)} liegt in der Zukunft — Tag oder Monat vertauscht?`;
-  }
-  if (
-    bezug &&
-    z.eintreffen < bezug.aufnahme - VERGANGENHEIT_TOLERANZ_MS &&
-    (bezug.zeitraumVon == null || z.eintreffen < bezug.zeitraumVon)
-  ) {
-    return `Eingetroffen ${zeitLang(z.eintreffen)} liegt mehr als einen Tag vor der Aufnahme (${zeitLang(bezug.aufnahme)}) — Jahr, Tag oder Monat vertauscht?`;
-  }
-  if (z.abgerueckt != null && z.abgerueckt > jetzt + ZUKUNFT_TOLERANZ_MS) {
-    return `Abgerückt ${zeitLang(z.abgerueckt)} liegt in der Zukunft — Tag oder Monat vertauscht?`;
-  }
-  if (z.abgerueckt != null && z.abgerueckt < z.eintreffen) {
-    return `Abgerückt ${zeitLang(z.abgerueckt)} liegt vor dem Eintreffen ${zeitLang(z.eintreffen)} — stimmt eine der Zeiten nicht?`;
-  }
-  return null;
-}
 
 /** Uhrzeit, bei anderem Tag mit Datum: „09:40" bzw. „26.09., 09:40". */
 export function zeitKurz(ms: number, jetzt = Date.now()): string {
@@ -257,18 +194,6 @@ export function platzRat(): string {
   return `Erst sichern${sammlungen > 0 ? " (Einsatz weitergeben / sichern)" : ""}, dann Platz schaffen: ${liste}.`;
 }
 
-/**
- * Meldung, wenn beim Einlesen Bögen am vollen Speicher scheiterten. Die Datei
- * ist dann in Ordnung — bisher stand „Keine Bögen in der Datei gefunden", und
- * der Meldekopf forderte gültige PDFs neu an (Audit Runde 3, R3-O1). Leer bei 0.
- */
-export function speicherVollMeldung(anzahl: number): string {
-  if (anzahl <= 0) return "";
-  return (
-    `Nicht aufgenommen: ${anzahl === 1 ? "1 Bogen" : `${anzahl} Bögen`} — der Speicher dieses Geräts ist voll, ` +
-    `die Datei selbst ist in Ordnung. ${platzRat()} Danach dieselbe Datei noch einmal einlesen.`
-  );
-}
 
 /** Ist dieser Fehler ein voller Speicher? (Browser nennen ihn unterschiedlich.) */
 export function istSpeicherVoll(e: unknown): boolean {
@@ -302,26 +227,7 @@ export function sammlungenSchreiben(liste: Einsatzsammlung[]): void {
   }
 }
 
-/**
- * Eine Sammlung auf einen früheren Stand zurücksetzen (Rückgängig nach dem Zusammenführen, R20-D3). Ersetzt die Sammlung gleicher ID
- * vollständig; gibt es sie nicht mehr, wird sie wieder angelegt. Ein voller Speicher kommt als {@link SpeicherVollFehler}.
- */
-export function sammlungZuruecksetzen(vorher: Einsatzsammlung): void {
-  const liste = alleSammlungen();
-  const i = liste.findIndex((x) => x.id === vorher.id);
-  if (i < 0) liste.push(vorher);
-  else liste[i] = vorher;
-  sammlungenSchreiben(liste);
-}
 
-/**
- * Prüft, ob die Sammlung nach dem Schreiben wirklich im Speicher steht. Ein
- * `setItem` kann in manchen Browsern still scheitern; darum wird nicht dem
- * Aufruf, sondern dem Speicher geglaubt.
- */
-export function eintragGespeichert(einsatzId: string, eintragId: string): boolean {
-  return alleSammlungen().some((s) => s.id === einsatzId && s.eintraege.some((e) => e.id === eintragId));
-}
 
 function eintragAendern(einsatzId: string, eintragId: string, aendern: (e: MeldeEintrag) => void): void {
   const liste = alleSammlungen();
@@ -333,22 +239,6 @@ function eintragAendern(einsatzId: string, eintragId: string, aendern: (e: Melde
   sammlungenSchreiben(liste);
 }
 
-/**
- * Name und Ort/Auftrag einer Sammlung nachträglich ändern (R16-K1): Beides steht beim Anlegen oft noch nicht fest. Der
- * Kern bietet dafür keinen Setter; Einheiten, Zeiten und Aufträge bleiben unberührt. Ein leerer Name lässt den alten
- * stehen, ein leerer Ort löscht ihn. Liefert die Werte davor (für „Rückgängig"); `null`, wenn es den Einsatz nicht gibt.
- */
-export function einsatzKopfSetzen(einsatzId: string, name: string, ort: string): { name: string; ort: string } | null {
-  const liste = alleSammlungen();
-  const s = liste.find((x) => x.id === einsatzId);
-  if (!s) return null;
-  const vorher = { name: s.name, ort: s.ort ?? "" };
-  s.name = name.trim() || s.name;
-  s.ort = ort.trim() || undefined;
-  s.geaendert = Date.now();
-  sammlungenSchreiben(liste);
-  return vorher;
-}
 
 /** Eintreffzeit einer Meldung korrigieren (Nachtragen vom Papier). */
 export function eintreffzeitSetzen(einsatzId: string, eintragId: string, zeitpunkt: number): void {
@@ -360,29 +250,6 @@ export function eintreffzeitSetzen(einsatzId: string, eintragId: string, zeitpun
   });
 }
 
-/**
- * „Nr. laut Zettel“ und Zug einer eben von Hand erfassten Einheit (R5-A4): Das Papier
- * (Blanko-Kasten „Meldekopf“) hat sie, die Erfassung kannte nur die Uhrzeit — sonst gab es
- * zwei Nummernreihen. Die Nummer gilt für die ganze Einheit; sie ist fest wie die aus dem
- * Papier-Abgleich (R4-A1).
- */
-export function nummerUndZugSetzen(einsatzId: string, eintragId: string, wert: { nummer?: number; zug?: string }): void {
-  const liste = alleSammlungen();
-  const s = liste.find((x) => x.id === einsatzId);
-  const e = s?.eintraege.find((x) => x.id === eintragId);
-  if (!s || !e) return;
-  // Wie beim Zuordnen an der Karte und beim Papier-Abgleich: „2", „Zug 2", „2.Zug" sind ein Zug (R10-S1, R10-A1).
-  const zug = zugNormalisiert(wert.zug ?? "", s.eintraege.map((x) => x.zugEtikett)) || undefined;
-  for (const x of s.eintraege) {
-    if (x.einheitSchluessel !== e.einheitSchluessel) continue;
-    if (wert.nummer != null) x.nummer = wert.nummer;
-    if (zug) x.zugEtikett = zug;
-  }
-  if (zug) vermerken(e, `Zug: ${zug}`);
-  if (wert.nummer != null) vermerken(e, `Nr. ${wert.nummer} laut Zettel`);
-  s.geaendert = Date.now();
-  sammlungenSchreiben(liste);
-}
 
 /** Abrückzeit einer abgerückten Meldung korrigieren. */
 export function abrueckzeitSetzen(einsatzId: string, eintragId: string, zeitpunkt: number): void {
@@ -438,27 +305,6 @@ export interface ZusammenfuehrungVorher {
   teile: { id: string; status: MeldeStatus; abgerueckAm?: number }[];
 }
 
-/**
- * Zusammenführen zurücknehmen: die Teile haben wieder ihren Status (und ihre
- * Abrückzeit), die neue Revision des Ziels geht heraus, die Fassung davor gilt
- * wieder. Ohne Vermerk in der Historie der Teile — sie waren nie weg.
- */
-export function zusammenfuehrungZurueck(einsatzId: string, v: ZusammenfuehrungVorher): void {
-  const liste = alleSammlungen();
-  const s = liste.find((x) => x.id === einsatzId);
-  if (!s) return;
-  for (const t of v.teile) {
-    const e = s.eintraege.find((x) => x.id === t.id);
-    if (!e) continue;
-    e.status = t.status;
-    if (t.abgerueckAm != null) e.abgerueckAm = t.abgerueckAm;
-    else delete e.abgerueckAm;
-    delete e.aufgegangenIn;
-  }
-  if (v.zielWarNeu) s.eintraege = s.eintraege.filter((x) => x.id !== v.zielId);
-  s.geaendert = Date.now();
-  sammlungenSchreiben(liste);
-}
 
 /** Auftrag/Notiz der Führungsstelle setzen (leer = entfernen). */
 export function notizSetzen(einsatzId: string, eintragId: string, notiz: string): void {
@@ -739,34 +585,6 @@ export function speicherGroessteSammlungen(anzahl = 3): { name: string; papierko
   }
 }
 
-/**
- * Eine Einheit samt aller ihrer Fassungen in eine andere Sammlung verschieben
- * (falsche Mappe erwischt — Audit „Fehler und Wiederanlauf", E5). Signatur,
- * Herkunft, Zeiten und Notiz reisen unverändert mit; Fassungen, die im Ziel
- * schon liegen (gleiche Inhalts-ID), werden nicht verdoppelt. Rückgabe: Zahl
- * der verschobenen Fassungen.
- */
-export function einheitVerschieben(vonEinsatzId: string, nachEinsatzId: string, einheitSchl: string): number {
-  if (vonEinsatzId === nachEinsatzId) return 0;
-  const liste = alleSammlungen();
-  const von = liste.find((s) => s.id === vonEinsatzId);
-  const nach = liste.find((s) => s.id === nachEinsatzId);
-  if (!von || !nach) return 0;
-  const wandern = von.eintraege.filter((e) => e.einheitSchluessel === einheitSchl);
-  if (wandern.length === 0) return 0;
-  von.eintraege = von.eintraege.filter((e) => e.einheitSchluessel !== einheitSchl);
-  let verschoben = 0;
-  for (const e of wandern) {
-    if (nach.eintraege.some((x) => x.id === e.id)) continue;
-    nach.eintraege.push(e);
-    verschoben++;
-  }
-  const jetzt = Date.now();
-  von.geaendert = jetzt;
-  nach.geaendert = jetzt;
-  sammlungenSchreiben(liste);
-  return verschoben;
-}
 
 /**
  * Eine Einheit samt ALLER ihrer Fassungen aus einer Sammlung nehmen. Der Kern
@@ -808,26 +626,6 @@ export function einheitEntfernen(einsatzId: string, einheitSchl: string, nummern
   return weg;
 }
 
-/**
- * Frisch vom Papier eingelesene Meldungen markieren (R3-A2). Nur neue
- * Einheiten: eine Folgemeldung erbt Zeit, Zug und Auftrag ihrer Vorgängerin
- * und braucht keinen Abgleich.
- */
-export function vomPapierMarkieren(einsatzId: string, eintragIds: string[], jetzt = Date.now()): void {
-  if (eintragIds.length === 0) return;
-  const ids = new Set(eintragIds);
-  const liste = alleSammlungen();
-  const s = liste.find((x) => x.id === einsatzId);
-  if (!s) return;
-  let geaendert = false;
-  for (const e of s.eintraege) {
-    if (!ids.has(e.id) || e.vomPapier != null) continue;
-    if (s.eintraege.some((x) => x.einheitSchluessel === e.einheitSchluessel && x.id !== e.id)) continue;
-    e.vomPapier = jetzt;
-    geaendert = true;
-  }
-  if (geaendert) sammlungenSchreiben(liste);
-}
 
 /** Eine Zeile des Abgleichs: was vom Blatt („Stand am Meldekopf") gilt. */
 export interface PapierAbgleichZeile {
@@ -848,64 +646,3 @@ export interface PapierAbgleichZeile {
   nummer?: number;
 }
 
-/**
- * Lage vom Papier in einem Schritt übernehmen (R3-A2): je Einheit
- * Eintreffzeit, Status samt Abrückzeit und Zug, mit Vermerken wie bei der
- * Einzelkorrektur an der Karte; danach gilt die Meldung als abgeglichen.
- * Ein Schreibvorgang für alle Zeilen. Rückgabe: Zahl der abgeglichenen.
- */
-export function papierAbgleichUebernehmen(einsatzId: string, zeilen: PapierAbgleichZeile[]): number {
-  const liste = alleSammlungen();
-  const s = liste.find((x) => x.id === einsatzId);
-  if (!s) return 0;
-  let n = 0;
-  for (const z of zeilen) {
-    const e = s.eintraege.find((x) => x.id === z.eintragId);
-    if (!e) continue;
-    n++;
-    const vorher = eintreffzeit(e);
-    if (z.eingetroffenAm != null && vorher !== z.eingetroffenAm) {
-      e.eingetroffenAm = z.eingetroffenAm;
-      vermerken(e, `Eintreffzeit korrigiert: ${zeitLang(vorher)} → ${zeitLang(z.eingetroffenAm)}`);
-    }
-    if (z.status === MeldeStatus.ABGERUECKT) {
-      // Steht auf dem Blatt keine Abrückzeit, bleibt sie offen („nicht bestätigt") – die Uhrzeit
-      // des Einlesens wäre keine (R6-A6, wie bei der Eintreffzeit).
-      const zeit = z.abgerueckAm;
-      if (e.status !== MeldeStatus.ABGERUECKT) vermerken(e, zeit != null ? "Abgerückt" : "Abgerückt (Zeit vom Papier nicht bestätigt)", zeit ?? Date.now());
-      e.status = MeldeStatus.ABGERUECKT;
-      if (zeit != null) e.abgerueckAm = zeit;
-      else delete e.abgerueckAm;
-    } else if (e.status === MeldeStatus.ABGERUECKT) {
-      vermerken(e, "Wieder als anwesend geführt");
-      e.status = MeldeStatus.ANWESEND;
-      delete e.abgerueckAm;
-    }
-    const zug = zugNormalisiert(z.zug, s.eintraege.map((x) => x.zugEtikett)) || undefined;
-    if (zug !== e.zugEtikett) {
-      const war = e.zugEtikett;
-      for (const x of s.eintraege) if (x.einheitSchluessel === e.einheitSchluessel) x.zugEtikett = zug;
-      vermerken(e, zug ? (war ? `Zug: ${zug} (war: ${war})` : `Zug: ${zug}`) : `Zug-Zuordnung entfernt (war: ${war})`);
-    }
-    if (z.notiz !== undefined) {
-      const notiz = z.notiz.trim() || undefined;
-      const war = e.notiz;
-      if (notiz !== war) {
-        if (notiz) e.notiz = notiz;
-        else delete e.notiz;
-        vermerken(e, !notiz ? `Auftrag/Notiz entfernt (war: ${war})` : war ? `Auftrag/Notiz geändert: ${notiz} (war: ${war})` : `Auftrag/Notiz: ${notiz}`);
-      }
-    }
-    if (z.nummer != null) {
-      for (const x of s.eintraege) if (x.einheitSchluessel === e.einheitSchluessel) x.nummer = z.nummer;
-    }
-    // Die Marke fällt nur, wenn die Zeit vom Blatt eingetragen wurde (R5-A1).
-    if (z.eingetroffenAm != null) delete e.vomPapier;
-    else e.papierAbgeglichen = true;
-  }
-  if (n > 0) {
-    s.geaendert = Date.now();
-    sammlungenSchreiben(liste);
-  }
-  return n;
-}

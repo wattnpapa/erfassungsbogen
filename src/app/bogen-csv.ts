@@ -44,7 +44,6 @@ import {
   staerke,
   unterbringungMWD,
   verpflegung,
-  datumZuIso,
   type EebDatum,
   type EebZeitpunkt,
   type Erfassungsbogen,
@@ -69,11 +68,7 @@ import { uhrzeitAus, uhrzeitZuIso } from "./zeitraum-eingabe";
 import { csvDatei, csvZeile, jaNein, mitNachtragSpalte } from "./csv";
 import { berufText, qualifikationenUndBerufe } from "./beruf";
 import { telefonAlsTabellenText } from "./telefon-eingabe";
-import { EINTREFF_HINWEIS, HERKUNFT_TEXT, eintreffzeit, eintreffzeitUnbestaetigt, zeitLang } from "./eintrag-zeiten";
-import { meldungsNummern } from "./einheiten-tabelle";
-import { MeldeStatus, type Einsatzsammlung, type MeldeEintrag, type MeldeQuelle } from "@bos/meldekopf/einsaetze";
-import { geltendeJeEinheit } from "./fassung-vorrang";
-import { exportKennzeile, nachtragGrundText, ortHinweisText, ortHinweise } from "./export-stand";
+import { ortHinweisText } from "./export-stand";
 
 // ------------------------------------------------------------------ Spalten
 
@@ -194,14 +189,7 @@ const ERFASSUNG_TEXT: Record<PersonalErfassung, string> = {
   [PersonalErfassung.NUR_STAERKE]: "Nur Stärke",
 };
 
-const STATUS_TEXT: Record<MeldeStatus, string> = {
-  [MeldeStatus.ANWESEND]: "Anwesend",
-  [MeldeStatus.ABGERUECKT]: "Abgerückt",
-  [MeldeStatus.AUFGEGANGEN]: "Aufgegangen",
-};
 
-// Derselbe Wortlaut wie auf der Karte (Audit Runde 2, R2-K6).
-const QUELLE_TEXT: Record<MeldeQuelle, string> = HERKUNFT_TEXT;
 
 function uhrzeitText(iso: string | undefined): string {
   const minuten = uhrzeitAus(iso);
@@ -391,67 +379,4 @@ export function bogenCsvInhalt(b: Erfassungsbogen): string {
   return zuDatei(bogenSaetze(b, {}));
 }
 
-function kontextAusMeldung(e: MeldeEintrag, einsatz: string, meldungNr?: number, fremderOrt?: string, unbestaetigt = false): Kontext {
-  return {
-    fremderOrt,
-    einsatz,
-    meldungNr,
-    // Stern wie Lageblatt und Sammel-PDF (R16-A1); die Fußnote steht am Dateiende.
-    eingetroffen: `${zeitLang(eintreffzeit(e))}${unbestaetigt ? " *" : ""}`,
-    abgerueckt: e.abgerueckAm != null ? zeitLang(e.abgerueckAm) : "",
-    notiz: e.notiz ?? "",
-    teil: e.teilEtikett,
-    zug: e.zugEtikett,
-    quelle: QUELLE_TEXT[e.quelle],
-    status: STATUS_TEXT[e.status],
-    signatur: e.signatur
-      ? e.signatur.zustand === "gueltig"
-        ? `gültig${e.signatur.kurzform ? ` (${e.signatur.kurzform})` : ""}`
-        : "ungültig"
-      : "",
-  };
-}
 
-/**
- * Einsatz-Sammlung → CSV-Text (mit BOM): jede gemeldete Einheit in ihrer
- * neuesten Revision, nach Anzeigename sortiert, je Einheit die Einheits-,
- * Personal- und Fahrzeugzeilen.
- */
-export function einsatzDetailCsvInhalt(
-  s: Einsatzsammlung,
-  /** Nummern aus der ganzen Sammlung — beim Teilexport „nur neue" sonst verschoben. */
-  nummern: Map<string, number> = meldungsNummern(s.eintraege),
-  /** Ganze Sammlung für die Kennzeichnung der Eintreffzeit (beim Teilexport fehlt die erste Fassung sonst). */
-  historie: readonly MeldeEintrag[] = s.eintraege,
-  erstellt: number = Date.now(),
-): string {
-  const meldungen = geltendeJeEinheit(s.eintraege).sort(
-    (a, b) =>
-      (nummern.get(a.einheitSchluessel) ?? Infinity) - (nummern.get(b.einheitSchluessel) ?? Infinity) ||
-      einheitAnzeigename(a.bogen.einheit).localeCompare(einheitAnzeigename(b.bogen.einheit), "de") ||
-      (a.teilEtikett ?? "").localeCompare(b.teilEtikett ?? "", "de"),
-  );
-  const gruende = s.nachtragGruende;
-  const orte = ortHinweise(s);
-  // Je Satz die Einheit, zu der er gehört — für die Spalte „Im Nachtrag wegen" (R5-W7).
-  const einheitJeSatz: string[] = [];
-  const unbestaetigt = meldungen.filter((e) => eintreffzeitUnbestaetigt(e, historie));
-  const saetze = meldungen.flatMap((e) => {
-    const teil = bogenSaetze(e.bogen, kontextAusMeldung(e, s.name, nummern.get(e.einheitSchluessel), orte[e.einheitSchluessel], unbestaetigt.includes(e)));
-    for (const _ of teil) einheitJeSatz.push(e.einheitSchluessel);
-    return teil;
-  });
-  // Schlusszeilen: Lage, Erstellzeit und Fußnote zur Eintreffzeit (R16-A1).
-  const fuss = [exportKennzeile(s, erstellt), ...(unbestaetigt.length > 0 ? [`* ${EINTREFF_HINWEIS}`] : [])];
-  if (!gruende) return zuDatei(saetze, undefined, fuss);
-  // Als Nachtrag: Grund auf jeder Zeile (wie der Kontext, damit eine gefilterte
-  // Ansicht lesbar bleibt) und eine Schlusszeile, die die Datei als Teilmenge
-  // kennzeichnet (R5-K6).
-  const seit = s.nachtragSeit != null ? ` seit ${zeitLang(s.nachtragSeit)}` : "";
-  return zuDatei(saetze, {
-    name: "Im Nachtrag wegen",
-    werte: (_satz, i) => nachtragGrundText(gruende[einheitJeSatz[i]!]),
-    schluss: `NACHTRAG${seit} — nicht die ganze Lage (${meldungen.length} ${meldungen.length === 1 ? "Einheit" : "Einheiten"} in dieser Datei)`,
-    vorspalte: `NACHTRAG${seit} — nicht die ganze Lage`,
-  }, fuss);
-}

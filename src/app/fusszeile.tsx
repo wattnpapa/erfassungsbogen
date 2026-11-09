@@ -136,7 +136,8 @@ function Datenschutzdialog({ dialogRef }: { dialogRef: RefObject<HTMLDialogEleme
         Es werden keine Cookies gesetzt. Die App speichert ihre Daten aber im
         lokalen Speicher (localStorage) des Geräts, weil sie ohne Server
         arbeitet und die Arbeit sonst bei jedem Neustart verloren wäre:
-        eigene Vorlagen, Einsatz-Sammlungen, der aktuelle Bogen-Entwurf, die
+        eigene Vorlagen, der aktuelle Bogen-Entwurf, Einsatz-Sammlungen aus
+        der Zeit vor der Meldekopf-App (bis sie gelöscht werden), die
         Absenderkarte, der private Signatur-Geräteschlüssel und die
         Anzeige-Einstellungen (Feld-/Nachtmodus). Ein Widerspruch gegen die
         Reichweitenmessung wird ebenfalls dort vermerkt.
@@ -253,18 +254,13 @@ export function beispielboegenOeffnen(): Promise<boolean> {
   });
 }
 
-export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false, offlineHinweis }: {
+export function Fusszeile({ onBogenOeffnen, kompakt = false, offlineHinweis }: {
   /**
    * Beispielbogen in der App öffnen — wie ein frisch gescannter Bogen.
    * Rückgabe false = die Übernahme wurde abgelehnt (Rückfrage abgebrochen);
    * dann bleibt der Dialog stehen.
    */
   onBogenOeffnen: (bogen: Erfassungsbogen) => Promise<boolean>;
-  /**
-   * Alle Bögen des offenen Beispiel-Ordners in eine neue Übungs-Sammlung legen
-   * (Prüfrunde Beispielbögen, BB-K1). Ohne Angabe fehlt der Knopf.
-   */
-  onAlsUebung?: (boegen: { bogen: Erfassungsbogen; zug?: string }[], ordnerName: string) => Promise<boolean>;
   /**
    * Schmale Linkzeile statt voller Fußzeile — für den Assistenten. Beim
    * Ausfüllen gehören Datensicherung, „Alle Daten löschen" und 227
@@ -735,7 +731,7 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false, offlin
               <p>
                 Einspielen <strong>ersetzt</strong> alle App-Daten auf diesem Gerät — Vorlagen,
                 Einsätze, Entwurf, Einstellungen und den Geräteschlüssel — durch den Inhalt der
-                Datei. Anders als „Einsatz importieren…“ wird nichts ergänzt.
+                Datei. Anders als „Einsatz importieren…“ in der Meldekopf-App wird nichts ergänzt.
               </p>
               <p><strong>Auf diesem Gerät — geht dabei verloren:</strong></p>
               <BestandListe bestand={einspielStand.geraet} kurzform={einspielStand.kurzGeraet} geraet />
@@ -907,7 +903,7 @@ export function Fusszeile({ onBogenOeffnen, onAlsUebung, kompakt = false, offlin
       </Dialog>
 
       {BeispieleDialog && beispielAnfrage > 0 && (
-        <BeispieleDialog anfrage={beispielAnfrage} onBogenOeffnen={onBogenOeffnen} onAlsUebung={onAlsUebung} />
+        <BeispieleDialog anfrage={beispielAnfrage} onBogenOeffnen={onBogenOeffnen} />
       )}
 
       <Dialog titel="Über dieses Projekt" dialogRef={ueber}>
