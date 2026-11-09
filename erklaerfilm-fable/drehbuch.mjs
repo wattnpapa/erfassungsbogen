@@ -115,7 +115,7 @@ export const COMIC_INTRO = {
           tts: "Stärke … null, zwei, sieben … oder ist das eine Eins? Und die Fahrzeuge stehen wo?",
           pauseDavor: 0.6,
         }),
-        z("i07", "hauke", "Neun Leute. Äh, acht. Der Jannik ist noch beim Tanken. Fahrzeuge hab ich auf die Rückseite geschrieben.", { pauseDavor: 0.4 }),
+        z("i07", "hauke", "Acht Leute. Äh, sieben. Der Jannik ist noch beim Tanken. Fahrzeuge hab ich auf die Rückseite geschrieben.", { pauseDavor: 0.4 }),
         z("i08", "erzaehler", "Melden auf Papier heißt: schreiben, entziffern, nachfragen – und später alles noch einmal abtippen.", { pauseDavor: 0.7 }),
       ],
     },
@@ -197,6 +197,10 @@ export const EINHEIT = {
   ],
   /** Zeilen (0-basiert) mit Geschlecht „W“. */
   weiblich: [0, 2, 5, 7, 11],
+  /** Zeilen mit Fahrerlaubnis CE (Kraftfahrer), damit die Prüfung grün wird. */
+  kraftfahrer: [1, 3],
+  /** Sitzplätze am MLW IV (Richtwert 7 reicht nicht für 12 Personen). */
+  sitzplaetzeMlw: "9",
   telefonGrFue: "0170 5558821",
   kennzeichen: ["THW-86421", "THW-86422", "THW-86423", "THW-86424"],
   dieselLiter: "300",
@@ -218,13 +222,13 @@ export const APP = {
     },
     {
       id: "einheit",
-      bild: "Seite 1 „Einheit“: Organisation THW, Ort tippen → Vorschlag Oldenburg (NI), Einheitstyp aus Liste → StAN-Vorbelegung, Regionalstelle und Landesverband per Knopf.",
+      bild: "Seite 1 „Einheit“: Organisation THW, Ort tippen → Vorschlag Oldenburg (NI) bringt Regionalstelle und Landesverband mit, Einheitstyp aus Liste → StAN-Vorbelegung.",
       zeilen: [
         z("a03", "erzaehler", "Seite eins: die Einheit. Organisation THW ist schon ausgewählt. Beim Ort tippen wir nur „Olden“ – die App kennt alle Ortsverbände und schlägt Oldenburg vor, mit Dienststellen-Kürzel, Telefon und E-Mail."),
         z("a04", "erzaehler", "Als Einheitstyp wählen wir die Fachgruppe Wasserschaden/Pumpen B aus der Liste. Damit kommt die Vorbelegung nach StAN: zwölf Personen und vier Fahrzeuge sind bereits angelegt.", {
           tts: "Als Einheitstyp wählen wir die Fachgruppe Wasserschaden Pumpen B aus der Liste. Damit kommt die Vorbelegung nach Schtan: zwölf Personen und vier Fahrzeuge sind bereits angelegt.",
         }),
-        z("a05", "erzaehler", "Ein Klick legt Regionalstelle und Landesverband an: Oldenburg und Bremen, Niedersachsen. Weiter."),
+        z("a05", "erzaehler", "Regionalstelle und Landesverband kommen mit dem Vorschlag gleich mit: Oldenburg und Bremen, Niedersachsen."),
       ],
     },
     {
@@ -245,8 +249,8 @@ export const APP = {
           tts: "Seite drei: das Personal. Die zwölf Plätze aus der Schtan stehen schon da – Gruppenführerin, zwei Truppführer, neun Helferinnen und Helfer.",
         }),
         z("a09", "erzaehler", "Statt jeden Namen einzeln zu tippen, fügen wir die Liste aus dem Ortsverband ein. Die App verteilt sie auf die Karten."),
-        z("a10", "erzaehler", "Die Stärke rechnet sie dabei selbst: eins, zwei, neun – Gesamt zwölf. Geschlecht und Verpflegung zählen später für Unterbringung und Küche. Und für Rückfragen trägt die Gruppenführerin ihre Handynummer ein.", {
-          tts: "Die Stärke rechnet sie dabei selbst: eins, zwei, neun – Gesamt zwölf. Geschlecht und Verpflegung zählen später für Unterbringung und Küche. Und für Rückfragen trägt die Gruppenführerin ihre Handynummer ein.",
+        z("a10", "erzaehler", "Die Stärke rechnet sie dabei selbst: null, drei, neun – Gesamt zwölf. Geschlecht und Verpflegung zählen später für Unterbringung und Küche. Und für Rückfragen trägt die Gruppenführerin ihre Handynummer ein.", {
+          tts: "Die Stärke rechnet sie dabei selbst: null, drei, neun – Gesamt zwölf. Geschlecht und Verpflegung zählen später für Unterbringung und Küche. Und für Rückfragen trägt die Gruppenführerin ihre Handynummer ein.",
         }),
       ],
     },
@@ -286,7 +290,7 @@ export const APP = {
     },
     {
       id: "meldekopf",
-      bild: "Startseite → „Neue Einsatz-Sammlung…“ → „Hochwasser Hunte“ → Sammlung mit drei Einheiten; der Oldenburger Bogen kommt dazu; Summen springen hoch.",
+      bild: "Startseite → Einsatz-Sammlung „Hochwasser Hunte“ öffnen (drei Einheiten sind schon drin) → Oldenburger Bogen einlesen; Summen springen von 3 Einheiten/18 auf 4/30.",
       zeilen: [
         z("a17", "erzaehler", "Zurück am Meldekopf. Dort läuft dieselbe App – mit einer Einsatz-Sammlung: „Hochwasser Hunte“."),
         z("a18", "erzaehler", "Delmenhorst, Cloppenburg und Westerstede sind schon drin. Jetzt kommt der Oldenburger Bogen dazu – und die Stärke aller anwesenden Einheiten wird sofort neu gerechnet, der Sofortbedarf gleich mit."),

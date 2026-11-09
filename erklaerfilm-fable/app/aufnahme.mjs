@@ -275,13 +275,21 @@ const morgen = new Date(heute.getTime() + 86_400_000);
 const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
 const EPOCHE = Date.UTC(2020, 0, 1);
+/** EebZeitpunkt = Minuten seit 2020-01-01 in lokaler Wandzeit (Berlin), wie jetztZeitpunkt() im Format. */
+function wandzeitMinuten(ms) {
+  const lokal = new Date(ms).toLocaleString("sv-SE", { timeZone: "Europe/Berlin" }); // „2026-11-09 14:48:00“
+  const [d, t] = lokal.split(" ");
+  const [j, m, tag] = d.split("-").map(Number);
+  const [h, min] = t.split(":").map(Number);
+  return Math.round((Date.UTC(j, m - 1, tag, h, min) - EPOCHE) / 60_000);
+}
 const heuteEebTag = Math.round((Date.UTC(heute.getFullYear(), heute.getMonth(), heute.getDate()) - EPOCHE) / 86_400_000);
 
 /** Beispielbogen aus examples/ in eine Einheit der Lage „Hochwasser Hunte“ verwandeln. */
 async function fremderBogen(pfad, ov, kurz, regionalstelle, empfangenAm) {
   const b = JSON.parse(await readFile(WURZEL + "examples/" + pfad, "utf8"));
   b.uebung = false;
-  b.stand = Math.floor((empfangenAm - EPOCHE) / 60_000) - 25; // Stand vor dem Eintreffen (kein Uhr-Hinweis)
+  b.stand = wandzeitMinuten(empfangenAm) - 8; // Stand kurz vor dem Eintreffen (kein Uhr-Hinweis, nicht „veraltet“)
   b.einsatz.zeitraumVon = heuteEebTag;
   b.einsatz.zeitraumBis = heuteEebTag + 1;
   delete b.einsatz.zeitraumVonIso;
@@ -470,6 +478,13 @@ await rec.klick(kontaktKnopf, { halten: 0.5 });
 const telFeld = page.locator("main input[type=tel]").first();
 await rec.klickUndTippe(telFeld, EINHEIT.telefonGrFue, { proZeichen: 0.09 });
 await rec.halten(0.8);
+// Fahrerlaubnis bei den Kraftfahrern (Truppführer), damit die Übersicht keinen offenen Punkt meldet.
+for (const i of EINHEIT.kraftfahrer ?? [1, 3]) {
+  const sel = page.getByLabel("Fahrerlaubnis", { exact: true }).nth(i);
+  await rec.klick(sel, { halten: 0.15, ohneSfx: true });
+  await sel.selectOption({ label: "CE" });
+  await rec.halten(0.35);
+}
 await rec.warteBis(bis - 1.6);
 await blaettern();
 
@@ -491,6 +506,9 @@ for (const [i, kz] of EINHEIT.kennzeichen.entries()) {
   await rec.klickUndTippe(kennzeichenFelder.nth(i), kz, { proZeichen: 0.07 });
   await rec.halten(0.25);
 }
+// Sitzplätze des Mannschaftslastwagens eintragen (Richtwert 7 → tatsächlich 9), damit alle zwölf mitfahren.
+const sitzplaetze = page.getByLabel("Sitzplätze");
+await rec.klickUndTippe(sitzplaetze.nth(1), EINHEIT.sitzplaetzeMlw ?? "9", { proZeichen: 0.12 });
 await page.keyboard.press("Tab");
 await rec.halten(0.4);
 const hinweise = page.locator("main").getByText(/Sitzplätze:/).first();
@@ -605,7 +623,7 @@ await rec.halten(1.4);
 const aufgenommen = page.getByText(/Bogen aufgenommen/).first();
 if (await aufgenommen.count()) await rec.zeige(aufgenommen, 0.8);
 await rec.scrolleNach(0, 10);
-await rec.zeige(page.getByText("GESAMT", { exact: true }).first(), 1.2);
+await rec.zeige(page.getByText(/^Gesamt$/i).first(), 1.2);
 const neueEinheit = page.getByText(/THW Oldenburg \(NI\)/).first();
 if (await neueEinheit.count()) {
   await rec.scrolleZu(neueEinheit, 0.3, 16);
