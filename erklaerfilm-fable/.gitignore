@@ -1,0 +1,4 @@
+# Erzeugte Medien bleiben draußen – sie entstehen aus den Skripten.
+build/
+ton/
+_erkunden*.mjs
