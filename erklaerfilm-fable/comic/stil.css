@@ -1,0 +1,35 @@
+/* Comic-Blöcke des Erklärfilms – Bühne 1920×1080, alles aus seek(t) berechnet. */
+@font-face { font-family: "Bangers"; src: url("../schrift/bangers-latin-400-normal.woff2") format("woff2"), url("../schrift/bangers-latin-ext-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Patrick Hand"; src: url("../schrift/patrick-hand-latin-400-normal.woff2") format("woff2"), url("../schrift/patrick-hand-latin-ext-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Comic Neue"; font-weight: 400; src: url("../schrift/comic-neue-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Comic Neue"; font-weight: 700; src: url("../schrift/comic-neue-latin-700-normal.woff2") format("woff2"); }
+
+html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+#buehne { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #e6dfca; font-family: "Comic Neue", sans-serif; }
+#buehne * { box-sizing: border-box; }
+
+.lage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+
+/* Panel: dicker Rahmen, Inhalt beschnitten. Inhalt ist ein SVG in Panel-Koordinaten. */
+.panel { position: absolute; border: 8px solid #141414; background: #0b1230; overflow: hidden; box-shadow: 10px 12px 0 rgba(20, 20, 20, 0.25); }
+.panel > svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; }
+
+/* Caption (Erzähler): gelbe Box, Hand-Schrift */
+.caption { position: absolute; background: #ffe76a; border: 6px solid #141414; padding: 14px 24px; font-family: "Patrick Hand", cursive; font-size: 40px; line-height: 1.2; color: #141414; box-shadow: 8px 8px 0 rgba(20,20,20,0.35); }
+.caption.klein { font-size: 34px; }
+
+/* Sprechblase: SVG-Form (mit Schwanz) hinter einem Textblock */
+.blase { position: absolute; }
+.blase > svg { position: absolute; overflow: visible; }
+.blase > .text { position: absolute; font-family: "Patrick Hand", cursive; font-size: 38px; line-height: 1.18; color: #141414; text-align: center; }
+.blase.funk > .text { font-family: "Comic Neue", sans-serif; font-weight: 700; font-size: 32px; letter-spacing: 0.01em; }
+.blase.alt { opacity: 0.55; }
+
+/* Onomatopoesie */
+.laut { position: absolute; font-family: "Bangers", cursive; color: #ffe100; -webkit-text-stroke: 4px #141414; paint-order: stroke fill; text-shadow: 7px 7px 0 #141414; white-space: nowrap; letter-spacing: 0.03em; }
+
+/* Titel */
+.titel { position: absolute; left: 0; right: 0; text-align: center; font-family: "Bangers", cursive; color: #ffe100; -webkit-text-stroke: 5px #141414; paint-order: stroke fill; text-shadow: 10px 10px 0 #141414, 0 0 60px rgba(255, 225, 0, 0.35); letter-spacing: 0.04em; white-space: nowrap; }
+.untertitel { position: absolute; left: 0; right: 0; text-align: center; font-family: "Comic Neue", sans-serif; font-weight: 700; color: #f3f5f9; font-size: 44px; letter-spacing: 0.02em; text-shadow: 4px 4px 0 #141414; }
+
+#messen { position: absolute; left: -5000px; top: 0; visibility: hidden; }
