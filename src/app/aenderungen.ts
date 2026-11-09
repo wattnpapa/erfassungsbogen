@@ -40,7 +40,7 @@ export const AENDERUNGEN: readonly Aenderung[] = [
       "Ausgefüllte THW-Word-Erfassungsbögen (.docx aus den Vorlagen 06-…_Erfassungsbogen) lassen sich über „Aus Datei laden…“ und „Bögen einlesen…“ übernehmen. Was keinem Feld zuzuordnen ist (etwa Fax, Zahl der Vegetarier), steht unter „Sonstiges“; eine Quittung nennt, was übernommen und was weggelassen wurde.",
       "PDF im Raster der THW-Word-Vorlage: gleiche Rahmen, Linien, Spaltenkanten, Zeilenhöhen und Seitenränder, Schrift 10 pt. Fahrzeuge und Sofortbedarf schließen wie auf dem Papierbogen direkt aneinander an.",
       "Titelzeile im PDF wie in der Vorlage: links das Kurzzeichen der Einheit, in der Mitte der Titel auf der Kennfarbe, rechts beim THW das THW-Logo, bei allen anderen der Name der Organisation. THW-Bögen tragen das Blau der Vorlage.",
-      "Im PDF steht rechts in der Titelzeile jetzt auch beim ASB, bei der Bundeswehr, der DLRG, den Johannitern und den Maltesern das Logo der Organisation. DRK, Feuerwehr, Polizei und alle übrigen behalten ihren Namen als Text.",
+      "Im PDF steht rechts in der Titelzeile jetzt auch beim ASB, bei der Bundeswehr, der DLRG, beim DRK, den Johannitern und den Maltesern das Logo der Organisation. Feuerwehr, Polizei und alle übrigen behalten ihren Namen als Text.",
       "Ankreuzkästchen im PDF sind gezeichnete Quadrate wie in Word, angekreuzt mit einem X, statt „[X]“ als Text.",
       "Personen-, Fahrzeug- und Qualifikationstabellen bleiben so lang wie nötig; der Kopf der Personentabelle steht auf jeder Seite.",
       "Blanko-Vordruck: 25 Personalzeilen statt 29, damit er bei den höheren Zeilen der Vorlage auf zwei Seiten bleibt.",

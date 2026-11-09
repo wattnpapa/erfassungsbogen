@@ -1087,6 +1087,7 @@ describe("Titelbalken im Raster der THWin-Vorlage", () => {
     OrganisationsTyp.ASB,
     OrganisationsTyp.BUNDESWEHR,
     OrganisationsTyp.DLRG,
+    OrganisationsTyp.DRK,
     OrganisationsTyp.JUH,
     OrganisationsTyp.MHD,
   ])("Organisation %i mit bekanntem Logo: Logo als Vektor statt Name, Gliederung darunter", (org) => {
