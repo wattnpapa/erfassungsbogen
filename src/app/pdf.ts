@@ -31,6 +31,7 @@ import { standLiegtNachEintreffen } from "./stand-uhr";
 import { exportStaendeLaden, lageblattVermerken, weitergabeVermerken } from "./export-stand";
 import { abweichenderOrt } from "./einheiten-tabelle";
 import { meldungsNummern } from "./einheiten-tabelle";
+import { kaestchenZeichnen } from "./pdf-kaestchen";
 
 interface FontContainer {
   vfs: Record<string, string | { data: string; encoding?: string }>;
@@ -67,7 +68,7 @@ pdf.addFonts({
  * Probesatz misst den freien Platz (Audit Runde 3, R3-A6).
  */
 function einzelDokument(b: Erfassungsbogen, qr: Awaited<ReturnType<typeof qrErzeugen>>) {
-  return einzelPdfDokument(b, qr, (probe) => pdfMake.createPdf(probe).getBuffer());
+  return einzelPdfDokument(b, qr, (probe) => pdfMake.createPdf(kaestchenZeichnen(probe)).getBuffer());
 }
 
 /**
@@ -94,10 +95,10 @@ export async function pdfErzeugen(
   if (abgebrochen?.()) return { nichtDarstellbar, betroffen, umschrift, vereinfacht };
   if (istNativ()) {
     // In der App gibt es keinen Browser-Download: PDF übers Share-Sheet anbieten
-    const base64 = await pdfMake.createPdf(dd).getBase64();
+    const base64 = await pdfMake.createPdf(kaestchenZeichnen(dd)).getBase64();
     await binaerTeilen(dateiname, base64);
   } else {
-    pdfMake.createPdf(dd).download(dateiname);
+    pdfMake.createPdf(kaestchenZeichnen(dd)).download(dateiname);
   }
   return { nichtDarstellbar, betroffen, umschrift, vereinfacht };
 }
@@ -114,7 +115,7 @@ export async function pdfErzeugen(
 export async function pdfBlobUrl(b: Erfassungsbogen, herkunft?: Uint8Array | null): Promise<string> {
   const qr = await qrErzeugen(b, herkunft);
   const dd = await einzelDokument(b, qr);
-  return URL.createObjectURL(await pdfMake.createPdf(dd).getBlob());
+  return URL.createObjectURL(await pdfMake.createPdf(kaestchenZeichnen(dd)).getBlob());
 }
 
 /**
@@ -161,7 +162,7 @@ export async function meldungPdfAnzeigen(m: MeldeEintrag, fenster: Window | null
     return dateiname;
   }
   const qr = await qrErzeugen(m.bogen, herkunft);
-  await pdfMake.createPdf(await einzelDokument(m.bogen, qr)).open(fenster);
+  await pdfMake.createPdf(kaestchenZeichnen(await einzelDokument(m.bogen, qr))).open(fenster);
   tabNachErzeugung(fenster);
   return dateiname;
 }
@@ -271,11 +272,11 @@ function dateiRumpf(einsatz: Einsatzsammlung): string {
  */
 async function dokumentAusgeben(dd: Parameters<typeof pdfMake.createPdf>[0], dateiname: string): Promise<boolean> {
   if (istNativ()) {
-    const base64 = await pdfMake.createPdf(dd).getBase64();
+    const base64 = await pdfMake.createPdf(kaestchenZeichnen(dd)).getBase64();
     return binaerTeilen(dateiname, base64);
   }
   // Bis die Datei wirklich entstanden ist: Ohne `await` meldete die Sperre „fertig", Sekunden bevor der Download kam (R17-D4).
-  await pdfMake.createPdf(dd).download(dateiname);
+  await pdfMake.createPdf(kaestchenZeichnen(dd)).download(dateiname);
   return true;
 }
 
@@ -323,7 +324,7 @@ export async function einsatzPdfErzeugen(
     einsatzDateiInhalt(nachtrag && nachtragSeit != null ? { ...einsatz, nachtragSeit } : einsatz, exportStaendeLaden(einsatz.id), lageAngabenLaden(einsatz.id)),
     Date.now(),
     nachtrag ? nachtragSeit : undefined,
-    (probe) => pdfMake.createPdf(probe).getBuffer(),
+    (probe) => pdfMake.createPdf(kaestchenZeichnen(probe)).getBuffer(),
   );
   lueckenZeileSetzen("");
   await fortschrittMelden("Datei wird geschrieben …");
@@ -348,7 +349,7 @@ export async function einsatzLageblattErzeugen(einsatz: Einsatzsammlung): Promis
   // Zwei Sätze: der erste misst, wie viel Platz unter dem Inhalt bleibt, der
   // zweite füllt ihn mit Nachtragszeilen (Audit Runde 3, R3-A5).
   lueckenZeileSetzen(entfernteNummernText(einsatz.id)); // R19-A2
-  const dd = await einsatzLageblattSeiteFuellen(einsatz.name, eintraege, (probe) => pdfMake.createPdf(probe).getBuffer());
+  const dd = await einsatzLageblattSeiteFuellen(einsatz.name, eintraege, (probe) => pdfMake.createPdf(kaestchenZeichnen(probe)).getBuffer());
   lueckenZeileSetzen("");
   const ok = await dokumentAusgeben(dd, ausgabeDateiname("lageblatt", dateiRumpf(einsatz), "pdf"));
   // Merken, wann das Blatt entstand — die Einsatzansicht sagt dann „Lageblatt

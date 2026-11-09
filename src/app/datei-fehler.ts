@@ -19,6 +19,7 @@ import { bogenBefund } from "./bogen-pruefung";
 import { fehlerText, istNachladeFehler } from "./nachladen";
 import { SpeicherVollFehler, istSpeicherVoll } from "./eintrag-zeiten";
 import { leseausgabeMeldung } from "./pdf-titel";
+import { WordBogenFehler } from "./word-bogen-fehler";
 
 /** Über welchen Knopf die Datei kam — bestimmt, was „richtig" wäre und wohin eine falsche gehört. */
 export type DateiWeg =
@@ -210,6 +211,8 @@ export function allgemeineMeldung(name: string, weg: DateiWeg): string {
 export async function dateiFehlerMeldung(datei: File, fehler: unknown, weg: DateiWeg): Promise<string> {
   if (istNachladeFehler(fehler)) return fehlerText(fehler);
   if (fehler instanceof SpeicherVollFehler) return fehler.message;
+  // Word-Bogen (.docx): der Leser formuliert seine Sätze selbst, eine Binärdatei hat keinen Text zum Auswerten.
+  if (fehler instanceof WordBogenFehler) return fehler.message;
   if (istSpeicherVoll(fehler)) return new SpeicherVollFehler(fehler).message;
   const eigen = fehler instanceof Error ? fehler.message : "";
   if (/neueren App-Version|Lokaler Speicher ist nicht verfügbar/.test(eigen)) return eigen;

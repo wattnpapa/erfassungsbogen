@@ -21,11 +21,12 @@ export const BLANKO_DATEINAME = "einheiten-erfassungsbogen-blanko.pdf";
 
 /**
  * Zeilenzahl des Vordrucks. Die Fahrzeug- und Personalzeilen füllen zusammen
- * genau zwei Seiten; mehr Personalzeilen würden eine dritte, fast leere Seite
+ * genau zwei Seiten (seit dem Raster der THWin-Vorlage 25 statt 29 Personalzeilen,
+ * weil jede Zeile 19,85 pt hoch ist); mehr würden eine dritte, fast leere Seite
  * anfangen — ein Vordruck, den man in zweifacher Ausfertigung kopiert, soll
  * kein Papier verschwenden.
  */
-export const BLANKO_ZEILEN: BlankoZeilen = { fahrzeuge: 4, personal: 29, qualifikationen: 6 };
+export const BLANKO_ZEILEN: BlankoZeilen = { fahrzeuge: 4, personal: 25, qualifikationen: 6 };
 
 /**
  * Bogen ganz ohne Inhalt. `OrganisationsTyp.SONSTIGE` ist hier kein Notbehelf,

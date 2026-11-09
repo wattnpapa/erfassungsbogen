@@ -24,6 +24,7 @@ import {
 } from "@bos/eeb-format/model";
 import { einheitAnzeigename, neuePerson, neuerBogen, neuesFahrzeug, zeitgruppe, type QrSatz } from "./hilfen";
 import { EEB_JSON_DATEINAME, aenderungFuerPapier, bogenAlsEingebetteteDatei, einsatzLageblattDokument, einsatzPdfDokument, pdfDokument, stiftHinweis, STIFT_KAESTCHEN, codeKopfzeile, meldekopfVermerk, ohneVorbelegung, erreichbarkeitZeilen, nichtDarstellbareNamen, nichtDarstellbareBetroffene, ansprechpersonPapier, umschrift, umschriftBetroffene } from "./pdf-dokument";
+import { THW_LOGO_JPEG } from "./pdf-logo-thw";
 
 const QR_BILD = "data:image/png;base64,QRTESTBILD";
 const QR_URL = "https://erfassungsbogen.app/#TESTPAYLOAD";
@@ -749,10 +750,11 @@ describe("einsatzLageblattDokument()", () => {
 
   it("beschriftet die Stärke-Linien des Blanko-Vordrucks (R2-A6)", () => {
     const blanko = texte(pdfDokument(basisBogen(), null, { fahrzeuge: 1, personal: 1, qualifikationen: 1 }).content).join("\n");
-    expect(blanko).toContain("Stärke (F / UF / M // Ges.):");
+    // Seit dem Raster der THWin-Vorlage zweizeilig: „Stärke:“ und darunter klein die Legende.
+    expect(blanko).toContain("Stärke:\nF / UF / M // Ges.");
     // Seit R3-A6 auch auf dem ausgefüllten Bogen — gleiche Beschriftung wie der Vordruck.
     const voll = texte(pdfDokument(basisBogen(), QR).content).join("\n");
-    expect(voll).toContain("Stärke (F / UF / M // Ges.):");
+    expect(voll).toContain("Stärke:\nF / UF / M // Ges.");
   });
 
   it("Blanko-Vordruck trägt den Meldekopf-Kasten mit „ins Gerät übertragen“ und dem Kästchen „Übung“ (R4-A4)", () => {
@@ -833,12 +835,12 @@ describe("einsatzLageblattDokument()", () => {
     const t = texte(dd.content).join("\n");
     expect(t).toContain("Rolle\nF/UF/M");
     // Johannes Rudolph ist Führer, Anna Weber Mannschaft.
-    expect(t).toMatch(/\nF\ncenter\nRudolph, Johannes\n/);
-    expect(t).toMatch(/\nM\ncenter\nWeber, Anna\n/);
+    expect(t).toMatch(/\nF\nmiddle\ncenter\nRudolph, Johannes\n/);
+    expect(t).toMatch(/\nM\nmiddle\ncenter\nWeber, Anna\n/);
     // Ohne Messung keine freien Zeilen — die gibt es nur über einzelPdfDokument.
-    expect(JSON.stringify(dd.content)).not.toContain('"text":" ","margin":[0,5,0,5]');
+    expect(JSON.stringify(dd.content)).not.toContain('"text":" ","margin":[0,2,0,2]');
     const frei = pdfDokument(basisBogen(), QR, undefined, undefined, { freiePersonalZeilen: 2, freiesFahrzeug: true });
-    expect(JSON.stringify(frei.content).match(/"text":" ","margin":\[0,5,0,5\]/g)).toHaveLength(6);
+    expect(JSON.stringify(frei.content).match(/"text":" ","margin":\[0,2,0,2\]/g)).toHaveLength(6);
     expect(texte(frei.content)).toContain("Kennzeichen:");
   });
 
@@ -1058,5 +1060,32 @@ describe("ansprechpersonPapier() (R8-A3)", () => {
     b.personalErfassung = 1;
     b.personal = [{ ...neuePerson() }, { ...neuePerson() }];
     expect(JSON.stringify(pdfDokument(b, null).content)).toContain("Sollstärke der Vorbelegung");
+  });
+});
+
+describe("Titelbalken im Raster der THWin-Vorlage", () => {
+  it("THW-Bogen: Wortbildmarke rechts, Balken im Vorlagen-Blau #003399", () => {
+    const b = basisBogen();
+    b.uebung = false;
+    const t = JSON.stringify(pdfDokument(b, QR).content);
+    expect(t).toContain(THW_LOGO_JPEG);
+    expect(t).toContain('"fillColor":"#003399"');
+  });
+
+  it("andere Organisation: kein THW-Logo, stattdessen der Name der Organisation", () => {
+    const b = basisBogen();
+    b.einheit.organisation = OrganisationsTyp.FEUERWEHR;
+    b.einheit.organisationName = "Freiwillige Feuerwehr Musterstadt";
+    const t = JSON.stringify(pdfDokument(b, QR).content);
+    expect(t).not.toContain(THW_LOGO_JPEG);
+    expect(t).toContain('"text":"Feuerwehr"');
+    expect(t).toContain("Freiwillige Feuerwehr Musterstadt");
+  });
+
+  it("Vordruck: weder Logo noch Organisation, nur die Beschriftung zum Ausfüllen", () => {
+    const t = JSON.stringify(pdfDokument(basisBogen(), null, { fahrzeuge: 1, personal: 1, qualifikationen: 1 }).content);
+    expect(t).not.toContain(THW_LOGO_JPEG);
+    expect(t).toContain('"text":"Organisation:"');
+    expect(t).toContain('"text":"Einheit:"');
   });
 });

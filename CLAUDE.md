@@ -1,5 +1,28 @@
 # Hinweise für Claude Code
 
+## Änderungsverlauf („Was ist neu“) bei JEDER sichtbaren Änderung fortschreiben
+
+Der Changelog der App ist `src/app/aenderungen.ts` (in der App: Versionsnummer
+in der Fußzeile → „Was ist neu“). Er wird von Hand gepflegt und ist schon
+vergessen worden. Deshalb gilt ohne Ausnahme:
+
+- **Jeder Commit, der etwas ändert, das man in der App, auf dem Papier (PDF,
+  Blanko-Vordruck, Sammel-PDF, Lageblatt), in Exporten oder auf der Website
+  bemerkt, trägt im selben Commit einen Eintrag in `AENDERUNGEN` nach.** Nicht
+  „später“, nicht in einem eigenen Aufräum-Commit.
+- Ein Eintrag je Tag (`datum` als ISO-Datum, Tag des Commits), neueste oben.
+  Gibt es den Tag schon, den Punkt dort ergänzen. Ein Punkt = ein ganzer Satz
+  aus Nutzersicht, ohne Dateinamen, Ticketnummern oder Fachjargon der
+  Entwicklung.
+- Beginnt ein neuer Monat, braucht `MONATE` einen Satz für ihn (der Test in
+  `fusszeile.test.tsx` prüft das). Kommt in einem laufenden Monat etwas
+  Größeres dazu, den Monatssatz nachziehen.
+- Draußen bleiben reine Technik-Änderungen ohne sichtbare Wirkung:
+  Abhängigkeiten, Tests, Refactorings, Prüfberichte unter `docs/audits/`.
+- Vor dem Commit prüfen: `git diff --cached --stat` zeigt Änderungen unter
+  `src/`, `public/` oder `vendor/` mit sichtbarer Wirkung, aber nicht
+  `src/app/aenderungen.ts`? Dann fehlt der Eintrag.
+
 ## Begleitdokumente bei Änderungen mitziehen
 
 Neben `README.md`, `PRODUCT.md`, `DESIGN.md` und den Dateien unter `docs/` gibt

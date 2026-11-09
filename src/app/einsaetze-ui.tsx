@@ -263,6 +263,7 @@ import {
 const AUFTRAG_KARTE_MAX = 80;
 
 import { ART_LABEL } from "./einsaetze-konstanten";
+import { WORD_DATEI_ARTEN } from "./word-bogen-fehler";
 
 /** Überschrift über den nicht anwesenden Karten am Ende der Liste: „Abgerückt (2)" bzw. mit zusammengeführten Einheiten (R17-K4). */
 export function abgerueckteUeberschrift(liste: readonly Pick<MeldeEintrag, "status">[]): string {
@@ -957,7 +958,7 @@ function ordnerAuswahlMoeglich(): boolean {
 }
 
 /** Was der Einlese-Knopf im Dateifenster vorschlägt: fertige Bögen in jeder Form. */
-const EINLESE_ARTEN = ".json,application/json,.pdf,application/pdf,image/*";
+const EINLESE_ARTEN = `.json,application/json,.pdf,application/pdf,image/*,${WORD_DATEI_ARTEN}`;
 
 /**
  * Ein Knopf für alles, was fertig ausgefüllt hereinkommt: JSON, PDF, Fotos und
@@ -1033,7 +1034,7 @@ function BoegenEinlesenKnopf(props: {
         aria-haspopup={mitOrdner ? "menu" : undefined}
         aria-expanded={mitOrdner ? offen : undefined}
         aria-describedby="aufnahme-zusatz-einlesen"
-        title="Fertig ausgefüllte Bögen aufnehmen: JSON- oder PDF-Datei, Fotos oder Screenshots von QR-Codes — auch viele auf einmal und mehrteilige Bögen."
+        title="Fertig ausgefüllte Bögen aufnehmen: JSON- oder PDF-Datei, THW-Word-Bogen (.docx), Fotos oder Screenshots von QR-Codes — auch viele auf einmal und mehrteilige Bögen."
         onClick={() => (mitOrdner ? setOffen((o) => !o) : dateiFeld.current?.click())}
       >
         Bögen einlesen…

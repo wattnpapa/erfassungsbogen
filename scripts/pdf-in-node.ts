@@ -12,6 +12,7 @@
 
 import pdfMake from "pdfmake";
 import type { TDocumentDefinitions } from "pdfmake/interfaces";
+import { kaestchenZeichnen } from "../src/app/pdf-kaestchen";
 
 const SCHNITTE = {
   normal: "Helvetica",
@@ -37,7 +38,8 @@ function einrichten(): void {
 /** Setzt die DocDefinition und liefert die fertige PDF-Datei. */
 export async function pdfBytes(dd: TDocumentDefinitions): Promise<Buffer> {
   einrichten();
-  return (await pdfMake.createPdf(dd).getBuffer()) as Buffer;
+  // Wie in der App (pdf.ts): Kästchen erst beim Setzen zeichnen.
+  return (await pdfMake.createPdf(kaestchenZeichnen(dd)).getBuffer()) as Buffer;
 }
 
 /**
