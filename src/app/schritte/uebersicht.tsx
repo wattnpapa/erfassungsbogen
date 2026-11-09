@@ -282,7 +282,12 @@ export function Uebersicht(props: {
   // R14-H1: Auch ein empfangener, unveränderter Bogen einer fremden Einheit (Link ohne Sammlung auf diesem Gerät) gehört
   // in eine Sammlung — nicht in „Mängel beheben und weitergeben".
   const empfangenFremd = props.signatur != null && props.signatur.zustand !== "unsigniert";
-  const schnellAblegen = (nurStaerke || empfangenFremd) && !props.sammelAktion && !props.vorlageBearbeitung && props.onInEinsatzAufnehmen != null;
+  // Prüfrunde Beispielbögen (BB-W6): Ein weitergegebener ÜBUNGS-Bogen (etwa ein Beispiel,
+  // das der Ausbilder per Link verteilt) ist beim Teilnehmer der Bogen, den er am
+  // Meldekopf melden soll. Vorne steht deshalb „Bogen übergeben…", das Ablegen in
+  // eine Sammlung bleibt daneben.
+  const uebungEmpfangen = empfangenFremd && !nurStaerke && bogen.uebung === true;
+  const schnellAblegen = (nurStaerke || (empfangenFremd && !uebungEmpfangen)) && !props.sammelAktion && !props.vorlageBearbeitung && props.onInEinsatzAufnehmen != null;
   // Die Fortschrittsleiste führt Schritt 5 dann als „–" (entfällt); der Rückknopf nennt den Schritt davor (R15-N3).
   const schnellOhneBedarf = nurStaerke && props.fremdeErfassung === true;
   const mwd = unterbringungMWD(bogen);
@@ -592,6 +597,12 @@ export function Uebersicht(props: {
           </span>
         </div>
         {fehler && <p className="fehler">{fehler}</p>}
+        {uebungEmpfangen && !props.sammelAktion && !props.vorlageBearbeitung && (
+          <p className="hinweis uebung-empfangen-hinweis">
+            Empfangener Übungsbogen: Zum Melden am Meldekopf „Bogen übergeben…“ (QR-Code, PDF oder Link). Wer den
+            Meldekopf spielt, legt ihn in eine Sammlung der Art „Übung“.
+          </p>
+        )}
         {schnellAblegen && (
           <p className="hinweis schnell-hinweis">
             Meldung einer fremden Einheit: Sie gehört in eine Einsatz-Sammlung. „Bogen übergeben…“ gäbe sie mit dem Siegel

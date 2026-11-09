@@ -117,6 +117,10 @@ const UEBUNG_FARBE = "#b02a1e";
  * die Buchstabenkonturen als SVG-Grafik hinter dem Inhalt (siehe
  * uebung-wasserzeichen.ts) — nicht markierbar und nicht kopierbar.
  */
+// 8 % (Grauwert 241/255) ging beim Schwarzweiß-Kopieren unter (Prüfrunde
+// Beispielbögen, BB-A3); 14 % bleibt hinter dem Text lesbar.
+const UEBUNG_DECKKRAFT = 0.14;
+
 function uebungsWasserzeichen(): TDocumentDefinitions["background"] {
   // Pro Seite, weil die Sammel-PDF Quer- und Hochformat mischt.
   return (_seite, groesse) => {
@@ -151,7 +155,7 @@ function uebungsWasserzeichen(): TDocumentDefinitions["background"] {
       `scale(${rund(skala)})`,
     ].join(" ");
     return {
-      svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${rund(breite)}" height="${rund(hoehe)}" viewBox="0 0 ${rund(breite)} ${rund(hoehe)}"><g transform="${lage}" fill="${UEBUNG_FARBE}" fill-opacity="0.08"><path d="${UEBUNG_PFAD}"/></g></svg>`,
+      svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${rund(breite)}" height="${rund(hoehe)}" viewBox="0 0 ${rund(breite)} ${rund(hoehe)}"><g transform="${lage}" fill="${UEBUNG_FARBE}" fill-opacity="${UEBUNG_DECKKRAFT}"><path d="${UEBUNG_PFAD}"/></g></svg>`,
       width: breite,
     };
   };
@@ -3446,7 +3450,9 @@ export function pdfDokument(
     footer: (seite, gesamt) => ({
       columns: [
         {
-          text: blanko ? "Stand:" : `Stand: ${zeitgruppe(b.stand)}`,
+          // „ÜBUNG" auf jeder Seite (BB-A3): Die Störer-Zeile steht nur auf Seite 1,
+          // lose Folgeblätter einer Kopie trugen sonst keine Kennzeichnung.
+          text: `${!blanko && b.uebung ? "ÜBUNG · " : ""}${blanko ? "Stand:" : `Stand: ${zeitgruppe(b.stand)}`}`,
           margin: [40, 0, 0, 0],
         },
         {

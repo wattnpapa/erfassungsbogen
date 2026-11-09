@@ -3335,6 +3335,15 @@
       flex: 0 0 auto; margin-left: auto; white-space: nowrap; font-family: var(--schrift-daten); font-size: var(--t-s); font-weight: 400;
       color: var(--text-2); font-variant-numeric: tabular-nums;
     }
+    /* Quittung nach „PDF" (BB-H9, BB-A6) und Ladefehler über der Liste (BB-E5). */
+    .beispiel-quittung { color: var(--gut); font-weight: 600; margin: 0 0 var(--r-3); }
+    .beispiel-ladefehler { margin: 0 0 var(--r-3); }
+    /* Der Beispielbögen-Dialog hat eine feste Höhe: Vorher sprangen Kopfzeile und
+       „Schließen" bei jedem Ordnerwechsel um 45 bis 110 px (BB-S7, BB-M6). Titel und
+       „Schließen" bleiben in einer Zeile, auch im Modus „Feld" bei 360 px (BB-H11). */
+    dialog.beispiele-dialog[open] { height: calc(100dvh - min(2rem, 32px)); }
+    dialog.beispiele-dialog > .kopfzeile { flex-wrap: nowrap; align-items: center; }
+    dialog.beispiele-dialog > .kopfzeile > h2 { flex: 1 1 auto; min-width: 0; }
     /* Sammelweg: alle Bögen des Ordners in eine Übungs-Sammlung (BB-K1). */
     .beispiel-sammelweg { display: flex; flex-wrap: wrap; align-items: center; gap: var(--r-2) var(--r-3); margin: 0 0 var(--r-3); }
     .beispiel-sammelweg .hinweis { flex: 1 1 18rem; margin: 0; font-size: var(--t-s); }

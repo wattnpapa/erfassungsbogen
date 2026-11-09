@@ -280,7 +280,7 @@ export function PapierAbgleich(props: {
               Vom Papier eingelesen, Lage noch nicht abgeglichen: {offen.length === 1 ? "1 Einheit" : `${offen.length} Einheiten`}.
             </strong>{" "}
             Die Eintreffzeit ist die Zeit des Einlesens und gilt als nicht bestätigt, alle stehen als anwesend, ohne Zug, Auftrag und Nummer. Die Angaben vom
-            Blatt (Seite 1 bzw. Kasten „Stand am Meldekopf“) hier in einem Schritt eintragen.
+            Blatt (Kopfzeile „Meldekopf“ auf Seite 1 des Bogens bzw. Kasten „Stand am Meldekopf“ der Sammel-PDF) hier in einem Schritt eintragen.
           </p>
         )}
         {entwurfAnzahl > 0 && (
@@ -303,7 +303,7 @@ export function PapierAbgleich(props: {
     <section className="karte papier-abgleich" aria-label="Lage vom Papier abgleichen" ref={karte}>
       <h3>Lage vom Papier abgleichen ({zeilen.length})</h3>
       <p className="hinweis">
-        Je Einheit, was auf dem Blatt steht — auch „Nr.“ und „Auftrag / Notiz“ aus dem Kasten „Stand am Meldekopf“.
+        Je Einheit, was auf dem Blatt steht — „Nr.“ aus der Kopfzeile „Meldekopf“ des Bogens, „Auftrag / Notiz“ aus dem Kasten „Stand am Meldekopf“ der Sammel-PDF.
         „Abgleich übernehmen“ schreibt alles auf einmal.
       </p>
       <datalist id={listeId}>

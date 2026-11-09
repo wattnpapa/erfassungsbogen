@@ -1092,7 +1092,7 @@ flowchart TB
   app --> export["bogen-csv.ts, einsatz-csv.ts,<br/>csv.ts"]
   app --> persist["entwurf.ts, speicher-browser.ts,<br/>sicherung.ts, absenderkarte.ts"]
   app --> nativ["nativ.ts, hilfen.ts, geraete-schluessel.ts"]
-  app --> anzeige["anzeige-modus.ts, org-farben.ts,<br/>fusszeile.tsx, kopfnav-ui.tsx"]
+  app --> anzeige["anzeige-modus.ts, org-farben.ts,<br/>fusszeile.tsx (lädt beispiele-dialog.tsx), kopfnav-ui.tsx"]
   app --> aktual["aktualisierung.tsx<br/>SW-/Electron-Update-Hinweise"]
   schritte --> bausteine["schritte/bausteine.tsx<br/>gemeinsame Feld-/Auswahl-Bausteine"]
   einsaetze --> auswertung["auswertung.ts<br/>Summen, Zwischensummen je Zug"]
@@ -1468,6 +1468,10 @@ Beispielbögen der THW-Ortsverbände"). Ihre Adressliste steht nicht im Glob der
 Baustein `src/app/beispiele-thw-ov.ts` (rund 0,74 MB, gezippt 84 KB), den der Beispielbögen-Dialog beim
 Öffnen nachlädt; Startbündel unverändert, JS-Gesamtumfang 6,45 MB (`scripts/bundle-budget.json` angehoben).
 Kein neuer Host zur Laufzeit; thw.blafusel.de ruft nur das Generatorskript mit `--abrufen` auf.
+*Nachgezogen 2026-11-09:* Der Beispielbögen-Dialog samt Glob der übrigen Beispiel-Dateien, Suche und
+Ordnernavigation liegt in eigenem Baustein `src/app/beispiele-dialog.tsx`, den `fusszeile.tsx` beim ersten
+Öffnen per `lazy()` lädt (vorher Teil des Startbündels, das nach den Prüfrunden-Korrekturen über dem Budget lag).
+Beispiele werden beim Weitergeben auf heute gestellt (`src/app/beispiel-heute.ts`).
 *Nachgezogen 2026-10-06 (Audit Runde 4, R4-O1):* Bricht das Erstladen im
 Funkloch ab, scheitert der Service Worker an der Installation, und der Browser
 verwirft die Registrierung; ein späteres `update()` ginge ins Leere und die

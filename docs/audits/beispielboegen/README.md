@@ -110,4 +110,32 @@ Behoben am 09.11.2026, Nr. 7 bis 12:
     neue Sammlung aus einem Übungsbogen mit Art „Übung" vorbelegt; die Namensprüfung beim Abwählen von
     „Übung" gilt auch nach Zurückholen, Musterung und „Vorlage bearbeiten".
 
-Tests für 7, 10 und die Rückkehr in den Ordner. Offen: Nr. 13 bis 21.
+Tests für 7, 10 und die Rückkehr in den Ordner.
+
+Bearbeitet am 09.11.2026, Nr. 13 bis 21:
+
+13. Schon mit Nr. 2 behoben (eigener Cache `eeb-ov-beispiele`).
+14. Das Zeichen in der Tabelle trägt `einheit-avatar`; Dunkel und Nacht geben ihm die helle Unterlage und Dämpfung.
+15. Ein empfangener Übungsbogen (Link) zeigt „Bogen übergeben…" vorn und einen Hinweis für Teilnehmer und
+    Meldekopf statt „Meldung einer fremden Einheit"; „In Einsatz-Sammlung ablegen…" bleibt daneben.
+16. Beim Anzeigen, als PDF, als Link und im Sammelweg rückt ein vergangener Einsatzzeitraum mit gleicher Dauer
+    auf heute, der Stand auf jetzt (`src/app/beispiel-heute.ts`, mit Test). Warnungen aus den Daten selbst
+    („Geschlecht nur vorbelegt", „mehr Führer als Mannschaft") bleiben offen.
+17. Ländernamen unter „Katastrophenschutz" ausgeschrieben, Ersatzwert ohne Versalien; keine Doppelwörter
+    bei der obersten Ebene; Hinweis auf lose Bögen neben Unterordnern; „Noch ohne Beispielbögen: …" nennt
+    fehlende Länder. Offen: uneinheitlicher Aufbau der Herkunft in einzelnen Ordnern (Hessen).
+18. Nur teilweise: Das Abgleich-Formular nennt jetzt die Kopfzeile „Meldekopf" des Bogens und den Kasten
+    „Stand am Meldekopf" der Sammel-PDF getrennt. Der Kasten des Blanko-Vordrucks passt nicht in die
+    Kopfzeile des Einzelbogens (gemessen 478 bis 632 pt bei 459 pt Platz); ein Kasten im Seiteninhalt
+    kann einseitige Bögen auf zwei Seiten treiben und ist ohne Seitenmessung nicht umgesetzt.
+19. Ladefehler steht über der Liste statt am Ende, verschwindet beim Ordnerwechsel, „Erneut laden" und
+    Nachladen bei Netzrückkehr.
+20. Quittung nach „PDF"; Dateiname `uebung-beispiel-<ordner>-<datei>.pdf`; Wasserzeichen 14 % statt 8 %;
+    „ÜBUNG ·" in der Fußzeile jeder Seite. Offen: Leerzeile für Nachträge auf vollen einseitigen Bögen
+    (bewusst nur, wo sie keine Seite kostet, R3-A6).
+21. Feste Dialoghöhe (Kopfzeile springt nicht), Titel und „Schließen" in einer Zeile, Doppeltipp-Sperre
+    400 ms im Register. Bewusst nicht geändert: Lage des Abschnitts unter „So funktioniert's" und der
+    Primärknopf „Beispielbögen ansehen" (beides ausdrücklicher Wunsch, BB-N7, BB-M7).
+
+Außerdem: Der Dialog liegt jetzt in eigenem Baustein `src/app/beispiele-dialog.tsx` und lädt erst beim
+ersten Öffnen; das Startbündel war mit den Korrekturen über dem Budget (754 562 > 753 492 Byte).
