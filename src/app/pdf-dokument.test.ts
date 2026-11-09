@@ -1073,18 +1073,19 @@ describe("Titelbalken im Raster der THWin-Vorlage", () => {
     expect(t).toContain('"fillColor":"#003399"');
   });
 
-  it("andere Organisation: kein THW-Logo, stattdessen der Name der Organisation", () => {
+  it("Organisation ohne Logo: kein THW-Logo, stattdessen der Name der Organisation", () => {
     const b = basisBogen();
-    b.einheit.organisation = OrganisationsTyp.FEUERWEHR;
-    b.einheit.organisationName = "Freiwillige Feuerwehr Musterstadt";
+    b.einheit.organisation = OrganisationsTyp.POLIZEI;
+    b.einheit.organisationName = "Polizeidirektion Musterstadt";
     const t = JSON.stringify(pdfDokument(b, QR).content);
     expect(t).not.toContain(THW_LOGO_JPEG);
-    expect(t).toContain('"text":"Feuerwehr"');
-    expect(t).toContain("Freiwillige Feuerwehr Musterstadt");
+    expect(t).toContain('"text":"Polizei"');
+    expect(t).toContain("Polizeidirektion Musterstadt");
   });
 
   it.each([
     OrganisationsTyp.ASB,
+    OrganisationsTyp.BUNDESPOLIZEI,
     OrganisationsTyp.BUNDESWEHR,
     OrganisationsTyp.DLRG,
     OrganisationsTyp.DRK,
