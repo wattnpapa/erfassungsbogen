@@ -38,7 +38,10 @@
 > mit 25 statt 29 Personalzeilen (zwei Seiten), Restseiten-Schwelle der Sammel-PDF 210
 > statt 160 pt (`RESTSEITE_MAX_PT`), kleine Bögen tragen den QR-Code häufiger auf
 > Seite 2. Daten, Transportformat, Speicher und Netz unverändert. Auswertung der
-> Word-Vorlagen als mögliche Importquelle: `docs/thw-word-vorlagen.md`.
+> Word-Vorlagen als mögliche Importquelle: `docs/thw-word-vorlagen.md`. Ankreuzkästchen
+> sind gezeichnete Quadrate wie in Word: Die Dokumentdefinition schreibt sie weiter als
+> „[X]“/„[  ]“, `kaestchenZeichnen` (`pdf-kaestchen.ts`) ersetzt sie unmittelbar vor jedem
+> `createPdf` (pdf.ts, `scripts/pdf-in-node.ts`) durch Canvas-Quadrate.
 >
 > **Nachgezogen 2026-11-08 (Rückmeldungen FAG THW und OV Chemnitz):** Kap. 5, 8.2, 12;
 > Transportformat und Schema unverändert, kein neuer Host, kein neuer Speicherschlüssel.

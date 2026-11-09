@@ -65,7 +65,8 @@ describe("Einzel-PDF: Kopfzeile jeder Seite (R5-A2, R5-A3)", () => {
     const seiten = await seitenTexte(dd);
     expect(seiten.length).toBeGreaterThan(2);
     expect(seiten[0]).toMatch(/Meldekopf:\s+Nr\. _+/);
-    expect(seiten[0]).toMatch(/übertragen \[ +\] von/);
+    // Das Kästchen ist gezeichnet (pdf-kaestchen.ts), im Text steht nur noch „übertragen von“.
+    expect(seiten[0]).toMatch(/übertragen +von/);
     seiten.slice(1).forEach((t, i) => {
       expect(t).toContain("Verstärkter Bergungszug");
       expect(t).toContain(`Blatt ${i + 2} von ${seiten.length} dieses Bogens`);
@@ -109,7 +110,7 @@ describe("Sammel-PDF: Kopfzeile je Bogenseite, Bedarf nicht allein (R5-A2, R5-A3
     expect(erste).toBeGreaterThan(0); // davor nur die Übersicht (quer)
     const bogenSeiten = seiten.slice(erste);
     for (const t of bogenSeiten) expect(t).toMatch(/Nr\. \d+ +· .*Blatt \d+ von \d+/);
-    expect(bogenSeiten.filter((t) => /Blatt 1 von \d+/.test(t) && /übertragen \[ +\]/.test(t)).length).toBe(6);
+    expect(bogenSeiten.filter((t) => /Blatt 1 von \d+/.test(t) && /übertragen +von/.test(t)).length).toBe(6);
     // Nach Nr. geordnet: Nr. 1 steht vor Nr. 6.
     const seite = (nr: number) => seiten.findIndex((t) => new RegExp(`Nr\\. ${nr} +· .*Blatt 1 von`).test(t));
     expect(seite(1)).toBeGreaterThan(0);

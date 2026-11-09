@@ -3062,7 +3062,8 @@ function blankoMeldekopf(z: BlankoZeilen): Content {
               // „abgerückt am … um …" neben „eingegangen": Rückt die Einheit ab, während das Gerät aus ist, steht die
               // Uhrzeit auf ihrem Blatt statt nur auf dem Meldeblock (R11-A2).
               {
-                text: `${kasten(false)} ÜBUNG (kein Einsatz)  ·  abgerückt am __________ um ____:____ Uhr  ·  ins Gerät übertragen ${kasten(false)} von ______ um ____:____ Uhr`,
+                // Zwei Zeilen: Mit gezeichneten Kästchen (pdf-kaestchen.ts) bricht eine Zeile nur am Ende sauber um.
+                text: `${kasten(false)} ÜBUNG (kein Einsatz)  ·  abgerückt am __________ um ____:____ Uhr\nins Gerät übertragen ${kasten(false)} von ______ um ____:____ Uhr`,
                 margin: [0, 5, 0, 0],
               },
               // Beiblatt (R5-A6): Der Vordruck fasst 4 Fahrzeuge und 6 Qualifikationen. Mehr gehört
