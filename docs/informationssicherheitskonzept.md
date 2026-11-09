@@ -1279,6 +1279,21 @@ ORP.1 Organisation, INF.1 Gebäude) sind nicht Gegenstand dieses Dokuments.
 > Swift-Paketauflösung wird von Dependabot mitgeprüft, ist aber nicht im
 > npm-Lockfile enthalten und muss beim Heben von `@capacitor/ios` mit
 > `npx cap update ios` nachgezogen werden.
+>
+> *Prüfvermerk (Stand 2026-11-09):* Dependabot-Alert #106 (deepmerge,
+> GHSA-gcqx-w48m-w2h4 / CVE-2026-93753, niedrig) erneut geprüft. Betroffen ist
+> deepmerge 4.2.0–4.3.1; 4.3.1 ist weiterhin die neueste Version, eine
+> korrigierte gibt es nicht. Einziger Pfad: vite-plugin-pwa 1.3.0 →
+> workbox-build 7.4.1 → @rollup/plugin-node-resolve 16.0.3 (jeweils neueste
+> Version, alle verlangen deepmerge ^4.2.2) → deepmerge 4.3.1. Das ist reines
+> Bauwerkzeug (`devDependencies`), `npm audit --omit=dev` ist leer, im
+> ausgelieferten Bundle steckt kein deepmerge. Der einzige Aufruf
+> (`deepMerge({}, defaults)` in @rollup/plugin-node-resolve) verschmilzt die
+> fest eingebauten Voreinstellungen des Plugins, also keine von außen
+> kommenden Objekte. Ein `overrides` auf eine Version vor 4.2.0 würde den
+> Prototyp-Schutz entfernen, der in 4.2.0 hinzukam, und scheidet aus;
+> `npm audit fix --force` (vite-plugin-pwa 0.2.1) ebenso. Der Alert wird als
+> tragbares Risiko geführt, bis upstream eine korrigierte Version erscheint.
 
 ## 7. Ergänzende Risikoanalyse (BSI-Standard 200-3, Auswahl)
 
