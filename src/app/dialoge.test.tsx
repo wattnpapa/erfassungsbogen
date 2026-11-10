@@ -243,7 +243,6 @@ describe("Aufbau der Rückfrage", () => {
   });
 });
 
-
 // Audit Runde 9: Fokus, Hinweis auf fehlende Felder, Ziffernblock.
 describe("Rückfragen und Eingaben (Runde 9)", () => {
   it("nennt, welches Pflichtfeld noch fehlt, und warum der Knopf ausgegraut ist (R9-E7)", async () => {

@@ -106,14 +106,6 @@ describe("nichts Unumbrechbares breiter als die Karte (R2-M1)", () => {
     expect(wert(".einheit-kopf.leitzeile .einheit-staerke strong", "white-space")).toBeUndefined();
   });
 
-  it.each([".zug-badge", ".teil-badge", ".neu-badge", ".alt-badge", ".bedarf-marke"])(
-    "Marke %s ist nicht mehr nowrap",
-    (marke) => {
-      expect(wert(marke, "white-space")).toBe("normal");
-      expect(wert(marke, "max-width")).toBe("100%");
-    },
-  );
-
   it("das Vorschlagsfeld in der Chip-Zeile nimmt die Kartenbreite an", () => {
     expect(wert(".autocomplete.im-fluss", "min-width")).toBe("0");
     expect(wert(".autocomplete.im-fluss", "max-width")).toBe("100%");
@@ -191,7 +183,6 @@ describe("Tippziele im Standard-Thema (R2-G3)", () => {
     expect(wert(".chip button", "min-height")).toBe("var(--ziel-basis)");
     expect(wert("ul.vorschlaege li", "min-height")).toBe(ZIEL);
     expect(wert("ul.vorschlaege li + li", "border-top")).toContain("solid");
-    expect(wert("table.einheiten-tabelle thead th > .spalten-sortierung", "min-width")).toBe(ZIEL);
   });
 
   it("Schrittleiste mindestens 44 px, ohne den Feld-Modus zu vergrößern", () => {
@@ -210,8 +201,6 @@ describe("Tippziele im Standard-Thema (R2-G3)", () => {
 
   it("„ändern“, „Lücken“ und Hinweis-Links: 44 px Trefferfläche, Zeilenhöhe per Gegenrand unverändert", () => {
     for (const selektor of [
-      ".zeiten-zeile button.link.zeit-aendern",
-      "button.link.luecken-marke",
       ".hinweis > button.link",
       ".fuss-marke > button.link",
     ]) {

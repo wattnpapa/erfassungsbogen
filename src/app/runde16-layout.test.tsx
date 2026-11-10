@@ -69,13 +69,6 @@ describe("Scanner ohne Kamera (R16-M3)", () => {
   });
 });
 
-describe("Fußleiste mit „In Einsatz übernehmen“ (R16-G1)", () => {
-  it("16 px Abstand vor „Weiter“; ab 320 px Leistenbreite steht das Wort wieder", () => {
-    expect(abschnitt).toMatch(/footer\.nav\.assistent-nav\.mit-uebernehmen > \.primaer\s*\{\s*margin-left:\s*8px/);
-    expect(abschnitt).toMatch(/@container assistent-nav \(min-width: 20rem\)\s*\{\s*footer\.nav\.assistent-nav\.mit-uebernehmen \.nav-weiter-wort\s*\{\s*display:\s*inline/);
-  });
-});
-
 describe("Offene Punkte der Übersicht (R16-G2)", () => {
   it("die Zeilen sind Knöpfe in einer Spaltenliste mit 8 px Lücke", () => {
     const punkte = [
@@ -90,8 +83,3 @@ describe("Offene Punkte der Übersicht (R16-G2)", () => {
   });
 });
 
-describe("Sprungverweise im Kasten „Neu seit der letzten Kenntnisnahme“ (R16-H1)", () => {
-  it("haben die Mindesthöhe der Nachbarn (44 px)", () => {
-    expect(abschnitt).toMatch(/\.stapel-eingang > button\.link\s*\{\s*min-height:\s*44px;\s*display:\s*inline-flex;\s*align-items:\s*center/);
-  });
-});

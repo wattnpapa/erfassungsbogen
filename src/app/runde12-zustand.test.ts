@@ -175,13 +175,6 @@ const css = (() => {
 })();
 
 describe("Stilregeln Runde 12 (Zustand)", () => {
-  it("R12-D2: Historie-Aktionen 44 px hoch mit Abstand, „Fassung verwerfen…“ abgesetzt in Alarmfarbe", () => {
-    expect(css).toMatch(/\.historie li button\.link\.historie-aktion\s*\{[^}]*min-height:\s*44px[^}]*margin:\s*4px 8px 4px 0/);
-    expect(css).toMatch(/\.historie-verwerfen\s*\{[^}]*color:\s*var\(--alarm\)/);
-  });
-  it("R12-O2: Erledigt, Rückgängig und Schließen am Widerspruch sind 44-px-Ziele", () => {
-    expect(css).toMatch(/button\.link\.widerspruch-aktion\s*\{[^}]*min-height:\s*44px/);
-  });
   it("R12-G1: das Rückgängig der Chip-Felder ist ein 44-px-Ziel in eigener Zeile", () => {
     expect(css).toMatch(/\.chips \.chip-rueckgaengig button\s*\{[^}]*min-height:\s*44px/);
   });

@@ -29,7 +29,6 @@ function bogenMitName(name: string): Erfassungsbogen {
   return b;
 }
 
-
 describe("R13-D2 Absenderkarte mit leeren Feldern übernehmen", () => {
   beforeEach(() => localStorage.clear());
 

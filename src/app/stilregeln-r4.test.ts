@@ -42,11 +42,6 @@ describe("Fußleiste des Assistenten: Raster mit festen Plätzen (R4-M2, R4-M3, 
     expect(bloecke("footer.nav.assistent-nav > .primaer").join("\n")).toMatch(/grid-area:\s*weiter/);
   });
 
-  it("hält die Erfassungsleiste auf zwei Zeilen: Abschluss oben, darunter dieselbe Ordnung", () => {
-    const b = bloecke("footer.nav.assistent-nav.mit-uebernehmen").join("\n");
-    expect(b).toMatch(/grid-template-areas:\s*"mitte mitte mitte mitte" "zurueck modus leer weiter"/);
-  });
-
   it("kürzt „Zurück“ per Container-Abfrage auf die Breite der Leiste, nicht per Media Query in rem", () => {
     // Media Queries rechnen rem mit der Browser-Grundschrift (16 px) und sehen
     // weder den Feld-Modus (112 %) noch 200 % Systemschrift.
@@ -67,8 +62,6 @@ describe("Fußleiste des Assistenten: Raster mit festen Plätzen (R4-M2, R4-M3, 
   });
 
   it("deckelt den Abschluss „In Einsatz übernehmen“ und die Reserve unter dem Inhalt", () => {
-    expect(css).toMatch(/footer\.nav\.mit-uebernehmen \.uebernehmen\s*\{[^}]*min-height:\s*min\([^;]*44px/);
-    expect(css).toMatch(/main\.mit-uebernehmen\s*\{\s*padding-bottom:\s*calc\(min\(10rem, 160px\)/);
     expect(bloecke("main").join("\n")).toMatch(/min\(6rem, 108px\)/);
   });
 
@@ -257,12 +250,6 @@ describe("Kleinere Sichtreste (R4-L4)", () => {
 
   it("der Handscanner-Rahmen trägt nachts --text-2 statt Weiß mit Deckkraft", () => {
     expect(bloecke(".nacht-modus .scanner-handscanner").join("\n")).toMatch(/border-color:\s*var\(--text-2\)/);
-  });
-
-  it("die Alarmmarke ist auf dunklem Grund gefüllt, die Warnmarken bleiben Umrisse", () => {
-    const b = bloecke(".dunkel-modus .signatur-marke, .nacht-modus .signatur-marke").join("\n");
-    expect(b).toMatch(/background:\s*var\(--alarm\)/);
-    expect(bloecke(".bedarf-marke").join("\n")).not.toMatch(/background:\s*var\(--alarm\)/);
   });
 
   it("„Nacht“ liegt im Umschalter nicht neben „Feld“", () => {

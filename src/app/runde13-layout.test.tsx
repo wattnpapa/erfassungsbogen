@@ -22,21 +22,11 @@ const abschnitt = (() => {
 })();
 
 describe("Stilregeln Runde 13", () => {
-  it("Kopfzellen ohne Sperrung, zweite Spalte mit Abstand zur klebenden Namensspalte (R13-M3)", () => {
-    expect(abschnitt).toMatch(/thead th > \.spalten-sortierung\s*\{\s*letter-spacing:\s*0/);
-    expect(abschnitt).toMatch(/:first-child \+ th > \.spalten-sortierung\s*\{\s*padding-inline-start:\s*6px/);
-  });
   it("Marke „offen“ in Nacht mindestens 12 px (R13-L1)", () => {
     const regeln = [...html.matchAll(/\.nacht-modus \.schritte button\.status-begonnen \.schritt-status\s*\{([^}]*)\}/g)].map((m) => m[1]!);
     const letzte = regeln[regeln.length - 1] ?? "";
     expect(letzte).toMatch(/font-size:\s*max\(0\.95em,\s*12px\)/);
     expect(letzte).not.toMatch(/0\.85em/);
-  });
-  it("Zug-Feld mit 8 px Abstand zu den Knöpfen (R13-G2)", () => {
-    expect(abschnitt).toMatch(/\.zug-bearbeiten:not\(\.zeit-bearbeiten\):not\(\.notiz-bearbeiten\)\s*\{[^}]*flex-wrap:\s*wrap;[^}]*gap:\s*8px/);
-  });
-  it("Kontakt-Verknüpfungen in „Details“ mit 4 px Rand je Seite, also 8 px Abstand (R13-G3)", () => {
-    expect(abschnitt).toMatch(/dl\.paare dd a\.kontakt-link\s*\{\s*margin-block:\s*4px/);
   });
 });
 

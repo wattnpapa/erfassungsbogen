@@ -77,9 +77,6 @@ function mitPersonen(b: Erfassungsbogen, n: number): void {
   b.personal = Array.from({ length: n }, (_, i) => ({ ...neuePerson(), nachname: `P${i}`, vorname: "X" }));
 }
 
-
-
-
 describe("R17-K8 / R17-W4 eine Zahl, ein Wort", () => {
 
   it("kürzt die Bemerkung an der Wortgrenze und setzt keine Klammer in die Klammer", () => {
@@ -228,19 +225,10 @@ describe("R17-K3 / K11 Lagemonitor", () => {
 });
 
 describe("R17-K12 / K10 Einsatzansicht am Telefon", () => {
-  it("die Erfassungsknöpfe folgen der Lage: erst Kennzahlen, Neues, Bedarf, dann die Knöpfe, dann die Liste (nur Darstellung)", () => {
-    expect(abschnitt).toMatch(/@media \(max-width: 30rem\) \{[\s\S]*main\.einsatz-detail \{ display: flex; flex-direction: column; \}/);
-    expect(abschnitt).toMatch(/\.einsatz-seite > \.aktionen \{ order: 1;/);
-    expect(abschnitt).toMatch(/main\.einsatz-detail > \.einsatz-liste, main\.einsatz-detail > \.einsatz-liste ~ \* \{ order: 2; \}/);
-  });
 
   it("die Kennzahlen stehen am Telefon in drei Spalten, „Gesamt“ als breite Zelle", () => {
     expect(abschnitt).toMatch(/@media \(16rem < width <= 30rem\) \{[\s\S]*repeat\(3, minmax\(0, 1fr\)\)/);
     expect(abschnitt).toMatch(/> div\.gesamt \{ grid-column: span 2; \}/);
   });
 
-  it("„Angaben vom Zettel (optional)“ trägt ein Aufklappzeichen", () => {
-    expect(abschnitt).toMatch(/details\.zettel-angaben > summary::before \{ content: "▸"/);
-    expect(abschnitt).toMatch(/details\.zettel-angaben\[open\] > summary::before \{ content: "▾"/);
-  });
 });

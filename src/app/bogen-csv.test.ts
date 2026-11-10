@@ -57,8 +57,6 @@ function bogen(name = "Oldenburg", over: Partial<Erfassungsbogen> = {}): Erfassu
   };
 }
 
-
-
 /** BOM abtrennen und in Zeilen zerlegen (CRLF). */
 function zeilen(csv: string): string[] {
   expect(csv.startsWith("﻿")).toBe(true);

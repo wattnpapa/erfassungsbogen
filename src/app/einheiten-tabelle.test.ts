@@ -67,7 +67,6 @@ function eintrag(id: string, b: Erfassungsbogen, over: Partial<MeldeEintrag> = {
   };
 }
 
-
 describe("meldungsNummern (Audit Runde 2, R2-A6)", () => {
   it("nummeriert Einheiten nach dem ersten Eingang; Folgemeldungen und korrigierte Eintreffzeit ändern nichts", () => {
     const a1 = eintrag("a1", bogen("Aalen", 1), { einheitSchluessel: "A", empfangenAm: 300 });

@@ -36,12 +36,6 @@ describe("Stilregeln Runde 14 (Layout)", () => {
     expect(abschnitt).toMatch(/\.fuss-gruppe \.anzeige-schalter\s*\{\s*gap:\s*8px;\s*border:\s*none/);
     expect(abschnitt).toMatch(/\.fuss-gruppe \.anzeige-schalter button\s*\{\s*border:\s*var\(--strich\) solid/);
   });
-  it("Aufnahmeknöpfe am niedrigen Telefon in zwei Reihen, Bedarfsmarke an der ersten Zeile (R14-K5)", () => {
-    expect(abschnitt).toMatch(/max-height:\s*720px\)/);
-    expect(abschnitt).toMatch(/\.aktionen\s*\{[^}]*grid-template-columns:\s*1fr 1fr/);
-    expect(abschnitt).toMatch(/\.aktionen > \.primaer\s*\{\s*grid-column:\s*1 \/ -1/);
-    expect(abschnitt).toMatch(/details\.bedarf-block > summary\s*\{\s*align-items:\s*flex-start/);
-  });
 });
 
 describe("Länderliste der Übersichtsseite (R14-H3)", () => {

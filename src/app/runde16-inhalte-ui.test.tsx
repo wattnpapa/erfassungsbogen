@@ -42,7 +42,6 @@ afterEach(() => {
   sessionStorage.clear();
 });
 
-
 describe("R16-L1 Beschriftung der Kennzahlen-Kacheln (Stilregel)", () => {
   // Gemessen im Produktionsbuild (Chromium, Touch, 390/360/320 px, Standard/Feld/Nacht): Text höchstens Zellbreite, mindestens 7 px Reserve.
   const html = readFileSync(`${process.cwd()}/index.html`, "utf8");

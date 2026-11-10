@@ -52,9 +52,6 @@ afterEach(() => {
   window.history.replaceState(null, "", window.location.pathname + window.location.search);
 });
 
-
-
-
 describe("Weiter im Assistenten im Takt von 0,6 s (R17-G11)", () => {
   beforeEach(() => {
     localStorage.clear();

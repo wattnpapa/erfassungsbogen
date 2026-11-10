@@ -29,9 +29,6 @@ afterEach(() => {
   delete (window as { matchMedia?: unknown }).matchMedia;
 });
 
-
-
-
 describe("R18-N11/N12 Übersicht im Assistenten", () => {
   it("nennt fehlende Angaben „nicht eingetragen“ und leere Namenszellen „(offen)“, mit Legende der Rollen", () => {
     const b = neuerBogen();
@@ -81,11 +78,4 @@ describe("R18: Stilregeln in index.html", () => {
     expect(abschnitt).toMatch(/footer\.nav\.assistent-nav > \.nav-zurueck:disabled \{ visibility: hidden; \}/);
   });
 
-  it("W7: Schrittleiste und Legende der Schnellerfassung sind am Telefon eingeklappt", () => {
-    expect(abschnitt).toMatch(/@media \(max-width: 30rem\)\s*\{[^}]*\.schritte\.schritte-schnell[^}]*display: none/);
-  });
-
-  it("A6/A7: die Textverweise des Abschluss-Blocks sind 44 px hoch", () => {
-    expect(abschnitt).toMatch(/\.einsatz-abschluss button\.link \{[^}]*min-height: 44px/);
-  });
 });

@@ -89,7 +89,6 @@ function bogen(personen = 2): Erfassungsbogen {
   };
 }
 
-
 describe("Sammel-PDF: QR-Seiten ohne Überlauf (R3-A3)", () => {
 
   it.each([2, 3, 7])("%i Teile im Einzel-PDF: ebenso", async (teile) => {

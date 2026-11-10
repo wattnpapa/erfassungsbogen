@@ -53,13 +53,6 @@ describe("Einsatzansicht (R8-K2, R8-K3, R8-M6, R8-M9, R8-N3)", () => {
     expect(css).toMatch(/table\.einheiten-tabelle tbody th\s*\{[^}]*overflow-wrap:\s*normal/);
     expect(css).toMatch(/@media \(max-width: 16rem\)\s*\{\s*table\.einheiten-tabelle > \* > tr > :first-child\s*\{\s*position:\s*static/);
   });
-  it("Bedarf-Zeile bei 180 px: Wert unter der Beschriftung", () => {
-    expect(css).toMatch(/details\.bedarf-block > summary > \.bedarf-werte\s*\{\s*flex:\s*1 1 100%/);
-  });
-  it("Einsatzname im Kopf bleibt bei großer Schrift 22 px, die Zeile darunter ist gedeckelt", () => {
-    expect(css).toMatch(/html\.schrift-gross \.seiten-kopf\.einsatz-kopf h1\s*\{\s*font-size:\s*min\(var\(--t-xl\), 22px\)/);
-    expect(css).toMatch(/html\.schrift-gross \.seiten-kopf\.einsatz-kopf p\.hinweis\s*\{\s*font-size:\s*min\(var\(--t-s\), 16px\)/);
-  });
 });
 
 describe("Kurz-Liste, Dialoge (R8-M5, R8-M7)", () => {

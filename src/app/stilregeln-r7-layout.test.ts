@@ -11,13 +11,6 @@ const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
 const css = html.replace(/\/\*[\s\S]*?\*\//g, "");
 const vite = readFileSync(new URL("../../vite.config.ts", import.meta.url), "utf8");
 
-describe("„Bedarf:“ bricht nicht im Wort (R7-M1, R7-G9)", () => {
-
-  it("bei großer Schrift ist die Zeile gedeckelt", () => {
-    expect(css).toMatch(/html\.schrift-gross details\.bedarf-block > summary\s*\{[^}]*font-size:\s*min\(var\(--t-s\), 16px\)/);
-  });
-});
-
 describe("Entwurfskarte bei großer Schrift (R7-H1, R7-S4, R7-H8)", () => {
   it("bricht mit der Klasse schrift-gross selbst um, nicht nur unter 30rem", () => {
     expect(css).toMatch(/html\.schrift-gross \.entwurf-karte\s*\{\s*flex-wrap:\s*wrap/);

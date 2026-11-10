@@ -39,9 +39,6 @@ afterEach(() => {
   delete (window as { matchMedia?: unknown }).matchMedia;
 });
 
-
-
-
 describe("Runde 20 (Layout): die Stilregeln sind da", () => {
   it("der Abschnitt ist da", () => {
     expect(abschnitt.length).toBeGreaterThan(3000);
@@ -54,58 +51,23 @@ describe("Runde 20 (Layout): die Stilregeln sind da", () => {
     expect(abschnitt).toMatch(/\.scanner-mitte\.scrollt \{[^}]*scrollbar-width: auto[^}]*linear-gradient\(#000 30%/);
   });
 
+  it("R20-S5: Tabelle am Telefon endet am Kartenrand", () => {
+    expect(abschnitt).toMatch(/\.karte > \.tabellen-scroll:has\(> table\.einheiten-tabelle\) \{ margin-inline: -8px; \}/);
+  });
   it("R20-G7, M3, S3, H7, M4: Kopf des Assistenten quer in einer Zeile mit der Schrittleiste, Einsatzansicht quer mit Raster", () => {
     expect(abschnitt).toMatch(/\.seiten-kopf\.assistent-kopf \.kopf-inhalt \{ flex-wrap: nowrap;/);
     expect(abschnitt).toMatch(/\.seiten-kopf\.assistent-kopf \.schritte \{ order: 2; flex: 0 0 auto;/);
-    expect(abschnitt).toMatch(/grid-template-areas: "zur titel ansicht" "info info aendern"/);
   });
 
   it("R20-H9, M5, L2: „Datensicherung“ und „Alle Daten löschen“ am kleinen Telefon: Entscheidung klebt, Kopf klebt nicht", () => {
     expect(abschnitt).toMatch(/@media \(max-width: 30rem\) and \(max-height: 40rem\) \{[\s\S]*dialog\.rollhinweis > \.kopfzeile:first-child \{ position: static;/);
     expect(abschnitt).toMatch(/dialog\.rollhinweis \.dialog-entscheidung \{ position: sticky; bottom: 0;/);
   });
-
-  it("R20-G1, M6, L1, O4, A4: „ganz zeigen“, „Warum?“ und „Hinweise“ sind Ziele von mindestens einer Fingerhöhe ohne Überlappung", () => {
-    expect(abschnitt).toMatch(/--ziel-karte: calc\(var\(--ziel-basis\) \+ var\(--ziel\)\)/);
-    expect(abschnitt).toMatch(/\.ort-warum > summary \{\s*display: inline-block;[^}]*min-height: var\(--ziel-karte, 44px\)[^}]*margin-bottom: 8px/);
-    expect(abschnitt).toMatch(/button\.link\.zeit-aendern \{\s*display: inline-block;[^}]*margin: 0 0 0 0\.25rem/);
-    expect(abschnitt).toMatch(/> button\.link\.luecken-marke \{\s*display: block; margin: 0;/);
-  });
-
-  it("R20-G2, M1: der Chip liegt über dem Aufklapp-Knopf der Karte", () => {
-    expect(abschnitt).toMatch(/button\.kompakt-merkmal\.marke-knopf \{ position: relative; z-index: 2;/);
-  });
-
-  it("R20-W6, H5, G6: am Telefon steht die Liste vor Bedarf und Zwischensummen, der Sprung zur Liste entfällt", () => {
-    expect(abschnitt).toMatch(/main\.einsatz-detail > \.einsatz-liste \{ order: 2; \}/);
-    expect(abschnitt).toMatch(/details\.bedarf-block, main\.einsatz-detail \.einsatz-seite > details\.zug-summen,\s*main\.einsatz-detail \.einsatz-seite > details\.uebung-ausgenommen \{ order: 3; \}/);
-    expect(abschnitt).toMatch(/p\.ausgabe-sprung:not\(\.ausgabe-sprung ~ \.ausgabe-sprung\) \{ display: none; \}/);
-  });
-
-  it("R20-H6: Sprungverweise und Tabellenknöpfe halten mindestens 8 px Abstand", () => {
-    for (const regel of [/main\.einsatz-detail p\.hinweis\.ausgabe-sprung \{ margin: (\d+)px 0 0; \}/, /p\.hinweis\.ausgabe-sprung > button\.link \{[^}]*margin: 0 (\d+)px (\d+)px 0;/]) {
-      const m = regel.exec(abschnitt);
-      expect(m, String(regel)).not.toBeNull();
-      for (const zahl of m!.slice(1)) expect(Number(zahl)).toBeGreaterThanOrEqual(8);
-    }
-    expect(abschnitt).toMatch(/p\.tabellen-spalten \{ margin-top: 10px; \}/);
-    expect(abschnitt).toMatch(/p\.hinweis\.luecken-zaehler \{ margin-block: 4px 10px; \}/);
-  });
-
-  it("R20-S5, N6, H11: Tabelle am Telefon endet am Kartenrand, Zellen mindestens 14 px, Köpfe in Fließschrift", () => {
-    expect(abschnitt).toMatch(/\.karte > \.tabellen-scroll:has\(> table\.einheiten-tabelle\) \{ margin-inline: -8px; \}/);
-    expect(abschnitt).toMatch(/tabelle-kern thead th \{ font-family: inherit; text-transform: none; letter-spacing: 0; font-size: 14px;/);
-    expect(abschnitt).toMatch(/tabelle-kern tbody td, :root:root table\.einheiten-tabelle\.tabelle-kern tbody th \{ font-size: 14px; vertical-align: top;/);
-  });
-
   it("R20-E2 / OV Chemnitz: Erreichbarkeit auf jeder Breite unter dem Namen, keine eigene Spalte", () => {
     expect(abschnitt).toMatch(/table\.uebersicht \.kontakt-unter \{ display: block;/);
     expect(abschnitt).not.toContain(".kontakt-unter { display: none; }");
   });
 
-  it("R20-H4, G4: „Ansicht“ steht im Kopf der Einsatzansicht", () => {
-    expect(abschnitt).toMatch(/\.seiten-kopf\.einsatz-kopf \.anzeige-mit-name \{ display: inline-flex; \}/);
-  });
 });
 
 describe("R20-L5: „Hinweise zum Handscanner“ aufgeklappt beginnt oben im Rollfenster", () => {

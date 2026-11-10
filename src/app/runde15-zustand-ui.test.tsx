@@ -29,10 +29,6 @@ afterEach(() => {
   sessionStorage.clear();
 });
 
-
-
-
-
 describe("R15-E5 THW-Kennzeichen: „Stimmt das?“ nach dem Verlassen des Felds", () => {
   it("fragt bei vier Ziffern, nicht bei fünf und nicht bei freiem Text", async () => {
     const nutzer = userEvent.setup();

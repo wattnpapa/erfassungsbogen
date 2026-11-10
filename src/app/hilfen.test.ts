@@ -95,7 +95,6 @@ function person(p: Partial<Person> = {}): Person {
   };
 }
 
-
 describe("plausibilitaet()", () => {
   function bogen(over: Partial<Erfassungsbogen> = {}): Erfassungsbogen {
     return { ...neuerBogen(), ...over };
@@ -1074,7 +1073,6 @@ describe("nurSollstaerke() bei der Schnellerfassung (R7-A1)", () => {
     expect(nurSollstaerke(b)).toBe(false);
   });
 });
-
 
 // Audit Runde 9, R9-H2: Die Vorbelegung nach Einheitstyp zählt in der Schnellerfassung nicht und erzeugt keine Hinweise.
 describe("plausibilitaet() — Schnellerfassung mit Vorbelegung (R9-H2)", () => {

@@ -26,8 +26,6 @@ const abschnitt = (() => {
   return html.slice(von, bis).replace(/\/\*[\s\S]*?\*\//g, "");
 })();
 
-
-
 function alsTelefon() {
   const vorher = window.matchMedia;
   window.matchMedia = ((abfrage: string) => ({
@@ -41,19 +39,6 @@ function alsTelefon() {
     else delete (window as { matchMedia?: unknown }).matchMedia;
   };
 }
-
-describe("R15-M1 aufgeklappte Karte am Telefon", () => {
-  let zurueck: () => void;
-  beforeEach(() => {
-    zurueck = alsTelefon();
-  });
-  afterEach(() => zurueck());
-
-  it("Stilregel: Rahmen in der Kennfarbe, linker Rand schon offen 3 px (kein Springen beim Abrücken)", () => {
-    expect(abschnitt).toMatch(/\.einheit-zeile\.karte-offen:not\(\.kompakt\)\s*\{[^}]*border:\s*var\(--strich\) solid var\(--akzent\);\s*border-left:\s*3px solid var\(--akzent\)/);
-    expect(abschnitt).toMatch(/\.einheit-zeile\.gestrichen\.karte-offen:not\(\.kompakt\)\s*\{\s*border-left:\s*3px dashed/);
-  });
-});
 
 describe("R15-G1 Doppeltipp nach „Zur Kenntnis genommen“", () => {
 
@@ -107,10 +92,5 @@ describe("Stilregeln Runde 15 (Layout)", () => {
   it("Ansichtswahl als Überlagerung: Kopf behält seine Höhe, Kacheln in Kopffarbe (R15-M3)", () => {
     expect(abschnitt).toMatch(/\.anzeige-schalter\.klappbar\.offen\s*\{[^}]*position:\s*absolute;[^}]*z-index:\s*30/);
     expect(abschnitt).toMatch(/\.anzeige-schalter\.klappbar\.offen > button:not\(\.anzeige-klappe\)\s*\{[^}]*background:\s*var\(--wahl-fond\)/);
-  });
-  it("Fußleiste mit „In Einsatz übernehmen“ am niedrigen Telefon einzeilig (R15-M2)", () => {
-    expect(abschnitt).toMatch(/min-width:\s*20rem\) and \(max-width:\s*35\.99rem\) and \(max-height:\s*43\.75rem\)/);
-    expect(abschnitt).toMatch(/footer\.nav\.assistent-nav\.mit-uebernehmen\s*\{\s*grid-template-areas:\s*"zurueck modus mitte weiter"/);
-    expect(abschnitt).toMatch(/\.nav-weiter-wort\s*\{\s*display:\s*none/);
   });
 });

@@ -10,9 +10,6 @@ import userEvent from "@testing-library/user-event";
 import { AUFRAEUM_FRIST_MS, EinsatzArt, einsaetzeZuJson } from "@bos/meldekopf/einsaetze";
 import { aufgeraeumteLaden, aufraeumBeobachter, ruhendeVormerken } from "./aufraeum-hinweis";
 
-
-
-
 describe("Nachricht nach automatischer Löschung (R2-D5)", () => {
   beforeEach(() => {
     localStorage.clear();

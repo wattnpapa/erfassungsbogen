@@ -13,13 +13,8 @@ describe("Runde 19 (Speicher), Layout", () => {
     expect(abschnitt.length).toBeGreaterThan(500);
   });
 
-  it("R19-O7: In der Schnellerfassung steht der Zettel-Kasten hinter dem Schritt", () => {
-    expect(abschnitt).toMatch(/\.schritt-inhalt:has\(> \.nacherfassung-zeit\) \{ display: flex; flex-direction: column; \}/);
-    expect(abschnitt).toMatch(/> \.nacherfassung-zeit \{ order: 2; \}/);
-  });
-
   it("R19-O8: Karten | Tabelle und die Fußzeilenlisten halten mindestens 8 px Abstand", () => {
-    for (const regel of [/\.ansicht-umschalter \{ gap: (\d+)px !important; \}/, /\.fuss-gruppe \{ gap: (\d+)px; \}/, /\.fuss-schmal nav \{ row-gap: (\d+)px; \}/, /footer\.seite \.fuss-werkzeuge \{ row-gap: (\d+)px; \}/]) {
+    for (const regel of [/\.fuss-gruppe \{ gap: (\d+)px; \}/, /\.fuss-schmal nav \{ row-gap: (\d+)px; \}/, /footer\.seite \.fuss-werkzeuge \{ row-gap: (\d+)px; \}/]) {
       const m = regel.exec(abschnitt);
       expect(m, String(regel)).not.toBeNull();
       expect(Number(m![1])).toBeGreaterThanOrEqual(8);
@@ -27,7 +22,6 @@ describe("Runde 19 (Speicher), Layout", () => {
   });
 
   it("R19-O9/O10: Karte und Rückfrage „Stärke ändern“ sind für 320-px-Telefone gekürzt", () => {
-    expect(abschnitt).toContain(".einheit-zeile.karte-offen .neu-badge .neu-kurz { display: inline; }");
     expect(abschnitt).toContain('dialog.abfrage .abfrage-rumpf:has(input[inputmode="numeric"]) { display: grid; grid-template-columns: repeat(3');
     expect(abschnitt).toMatch(/@media \(max-width: 22\.5rem\)/);
   });

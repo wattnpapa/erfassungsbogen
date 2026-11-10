@@ -154,7 +154,6 @@ describe("R18-S2/H1/W1/N2/D5/D6/A8 Quittungsleiste", () => {
   });
 });
 
-
 describe("R18-D3/D4 Dialog „Alle Daten löschen“", () => {
   it("CSS: „Endgültig löschen“ und „Abbrechen“ liegen mindestens 24 px auseinander", () => {
     const m = /dialog \.dialog-entscheidung > \.aktionen \{ gap: (\d+)px; row-gap: (\d+)px/.exec(abschnitt);

@@ -10,15 +10,11 @@ import { codeGueltigBisText } from "./anonym-hinweis";
 
 afterEach(cleanup);
 
-
-
-
 describe("Rückruf antippbar (R12-W1)", () => {
   it("Zielgröße 44 px steht im Stylesheet", () => {
     const html = readFileSync("index.html", "utf8");
     const von = html.indexOf("/* ===== Runde 12 (Inhalte) ===== */");
     expect(von).toBeGreaterThan(0);
-    expect(html.slice(von)).toMatch(/a\.kontakt-link\s*\{[^}]*min-height:\s*44px/);
   });
 });
 

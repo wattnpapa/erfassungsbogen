@@ -22,7 +22,6 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-
 function bogenMitOrt(ort: string, org: OrganisationsTyp = OrganisationsTyp.THW, aendern?: (b: Erfassungsbogen) => void): Erfassungsbogen {
   const b = neuerBogen();
   b.einheit.organisation = org;

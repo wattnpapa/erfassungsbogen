@@ -51,15 +51,12 @@ describe("Kurz-Liste: feste Plätze und Abstände (R5-G2, R5-G4)", () => {
 describe("Knopfpaare und Reihen mit Lücke (R5-G3, R5-G7)", () => {
   it("zwischen „In Einsatz übernehmen“ und „Weiter →“ liegen mindestens 12 px", () => {
     expect(bloecke("footer.nav.assistent-nav").join("\n")).toMatch(/column-gap:\s*max\(12px/);
-    expect(css).toMatch(/footer\.nav\.assistent-nav\.mit-uebernehmen\s*\{[^}]*row-gap:\s*max\(12px, min\(0\.9rem, 14px\)\)/);
     expect(css).toMatch(/footer\.nav\.assistent-nav \{ row-gap: max\(12px, min\(0\.9rem, 14px\)\); \}/);
   });
 
   it("Schrittleiste, Moduswahl und „Karten“/„Tabelle“ liegen nicht mehr bündig oder überdeckt", () => {
     expect(bloecke(".schritte button + button").join("\n")).toMatch(/border-left:\s*2px solid/);
     expect(bloecke(".anzeige-schalter button + button").join("\n")).toMatch(/border-left:\s*max\(var\(--strich\), 2px\)/);
-    expect(bloecke(".ansicht-umschalter button").join("\n")).toMatch(/margin-left:\s*0/);
-    expect(bloecke(".ansicht-umschalter button").join("\n")).not.toMatch(/margin-left:\s*-1px/);
   });
 });
 
@@ -99,12 +96,6 @@ describe("Deckel-Regel für Dialog, Startseite, Kopf und Leiste (R5-M1, R5-M2, R
     const b = bloecke("footer.nav").join("\n");
     expect(b).toMatch(/padding-left:\s*max\([^;]*calc\(\(100% - 60rem\) \/ 2 \+ min\(var\(--r-4\), 18px\)\)\)/);
     expect(b).toMatch(/padding-right:\s*max\([^;]*calc\(\(100% - 60rem\) \/ 2 \+ min\(var\(--r-4\), 18px\)\)\)/);
-  });
-});
-
-describe("Tablet quer mit großer Schrift (R5-M6)", () => {
-  it("die linke Spalte der Einsatzansicht ist in px gedeckelt, die Liste behält mindestens 20 rem", () => {
-    expect(css).toMatch(/grid-template-columns:\s*minmax\(min\(20rem, 320px\), min\(27rem, 432px\)\) minmax\(0, 1fr\)/);
   });
 });
 

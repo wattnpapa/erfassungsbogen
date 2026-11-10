@@ -22,7 +22,6 @@ function eintrag(id: string, name: string, empfangenAm: number): MeldeEintrag {
   return { id, einheitSchluessel: einheitSchluessel(b.einheit), empfangenAm, quelle: "scan", status: MeldeStatus.ANWESEND, bogen: b };
 }
 
-
 /** Der Logik-Lauf hat kein DOM — ein Speicher im Arbeitsspeicher reicht (wie in absenderkarte.test.ts). */
 class MemStorage {
   private m = new Map<string, string>();

@@ -12,6 +12,15 @@
 > umsetzen: SBOM, CSP ohne unsafe-inline, Entpack-Grenze") betrifft die Kapitel
 > 2.1, 8.3, 8.6, 8.7 und 11.2 — dort jeweils vermerkt.
 >
+> **Nachgezogen 2026-11-10 (Stilregeln der Sammlung entfernt):** Kap. 8. Nach dem Auszug der Einsatz-Sammlung trug das
+> Stylesheet in `index.html` noch rund 570 Regeln der Einsatzansicht, Einheitentabelle, Schnellerfassung, des Lagemonitors
+> und des Fußes „In Einsatz übernehmen". Entfernt ist jede Regel, deren Selektor eine Klasse verlangt, die im Code nicht mehr
+> vorkommt (Klassen in `:not()`/`:is()`/`:where()` zählen nicht als Bedingung; dynamisch gebildete `rolle-…`, `status-…`,
+> `platform-…` und `…-modus` geschützt), in Selektorlisten nur der tote Teil. Abschnittsüberschriften der Prüfrunden bleiben.
+> `index.html` sinkt von 518 auf 425 KB. Bildvergleich vorher/nachher (Startseite, Assistent, Übersicht, Übergabe; Telefon
+> und Rechner, hell und dunkel): pixelgleich bis auf den QR-Code mit seinem Zeitstempel. Rundentests, die nur tote Regeln
+> prüften, sind entfernt oder ausgedünnt.
+>
 > **Nachgezogen 2026-11-10 (Rückweg „An Meldekopf-App geben"):** Kap. 5, 6.3, 8. Im Übergabe-Dialog öffnet
 > `meldekopfLink()` (`src/app/meldekopf-app.ts`) die Meldekopf-App mit dem signierten Bogen im Fragment
 > (`https://meldekopf.erfassungsbogen.app/#…`). Öffnet die Meldekopf-App diese App mit `?rueck=meldekopf`, merkt

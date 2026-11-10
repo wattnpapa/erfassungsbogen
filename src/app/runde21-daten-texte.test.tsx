@@ -114,7 +114,6 @@ function bogenOrt(ort: string, aendern?: (b: ReturnType<typeof neuerBogen>) => v
   return b;
 }
 
-
 // ---------------------------------------------------------------------------------------- Speicher voll
 
 /** Speicher bis auf wenige Zeichen füllen (die App rechnet mit SPEICHER_GRENZE_ZEICHEN). */

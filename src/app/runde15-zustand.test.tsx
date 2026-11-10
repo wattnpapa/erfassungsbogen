@@ -18,7 +18,6 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-
 describe("R15-E3 Mehrteilige Codes: Nummer des gelesenen Teils, verworfene Teile genannt", () => {
   const teil = (nr: number, anzahl: number): SegmentTeil => ({ teilNr: nr, anzahl, id: 1, chunk: new Uint8Array() });
 

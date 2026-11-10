@@ -153,7 +153,6 @@ describe("Fenster der Startseite tragen einen Verlaufseintrag (R6-S3)", () => {
   });
 });
 
-
 describe("Späte Rückkehr eines eigenen back() (Runde 7)", () => {
   it("erkennt den Pop des eigenen back() einmal und danach nicht mehr", () => {
     eigenesZurueckVerbrauchen();

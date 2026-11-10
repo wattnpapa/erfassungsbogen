@@ -51,7 +51,6 @@ describe("Eingabetaste in Vorschlagsfeldern (R11-G1)", () => {
   });
 });
 
-
 describe("Aufnahme (R11-M1)", () => {
   it("ohne ortFokus bleibt der Fokus unberührt", () => {
     render(<SchrittEinheit bogen={neuerBogen()} aendern={() => {}} />);

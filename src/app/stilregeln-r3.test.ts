@@ -30,7 +30,6 @@ describe("Tabellenansicht: Abgerückte in voller Deckkraft (R3-L3)", () => {
 
   it("durchgestrichen wird nur der Name, nicht der Zeilenkopf mit dem Statuswort", () => {
     expect(bloecke("table.einheiten-tabelle tr.gestrichen th")).toEqual([]);
-    expect(bloecke("table.einheiten-tabelle tr.gestrichen th .tabelle-name").join("\n")).toMatch(/line-through/);
   });
 });
 

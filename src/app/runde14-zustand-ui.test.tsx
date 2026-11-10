@@ -24,10 +24,6 @@ afterEach(() => {
   sessionStorage.clear();
 });
 
-
-
-
-
 describe("R14-H4 Datensicherung: Fehlermeldung und Quittung widersprechen sich nicht", () => {
   it("nach einer falschen Datei und einer erfolgreichen Sicherung steht nur die Quittung, direkt unter den Knöpfen", async () => {
     const nutzer = userEvent.setup();

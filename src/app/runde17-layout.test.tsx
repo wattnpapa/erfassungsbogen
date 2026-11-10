@@ -36,8 +36,6 @@ const abschnitt = (() => {
   return html.slice(von, bis).replace(/\/\*[\s\S]*?\*\//g, "");
 })();
 
-
-
 describe("Fußleiste des Assistenten (R17-G4, M3, G2, G3, N7, H6)", () => {
   it("am Telefon eine Zeile: Zurück, Abschluss, Weiter; „◐“ entfällt (die Wahl steht im Kopf), „Weiter“ bleibt ein Wort", () => {
     expect(abschnitt).toMatch(
@@ -45,7 +43,6 @@ describe("Fußleiste des Assistenten (R17-G4, M3, G2, G3, N7, H6)", () => {
     );
     expect(abschnitt).toMatch(/grid-template-areas:\s*"zurueck mitte weiter";\s*grid-template-columns:\s*auto minmax\(0, 1fr\) auto/);
     expect(abschnitt).toMatch(/footer\.nav\.assistent-nav > \.anzeige-leiste\s*\{\s*display:\s*none/);
-    expect(abschnitt).toMatch(/footer\.nav\.assistent-nav\.mit-uebernehmen \.nav-weiter-wort\s*\{\s*display:\s*inline/);
   });
 
   it("niedriges Querformat behält „◐“ (der Kopf trägt die Wahl dort nicht): kein Ausblenden außerhalb der Hochformat-Abfrage", () => {
@@ -63,26 +60,15 @@ describe("Fußleiste des Assistenten (R17-G4, M3, G2, G3, N7, H6)", () => {
     expect(abschnitt).toMatch(/footer\.nav\.assistent-nav > \.nav-zurueck\s*\{[^}]*min-width:\s*calc\(44px \+ var\(--ziel\)\)/);
   });
 
-  it("schmale Leiste zeigt „Übernehmen“ statt „In Einsatz übernehmen“ (Container unter 20,25 rem)", () => {
-    expect(abschnitt).toMatch(/@container assistent-nav \(max-width: 20\.25rem\)\s*\{\s*footer\.nav\.assistent-nav \.nav-einsatz\s*\{\s*display:\s*none/);
-    expect(abschnitt).toMatch(/\.nav-ue::first-letter\s*\{\s*text-transform:\s*uppercase/);
-  });
-
-  it("in der Schnellerfassung ist der Abschluss der dunkle Hauptknopf, „Weiter →“ der Nebenknopf", () => {
-    expect(abschnitt).toMatch(/footer\.nav\.assistent-nav\.uebernehmen-haupt > \.uebernehmen\s*\{\s*background:\s*var\(--akzent\);\s*color:\s*var\(--auf-akzent\)/);
-    expect(abschnitt).toMatch(/footer\.nav\.assistent-nav\.uebernehmen-haupt > \.nav-weiter\s*\{\s*background:\s*var\(--flaeche\)/);
-  });
 });
 
 describe("Kopf des Assistenten am Telefon (R17-M1, L2, M2)", () => {
   it("der Rücksprung bricht den Einsatznamen um, statt ihn zu kürzen; die Marke mit demselben Namen entfällt", () => {
     expect(abschnitt).toMatch(/\.kopf-oberzeile \.zur-start\s*\{\s*display:\s*flex;\s*white-space:\s*normal;\s*overflow:\s*visible;\s*text-overflow:\s*clip;\s*overflow-wrap:\s*break-word/);
-    expect(abschnitt).toMatch(/\.titelzeile \.modus-marke\.marke-einsatz\s*\{\s*display:\s*none/);
   });
 
   it("Erklärzeile und Speicherzeile teilen sich keine Zeile mit dem Rücksprung und bleiben einzeilig", () => {
     expect(abschnitt).toMatch(/\.kopf-oberzeile\s*\{\s*flex:\s*1 1 100%/);
-    expect(abschnitt).toMatch(/\.schritte-erklaerung\s*\{\s*order:\s*4;\s*flex:\s*1 1 100%/);
     expect(abschnitt).toMatch(/\.autosave:not\(\.speicher-fehler\):not\(\.fest-warnung\)\s*\{\s*font-size:\s*min\(var\(--t-xs\), 13px\)/);
   });
 });
@@ -97,23 +83,9 @@ describe("Platzhalter im Feld „Einheitstyp“ (R17-M4)", () => {
   });
 });
 
-describe("Tabelle am Telefon (R17-H8, K7, G7)", () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
-
-  it("Stilregeln: feste Spaltenbreiten, „1. Zug“ unteilbar, Sortierköpfe der breiten Tabelle 8 px auseinander", () => {
-    expect(abschnitt).toMatch(/table\.einheiten-tabelle\.tabelle-kern\s*\{\s*table-layout:\s*fixed;\s*width:\s*100%/);
-    expect(abschnitt).toMatch(/table\.einheiten-tabelle\.tabelle-kern td\.zug-zelle\s*\{\s*white-space:\s*nowrap/);
-    expect(abschnitt).toMatch(/th:has\(> \.spalten-sortierung\)\s*\{\s*padding-inline:\s*2px;\s*min-width:\s*52px/);
-    expect(abschnitt).toMatch(/thead th > \.spalten-sortierung\s*\{\s*margin-inline:\s*2px;\s*width:\s*calc\(100% - 4px\)/);
-  });
-});
-
 describe("Ansichtsleiste zieht sich beim Lesen ein (R17-N3, H7, G5, K6)", () => {
 
   it("Stilregeln: weg = unsichtbar (außer im Fokus), Quittung verdrängt die Leiste, Quittung steht nebeneinander", () => {
-    expect(abschnitt).toMatch(/html\.balken-weg \.anzeige-balken:not\(:focus-within\)\s*\{\s*visibility:\s*hidden/);
     expect(abschnitt).toMatch(/html:has\(\.quittung-daumen\) \.anzeige-balken\s*\{\s*display:\s*none/);
     expect(abschnitt).toMatch(/html:has\(\.anzeige-balken\):has\(\.quittung-daumen\) \.quittung-daumen\s*\{\s*bottom:\s*max\(var\(--r-3\), env\(safe-area-inset-bottom\)\)/);
     expect(abschnitt).toMatch(/\.quittung-daumen:not\(\.quittung-kompakt\)\s*\{\s*flex-wrap:\s*nowrap/);
@@ -210,15 +182,9 @@ describe("Gesperrte Knöpfe bleiben lesbar und nennen den Grund (R17-L1)", () =>
 });
 
 describe("Abstände und Tippflächen (R17-G1, G6, G9, G10, G8, H9, N6, G12)", () => {
-  it("G1, G10: Hinweisverweis und Filterverweise halten Abstand zu den Knöpfen", () => {
-    expect(abschnitt).toMatch(/\.einheit-zeile \.muster-sub:has\(> button\.luecken-marke\)\s*\{\s*margin-bottom:\s*8px/);
-    expect(abschnitt).toMatch(/p\.hinweis\.luecken-zaehler\s*\{\s*margin:\s*22px 0 20px/);
-    expect(abschnitt).toMatch(/p\.hinweis\.ausgabe-sprung\s*\{\s*margin-top:\s*28px/);
-  });
 
   it("G6: Schrittleiste, Karten | Tabelle, Vorschläge und Fußzeilenlisten berühren sich nicht", () => {
     expect(abschnitt).toMatch(/\.seiten-kopf \.schritte\s*\{\s*gap:\s*4px/);
-    expect(abschnitt).toMatch(/\.ansicht-umschalter\s*\{\s*gap:\s*6px !important/);
     expect(abschnitt).toMatch(/ul\.vorschlaege li \+ li\s*\{\s*margin-top:\s*4px/);
     expect(abschnitt).toMatch(/\.fuss-gruppe\s*\{\s*gap:\s*4px/);
     expect(abschnitt).toMatch(/footer\.seite \.fuss-werkzeuge\s*\{\s*row-gap:\s*4px/);
@@ -232,11 +198,6 @@ describe("Abstände und Tippflächen (R17-G1, G6, G9, G10, G8, H9, N6, G12)", ()
     expect(abschnitt).toMatch(
       /\.start-seo a\s*\{\s*display:\s*inline-flex;\s*align-items:\s*center;\s*min-height:\s*calc\(var\(--ziel-basis\) \+ var\(--ziel\)\);\s*margin-block:\s*4px/,
     );
-  });
-
-  it("N6: auch am niedrigen Telefon tragen die Aufnahmeknöpfe ihre Unterzeile, untereinander", () => {
-    expect(abschnitt).toMatch(/@media \(max-width: 30rem\) and \(max-height: 720px\)\s*\{\s*main\.einsatz-detail \.einsatz-seite > \.aktionen\s*\{\s*display:\s*flex;\s*flex-direction:\s*column/);
-    expect(abschnitt).toMatch(/\.aktionen > :not\(\.primaer\) \.knopf-zusatz\s*\{\s*display:\s*block/);
   });
 
   it("G12: Scanner ohne Kamera quer: Leiste einzeilig, Anleitung zweispaltig, Hinweiszeile frei", () => {

@@ -122,7 +122,6 @@ describe("tastaturWaechterStarten", () => {
   });
 });
 
-
 // Audit Runde 9, R9-G6: „Weiter“ der Bildschirmtastatur springt im Schritt zum nächsten Feld.
 describe("Eingabetaste im Schritt (R9-G6)", () => {
   afterEach(() => {

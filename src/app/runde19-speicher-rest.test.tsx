@@ -24,7 +24,6 @@ function bogenMitName(name: string, uebung = false) {
   return b;
 }
 
-
 describe("R19-E1 „Abbrechen“ in einer Rückfrage gibt die Stelle des öffnenden Knopfs frei", () => {
   const tipp = (el: Element, x: number, y: number) =>
     el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, clientX: x, clientY: y, detail: 1 }));

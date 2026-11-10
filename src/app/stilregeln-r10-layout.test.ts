@@ -48,12 +48,6 @@ describe("Einsatzansicht (R10-G2, R10-M3, R10-M6, R10-K3, R10-M2)", () => {
     expect(abschnitt).toMatch(/\.seiten-kopf \.anzeige-schalter\s*\{\s*gap:\s*8px;\s*border:\s*0/);
     expect(abschnitt).toMatch(/\.anzeige-leiste-wahl\s*\{\s*gap:\s*8px/);
   });
-  it("der Kopf der Einsatzansicht zeigt den Wähler nur ab Tablet, bei großer Schrift nie; Ränder knapper (R10-M3)", () => {
-    expect(abschnitt).toMatch(/@media \(max-width: 47\.999rem\)\s*\{\s*\.seiten-kopf\.einsatz-kopf \.anzeige-mit-name\s*\{\s*display:\s*none/);
-    expect(abschnitt).toMatch(/html\.schrift-gross \.seiten-kopf\.einsatz-kopf \.anzeige-mit-name\s*\{\s*display:\s*none/);
-    expect(abschnitt).toMatch(/html\.schrift-gross \.seiten-kopf\.einsatz-kopf \.kopf-inhalt\s*\{\s*padding-block:\s*min\(var\(--r-3\), 8px\)/);
-    expect(abschnitt).toMatch(/-webkit-line-clamp:\s*2/);
-  });
   it("Tabelle am Telefon: Rahmen ohne Seitenpolster, schmale Namensspalte, bei 200 % enge Zahlenspalten (R10-K3)", () => {
     expect(abschnitt).toMatch(/@media \(max-width: 20rem\)\s*\{\s*\.karte > \.tabellen-scroll\s*\{\s*padding-inline:\s*0/);
     expect(abschnitt).toMatch(/@container \(max-width: 20rem\)\s*\{[^@]*table\.einheiten-tabelle tbody th\s*\{\s*font-size:\s*11px/);

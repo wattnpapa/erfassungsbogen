@@ -41,10 +41,8 @@ function bogen(name: string, personal: Person[]): Erfassungsbogen {
   };
 }
 
-
 const soll = () => bogen("Zulauf Soll", [neuePerson(), neuePerson(), neuePerson()]);
 const gemeldet = () => bogen("Ahlen", [person(), person()]);
-
 
 describe("Rückruf einer Soll-Einheit (R9-A3)", () => {
   it("kennzeichnet Funkrufname und OV-Nummer als Vorbelegung", () => {

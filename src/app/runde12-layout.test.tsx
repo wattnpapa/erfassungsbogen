@@ -183,11 +183,6 @@ describe("Kennzeichen in einheitlicher Schreibweise (R12-N7)", () => {
 });
 
 describe("Stilregeln der Einsatzansicht am Telefon (R12-M1, R12-M2, R12-M3, R12-G3)", () => {
-  it("„Suchen, sortieren, filtern“ trägt Marke und Rahmen, aufgeklappt ▾ (R12-M1)", () => {
-    expect(abschnitt).toMatch(/details\.einheiten-filter-wahl > summary::before\s*\{\s*content:\s*"▸"/);
-    expect(abschnitt).toMatch(/details\.einheiten-filter-wahl\[open\] > summary::before\s*\{\s*content:\s*"▾"/);
-    expect(abschnitt).toMatch(/details\.einheiten-filter-wahl > summary\s*\{[^}]*border:\s*var\(--strich\) solid var\(--linie-stark\)/);
-  });
   it("Kachelbeschriftungen bleiben quer bei mindestens 12 px (R12-M2)", () => {
     expect(abschnitt).toMatch(/@media \(orientation: landscape\) and \(max-height: 31\.25rem\) and \(width > 30rem\)/);
     expect(abschnitt).toMatch(/\.staerke-leiste:has\(> div:nth-child\(5\)\) span\s*\{\s*font-size:\s*max\(var\(--t-xs\), 12px\)/);
@@ -198,7 +193,6 @@ describe("Stilregeln der Einsatzansicht am Telefon (R12-M1, R12-M2, R12-M3, R12-
   });
   it("die Karte trägt den Rand schon vor dem Abrücken, der Statusknopf behält seine Breite (R12-G3)", () => {
     expect(abschnitt).toMatch(/\.einheit-zeile:not\(\.gestrichen\):not\(\.kompakt\)\s*\{\s*border-left:\s*3px solid transparent;\s*padding-left:\s*var\(--r-2\)/);
-    expect(abschnitt).toMatch(/\.einheit-zeile button\.wechsel-knopf\s*\{\s*min-width:\s*9rem/);
     // Der gestrichelte Rand der abgerückten Karte hat dieselben Maße wie der durchsichtige.
     expect(html).toMatch(/\.einheit-zeile\.gestrichen\s*\{\s*border-left:\s*3px dashed var\(--linie-stark\);\s*padding-left:\s*var\(--r-2\)/);
   });

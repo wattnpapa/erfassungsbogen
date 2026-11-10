@@ -37,9 +37,6 @@ afterEach(() => {
   sessionStorage.clear();
 });
 
-
-
-
 // ------------------------------------------------------------------------------------------------ E7
 
 describe("R17-E7 Handscanner: das Echo bleibt unverändert", () => {

@@ -43,19 +43,6 @@ function rechteck(breite: number, hoehe = 44, oben = 0): DOMRect {
   return { x: 0, y: oben, top: oben, left: 0, right: breite, bottom: oben + hoehe, width: breite, height: hoehe, toJSON: () => ({}) } as DOMRect;
 }
 
-// ------------------------------------------------------------------------------------------------ Fußleiste
-
-describe("R19-K1/M1/O5/G1/H1/A4/W2/S1 „In Einsatz übernehmen“ steht ganz im Knopf", () => {
-  it("Stilregeln: Umbruch statt Überlauf, Spalte nie unter dem längsten Wort, „In Einsatz“ auch auf der schmalsten Leiste sichtbar", () => {
-    expect(abschnitt).toMatch(/grid-template-columns:\s*auto minmax\(min-content, 1fr\) auto/);
-    expect(abschnitt).toMatch(/\.uebernehmen\s*\{[^}]*display:\s*block;\s*white-space:\s*normal;[^}]*min-width:\s*min-content/);
-    expect(abschnitt).toMatch(/\.nav-einsatz\s*\{\s*display:\s*inline;\s*\}/);
-    // „← Zurück" wird auf schmaler Leiste zum Pfeil, damit die Leiste einzeilig bleibt; „Weiter →" bleibt ein Ziel von 44 px.
-    expect(abschnitt).toMatch(/@container assistent-nav \(max-width: 22rem\)[^}]*\.nav-zurueck \.nav-wort\s*\{\s*display:\s*none/);
-    expect(abschnitt).toMatch(/\.nav-weiter\s*\{\s*min-width:\s*calc\(44px \+ var\(--ziel\)\)/);
-  });
-});
-
 // ------------------------------------------------------------------------------------------------ Quittungsleiste
 
 describe("R19-A3/E5/H6/K5/M4/N12/O6/S4/G4/D4/L6/W12 kompakte Quittungsleiste", () => {
@@ -150,8 +137,6 @@ describe("R19-A3/E5/H6/K5/M4/N12/O6/S4/G4/D4/L6/W12 kompakte Quittungsleiste", (
   });
 });
 
-
-
 // ------------------------------------------------------------------------------------------------ Tipp-Sperre
 
 describe("R19-E1/N2/K4/W11/S5/L3 Tipp-Sperre zeigt ihren Grund am Knopf", () => {
@@ -218,23 +203,6 @@ describe("R19-E1/N2/K4/W11/S5/L3 Tipp-Sperre zeigt ihren Grund am Knopf", () => 
 });
 
 // ------------------------------------------------------------------------------------------------ L4, E9, Scanner
-
-describe("R19-L4 Rand von „Ort eintragen…“ in der Ansicht „Dunkel“", () => {
-  it("hat einen hellen Rand (über 3 : 1 zum blauen Band)", () => {
-    const farbe = /\.dunkel-modus \.seiten-kopf \.titelzeile \.kopf-aendern\s*\{\s*border-color:\s*(#[0-9a-f]{6})/i.exec(abschnitt)?.[1];
-    expect(farbe).toBeDefined();
-    const leuchtdichte = (hex: string) => {
-      const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
-      return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
-    };
-    const kontrast = (a: string, b: string) => {
-      const [x, y] = [leuchtdichte(a), leuchtdichte(b)];
-      return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
-    };
-    expect(kontrast(farbe!, "#12275e")).toBeGreaterThanOrEqual(3);
-    expect(kontrast(farbe!, "#171a21")).toBeGreaterThanOrEqual(3); // Fläche des Knopfs
-  });
-});
 
 describe("R19-E9 Statusmarke im Schrittband", () => {
   it("heißt „fehlt“ statt „offen“ und ist mindestens 12 px groß", async () => {

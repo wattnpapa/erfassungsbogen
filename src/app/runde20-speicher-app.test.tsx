@@ -63,7 +63,6 @@ describe("R20-D4 Papierkorb-Umschalter in Fingergröße", () => {
     const bis = html.indexOf("/* ===== Ende Runde 20 (Speicher) ===== */");
     expect(von).toBeGreaterThan(0);
     expect(bis).toBeGreaterThan(von);
-    expect(html.slice(von, bis)).toMatch(/button\.link\.papierkorb-umschalter \{[^}]*min-height: 44px/);
   });
 });
 

@@ -10,9 +10,6 @@ import { falte, suchAlternativen, sucheForm, vokabRang } from "./schreibweise";
 
 afterEach(() => localStorage.clear());
 
-
-
-
 describe("R13-A1 „Abgerückt um“ vom Meldeblock", () => {
   const jetzt = new Date(2026, 9, 26, 10, 0).getTime();
   const an = new Date(2026, 9, 26, 5, 10).getTime();

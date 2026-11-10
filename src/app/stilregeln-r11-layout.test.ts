@@ -19,16 +19,8 @@ const abschnitt = (() => {
 })();
 
 describe("Antippflächen mit Lücke (R11-G3)", () => {
-  it("Tabellenköpfe ohne 1-px-Naht: die Kopfzelle gibt 2 px je Seite ab", () => {
-    expect(abschnitt).toMatch(/table\.einheiten-tabelle thead th:has\(> \.spalten-sortierung\)\s*\{\s*padding-inline:\s*2px/);
-  });
-  it("Aufklapp-Karten sind abgesetzte Flächen mit Rand und 8 px Abstand", () => {
-    expect(abschnitt).toMatch(/\.einheit-zeile\.kompakt:first-of-type\s*\{\s*margin-top:\s*8px;[^}]*border:\s*var\(--strich\) solid var\(--linie-fein\);\s*border-radius:\s*var\(--radius\)/);
-  });
   it("Hinweise-Link, Filterzeile und Kopfzeile haben mindestens 8 px; Knopfreihen der Karte 12 px", () => {
     expect(abschnitt).toMatch(/\.einheit-zeile \.vorlage-aktionen\s*\{\s*margin-top:\s*12px;\s*gap:\s*12px/);
-    expect(abschnitt).toMatch(/p\.hinweis\.luecken-zaehler\s*\{\s*margin-bottom:\s*12px/);
-    expect(abschnitt).toMatch(/\.einsatz-liste > \.kopfzeile\s*\{\s*row-gap:\s*8px;\s*margin-bottom:\s*8px/);
   });
   it("„+ Person/Fahrzeug hinzufügen“ und der StAN-Knopf darunter stehen mit 12 px (auch quer)", () => {
     expect(abschnitt).toMatch(/\.schritt-inhalt button\.primaer \+ p:has\(> button:first-child\)\s*\{\s*margin-top:\s*12px/);
@@ -42,20 +34,10 @@ describe("Einsatzansicht am Telefon (R11-M2, R11-M3, R11-M4, R11-M5)", () => {
   it("die Quittung nach „Abrücken“ darf vier Zeilen haben, der Name wird nicht gekürzt (R11-M3)", () => {
     expect(abschnitt).toMatch(/\.quittung-daumen\.quittung-mehrzeilig > \.quittung-text\s*\{\s*-webkit-line-clamp:\s*4/);
   });
-  it("„Bogen fortsetzen“ ist ein Knopf in Zielhöhe (R11-M4)", () => {
-    expect(abschnitt).toMatch(/button\.link\.bogen-weiter\s*\{[^}]*min-height:\s*calc\(var\(--ziel-basis\) \+ var\(--ziel\)\)/);
-    expect(abschnitt).toMatch(/button\.link\.bogen-weiter\s*\{[^}]*border:\s*var\(--strich\) solid var\(--linie-stark\)/);
-  });
   it("quer bei niedrigem Fenster bleiben die fünf Kacheln in einer Zeile (R11-M5)", () => {
     expect(abschnitt).toMatch(/@media \(orientation: landscape\) and \(max-height: 31\.25rem\) and \(width > 30rem\)/);
     expect(abschnitt).toMatch(/\.staerke-leiste:has\(> div:nth-child\(5\)\)\s*\{\s*flex-wrap:\s*nowrap/);
     expect(abschnitt).toMatch(/\.staerke-leiste:has\(> div:nth-child\(5\)\) strong\s*\{\s*font-size:\s*calc\(var\(--t-zahl\) \* 0\.8\)/);
-  });
-});
-
-describe("Aufnahme (R11-M1)", () => {
-  it("die Zettelfelder stehen hinter einer Zusammenfassung in Zielhöhe", () => {
-    expect(abschnitt).toMatch(/details\.zettel-angaben > summary\s*\{[^}]*min-height:\s*calc\(var\(--ziel-basis\) \+ var\(--ziel\)\)/);
   });
 });
 

@@ -69,11 +69,6 @@ describe("Telefonfeld (E12) und Dauer (K11)", () => {
 });
 
 describe("Stilregeln des Blocks in index.html", () => {
-  it("hält die Tippziele der Tabelle und der Karte bei mindestens 44 px", () => {
-    expect(abschnitt).toMatch(/table\.einheiten-tabelle button\.tabelle-oeffnen \{[^}]*min-height: 44px/);
-    expect(abschnitt).toMatch(/input\[type="checkbox"\] \{ width: 44px; height: 44px; \}/);
-  });
-
   it("legt die Kartenknöpfe in zwei Spalten mit mindestens 8 px Abstand", () => {
     expect(abschnitt).toMatch(/\.einheit-zeile \.vorlage-aktionen \{ grid-template-columns: repeat\(2, minmax\(0, 1fr\)\); gap: 8px; \}/);
   });
@@ -83,7 +78,4 @@ describe("Stilregeln des Blocks in index.html", () => {
     expect(abschnitt).toMatch(/main\.start > \.weiche \{ order: 1; \}/);
   });
 
-  it("zeigt die Namen in der Kerntabelle ungekürzt", () => {
-    expect(abschnitt).toMatch(/tabelle-kern tbody th \.tabelle-name \{ display: inline; overflow: visible;/);
-  });
 });

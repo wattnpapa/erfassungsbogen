@@ -37,9 +37,6 @@ const abschnitt = (() => {
   return html.slice(von, bis).replace(/\/\*[\s\S]*?\*\//g, "");
 })();
 
-
-
-
 describe("R17-H2 keine Autokorrektur bei Funkrufname, Einsatzname, Ort und Auftrag", () => {
   it("die Felder einer Rückfrage (Name, Ort/Auftrag) schalten Autokorrektur und Rechtschreibprüfung ab", async () => {
     render(<Dialogschicht />);

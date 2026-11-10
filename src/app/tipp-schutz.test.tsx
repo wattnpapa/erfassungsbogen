@@ -333,7 +333,6 @@ describe("Sperre hinter der Rückfrage (R8-H5, R8-S4, R8-D5)", () => {
   });
 });
 
-
 // Audit Runde 9, R9-H5: Nach einem Wechsel der Ansicht gilt die Sperre 600 ms und nur an der Stelle des Tipps.
 describe("Sperre nach einem Wechsel der Ansicht (R9-H5)", () => {
   it("ist höchstens 600 ms lang und kürzer als die normale Ortssperre", () => {

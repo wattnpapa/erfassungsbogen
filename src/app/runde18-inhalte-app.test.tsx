@@ -9,7 +9,6 @@ import { OrganisationsTyp, PersonalErfassung } from "@bos/eeb-format/model";
 import { neuePerson, neuerBogen } from "./hilfen";
 import { entwurfSpeichern } from "./entwurf";
 
-
 const geladen: { name: string }[] = [];
 vi.mock("./pdf", () => ({
   pdfErzeugen: async () => {},

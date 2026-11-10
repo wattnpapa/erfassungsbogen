@@ -161,7 +161,6 @@ describe("offlineText(): Netz hakt beim Kern (R6-O4)", () => {
   });
 });
 
-
 /** Kasten auf der Startseite nur, solange er etwas verlangt; sonst Fußzeile und Balken. */
 describe("offlineRuhig und offlineFortschritt", () => {
   it("lässt den Kasten weg, sobald der Kern im Gerät liegt", () => {
