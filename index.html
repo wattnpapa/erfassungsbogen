@@ -598,7 +598,7 @@
     a.datei-knopf { text-decoration: none; }
     .meldekopf-altbestand { margin-top: var(--r-4); }
     .meldekopf-altbestand > p { margin: 0 0 var(--r-2); }
-    @media (hover: hover) { button.primaer:hover { background: var(--akzent-hell); border-color: var(--akzent-hell); color: var(--auf-akzent); } }
+    @media (hover: hover) { button.primaer:hover, .datei-knopf.primaer:hover { background: var(--akzent-hell); border-color: var(--akzent-hell); color: var(--auf-akzent); } }
     button:disabled { opacity: 0.4; cursor: default; }
     /* Sichtbarer Tastaturfokus in der Kennfarbe — überall gleich. */
     button:focus-visible, .datei-knopf:focus-within, a:focus-visible {
@@ -2212,6 +2212,7 @@
     }
     @media (hover: hover) { .teilen-dialog .teilen-weitere > summary:hover { color: var(--akzent); } }
     .teilen-dialog .teilen-weg button { width: 100%; }
+    .teilen-dialog .teilen-weg > a.datei-knopf { width: 100%; box-sizing: border-box; }
     .teilen-dialog .teilen-weg .hinweis { margin: 0.25rem 0 0; }
     /* Quittung „PDF gespeichert: …" — im Erledigt-Grün und mit dem Dateinamen
        in Datenschrift, damit er sich gegen den Hinweis darüber absetzt und

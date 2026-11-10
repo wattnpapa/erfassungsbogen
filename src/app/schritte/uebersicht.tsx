@@ -51,6 +51,7 @@ import {
 import { absenderkarteLaden, type Absenderkarte } from "../absenderkarte";
 import { AbsenderkarteFeld } from "../absenderkarte-ui";
 import { geraeteKurzform, geraeteSchluesselNurSitzung, geraeteOeffentlichHex } from "../geraete-schluessel";
+import { kamVomMeldekopf, meldekopfLink } from "../meldekopf-app";
 import { istNativ, linkTeilen, nahbereichDienst, pdfEinbettbar, shareSheetVerfuegbar, textTeilen } from "../nativ";
 import { fehlerText, istNachladeFehler } from "../nachladen";
 import { frageJaNein, frageText, frageWahl, zeigeHinweis } from "../dialoge";
@@ -404,6 +405,33 @@ export function Uebersicht(props: {
       setFehler(`Senden: ${e instanceof Error ? e.message : e}`);
     }
   }
+
+  /** Gekommen aus der Schnellerfassung der Meldekopf-App (meldekopf-app.ts, `?rueck=meldekopf`). */
+  const vomMeldekopf = kamVomMeldekopf();
+  const meldekopfWeg = (
+    <div className="teilen-weg meldekopf-weg">
+      {qr ? (
+        <a
+          className={`datei-knopf${vomMeldekopf ? " primaer" : ""}`}
+          href={meldekopfLink(qr.vollUrl)}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => props.onUebergeben?.("meldekopf")}
+        >
+          An Meldekopf-App geben ↗
+        </a>
+      ) : (
+        <button type="button" disabled>
+          An Meldekopf-App geben ↗
+        </button>
+      )}
+      <p className="hinweis">
+        {vomMeldekopf
+          ? "Zurück an den Meldekopf, von dem dieser Bogen kam: Die Meldekopf-App öffnet sich mit dem Bogen und fragt, in welche Sammlung er gehört."
+          : "Auf diesem Gerät: öffnet die Meldekopf-App mit dem Bogen, sie fragt, in welche Sammlung er gehört."}
+      </p>
+    </div>
+  );
 
   async function bogenLinkTeilen() {
     if (!qr) return;
@@ -1013,10 +1041,13 @@ export function Uebersicht(props: {
             />
           </details>
         )}
+        {/* Rückweg „An Meldekopf geben“: Der Bogen geht als Link in die Meldekopf-App, die nach der Sammlung fragt. Kam diese
+            App aus deren Schnellerfassung (`?rueck=meldekopf`), ist das der gesuchte Weg und steht als Hauptknopf vorn. */}
+        {vomMeldekopf && meldekopfWeg}
         <div className="teilen-weg">
           <button
             type="button"
-            className="primaer"
+            className={vomMeldekopf ? "" : "primaer"}
             disabled={!qr}
             onClick={() => {
               teilenDialog.current?.close();
@@ -1038,6 +1069,7 @@ export function Uebersicht(props: {
             {qr?.segmentiert ? ` — ${qr.teile.length} Teile nacheinander` : ""}.
           </p>
         </div>
+        {!vomMeldekopf && meldekopfWeg}
         {/* Handy zu Handy ohne Papier und ohne Kamera. Nur dort anbieten, wo es
             ein Share-Sheet gibt — sonst zeigte der Knopf ins Leere. */}
         {shareSheetVerfuegbar() && (

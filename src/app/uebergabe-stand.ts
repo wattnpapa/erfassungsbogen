@@ -19,7 +19,7 @@ import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { bogenInhaltsId, einheitSchluessel } from "@bos/meldekopf/einsaetze";
 
 /** Was mit dem Bogen geschah — nur das weiß die App, nicht ob er ankam. */
-export type UebergabeWeg = "qr" | "pdf" | "link" | "kopiert" | "nah";
+export type UebergabeWeg = "qr" | "pdf" | "link" | "kopiert" | "nah" | "meldekopf";
 
 export interface UebergabeStand {
   /** Zeitpunkt der letzten Übergabe (Date.now()). */
@@ -91,6 +91,7 @@ const EREIGNIS: Record<UebergabeWeg, string> = {
   link: "Link geteilt",
   kopiert: "Link kopiert",
   nah: "An Gerät in der Nähe gesendet",
+  meldekopf: "An die Meldekopf-App gegeben",
 };
 
 /** Uhrzeit, bei anderem Tag mit Datum. */

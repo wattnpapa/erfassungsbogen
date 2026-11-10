@@ -12,6 +12,12 @@
 > umsetzen: SBOM, CSP ohne unsafe-inline, Entpack-Grenze") betrifft die Kapitel
 > 2.1, 8.3, 8.6, 8.7 und 11.2 — dort jeweils vermerkt.
 >
+> **Nachgezogen 2026-11-10 (Rückweg „An Meldekopf-App geben"):** Kap. 5, 6.3, 8. Im Übergabe-Dialog öffnet
+> `meldekopfLink()` (`src/app/meldekopf-app.ts`) die Meldekopf-App mit dem signierten Bogen im Fragment
+> (`https://meldekopf.erfassungsbogen.app/#…`). Öffnet die Meldekopf-App diese App mit `?rueck=meldekopf`, merkt
+> `rueckMarkeUebernehmen()` das vor dem Lesen des Fragments im `sessionStorage` (`eeb.rueck.meldekopf`) und nimmt den
+> Parameter aus der Adresse; der Weg steht dann als Hauptknopf vorn. Übergabe-Vermerk: Weg `meldekopf`.
+>
 > **Nachgezogen 2026-11-09 (Einsatz-Sammlung ausgelagert):** Kap. 1, 3, 5, 6.3, 8, 12. Die Einsatz-Sammlung ist in die eigene Meldekopf-App
 > umgezogen (Repository `wattnpapa/meldekopf`, `meldekopf.erfassungsbogen.app`).
 > Entfernt sind hier: Einsatzliste und -ansicht, „Wohin damit?“, Dauerscan in eine

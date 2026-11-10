@@ -103,6 +103,7 @@ import { orgFarbe, wendeOrgAkzentAn } from "./org-farben";
 import { EinheitZeichen } from "./zeichen-bild";
 import { Fusszeile, beispielboegenOeffnen } from "./fusszeile";
 import { MeldekopfWeg } from "./meldekopf-weg";
+import { rueckMarkeUebernehmen } from "./meldekopf-app";
 import { Aktualisierungshinweise } from "./aktualisierung";
 import { SpeicherWarnung, istVoll } from "./speicher-warnung";
 import { arbeiten, useArbeitet } from "./arbeitet";
@@ -495,6 +496,8 @@ function teile(stuecke: Teil[]) {
   );
 }
 
+// Vor dem Fragment: `?rueck=meldekopf` merken und aus der Adresse nehmen (meldekopf-app.ts).
+rueckMarkeUebernehmen();
 const START = startAusUrlFragment();
 
 

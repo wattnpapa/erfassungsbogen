@@ -35,6 +35,13 @@ export const MONATE: Readonly<Record<string, string>> = {
 
 export const AENDERUNGEN: readonly Aenderung[] = [
   {
+    datum: "2026-11-10",
+    punkte: [
+      "Beim Übergeben eines Bogens gibt es den Weg „An Meldekopf-App geben“: Er öffnet die Meldekopf-App auf demselben Gerät mit dem Bogen, dort wird er in eine Sammlung aufgenommen.",
+      "Kommt der Bogen aus der Schnellerfassung der Meldekopf-App, steht dieser Rückweg beim Übergeben als erster Knopf.",
+    ],
+  },
+  {
     datum: "2026-11-09",
     punkte: [
       "Die Einsatz-Sammlung ist in die eigene Meldekopf-App umgezogen (meldekopf.erfassungsbogen.app): Sammeln, Lagemonitor, Sammel-PDF, Lageblatt und Weitermeldung gibt es dort. Auf der Startseite steht an ihrer Stelle der Weg dorthin.",

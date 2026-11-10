@@ -11,6 +11,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > **Wichtig:** Der Commit „Sicherheitsbericht umsetzen" (`c7604e9`, 2026-09-12)
 > hat das in R5/M6 genannte Dekomprimierungs-Risiko bereits behoben.
 >
+> **Nachgezogen 2026-11-10 — Rückweg „An Meldekopf-App geben":** Ein Übermittlungsweg mehr an denselben
+> Empfänger wie bisher (den Meldekopf): Der Bogen geht als Link-Fragment in die Meldekopf-App auf demselben Gerät,
+> dieselben Daten wie „Link teilen", ohne Server. Neue Datenkategorie oder neuer Empfänger: keine. Neu ist nur der
+> inhaltsleere Sitzungs-Merker `eeb.rueck.meldekopf` (Wert „1", endet mit dem Tab), der den Weg nach oben stellt,
+> wenn die Meldekopf-App diese App geöffnet hat.
+>
 > **Nachgezogen 2026-11-09 — Einsatz-Sammlung ausgelagert:** Die Einsatz-Sammlung ist in die eigene Meldekopf-App
 > umgezogen (Repository `wattnpapa/meldekopf`, `meldekopf.erfassungsbogen.app`).
 > Entfernt sind hier: Einsatzliste und -ansicht, „Wohin damit?“, Dauerscan in eine

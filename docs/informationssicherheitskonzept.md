@@ -16,6 +16,14 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Abhängigkeiten (6.4/R8/M8). Die betroffenen Abschnitte sind entsprechend
 > gekennzeichnet.
 >
+> **Nachgezogen 2026-11-10 — Rückweg „An Meldekopf-App geben":** Neuer Ausgabeweg im Übergabe-Dialog
+> (`src/app/meldekopf-app.ts`, `schritte/uebersicht.tsx`). Er öffnet `https://meldekopf.erfassungsbogen.app/#<Bogen>`
+> mit demselben signierten Payload wie „Link teilen" (5.2 gilt unverändert); der Bogen steht im Fragment und geht
+> nicht an einen Server, die Meldekopf-App ist ein Link, keine Verbindung dieser App. Neu im `sessionStorage` des
+> Tabs: `eeb.rueck.meldekopf` (nur der Wert „1"), gesetzt, wenn die Meldekopf-App diese App mit `?rueck=meldekopf`
+> öffnet; der Parameter wird sofort aus der Adresse genommen. Inhaltsleer, endet mit dem Tab, „Alle Daten löschen"
+> erfasst ihn über das Präfix.
+>
 > **Nachgezogen 2026-11-09 — Einsatz-Sammlung ausgelagert:** Die Einsatz-Sammlung ist in die eigene Meldekopf-App
 > umgezogen (Repository `wattnpapa/meldekopf`, `meldekopf.erfassungsbogen.app`).
 > Entfernt sind hier: Einsatzliste und -ansicht, „Wohin damit?“, Dauerscan in eine

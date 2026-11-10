@@ -4,11 +4,12 @@
  * Startseite → Schritt 1 → alle Schritte → Übersicht → Bogen übergeben.
  */
 
+import { MELDEKOPF_URL, RUECK_SCHLUESSEL } from "./meldekopf-app";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { OrganisationsTyp, type Erfassungsbogen } from "@bos/eeb-format/model";
-import { encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, fragmentInhalt, segmentPayloadUrls } from "@bos/eeb-format/codec";
+import { decodePayloadUrl, encodePayload, encodePayloadUrl, encodeVorlagePayloadUrl, fragmentInhalt, segmentPayloadUrls } from "@bos/eeb-format/codec";
 import { browserKompressor, neuePerson, neuerBogen } from "./hilfen";
 import { geraeteSchluesselLoeschen } from "./geraete-schluessel";
 import { tippSchutzZuruecksetzen } from "./tipp-schutz";
@@ -421,6 +422,36 @@ describe("Assistenten-Durchlauf", () => {
       expect(text.split("\n").length).toBeGreaterThan(1);
     } finally {
       mitschnitt.aufraeumen();
+    }
+  });
+
+  it("gibt den Bogen an die Meldekopf-App: Link mit demselben Bogen im Fragment", async () => {
+    const nutzer = userEvent.setup();
+    sessionStorage.removeItem(RUECK_SCHLUESSEL);
+    const dialog = await uebergabeDialog(nutzer);
+    const link = await within(dialog).findByRole("link", { name: "An Meldekopf-App geben ↗" });
+    const href = link.getAttribute("href")!;
+    expect(href.startsWith(MELDEKOPF_URL + "#")).toBe(true);
+    expect(decodePayloadUrl(href, browserKompressor).einheit.organisation).toBe(OrganisationsTyp.THW);
+    expect(link.getAttribute("target")).toBe("_blank");
+    // Ohne Rücksprung bleibt der QR-Code der Hauptweg.
+    expect(link.className).not.toContain("primaer");
+    expect(within(dialog).getByRole("button", { name: "QR-Code im Vollbild zeigen" }).className).toContain("primaer");
+  });
+
+  it("stellt den Rückweg vorn als Hauptknopf auf, wenn der Bogen aus der Meldekopf-App kam (?rueck=meldekopf)", async () => {
+    const nutzer = userEvent.setup();
+    sessionStorage.setItem(RUECK_SCHLUESSEL, "1");
+    try {
+      const dialog = await uebergabeDialog(nutzer);
+      const link = await within(dialog).findByRole("link", { name: "An Meldekopf-App geben ↗" });
+      expect(link.className).toContain("primaer");
+      const qrKnopf = within(dialog).getByRole("button", { name: "QR-Code im Vollbild zeigen" });
+      expect(qrKnopf.className).not.toContain("primaer");
+      expect(link.compareDocumentPosition(qrKnopf) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(within(dialog).getByText(/Zurück an den Meldekopf/)).toBeDefined();
+    } finally {
+      sessionStorage.removeItem(RUECK_SCHLUESSEL);
     }
   });
 
