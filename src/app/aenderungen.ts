@@ -37,6 +37,7 @@ export const AENDERUNGEN: readonly Aenderung[] = [
   {
     datum: "2026-11-10",
     punkte: [
+      "Die Aufklappmenüs der Themenleiste über der App sind wieder lesbar: Sie sind so breit wie ihr längster Eintrag, die Einträge stehen linksbündig, und das Menü der Anleitung klappt nach links auf.",
       "Beim Übergeben eines Bogens gibt es den Weg „An Meldekopf-App geben“: Er öffnet die Meldekopf-App auf demselben Gerät mit dem Bogen, dort wird er in eine Sammlung aufgenommen.",
       "Kommt der Bogen aus der Schnellerfassung der Meldekopf-App, steht dieser Rückweg beim Übergeben als erster Knopf.",
     ],
