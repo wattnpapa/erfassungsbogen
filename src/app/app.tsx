@@ -112,6 +112,7 @@ import { FesteWarnung } from "./feste-warnung";
 import { speicherFehlerDetails, speicherFehlerKurz } from "./speicher-fehler-text";
 import { UhrHinweis, UhrWarnung } from "./uhr-warnung";
 import { Dialogschicht, frageJaNein, frageWahl } from "./dialoge";
+import { useGeschlechtGeprueftStand } from "./geschlecht-geprueft";
 import {
   SchrittEinheit,
   SchrittEinsatz,
@@ -720,6 +721,8 @@ function AppInhalt() {
   const [bogen, setBogen] = useState<Erfassungsbogen | null>(START_SOFORT ?? ENTWURF?.bogen ?? null);
   // Ohne offenen Bogen gibt es keine Beispieldaten mehr, nach denen die Rückfrage beim Abwählen von „Übung" fragt (R14-E6).
   const keinBogen = bogen === null;
+  // „Geschlecht geprüft" liegt im Gerät, nicht im Bogen: Die Schrittanzeige soll trotzdem sofort mitziehen.
+  useGeschlechtGeprueftStand();
   useEffect(() => {
     if (keinBogen) {
       beispielVergessen();

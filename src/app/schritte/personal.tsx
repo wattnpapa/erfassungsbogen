@@ -51,6 +51,7 @@ import {
   personLeer,
   personUnbenannt,
   pruefpunkte,
+  alleAufVorbelegungMaennlich,
   verpflegungMitziehen,
   verschoben,
   vokabText,
@@ -58,6 +59,7 @@ import {
   vorbelegungGeladen,
 } from "../hilfen";
 import { mwdText } from "../auswertung";
+import { geschlechtGeprueft, geschlechtGeprueftSetzen, useGeschlechtGeprueftStand } from "../geschlecht-geprueft";
 import { frageJaNein, frageWahl } from "../dialoge";
 import { TelefonFeld } from "./telefon-feld";
 import { nachzueglerFuer } from "../vorlage-nachzuegler";
@@ -1519,6 +1521,8 @@ export function SchrittPersonal({
       bogen.personalErfassung !== PersonalErfassung.NUR_STAERKE,
   );
   const [fokusNeue, setFokusNeue] = useState(false);
+  // Neuzeichnen nach „Geschlecht geprüft“ (der Merker liegt im Gerät, nicht im Bogen).
+  useGeschlechtGeprueftStand();
   // Objektidentität statt Index — siehe fahrzeuge.tsx: ein Index rutscht beim
   // Löschen einer anderen Karte auf eine bestehende.
   const [frischeKarte, setFrischeKarte] = useState<Person | null>(null);
@@ -2023,6 +2027,23 @@ export function SchrittPersonal({
           Punkte dieses Schritts; Zugehörigkeit und Ort/Auftrag stehen dort,
           wo man sie behebt, und gesammelt in der Übersicht. */}
       <Hinweise punkte={pruefpunkte(bogen, false)} aktuellerSchritt={2} />
+      {/* Bei einer Einheit, die wirklich nur aus Männern besteht, stand der
+          Vorbelegungs-Hinweis für immer da. Das Häkchen bestätigt die
+          Besetzung; ändert sie sich, kommt der Hinweis zurück. */}
+      {alleAufVorbelegungMaennlich(bogen) && (
+        <p>
+          <label className="inline">
+            <input
+              type="checkbox"
+              checked={geschlechtGeprueft(bogen.personal)}
+              onChange={(e) => {
+                geschlechtGeprueftSetzen(bogen.personal, e.target.checked);
+              }}
+            />
+            Geschlecht geprüft: alle {bogen.personal.length} Personen sind männlich
+          </label>
+        </p>
+      )}
       {/* Der Weg zur Behebung steht an der Warnung (R8-W4): Der Knopf unter der Liste lag fünf
           Bildschirme tiefer. Gleiche Handlung, mit Rückweg. */}
       {!nurStaerke && unbenannte > 0 && bogen.personal.some(personLeer) && (

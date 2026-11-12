@@ -11,6 +11,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > **Wichtig:** Der Commit „Sicherheitsbericht umsetzen" (`c7604e9`, 2026-09-12)
 > hat das in R5/M6 genannte Dekomprimierungs-Risiko bereits behoben.
 >
+> **Nachgezogen 2026-11-12 — „Geschlecht geprüft":** Neuer Speicherort `eeb.geschlecht-geprueft.v1` im
+> `localStorage` (`src/app/geschlecht-geprueft.ts`). Er hält Prüfsummen (FNV-1a) über Namen und Geschlecht einer
+> Besetzung, die jemand in Schritt 3 als „alle männlich" bestätigt hat, höchstens 50 Stück; Namen stehen dort nicht im
+> Klartext. Wandert mit der Datensicherung, fällt mit „Alle Daten löschen" weg (5.7). Bogen, Transportformat,
+> Empfänger und Netzverbindungen unverändert.
+>
 > **Nachgezogen 2026-11-10 — Rückweg „An Meldekopf-App geben":** Ein Übermittlungsweg mehr an denselben
 > Empfänger wie bisher (den Meldekopf): Der Bogen geht als Link-Fragment in die Meldekopf-App auf demselben Gerät,
 > dieselben Daten wie „Link teilen", ohne Server. Neue Datenkategorie oder neuer Empfänger: keine. Neu ist nur der

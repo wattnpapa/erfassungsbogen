@@ -12,6 +12,10 @@
 > umsetzen: SBOM, CSP ohne unsafe-inline, Entpack-Grenze") betrifft die Kapitel
 > 2.1, 8.3, 8.6, 8.7 und 11.2 — dort jeweils vermerkt.
 >
+> **Nachgezogen 2026-11-12 („Geschlecht geprüft"):** Kap. 8. Neuer Speicherschlüssel `eeb.geschlecht-geprueft.v1`
+> (localStorage, `src/app/geschlecht-geprueft.ts`): Prüfsummen bestätigter Besetzungen, damit der Hinweis auf die
+> Geschlechts-Vorbelegung bei „alle männlich" abgeschaltet werden kann, ohne das Transportformat zu ändern.
+>
 > **Nachgezogen 2026-11-10 (Stilregeln der Sammlung entfernt):** Kap. 8. Nach dem Auszug der Einsatz-Sammlung trug das
 > Stylesheet in `index.html` noch rund 570 Regeln der Einsatzansicht, Einheitentabelle, Schnellerfassung, des Lagemonitors
 > und des Fußes „In Einsatz übernehmen". Entfernt ist jede Regel, deren Selektor eine Klasse verlangt, die im Code nicht mehr

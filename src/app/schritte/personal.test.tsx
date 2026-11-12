@@ -1732,3 +1732,41 @@ describe("Vorbelegte Funktion überlebt Herumklicken (OV Chemnitz)", () => {
     }
   }, 60_000);
 });
+
+/**
+ * Bei einer Einheit, die wirklich nur aus Männern besteht, ließ sich der
+ * Vorbelegungs-Hinweis nicht loswerden. Ein Häkchen bestätigt die Besetzung.
+ */
+describe("Geschlecht geprüft — Häkchen zum Vorbelegungs-Hinweis", () => {
+  const nurMaenner = () => ({
+    ...neuerBogen(),
+    personal: [
+      { ...neuePerson(), vorname: "Arne", nachname: "Muster", geschlecht: Geschlecht.M },
+      { ...neuePerson(), vorname: "Bert", nachname: "Beispiel", geschlecht: Geschlecht.M },
+    ],
+  });
+
+  it("blendet den Hinweis nach dem Häkchen aus und bringt ihn beim Abhaken zurück", async () => {
+    localStorage.removeItem("eeb.geschlecht-geprueft.v1");
+    const nutzer = userEvent.setup();
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={nurMaenner()} />);
+    const hinweis = () => screen.queryByText(/das ist die Vorbelegung/);
+    expect(hinweis()).not.toBeNull();
+
+    const haken = screen.getByRole<HTMLInputElement>("checkbox", { name: "Geschlecht geprüft: alle 2 Personen sind männlich" });
+    expect(haken.checked).toBe(false);
+    await nutzer.click(haken);
+    expect(haken.checked).toBe(true);
+    expect(hinweis()).toBeNull();
+
+    await nutzer.click(haken);
+    expect(hinweis()).not.toBeNull();
+  });
+
+  it("zeigt kein Häkchen, sobald eine Person nicht männlich ist", () => {
+    const b = nurMaenner();
+    b.personal[1] = { ...b.personal[1]!, geschlecht: Geschlecht.W };
+    render(<SchrittBuehne komponente={SchrittPersonal} bogen={b} />);
+    expect(screen.queryByRole("checkbox", { name: /Geschlecht geprüft/ })).toBeNull();
+  });
+});

@@ -5,6 +5,7 @@
 
 import { deflateRaw, Inflate } from "pako";
 import QRCode from "qrcode";
+import { geschlechtGeprueft } from "./geschlecht-geprueft";
 import {
   Einheit,
   Erfassungsbogen,
@@ -1064,12 +1065,9 @@ export function pruefpunkte(
   // Vorbelegung einer neuen Person ist „M". Sind ALLE Personen männlich
   // eingetragen, ist das entweder so — oder niemand hat das Feld angefasst und
   // die Unterbringungsplanung bekommt eine erfundene Zahl. Nachfragen kostet
-  // hier weniger als eine falsche Bettenzahl.
-  if (
-    b.personalErfassung === PersonalErfassung.VOLLSTAENDIG &&
-    b.personal.length > 1 &&
-    b.personal.every((p) => p.geschlecht === Geschlecht.M)
-  ) {
+  // hier weniger als eine falsche Bettenzahl. Wer es geprüft hat, hakt in
+  // Schritt 3 „Geschlecht geprüft" an; das gilt, bis sich die Besetzung ändert.
+  if (alleAufVorbelegungMaennlich(b) && !geschlechtGeprueft(b.personal)) {
     hinweise.push({
       text: `Alle ${b.personal.length} Personen stehen auf Geschlecht „männlich" — das ist die Vorbelegung. Bitte prüfen (zählt für Unterbringung und WC/Dusche).`,
       schritt: S_PERSONAL,
@@ -1291,6 +1289,20 @@ export function pruefpunkte(
     }
   }
   return hinweise;
+}
+
+/**
+ * Vollständig erfasst, mehr als eine Person und alle auf „männlich“ — der
+ * Fall, in dem die Vorbelegung nie angefasst worden sein könnte.
+ */
+export function alleAufVorbelegungMaennlich(
+  b: Pick<Erfassungsbogen, "personalErfassung" | "personal">,
+): boolean {
+  return (
+    b.personalErfassung === PersonalErfassung.VOLLSTAENDIG &&
+    b.personal.length > 1 &&
+    b.personal.every((p) => p.geschlecht === Geschlecht.M)
+  );
 }
 
 /** Nur die Hinweistexte — für Stellen, die keinen Sprung zum Schritt brauchen. */

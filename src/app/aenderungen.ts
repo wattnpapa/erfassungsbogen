@@ -35,6 +35,12 @@ export const MONATE: Readonly<Record<string, string>> = {
 
 export const AENDERUNGEN: readonly Aenderung[] = [
   {
+    datum: "2026-11-12",
+    punkte: [
+      "Stehen alle Personen auf „männlich“, lässt sich das in Schritt 3 mit dem Häkchen „Geschlecht geprüft“ bestätigen. Der Hinweis auf die Vorbelegung verschwindet dann und kommt erst wieder, wenn eine Person dazukommt, wegfällt oder anders heißt.",
+    ],
+  },
+  {
     datum: "2026-11-10",
     punkte: [
       "Beim Übergeben eines Bogens gibt es den Weg „An Meldekopf-App geben“: Er öffnet die Meldekopf-App auf demselben Gerät mit dem Bogen, dort wird er in eine Sammlung aufgenommen.",
