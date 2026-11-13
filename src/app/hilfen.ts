@@ -103,6 +103,11 @@ export {
 // das Startbündel (Startbündel 1,04 → 1,58 MB, ADR-003 Aufnahmeregel 5).
 let stempelQuelle: () => EebZeitpunkt = () => jetztZeitpunkt();
 
+/** Stempelzeit „jetzt“ aus der angemeldeten Quelle (geprüfte Uhr), minutengenau. */
+export function stempelZeit(): EebZeitpunkt {
+  return stempelQuelle();
+}
+
 /** Ist die Datenschutzfrist des Bogens abgelaufen (Namen, Funktionen und Erreichbarkeiten sind entfernt)? Geprüfte Uhr, Übungen nie. */
 export function bogenAnonymisiert(
   b: Pick<Erfassungsbogen, "uebung" | "stand">,

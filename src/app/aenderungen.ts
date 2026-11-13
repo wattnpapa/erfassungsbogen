@@ -35,6 +35,13 @@ export const MONATE: Readonly<Record<string, string>> = {
 
 export const AENDERUNGEN: readonly Aenderung[] = [
   {
+    datum: "2026-11-13",
+    punkte: [
+      "Beispielbögen bringen keinen erfundenen Einsatz mehr mit: Ort und Auftrag sind leer, der Zeitraum steht wie bei einem neuen Bogen auf heute. Als Stand gilt die Uhrzeit, zu der der Bogen, die PDF oder der Link erzeugt wurde.",
+      "PDF: Die Tabelle der Qualifikationen teilt am Seitenende keine Zeile mehr und wiederholt ihren Kopf auf der Folgeseite. Vorher ragte die letzte Zeile in den Rand, und die Kopfzeile der Seite stand quer darüber.",
+    ],
+  },
+  {
     datum: "2026-11-12",
     punkte: [
       "Stehen alle Personen auf „männlich“, lässt sich das in Schritt 3 mit dem Häkchen „Geschlecht geprüft“ bestätigen. Der Hinweis auf die Vorbelegung verschwindet dann und kommt erst wieder, wenn eine Person dazukommt, wegfällt oder anders heißt.",

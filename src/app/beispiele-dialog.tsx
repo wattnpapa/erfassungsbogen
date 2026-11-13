@@ -6,10 +6,10 @@
  */
 
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
-import { MINUTEN_JE_TAG, staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
+import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { istNativ, linkTeilen, shareSheetVerfuegbar } from "./nativ";
 import { fehlerText } from "./nachladen";
-import { bogenVollUrl, einheitAnzeigename, einheitOrt, heuteDatum, migriereBogen, orgLabel, vokabText, vokabularFuer } from "./hilfen";
+import { bogenVollUrl, einheitAnzeigename, einheitOrt, heuteDatum, migriereBogen, orgLabel, stempelZeit, vokabText, vokabularFuer } from "./hilfen";
 import { beispielAufHeute } from "./beispiel-heute";
 import { EinheitZeichen } from "./zeichen-bild";
 import { zeigeHinweis } from "./dialoge";
@@ -365,11 +365,9 @@ function ovBogenAblegen(url: string, antwort: Response): void {
  * Bogen wird bearbeitet, der Stand im Cache muss davon unberührt bleiben.
  */
 async function beispielKopie(url: string): Promise<Erfassungsbogen> {
-  // Zeitraum und Stand auf heute (BB-W5): sonst warnte jeder Beispielbogen vor seinem Alter.
-  // Stand fest je Tag (Mitternacht), nicht die Uhrzeit des Tipps (Runde 2, BB2-A1): Sonst ergaben
-  // dieselbe PDF und derselbe Sammelweg am selben Tag „älterer Stand" bei gleichem Inhalt.
-  const heute = heuteDatum();
-  return beispielAufHeute(structuredClone(await beispielBogen(url)), heute, heute * MINUTEN_JE_TAG);
+  // Einsatzangaben wie bei einem neuen Bogen (Ort und Auftrag leer), Stand = die Minute des Erzeugens
+  // (Rückmeldung 11/2026). Vorher stand der Stand fest auf dem Tagesbeginn (Runde 2, BB2-A1).
+  return beispielAufHeute(structuredClone(await beispielBogen(url)), heuteDatum(), stempelZeit());
 }
 
 /**

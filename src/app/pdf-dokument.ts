@@ -2054,6 +2054,11 @@ export function pdfDokument(
           widths: [spalte(171.25), spalte(RAHMEN_BREITE - 171.25)],
           heights: () => hoch(ZEILE_PERSONAL),
           body: qualiZeilen,
+          // Zeilen bleiben ganz, der Kopf wiederholt sich auf der Folgeseite: Eine am Seitenende
+          // geteilte Zeile ragte in den Fußrand, und die Kopfzeile der Seite stand quer über ihr.
+          dontBreakRows: true,
+          headerRows: 1,
+          keepWithHeaderRows: 1,
         },
       },
       // Vordruck: Platz für drei Zeilen Handschrift statt einer Zeile (R5-A7).
