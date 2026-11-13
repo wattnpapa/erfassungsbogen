@@ -20,6 +20,12 @@ export function zeitraumNachEingabe(
   iso: string,
   heute: EebDatum,
 ): Zeitraum {
+  // Leerer Zeitraum: Das erste eingetragene Datum gilt für beide Enden, ein geleertes Feld bleibt leer.
+  if (zeitraumLeer(alt)) {
+    if (!iso) return { zeitraumVon: 0, zeitraumBis: 0 };
+    const tag = datumAusIso(iso);
+    return { zeitraumVon: tag, zeitraumBis: tag };
+  }
   const bisFolgtVon = alt.zeitraumBis === alt.zeitraumVon;
   const neu =
     feld === "von"
@@ -44,6 +50,20 @@ export function zeitraumNachEingabe(
  */
 export const UHRZEIT_VON_VORGABE = 8 * 60;
 export const UHRZEIT_BIS_VORGABE = 18 * 60;
+
+/**
+ * Ist der Zeitraum nicht angegeben? Das Format verlangt für „von“ und „bis“ einen Tag (im QR je ein uint16);
+ * „leer“ ist deshalb der Tag 0 an beiden Enden (01.01.2020, vor dem ersten Bogen), wie im Blanko-Vordruck.
+ * Ältere Leser zeigen dafür „01.01.2020“.
+ */
+export function zeitraumLeer(z: Pick<Einsatz, "zeitraumVon" | "zeitraumBis">): boolean {
+  return z.zeitraumVon === 0 && z.zeitraumBis === 0;
+}
+
+/** Einsatzangaben ohne Inhalt: Zeitraum nicht angegeben, Ort/Auftrag leer (Beispielbögen). */
+export function einsatzLeer(): Einsatz {
+  return { zeitraumVon: 0, zeitraumBis: 0, ortAuftrag: "" };
+}
 
 /** Einsatzangaben eines neuen bzw. zurückgesetzten Bogens: heute, 08:00–18:00, Ort/Auftrag leer. */
 export function einsatzVorgabe(heute: EebDatum): Einsatz {

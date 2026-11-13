@@ -64,7 +64,7 @@ import {
   vokabularFuer,
   zeitpunktDeutsch,
 } from "./hilfen";
-import { uhrzeitAus, uhrzeitZuIso } from "./zeitraum-eingabe";
+import { uhrzeitAus, uhrzeitZuIso, zeitraumLeer } from "./zeitraum-eingabe";
 import { csvDatei, csvZeile, jaNein, mitNachtragSpalte } from "./csv";
 import { berufText, qualifikationenUndBerufe } from "./beruf";
 import { telefonAlsTabellenText } from "./telefon-eingabe";
@@ -272,8 +272,8 @@ function einheitSatz(b: Erfassungsbogen, k: Kontext): Satz {
     "Telefon Einheit": telefonAlsTabellenText(ebene0?.telefon),
     "E-Mail Einheit": ebene0?.email ?? "",
     "Ort/Auftrag (Bogen)": b.einsatz.ortAuftrag,
-    "Zeitraum von": datumText(b.einsatz.zeitraumVon),
-    "Zeitraum bis": datumText(b.einsatz.zeitraumBis),
+    "Zeitraum von": zeitraumLeer(b.einsatz) ? "" : datumText(b.einsatz.zeitraumVon),
+    "Zeitraum bis": zeitraumLeer(b.einsatz) ? "" : datumText(b.einsatz.zeitraumBis),
     // Ab Schema 11; ältere Bögen tragen nur den Tag.
     // Wandzeit ohne Offset, wie in der Oberfläche; der volle ISO-Zeitpunkt steht in der Bogen-Datei.
     "Uhrzeit von": uhrzeitText(b.einsatz.zeitraumVonIso),

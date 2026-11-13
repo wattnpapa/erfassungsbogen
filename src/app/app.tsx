@@ -6,6 +6,7 @@
  * Tests rendern, ohne dass ein Wurzelknoten oder Plattform-Seiteneffekte nötig sind.
  */
 
+import { zeitraumLeer } from "./zeitraum-eingabe";
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, type ChangeEvent } from "react";
 import { START_ABSCHNITTE, type Teil } from "./start-inhalt";
 import type { Erfassungsbogen, Person } from "@bos/eeb-format/model";
@@ -2328,7 +2329,7 @@ function AppInhalt() {
                 {/* „Entwurf … wiederhergestellt" steht in der Karte, zu der der Satz gehört, nicht darunter (R18-N7). */}
                 {meldungInKarte && <span className="hinweis">{meldung}</span>}
                 {/* Alter Bogen: der Zeitraum steht auf der Karte, bevor jemand „Fortsetzen" tippt (R2-S1). */}
-                {bogen.einsatz.zeitraumBis < heuteDatum() && (
+                {!zeitraumLeer(bogen.einsatz) && bogen.einsatz.zeitraumBis < heuteDatum() && (
                   <span className="hinweis warnung-text">Einsatz {zeitraumDeutsch(bogen)}</span>
                 )}
                 <span className="hinweis">

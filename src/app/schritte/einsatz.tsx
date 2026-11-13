@@ -14,7 +14,7 @@ import { useRef } from "react";
 import { beispielRestText } from "../beispiel-herkunft";
 import { frageJaNein } from "../dialoge";
 import { heuteDatum, pruefpunkte } from "../hilfen";
-import { uhrzeitAus, uhrzeitAusIso, uhrzeitZuIso, zeitraumNachEingabe, zeitraumZeitIso } from "../zeitraum-eingabe";
+import { uhrzeitAus, uhrzeitAusIso, uhrzeitZuIso, zeitraumLeer, zeitraumNachEingabe, zeitraumZeitIso } from "../zeitraum-eingabe";
 import { Feld, Hinweise, NAMEN_EINGABE, type SchrittProps } from "./bausteine";
 
 export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
@@ -34,6 +34,8 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
    * er nie berührt hat.
    */
   const bisFolgtVon = ez.zeitraumBis === ez.zeitraumVon;
+  /** Zeitraum nicht angegeben (Beispielbogen): Datumsfelder leer, Uhrzeit erst nach dem Datum. */
+  const leer = zeitraumLeer(ez);
   /**
    * Uhrzeitfeld zum Zeitraum (ab Schema 11, im Bogen als ISO 8601 mit dem Offset der Gerätezeitzone). Geleert = nur
    * der Tag ist gemeldet, wie bei älteren Bögen.
@@ -93,19 +95,19 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
         <Feld titel="Zeitraum von" klasse="datum">
           <input
             type="date"
-            value={datumZuIso(ez.zeitraumVon)}
+            value={leer ? "" : datumZuIso(ez.zeitraumVon)}
             onChange={(e) => setEz(zeitraumNachEingabe(ez, "von", e.target.value, heuteDatum()))}
           />
         </Feld>
         {/* Vorbelegt mit 08:00 bzw. 18:00 (einsatzVorgabe); ältere Bögen ohne Uhrzeit zeigen ein leeres Feld. */}
         <Feld titel="Uhrzeit von" klasse="schmal uhrzeit">
-          <input type="time" value={uhrzeitFeld(ez.zeitraumVonIso)} onChange={(e) => uhrzeitSetzen("zeitraumVonIso", e.target.value)} />
+          <input type="time" disabled={leer} value={uhrzeitFeld(ez.zeitraumVonIso)} onChange={(e) => uhrzeitSetzen("zeitraumVonIso", e.target.value)} />
         </Feld>
-        <Feld titel={bisFolgtVon ? "Zeitraum bis (Vorschlag: wie Beginn)" : "Zeitraum bis"} klasse="datum">
-          <input type="date" value={datumZuIso(ez.zeitraumBis)} onChange={(e) => setEz(zeitraumNachEingabe(ez, "bis", e.target.value, heuteDatum()))} />
+        <Feld titel={bisFolgtVon && !leer ? "Zeitraum bis (Vorschlag: wie Beginn)" : "Zeitraum bis"} klasse="datum">
+          <input type="date" value={leer ? "" : datumZuIso(ez.zeitraumBis)} onChange={(e) => setEz(zeitraumNachEingabe(ez, "bis", e.target.value, heuteDatum()))} />
         </Feld>
         <Feld titel="Uhrzeit bis" klasse="schmal uhrzeit">
-          <input type="time" value={uhrzeitFeld(ez.zeitraumBisIso)} onChange={(e) => uhrzeitSetzen("zeitraumBisIso", e.target.value)} />
+          <input type="time" disabled={leer} value={uhrzeitFeld(ez.zeitraumBisIso)} onChange={(e) => uhrzeitSetzen("zeitraumBisIso", e.target.value)} />
         </Feld>
         <Feld titel="Einsatzort / Auftrag">
           <input id="feld-ort-auftrag" value={ez.ortAuftrag} onChange={(e) => setEz({ ortAuftrag: e.target.value })} placeholder="z. B. Fernmeldebauübung Kabelblitz" {...NAMEN_EINGABE} />

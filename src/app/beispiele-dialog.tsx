@@ -365,9 +365,9 @@ function ovBogenAblegen(url: string, antwort: Response): void {
  * Bogen wird bearbeitet, der Stand im Cache muss davon unberührt bleiben.
  */
 async function beispielKopie(url: string): Promise<Erfassungsbogen> {
-  // Einsatzangaben wie bei einem neuen Bogen (Ort und Auftrag leer), Stand = die Minute des Erzeugens
+  // Einsatzangaben leer (Zeitraum nicht angegeben, Ort und Auftrag leer), Stand = die Minute des Erzeugens
   // (Rückmeldung 11/2026). Vorher stand der Stand fest auf dem Tagesbeginn (Runde 2, BB2-A1).
-  return beispielAufHeute(structuredClone(await beispielBogen(url)), heuteDatum(), stempelZeit());
+  return beispielAufHeute(structuredClone(await beispielBogen(url)), stempelZeit());
 }
 
 /**

@@ -8,16 +8,16 @@
  * oder in einer Übungs-Sammlung meldete die App deshalb „Stand vor 50 Tagen"
  * und „Zeitraum vorbei", und wer ein Beispiel als Ausgangspunkt nahm, musste
  * zuerst einen fremden Auftrag löschen. Beim Weitergeben aus dem Dialog stehen
- * die Einsatzangaben deshalb wie bei einem neuen Bogen da (heute, Ort und
+ * die Einsatzangaben deshalb leer da (Zeitraum nicht angegeben, Ort und
  * Auftrag leer), und der Stand ist die Minute, in der Bogen, PDF oder Link
  * erzeugt wurden.
  *
  * Bewusst ohne Vokabular- oder Kern-Importe außer dem Format (Startbündel).
  */
 
-import type { EebDatum, EebZeitpunkt, Erfassungsbogen } from "@bos/eeb-format/model";
-import { einsatzVorgabe } from "./zeitraum-eingabe";
+import type { EebZeitpunkt, Erfassungsbogen } from "@bos/eeb-format/model";
+import { einsatzLeer } from "./zeitraum-eingabe";
 
-export function beispielAufHeute(b: Erfassungsbogen, heute: EebDatum, stand: EebZeitpunkt): Erfassungsbogen {
-  return { ...b, einsatz: einsatzVorgabe(heute), stand };
+export function beispielAufHeute(b: Erfassungsbogen, stand: EebZeitpunkt): Erfassungsbogen {
+  return { ...b, einsatz: einsatzLeer(), stand };
 }

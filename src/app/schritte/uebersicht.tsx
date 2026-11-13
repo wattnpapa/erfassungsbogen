@@ -3,6 +3,7 @@
  * prüfung und die Übergabewege (QR, PDF, Link, Datei).
  */
 
+import { zeitraumLeer } from "../zeitraum-eingabe";
 import { UhrHinweis } from "../uhr-warnung";
 import { beispielRestText } from "../beispiel-herkunft";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -220,7 +221,7 @@ export function Uebersicht(props: {
   // Dazu die Reste aus einem Beispiel, solange die Übungsmarke fehlt (R14-E6).
   const beispielRest = bogen.uebung ? "" : beispielRestText(bogen);
   const offenePunkte = [...pruefpunkte(bogen, true, heuteDatum()), ...(beispielRest ? [{ text: `${beispielRest} Personal und Nummern ersetzen.`, schritt: 2 }] : [])];
-  const zeitraumVorbei = bogen.einsatz.zeitraumBis < heuteDatum();
+  const zeitraumVorbei = !zeitraumLeer(bogen.einsatz) && bogen.einsatz.zeitraumBis < heuteDatum();
   const [schluesselKurz, setSchluesselKurz] = useState<string | null>(null);
   // Geräteschlüssel ließ sich nicht speichern: das Siegel gilt nur für diese
   // Sitzung (R3-E1). Code und PDF entstehen trotzdem.
@@ -700,7 +701,7 @@ export function Uebersicht(props: {
 
       {abschnitt("Einsatz", 1, (
         <dl className="paare">
-          <dt>Zeitraum</dt><dd>{zeitraumVonBis(bogen)}</dd>
+          <dt>Zeitraum</dt><dd>{zeitraumVonBis(bogen) || "nicht angegeben"}</dd>
           <dt>Ort / Auftrag</dt><dd>{bogen.einsatz.ortAuftrag || "nicht eingetragen"}</dd>
           <dt>Uhrzeit Beginn / Ende</dt>
           <dd>

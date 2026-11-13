@@ -1562,8 +1562,12 @@ Kein neuer Host zur Laufzeit; thw.blafusel.de ruft nur das Generatorskript mit `
 Ordnernavigation liegt in eigenem Baustein `src/app/beispiele-dialog.tsx`, den `fusszeile.tsx` beim ersten
 Öffnen per `lazy()` lädt (vorher Teil des Startbündels, das nach den Prüfrunden-Korrekturen über dem Budget lag).
 Beispiele werden beim Weitergeben auf heute gestellt (`src/app/beispiel-heute.ts`).
-*Nachgezogen 2026-11-13:* Dabei stehen die Einsatzangaben wie bei einem neuen Bogen da (heute, Ort und Auftrag
-leer), der Stand ist die Minute des Erzeugens (vorher: Zeitraum verschoben, Stand auf Tagesbeginn).
+*Nachgezogen 2026-11-13:* Dabei stehen die Einsatzangaben leer da (Ort und Auftrag leer, Zeitraum nicht
+angegeben), der Stand ist die Minute des Erzeugens (vorher: Zeitraum verschoben, Stand auf Tagesbeginn).
+„Zeitraum nicht angegeben“ ist eine Konvention der App ohne Formatänderung: Tag 0 (01.01.2020) an beiden Enden
+(`zeitraumLeer` in `src/app/zeitraum-eingabe.ts`). App, PDF und CSV zeigen dafür ein leeres Feld; ältere Leser,
+die Portierungen unter `vendor/eeb-format/ports/` und der Meldungsvergleich in `@bos/meldekopf` zeigen „01.01.2020“
+(dort noch nachzuziehen).
 *Nachgezogen 2026-11-09 (Runde 2):* `fusszeile.tsx` lädt den Baustein selbst (`import()` mit Fehlerfang statt
 `React.lazy`), damit ein Fehlschlag ohne Netz nicht die ganze App in den Fehlerfänger reißt. Die Suche nutzt einen
 Index `src/app/beispiele-suchindex.json` (Einheitstyp, Träger, Orte; erzeugt mit `npm run beispiele:suchindex`,
