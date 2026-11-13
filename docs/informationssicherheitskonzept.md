@@ -271,6 +271,11 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > (Verfügbarkeit, 5.5). Kein neuer Speicherort; das gemerkte Lese-Ergebnis
 > liegt nur im Arbeitsspeicher der geöffneten Seite.
 >
+> **Nachgezogen 2026-11-13:** Die 100 gewürfelten THW-Beispielbögen und der
+> Großbogen sind entfallen; THW-Beispiele liegen damit nicht mehr im
+> Offline-Vorrat, sondern kommen ausschließlich auf Abruf aus dem unten
+> beschriebenen Ordner. Kein neuer Host, kein neuer Speicherort.
+>
 > **Nachgezogen 2026-11-08:** Beispielbögen aller THW-Ortsverbände
 > (`examples/thw/ortsverbaende/`, 3.533 Übungsbögen, erfundene Namen, Rufnummern
 > 555…). Sie gehören weder zum Kern noch zur Zusatzstufe des Offline-Vorrats

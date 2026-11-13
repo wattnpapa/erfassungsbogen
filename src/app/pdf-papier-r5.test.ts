@@ -28,8 +28,11 @@ const qr = (n: number): QrSatz => ({
   stufen: 1,
   weitergeleitet: false,
 });
+// Der Großbogen ist ein Prüfling (überlanger Bogen mit segmentiertem QR), kein Beispielbogen der App.
+const GROSSBOGEN = "./grossbogen-verstaerkter-bergungszug.json";
+const LOG_MW = "../../../examples/thw/ortsverbaende/lv-baden-wuerttemberg/rst-biberach/ov-biberach-riss/ov-biberach-riss-02-fz-log-fgr-log-mw.json";
 const beispiel = (datei: string): Erfassungsbogen =>
-  JSON.parse(readFileSync(new URL(`../../examples/thw/${datei}`, import.meta.url), "utf8")) as Erfassungsbogen;
+  JSON.parse(readFileSync(new URL(datei, new URL("./testdaten/", import.meta.url)), "utf8")) as Erfassungsbogen;
 
 const hatPdftotext = (() => {
   try {
@@ -54,7 +57,7 @@ async function seitenTexte(dd: TDocumentDefinitions): Promise<string[]> {
 
 describe("Einzel-PDF: Kopfzeile jeder Seite (R5-A2, R5-A3)", () => {
   it.skipIf(!hatPdftotext)("Seite 1 trägt den Platz „übertragen“, jede Folgeseite Nr. und Einheit", async () => {
-    const dd = await einzelPdfDokument(beispiel("grossbogen-verstaerkter-bergungszug.json"), qr(1), pdfBytes);
+    const dd = await einzelPdfDokument(beispiel(GROSSBOGEN), qr(1), pdfBytes);
     const seiten = await seitenTexte(dd);
     expect(seiten.length).toBeGreaterThan(2);
     expect(seiten[0]).toMatch(/Meldekopf:\s+Nr\. _+/);
@@ -67,7 +70,7 @@ describe("Einzel-PDF: Kopfzeile jeder Seite (R5-A2, R5-A3)", () => {
   }, 60_000);
 
   it("kein Fahrzeugblock liegt auf zwei Seiten", async () => {
-    for (const datei of ["grossbogen-verstaerkter-bergungszug.json", "015-ansbach-fgr-log-mw.json"]) {
+    for (const datei of [GROSSBOGEN, LOG_MW]) {
       const dd = pdfDokument(beispiel(datei), qr(1));
       const gerissen: number[][] = [];
       dd.pageBreakBefore = (k) => {

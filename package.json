@@ -5,7 +5,6 @@
   "main": "electron/main.js",
   "scripts": {
     "demo": "tsx scripts/qr-demo.ts",
-    "beispiele": "node --import tsx scripts/beispielboegen-pdf.mts",
     "beispiele:kats": "node --import tsx scripts/kats-nds-beispielboegen.mts",
     "beispiele:kats-sn": "node --import tsx scripts/kats-sachsen-beispielboegen.mts",
     "beispiele:kats-bb": "node --import tsx scripts/kats-brandenburg-beispielboegen.mts",

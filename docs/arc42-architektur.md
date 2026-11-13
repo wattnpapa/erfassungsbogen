@@ -150,9 +150,9 @@
 > je Person mit der Dienststelle aus Schritt 1 vor und schlägt beim THW die
 > Ortsverbände des Verzeichnisses vor (`OvVorschlagFeld`/`useOvDaten` aus Schritt 1,
 > in Karte und Kurz-Liste); das PDF nennt eine Abweichung als erste Zeile der
-> Kontaktspalte („OV: Bremen - Nord"; seit 2026-11-08 klein hinter dem Namen). Die THW-Beispielbögen (`npm run beispiele`)
-> tragen seit 2026-10-27 in rund jeder dritten Einheit ein bis drei Helfer aus
-> Nachbar-Ortsverbänden (eigener Zufallsstrom, übrige Bögen unverändert). Kein
+> Kontaktspalte („OV: Bremen - Nord"; seit 2026-11-08 klein hinter dem Namen). Die 100 gewürfelten THW-Beispielbögen
+> trugen seit 2026-10-27 in rund jeder dritten Einheit ein bis drei Helfer aus
+> Nachbar-Ortsverbänden; sie sind seit 2026-11-13 entfallen (Hinweis vom 2026-11-13 beim Offline-Vorrat). Kein
 > neuer Host, kein neuer Speicherort.
 >
 > **Nachgezogen 2026-10-26 (Probelauf Meldekopf):** Kap. 5, 6.2, 8.2: neuer
@@ -1545,6 +1545,13 @@ der Service Worker legt sie über zwei Laufzeit-Routen in den Cache
 `eeb-zusatz` (Beispielbögen `CacheFirst`, Seiten `StaleWhileRevalidate` seit Runde 7, Liste `NetworkFirst`).
 *Hinweis 2026-10-24:* Mit `examples/praktische-ausbildung/` (41 Bögen, JSON) sind die Zusatzstufe um 41 Dateien und die Zahlen oben (474 Dateien, 4,0 MB) sowie die Bogenzählungen weiter unten (227/239/443 Beispielbögen) nicht mehr aktuell; beim nächsten Build neu messen.
 *Hinweis 2026-11-09 (Kreiseinheiten der Kreisfeuerwehren Niedersachsen):* `examples/feuerwehr/niedersachsen/kreisfeuerwehren/` (106 Bögen aus zehn Landkreisen und der Region Hannover, zusammen rund 1,4 MB JSON, erzeugt von `scripts/kreisfeuerwehr-nds-beispielboegen.mts`) liegt in der Zusatzstufe; ihre Datei- und Größenzahlen oben sind entsprechend höher, beim nächsten Build neu messen.
+*Nachgezogen 2026-11-13 (nur noch echte THW-Einheiten):* Die 100 gewürfelten THW-Bögen direkt in `examples/thw/` und ihr
+Generator (`scripts/beispielboegen-pdf.mts`, `npm run beispiele`) sind entfallen, ebenso der Großbogen „Verstärkter
+Bergungszug“ als Beispiel (er liegt als Prüfling unter `src/app/testdaten/`). THW-Beispiele gibt es nur noch unter
+`examples/thw/ortsverbaende/`; der Ordner „THW“ im Dialog entsteht damit erst aus dem nachgeladenen Baustein
+`beispiele-thw-ov.ts` (bis dahin Platzhalter). Die Zusatzstufe des Offline-Vorrats ist um 101 Dateien kleiner, kein
+THW-Beispielbogen liegt mehr vorab auf dem Gerät; Datei- und Bogenzahlen oben beim nächsten Build neu messen.
+
 *Nachgezogen 2026-11-08 (alle THW-Ortsverbände):* `examples/thw/ortsverbaende/` trägt 3.533 Übungsbögen
 (jede Einheit von 667 OVs, Landesverband › Regionalstelle › Ortsverband, immer StAN-Stärke, erzeugt von
 `scripts/thw-ov-beispielboegen.mts` aus der Momentaufnahme `scripts/quellen/thw-ov-einheiten.json` der OV-Karte

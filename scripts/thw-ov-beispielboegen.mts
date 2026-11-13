@@ -2,9 +2,9 @@
  * Erzeugt für jeden THW-Ortsverband einen Beispiel-Erfassungsbogen je Einheit
  * (Zugtrupps, Gruppen, Fachgruppen, Trupps) als JSON nach
  * examples/thw/ortsverbaende/<LV>/<RSt>/<OV>/. Wunsch aus Übungen: Jede
- * Einheit des eigenen OV (und der Nachbarn) als fertiger Übungsbogen, statt nur
- * 100 zufällig gewählte (die liegen weiter direkt in examples/thw/,
- * erzeugt von scripts/beispielboegen-pdf.mts).
+ * Einheit des eigenen OV (und der Nachbarn) als fertiger Übungsbogen. Die 100
+ * zufällig gewürfelten Einheiten, die es vorher direkt in examples/thw/ gab,
+ * sind entfallen: Sie standen an Ortsverbänden, die es dort so nicht gibt.
  *
  * Aufruf (Node ≥ 22):
  *   npm run beispiele:thw-ov              Bögen aus der Quell-Momentaufnahme erzeugen
@@ -609,9 +609,7 @@ writeFileSync(
   `# Alle THW-Einheiten aller Ortsverbände
 
 Für Übungen: je Einheit eines Ortsverbands ein Beispiel-Erfassungsbogen,
-gegliedert nach Landesverband › Regionalstelle › Ortsverband — zusätzlich zu den
-100 fiktiven Einheiten eine Ebene höher. ${anzahlBoegen} Bögen aus ${zeilen.length}
-Ortsverbänden.
+gegliedert nach Landesverband › Regionalstelle › Ortsverband. ${anzahlBoegen} Bögen aus ${zeilen.length} Ortsverbänden.
 
 - Einheiten je OV: [thw.blafusel.de](${QUELLE_URL}) (inoffizielle OV-Karte), Stand
   ${quelle.abgerufen}, Momentaufnahme in \`scripts/quellen/thw-ov-einheiten.json\`.

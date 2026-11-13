@@ -99,7 +99,7 @@ const LAENDER: Record<string, string> = {
 };
 
 // Beispielbögen aus examples/ — beliebig tief verschachtelt (z. B.
-// examples/thw/*.json oder examples/katastrophenschutz/niedersachsen/*.json).
+// examples/dlrg/*.json oder examples/katastrophenschutz/niedersachsen/*.json).
 // Abgelegt ist nur das Bogen-JSON; die PDF entsteht erst beim Klick aus dem
 // aktuellen Layout (siehe beispielPdf), damit Layout-Änderungen nicht jedes
 // Mal ein Neurendern aller Beispiele erzwingen. Der Glob wird beim Build
@@ -130,7 +130,9 @@ const nachDatei = (a: BeispielEintrag, b: BeispielEintrag) => a.datei.localeComp
 // ortsverbaende/, scripts/thw-ov-beispielboegen.mts) stehen nicht in diesem
 // Glob: Ihre Adressliste allein wäre mehrere hundert KB groß und läge sonst
 // in jedem App-Start. Sie kommt beim Öffnen des Dialogs aus einem eigenen
-// Baustein (beispiele-thw-ov.ts) dazu.
+// Baustein (beispiele-thw-ov.ts) dazu. Andere THW-Bögen gibt es nicht mehr
+// (die 100 gewürfelten Einheiten sind entfallen): Der Ordner „THW“ entsteht
+// also erst mit diesem Baustein.
 const BEISPIELE: BeispielEintrag[] = beispielEintraege(
   import.meta.glob(["../../examples/**/*.json", "!../../examples/thw/ortsverbaende/**"], {
     eager: true,
@@ -574,6 +576,12 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
   }, [beispielSuche]);
   const suchErgebnis = beispielSuche.trim().length >= 2 ? suchTreffer(beispielSuche) : null;
   const beispielOrdner = suchErgebnis ? [] : unterordner(beispielPfad);
+  // „THW“ besteht nur aus dem nachgeladenen Baustein: Bis er da ist, steht der
+  // Ordner als Platzhalter an seiner Stelle, statt später in die Liste zu springen.
+  if (!suchErgebnis && ovLaedt && beispielPfad.length === 0 && !beispielOrdner.some((o) => o.ordner === "thw")) {
+    beispielOrdner.push({ ordner: "thw", anzahl: 0 });
+    beispielOrdner.sort((a, b) => ordnerLabel(a.ordner).localeCompare(ordnerLabel(b.ordner), "de"));
+  }
   const beispielBoegen = suchErgebnis ? suchErgebnis.boegen : boegenHier(beispielPfad);
   const sichtbarSchluessel = beispielBoegen.map((b) => b.url).join("|");
   // Bögen aller Ortsverbände beim ersten Öffnen dazuholen (eigener Baustein,
@@ -625,7 +633,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
     }
     setBeispielLaedt(true);
     // Je Bogen einzeln in den Stand geben statt erst am Ende: bei einem großen
-    // Ordner (THW: über 100 Bögen) füllt sich die Tabelle so nach und nach.
+    // Ordner füllt sich die Tabelle so nach und nach.
     void Promise.all(
       fehlend.map((u) =>
         beispielBogen(u).then(
@@ -798,10 +806,10 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
 
   function beispieleOeffnen() {
     // Dort weiter, wo man zuletzt war (BB-S3, BB-W3); einen nicht mehr
-    // vorhandenen Ordner verwirft der Dialog. Der Ordner der Ortsverbände kommt
-    // erst mit seinem Baustein und darf deshalb kurz leer sein.
+    // vorhandenen Ordner verwirft der Dialog. „THW“ kommt erst mit dem Baustein
+    // der Ortsverbände und darf deshalb kurz leer sein.
     const p = pfadLaden();
-    setBeispielPfad(p.length === 0 || unterPfad(p).length > 0 || imOvOrdner(p) ? p : []);
+    setBeispielPfad(p.length === 0 || unterPfad(p).length > 0 || p[0] === "thw" ? p : []);
     setBeispielSuche("");
     setAusSuche("");
     setBeispielFehler("");
@@ -984,7 +992,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
         )}
         {ovFehlt && beispielPfad.length <= 1 && (beispielPfad.length === 0 || beispielPfad[0] === "thw") && (
           <p className="hinweis" role="status">
-            Ohne Netz fehlt unter „THW“ der Ordner „Alle Einheiten aller Ortsverbände“. Er erscheint wieder, sobald das Netz
+            Ohne Netz fehlt der Ordner „THW“ mit allen Einheiten aller Ortsverbände. Er erscheint wieder, sobald das Netz
             zurück ist — sonst die Seite mit Netz einmal neu laden.
           </p>
         )}
@@ -1010,7 +1018,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
           <p className="beispiel-zaehler">
             <strong>
               {beispielBoegen.length.toLocaleString("de-DE")} {beispielBoegen.length === 1 ? "Bogen" : "Bögen"}
-              {/* Lose Bögen neben Unterordnern (THW, DRK): sagen, dass sie direkt hier liegen (BB-S6, BB-N6, BB-W8). */}
+              {/* Lose Bögen neben Unterordnern (DRK): sagen, dass sie direkt hier liegen (BB-S6, BB-N6, BB-W8). */}
               {beispielOrdner.length > 0 && beispielPfad.length > 0 && ` direkt in „${ordnerLabel(beispielPfad[beispielPfad.length - 1]!)}“, außerhalb der Ordner oben`}
             </strong>
             {beispielLaedt && (

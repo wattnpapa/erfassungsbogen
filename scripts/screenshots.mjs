@@ -113,7 +113,7 @@ const SEO_AUFNAHMEN = [
   {
     datei: "thw-erfassungsbogen.png",
     ...BREIT,
-    seed: async () => entwurfSeed(await beispielBogen("thw/013-ulm-b.json")),
+    seed: async () => entwurfSeed(await beispielBogen("thw/ortsverbaende/lv-baden-wuerttemberg/rst-biberach/ov-ulm/ov-ulm-02-1-tz-b.json")),
     aktion: entwurfFortsetzen,
   },
   {
@@ -171,8 +171,8 @@ const SEO_AUFNAHMEN = [
     ...BREIT,
     seed: async () =>
       einsatzSeed("Sturmtief Quirin", "Albstadt", [
-        await beispielBogen("thw/001-albstadt-ztr-tz.json"),
-        await beispielBogen("thw/013-ulm-b.json"),
+        await beispielBogen("thw/ortsverbaende/lv-baden-wuerttemberg/rst-tuebingen/ov-albstadt/ov-albstadt-01-1-tz-ztr-tz.json"),
+        await beispielBogen("thw/ortsverbaende/lv-baden-wuerttemberg/rst-biberach/ov-ulm/ov-ulm-02-1-tz-b.json"),
         await beispielBogen("katastrophenschutz/sachsen/loeschgruppe-loeschzug-retten-kamenz.json"),
         await beispielBogen("dlrg/wrz-mittelbaden-bootsgruppe.json"),
         await beispielBogen("katastrophenschutz/sachsen/sanitaetsgruppe-einsatzzug-goerlitz.json"),
@@ -187,7 +187,7 @@ const SEO_AUFNAHMEN = [
     // App. Bewusst ein kleiner Bogen, damit ein einzelner Code entsteht.
     datei: "qr-code-uebergabe.png",
     ...SCHMAL,
-    seed: async () => entwurfSeed(await beispielBogen("thw/073-speyer-tr-mhp.json")),
+    seed: async () => entwurfSeed(await beispielBogen("thw/ortsverbaende/lv-hessen-rheinland-pfalz-saarland/rst-neustadt-a-d-w/ov-speyer/ov-speyer-01-1-tz-ztr-tz.json")),
     aktion: async (seite) => {
       await entwurfFortsetzen(seite);
       // Signieren + QR-Rendern läuft asynchron — erst warten, dann hinscrollen.

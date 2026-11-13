@@ -1,12 +1,11 @@
 /**
  * Gemeinsame Tabellen und Helfer der THW-Beispielbogen-Generatoren
- * (scripts/beispielboegen-pdf.mts: 100 fiktive Einheiten;
- * scripts/thw-ov-beispielboegen.mts: alle Einheiten aller Ortsverbände).
+ * (scripts/thw-ov-beispielboegen.mts: alle Einheiten aller Ortsverbände).
  * Namens-Pools, Zusatzfunktionen, Einsatz-Szenarien, Fahrzeug-Hilfstabellen
  * und die OV-Hierarchie wie im Autofill der App.
  */
 
-import type { Fahrzeug, HierarchieEbene } from "@bos/eeb-format/model";
+import type { HierarchieEbene } from "@bos/eeb-format/model";
 import type { ThwOrtsverband } from "@bos/vokabulare/thw-ov";
 import {
   THW_LANDESVERBAENDE_KONTAKT,
@@ -179,19 +178,6 @@ export const MIT_MOTORSAEGE = new Set([4, 5, 6, 7, 8, 19]);
 
 /** Fahrzeugtypen, die einen CE-Kraftfahrer voraussetzen. */
 export const SCHWERE_FAHRZEUGE = new Set([4, 6, 7, 8, 9, 10, 11, 12, 13, 20]);
-
-/** Anhänger/Auflieger (kein eigener Antrieb). */
-export const ANHAENGER = new Set([14, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55]);
-export const istAnhaenger = (fz: Fahrzeug): boolean =>
-  fz.typ.code != null ? ANHAENGER.has(fz.typ.code) : (fz.typ.freitext ?? "").startsWith("Anh");
-
-/** OV-eigene Zusatzfahrzeuge (Abweichung „mehr Fahrzeuge"): Klasse → Kennzahlen. */
-export const EXTRA_FAHRZEUGE: { freitext: string; kennzahlen: number[]; kraftstoff: [number, number] }[] = [
-  { freitext: "MTW OV", kennzahlen: [25, 26, 27, 28], kraftstoff: [30, 0] },
-  { freitext: "PKW OV", kennzahlen: [21, 22, 23, 24], kraftstoff: [20, 0] },
-  { freitext: "MzKW", kennzahlen: [54], kraftstoff: [50, 0] },
-  { freitext: "Anh OV (Plane)", kennzahlen: [], kraftstoff: [0, 0] },
-];
 
 export function slug(s: string): string {
   return s

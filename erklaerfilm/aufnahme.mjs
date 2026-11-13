@@ -285,7 +285,12 @@ try {
   // Ein zweites Gerät: das Tablet am Meldekopf. Vier THW-Einheiten aus den
   // Beispielbögen sind schon eingetroffen, die Bergungsgruppe Ulm kommt dazu.
   const vorher = await Promise.all(
-    ["thw/001-albstadt-ztr-tz.json", "thw/004-freiburg-fgr-wp-a.json", "thw/012-sinsheim-fgr-w-b.json", "thw/007-laufenburg-ztr-fz-log.json"].map(beispielBogen),
+    [
+      "thw/ortsverbaende/lv-baden-wuerttemberg/rst-tuebingen/ov-albstadt/ov-albstadt-01-1-tz-ztr-tz.json",
+      "thw/ortsverbaende/lv-baden-wuerttemberg/rst-freiburg/ov-freiburg/ov-freiburg-03-1-tz-fgr-r-a.json",
+      "thw/ortsverbaende/lv-baden-wuerttemberg/rst-mannheim/ov-sinsheim/ov-sinsheim-04-1-tz-fgr-n.json",
+      "thw/ortsverbaende/lv-baden-wuerttemberg/rst-villingen-schwenningen/ov-laufenburg/ov-laufenburg-02-1-tz-b-ash.json",
+    ].map(beispielBogen),
   );
   for (const [szene, boegen] of [
     ["meldekopf", vorher],

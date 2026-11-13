@@ -37,6 +37,7 @@ export const AENDERUNGEN: readonly Aenderung[] = [
   {
     datum: "2026-11-13",
     punkte: [
+      "Beispielbögen THW: Die 100 gewürfelten Einheiten und der übergroße „Verstärkte Bergungszug“ sind entfallen. Unter „THW“ stehen nur noch die Einheiten, die es im jeweiligen Ortsverband gibt, geordnet nach Landesverband, Regionalstelle und Ortsverband. Diese Bögen lädt die App erst beim Öffnen; ohne Netz ist nur da, was schon einmal geöffnet war.",
       "Die Aufklappmenüs der Themenleiste über der App sind wieder lesbar: Sie sind so breit wie ihr längster Eintrag, die Einträge stehen linksbündig, und das Menü der Anleitung klappt nach links auf.",
       "THW, Fachgruppe Ölschaden (B): Der LKW mit Ladekran wird mit dem Funkrufnamen 56/45 vorbelegt statt mit 56/44 (Hinweis aus dem OV Kiel).",
       "Der Hinweis zur Verpflegung erscheint jetzt auch, wenn für weniger Personen Verpflegung angefordert ist, als die Einheit stark ist. Bisher kam er nur bei zu vielen Portionen. Wer 0 einträgt, weil sich die Einheit selbst versorgt, wird weiterhin nicht gefragt.",

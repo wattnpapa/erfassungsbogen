@@ -36,7 +36,7 @@ Ort aus dem OV-Verzeichnis, Einheitstyp mit StAN-Vorbelegung, Namensliste
 einfügen, Fahrzeuge, Sofortbedarf, offenen Punkt beheben, PDF, QR-Vollbild.
 Nach jeder Eingabe entsteht ein Bild samt Position des Zielfelds
 (`aufnahmen/index.json`). Die Meldekopf-Ansicht entsteht auf einem zweiten,
-frischen Browser-Profil mit vier Beispielbögen aus `examples/thw/` plus dem
+frischen Browser-Profil mit vier Beispielbögen aus `examples/thw/ortsverbaende/` plus dem
 eben ausgefüllten Bogen.
 
 Nach Änderungen an der Oberfläche einfach neu aufnehmen. Bricht die Aufnahme

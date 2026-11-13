@@ -1,9 +1,7 @@
 # Alle THW-Einheiten aller Ortsverbände
 
 Für Übungen: je Einheit eines Ortsverbands ein Beispiel-Erfassungsbogen,
-gegliedert nach Landesverband › Regionalstelle › Ortsverband — zusätzlich zu den
-100 fiktiven Einheiten eine Ebene höher. 3533 Bögen aus 667
-Ortsverbänden.
+gegliedert nach Landesverband › Regionalstelle › Ortsverband. 3533 Bögen aus 667 Ortsverbänden.
 
 - Einheiten je OV: [thw.blafusel.de](https://thw.blafusel.de/) (inoffizielle OV-Karte), Stand
   2026-11-08, Momentaufnahme in `scripts/quellen/thw-ov-einheiten.json`.

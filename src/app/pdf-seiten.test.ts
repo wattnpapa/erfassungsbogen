@@ -103,7 +103,7 @@ describe("Einzel-PDF: Platz für Stiftnachträge, wo er keine Seite kostet (R3-A
   const freieZeilen = (dd: { content: unknown }) =>
     (JSON.stringify(dd.content).match(/"text":" ","margin":\[0,2,0,2\]/g) ?? []).length / 3;
   const beispiel = (datei: string): Erfassungsbogen =>
-    JSON.parse(readFileSync(new URL(`../../examples/thw/${datei}`, import.meta.url), "utf8")) as Erfassungsbogen;
+    JSON.parse(readFileSync(new URL(`../../examples/thw/ortsverbaende/${datei}`, import.meta.url), "utf8")) as Erfassungsbogen;
 
   it.each([3])("kleiner Bogen (%i QR-Teile): zwei freie Personalzeilen und ein leerer Fahrzeugblock, Seitenzahl gleich", async (teile) => {
     const b = bogen(4);
@@ -125,13 +125,19 @@ describe("Einzel-PDF: Platz für Stiftnachträge, wo er keine Seite kostet (R3-A
   // Seit dem Raster der THWin-Vorlage (10 pt, Zeilenhöhen der Vorlage) steht der Code des
   // Zugtrupps Albstadt auf Seite 2. Die Regel bleibt: freie Zeilen kosten keine Seite.
   it("Zugtrupp Albstadt: freie Zeilen kosten keine Seite", async () => {
-    const b = beispiel("001-albstadt-ztr-tz.json");
+    const b = beispiel("lv-baden-wuerttemberg/rst-tuebingen/ov-albstadt/ov-albstadt-01-1-tz-ztr-tz.json");
     const dd = await einzelPdfDokument(b, qrSatz(1), pdfBytes);
     expect(seitenZahl(await pdfBytes(dd))).toBe(seitenZahl(await pdfBytes(pdfDokument(b, qrSatz(1)))));
   }, 20_000);
 
   it("50 THW-Beispielbögen: freie Zeilen und Fahrzeugblock kosten nie eine Seite", async () => {
-    for (const datei of readdirSync(new URL("../../examples/thw/", import.meta.url)).filter((d) => /^0[0-4]\d-.*\.json$/.test(d))) {
+    // Quer durch alle Landesverbände und Einheitstypen: jeder 70. der rund 3.500 Bögen.
+    const alle = (readdirSync(new URL("../../examples/thw/ortsverbaende/", import.meta.url), { recursive: true }) as string[])
+      .filter((d) => d.endsWith(".json"))
+      .sort();
+    const auswahl = alle.filter((_, i) => i % 70 === 0);
+    expect(auswahl.length).toBeGreaterThanOrEqual(50);
+    for (const datei of auswahl) {
       const b = beispiel(datei);
       const ohne = seitenZahl(await pdfBytes(pdfDokument(b, qrSatz(1))));
       const mit = seitenZahl(await pdfBytes(await einzelPdfDokument(b, qrSatz(1), pdfBytes)));
