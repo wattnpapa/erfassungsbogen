@@ -39,6 +39,7 @@ export const AENDERUNGEN: readonly Aenderung[] = [
     punkte: [
       "Die Aufklappmenüs der Themenleiste über der App sind wieder lesbar: Sie sind so breit wie ihr längster Eintrag, die Einträge stehen linksbündig, und das Menü der Anleitung klappt nach links auf.",
       "THW, Fachgruppe Ölschaden (B): Der LKW mit Ladekran wird mit dem Funkrufnamen 56/45 vorbelegt statt mit 56/44 (Hinweis aus dem OV Kiel).",
+      "Der Hinweis zur Verpflegung erscheint jetzt auch, wenn für weniger Personen Verpflegung angefordert ist, als die Einheit stark ist. Bisher kam er nur bei zu vielen Portionen. Wer 0 einträgt, weil sich die Einheit selbst versorgt, wird weiterhin nicht gefragt.",
       "Beispielbögen bringen keinen erfundenen Einsatz mehr mit: Zeitraum sowie Ort und Auftrag sind leer und bleiben auch in der PDF frei. Vor der Übergabe erinnert die App daran, den Zeitraum einzutragen. Als Stand gilt die Uhrzeit, zu der der Bogen, die PDF oder der Link erzeugt wurde.",
       "PDF: Die Tabelle der Qualifikationen teilt am Seitenende keine Zeile mehr und wiederholt ihren Kopf auf der Folgeseite. Vorher ragte die letzte Zeile in den Rand, und die Kopfzeile der Seite stand quer darüber.",
     ],
