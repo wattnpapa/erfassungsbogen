@@ -40,6 +40,7 @@ import { WERKZEUGE, WERKZEUGE_TITEL } from "./werkzeuge";
 import { folgenText } from "./uhr-folgen";
 import { arbeiten, useArbeitet } from "./arbeitet";
 import type { Aenderung } from "./aenderungen";
+import { stammLaden } from "./personalstamm";
 
 const KONTAKT = "johannes.rudolph@thw-oldenburg.de";
 const REPO = "https://github.com/wattnpapa/erfassungsbogen";
@@ -138,8 +139,9 @@ function Datenschutzdialog({ dialogRef }: { dialogRef: RefObject<HTMLDialogEleme
         arbeitet und die Arbeit sonst bei jedem Neustart verloren wäre:
         eigene Vorlagen, der aktuelle Bogen-Entwurf, Einsatz-Sammlungen aus
         der Zeit vor der Meldekopf-App (bis sie gelöscht werden), die
-        Absenderkarte, der private Signatur-Geräteschlüssel und die
-        Anzeige-Einstellungen (Feld-/Nachtmodus). Ein Widerspruch gegen die
+        Absenderkarte, der private Signatur-Geräteschlüssel, die
+        Anzeige-Einstellungen (Feld-/Nachtmodus) und, wenn eine Dienststelle
+        ihn einliest, der Personalstamm (ihre Helferliste). Ein Widerspruch gegen die
         Reichweitenmessung wird ebenfalls dort vermerkt.
       </p>
       <p>
@@ -655,6 +657,12 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false, offlineHinweis }: {
           eine Datei sichern und auf einem anderen Gerät (oder nach einer
           Neuinstallation) wieder einspielen.
         </p>
+        {stammLaden() && (
+          <p className="hinweis">
+            Nicht in der Datei: der Personalstamm. Die Helferliste bleibt auf diesem Gerät; ein anderes Gerät liest
+            die Excel- oder CSV-Datei selbst ein.
+          </p>
+        )}
         <p className="warnung">
           Die Datei enthält den privaten Signaturschlüssel und ggf. Personendaten.
           Sicher aufbewahren und nur über vertrauenswürdige Wege übertragen.
@@ -870,6 +878,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false, offlineHinweis }: {
                     : "kein Signatur-Geräteschlüssel"}
                 </li>
                 <li>alle Einstellungen (Darstellung, Vorbelegungen)</li>
+                {stammLaden() && <li>der Personalstamm (die eingelesene Helferliste)</li>}
               </ul>
             </>
           )

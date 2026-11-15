@@ -63,6 +63,8 @@ import { geschlechtGeprueft, geschlechtGeprueftSetzen, useGeschlechtGeprueftStan
 import { frageJaNein, frageWahl } from "../dialoge";
 import { TelefonFeld } from "./telefon-feld";
 import { nachzueglerFuer } from "../vorlage-nachzuegler";
+import { stammLaden } from "../personalstamm";
+import { StammAuswahlFenster } from "../personalstamm-fenster";
 import { TabellenScroll } from "../tabellen-scroll";
 import {
   Feld,
@@ -1491,6 +1493,10 @@ export function SchrittPersonal({
     if (!schnell) setZurNeuen(bogen.personal.length);
     aendern({ personal: [...bogen.personal, neu] });
   }
+  // Lokaler Personalstamm (personalstamm.ts): Wer nachkommt, wird mit Suche ergänzt — auch nach einem Neuladen,
+  // anders als „Aus der Vorlage ergänzen", das nur die Abgewählten der letzten Musterung kennt.
+  const [stamm] = useState(() => stammLaden());
+  const [stammOffen, setStammOffen] = useState(false);
   const vorlage = stanPersonalVorbelegung(
     bogen.einheit.organisation,
     bogen.einheit.einheitsTyp,
@@ -2116,6 +2122,11 @@ export function SchrittPersonal({
               Aus der Vorlage ergänzen… ({nachzuegler.length})
             </button>
           )}
+          {stamm && stamm.personen.length > 0 && (
+            <button type="button" onClick={() => setStammOffen(true)}>
+              Aus Personalstamm hinzufügen…
+            </button>
+          )}
         </p>
       )}
       {/* Die Karten sind die lange Wahl: Wer viele Personen hat und in den Karten
@@ -2319,6 +2330,21 @@ export function SchrittPersonal({
         </p>
       )}
 
+      {stamm && (
+        <StammAuswahlFenster
+          offen={stammOffen}
+          titel="Aus Personalstamm hinzufügen"
+          onSchliessen={() => setStammOffen(false)}
+          stamm={stamm}
+          organisation={bogen.einheit.organisation}
+          bestand={bogen.personal}
+          okText={(n) => (n === 1 ? "1 Person hinzufügen" : `${n} Personen hinzufügen`)}
+          onUebernehmen={(personal, text) => {
+            aendernMitRueckweg(personal, text);
+            setStammOffen(false);
+          }}
+        />
+      )}
       <dialog ref={namenDialog} aria-label="Namen einfügen">
         <div className="kopfzeile">
           <h2>Namen einfügen</h2>

@@ -889,6 +889,30 @@
        Komponente der App, nur an diesen Regeln. */
     /* R6-G4: Der Umschalter der Musterung behält seine Breite, wenn das Wort wechselt. */
     .muster-umschalter { min-width: 8.5em; }
+    /* Personalstamm (personalstamm-fenster.tsx, personalstamm-ui.tsx): „Personal einlesen…" und „Wer ist dabei?".
+       Breiter als eine Rückfrage, weil Liste, Filter und Spaltenzuordnung nebeneinander Platz brauchen. Das Fenster
+       „Wer ist dabei?" hat zwei Bereiche wie die Rückfragen (R7-W1): Die Liste rollt, Stärke und Knopf stehen fest,
+       damit nach 40 angetippten Zeilen niemand zum Knopf rollen muss. */
+    dialog.stamm-dialog { width: min(46rem, calc(100vw - min(2rem, 32px))); }
+    dialog.stamm-dialog h3 { font-size: var(--t-m); margin: var(--r-4) 0 var(--r-2); }
+    dialog.stamm-auswahl[open] { display: flex; flex-direction: column; overflow: hidden; height: calc(100dvh - min(2rem, 32px)); }
+    dialog.stamm-auswahl > * { flex: 0 0 auto; }
+    dialog.stamm-auswahl > .stamm-rollt { flex: 1 1 auto; min-height: 6rem; overflow-y: auto; overscroll-behavior: contain; border-bottom: var(--strich) solid var(--linie); padding-right: 2px; }
+    .stamm-filter { display: flex; flex-wrap: wrap; gap: 0 var(--r-3); }
+    .stamm-filter > label.feld { flex: 1 1 9rem; min-width: 0; }
+    .stamm-filter > label.feld:first-child { flex: 2 1 14rem; }
+    .stamm-stand { margin: var(--r-3) 0 0; }
+    .stamm-dialog .rolle-badge { width: auto; min-width: 1.5rem; padding: 0 0.25rem; }
+    .muster-zeile.stamm-im-bogen { cursor: default; }
+    .muster-zeile.stamm-im-bogen .muster-name { color: var(--text-2); }
+    dialog.stamm-auswahl .stamm-fuss { margin-top: var(--r-2); }
+    .stamm-zuordnung { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 0 var(--r-4); }
+    .stamm-zuordnung > label.feld > .hinweis { display: block; margin: 0.2rem 0 0; font-weight: 400; }
+    .stamm-knoepfe { display: flex; flex-wrap: wrap; gap: var(--r-2) var(--r-3); margin: var(--r-3) 0; }
+    .stamm-knoepfe > button, .stamm-knoepfe > .datei-knopf { min-height: calc(2.75rem + var(--ziel)); padding: 0.6rem 1.1rem; font-size: var(--t-m); }
+    @media (max-width: 540px) {
+      .stamm-knoepfe, .stamm-fuss { flex-direction: column; align-items: stretch; }
+    }
     .fehlerseite { max-width: 40rem; margin: 0 auto; padding: var(--r-5, 1.5rem) var(--r-4, 1rem); }
     .fehlerseite h1 { font-size: var(--t-xl); margin: 0 0 var(--r-3, 0.75rem); }
     .fehlerseite details { margin-top: var(--r-4, 1rem); }

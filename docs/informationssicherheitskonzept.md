@@ -16,6 +16,17 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Abhängigkeiten (6.4/R8/M8). Die betroffenen Abschnitte sind entsprechend
 > gekennzeichnet.
 >
+> **Nachgezogen 2026-11-15 — Personalstamm:** Neuer Speicherort `eeb.personalstamm.v1` (3.3, Zeile D2q): die
+> Helferliste einer Dienststelle, einmal aus CSV oder Excel (.xlsx) eingelesen (`src/app/personalstamm.ts`,
+> `personalstamm-import.ts`). Anders als alle bisherigen Speicherorte enthält er auch Personen, die in keinem Bogen
+> stehen. Er wandert deshalb **nicht** in die Datensicherung und bleibt beim Einspielen einer Sicherung auf dem Gerät
+> (`sicherung.ts`, `BEIM_GERAET`); „Alle Daten löschen" und „Personalstamm löschen…" entfernen ihn (5.5). Neuer
+> Eingang (6.2): Die .xlsx wird ohne neue Abhängigkeit gelesen — derselbe ZIP-Leser wie beim Word-Import
+> (`zipEintrag`, pako mit Entpack-Grenze, hier 40 MB je XML-Datei; Datei höchstens 10 MB, höchstens 3 000 Personen,
+> 60 Spalten), XML über den DOMParser. Gelesen werden nur Zellwerte; Formeln, Makros und eingebettete Objekte
+> werden nicht ausgewertet. Die Mustervorlage (.xlsx, .csv) erzeugt die App selbst, ohne Formeln und Makros.
+> Transportformat, Schema, CSP und Netzverbindungen unverändert; keine neue Abhängigkeit (6.4).
+>
 > **Nachgezogen 2026-11-15 — Schema 13:** Transportformat (5.2): abweichende Farbe des taktischen Zeichens je
 > Fahrzeug (`Fahrzeug.zeichenfarbe`, Flag 64 im Fahrzeug-Byte, ein Byte). Nur Bögen mit diesem Feld sind
 > Schema 13; ältere App-Stände lehnen sie als „nicht unterstützte Schema-Version" ab. Exporte (5.4): PDF nennt
@@ -765,6 +776,7 @@ dem Vite-Build); es gibt keine serverseitige Variante.
 | D2n | Einsatzbeginn und Funkrufname für den Lagemonitor (seit 2026-10-17) | Je Einsatz-Kennung der von Hand gesetzte Beginn als Zeitpunkt und der von Hand eingetragene, optionale Funkrufname der eigenen Führungsstelle als Freitext bis 60 Zeichen (`src/app/lagemonitor-beginn.ts`, `lagemonitor-speicher.ts`); beim Schreiben fallen Einträge zu nicht mehr vorhandenen Einsätzen weg; keine Namen von Personen vorgesehen | `localStorage` des Geräts (`eeb.lagebeginn.v1`, `eeb.lagefunkruf.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
 | D2o | Letzter Stand des Offline-Vorrats (seit 2026-10-23, R6-O7) | Zwei Zähler: wie viele Dateien der zweiten Stufe (Beispielbögen, Themenseiten) im Gerät liegen und wie viele es gibt (`src/app/offline-bereit.ts`) — damit die Zeile nach einem Neuladen ohne Netz weiter sagt, was fehlt; keine Namen, keine Personendaten | `localStorage` des Geräts (`eeb.offline-zusatz.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
 | D2p | Bestätigung „Geschlecht geprüft“ (seit 2026-11-12) | Prüfsummen (FNV-1a) über Namen und Geschlecht der Personen eines Bogens, dessen Besetzung jemand in Schritt 3 als „alle männlich“ bestätigt hat — damit der Hinweis auf die Geschlechts-Vorbelegung bei dieser Besetzung schweigt (`src/app/geschlecht-geprueft.ts`); höchstens 50 Einträge, die ältesten fallen heraus; keine Namen im Klartext, kein Merker im Bogen oder im Transportformat | `localStorage` des Geräts (`eeb.geschlecht-geprueft.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
+| D2q | Lokaler Personalstamm (seit 2026-11-15) | Helferliste einer Dienststelle, einmal aus CSV oder Excel eingelesen (`src/app/personalstamm.ts`): je Person Name, Rolle (F/UF/H), Funktion, Qualifikationen, Fahrerlaubnisklassen, Teileinheit; Rufnummer nur, wenn beim Einlesen angehakt (Vorgabe: ja); Geschlecht und Ernährung nur, wenn beim Einlesen angehakt (Vorgabe: nein); dazu Dateiname und Zeitpunkt des Einlesens. Enthält auch Personen, die in keinem Bogen stehen; in Bogen, QR-Code, PDF und Exporte gelangen nur die in „Wer ist dabei?" ausgewählten | `localStorage` des Geräts (`eeb.personalstamm.v1`), wandert **nicht** mit der Datensicherung und bleibt beim Einspielen einer Sicherung liegen; fällt mit „Personalstamm löschen…" und mit „Alle Daten löschen" weg; die Startseite nennt das Datum des Einlesens und erinnert nach 90 Tagen |
 | D3 | Absenderkarte | Freiwillige Kontaktangabe (Name/E-Mail/Telefon) der meldenden Person | `localStorage` des Geräts |
 | D4 | Privater Geräteschlüssel | Ed25519-Schlüssel zur Signatur weitergereichter Bögen | `localStorage` des Geräts, **unverschlüsselt als Hex**; lässt er sich beim ersten Erzeugen nicht speichern (Speicher voll/gesperrt), nur im Arbeitsspeicher der offenen Seite, bis Platz ist (seit 2026-10-05, R3-E1) |
 | D5 | QR-Payload / Exportdatei | Binär kodierter, komprimierter Bogen zur Übergabe an ein zweites Gerät; ebenso eine geteilte Vorlage (QR/Link mit Marker `V.`, oder JSON-Datei `eeb-vorlage-*.json`) | Transient (QR-Code-Anzeige) bzw. Datei auf dem Gerät oder in einer vom Nutzer gewählten Ablage (z. B. Cloud-Ordner) |

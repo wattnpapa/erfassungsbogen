@@ -11,6 +11,21 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > **Wichtig:** Der Commit „Sicherheitsbericht umsetzen" (`c7604e9`, 2026-09-12)
 > hat das in R5/M6 genannte Dekomprimierungs-Risiko bereits behoben.
 >
+> **Nachgezogen 2026-11-15 — Personalstamm:** Neuer Speicherort `eeb.personalstamm.v1` im `localStorage`
+> (`src/app/personalstamm.ts`) und damit eine **neue Betroffenengruppe auf dem Gerät** (5.4, 5.7): Angehörige der
+> Dienststelle, die an keinem Einsatz teilnehmen. Die einsetzende Organisation liest ihre Helferliste (CSV oder Excel)
+> selbst ein; je Person Name, Rolle, Funktion, Qualifikationen, Fahrerlaubnisklassen und Teileinheit. Rufnummern
+> lassen sich beim Einlesen abwählen; Geschlecht und Ernährung (Ernährung kann Rückschlüsse auf Religion oder
+> Gesundheit zulassen) kommen nur mit, wenn sie ausdrücklich angehakt werden (datenschutzfreundliche Voreinstellung,
+> Art. 25 Abs. 2 DSGVO). Datenminimierung und Speicherbegrenzung: Der Stamm verlässt das Gerät nicht — in Bogen,
+> QR-Code, PDF und Exporte gelangen nur die ausgewählten Personen, die Datensicherung enthält ihn nicht, einen Server
+> gibt es nicht (5.8 unverändert). Die Startseite zeigt das Datum des Einlesens und erinnert nach 90 Tagen;
+> „Personalstamm löschen…" und „Alle Daten löschen" entfernen ihn. Eine automatische Löschfrist gibt es nicht: Die
+> Organisation sollte in ihrer Fassung dieser Vorlage festlegen, wer die Liste einliest, auf welchen Geräten sie
+> liegen darf und wann sie zu erneuern oder zu löschen ist (neues Risiko: verlorenes oder weitergegebenes Gerät mit
+> vollständiger Helferliste; Maßnahmen: Gerätesperre, nur dienstliche Geräte, Rufnummern abwählen). Die
+> Datenschutzfrist der Bögen (Anonymisierung) erfasst den Stamm nicht.
+>
 > **Nachgezogen 2026-11-15 — Schema 13:** Datenkategorie Fahrzeug erweitert (5.4): die Farbe des taktischen
 > Zeichens (`Fahrzeug.zeichenfarbe`: kommunal oder grau) für Gerät von Partnern. Sachangabe zum Gerät ohne
 > Personenbezug; sie reist mit dem Bogen durch QR, Datei, PDF und CSV. Kein neuer Speicherort, keine neue

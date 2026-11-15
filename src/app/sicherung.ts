@@ -34,8 +34,14 @@ const UHR_SCHLUESSEL = "eeb.uhr.v1";
  * DIESEM Gerät im Cache liegt, nicht auf dem Herkunftsgerät der Sicherung; bleibt beim Einspielen beim Gerät (R14-O2).
  */
 export const ZUSATZ_STAND_SCHLUESSEL = "eeb.offline-zusatz.v1";
+/**
+ * Lokaler Personalstamm (personalstamm.ts): die Helferliste der Dienststelle, auch mit Personen, die in keinem Bogen
+ * stehen. Er wandert nicht in die Sicherungsdatei — die Quelle ist die Datei der Dienststelle, ein zweites Gerät liest
+ * sie selbst ein — und bleibt beim Einspielen einer Sicherung auf dem Gerät. „Alle Daten löschen" nimmt ihn mit.
+ */
+const STAMM_SCHLUESSEL = "eeb.personalstamm.v1";
 /** Schlüssel, die zum Gerät gehören und beim Einspielen weder gelöscht noch aus der Datei übernommen werden. */
-const BEIM_GERAET: ReadonlySet<string> = new Set([UHR_SCHLUESSEL, ZUSATZ_STAND_SCHLUESSEL]);
+const BEIM_GERAET: ReadonlySet<string> = new Set([UHR_SCHLUESSEL, ZUSATZ_STAND_SCHLUESSEL, STAMM_SCHLUESSEL]);
 
 export interface Sicherung {
   format: typeof FORMAT;
@@ -457,6 +463,7 @@ export function sicherungErstellen(jetzt = new Date()): string {
       /* kein Fenster (Test ohne DOM) */
     }
     for (const k of alleEebSchluessel(s)) {
+      if (k === STAMM_SCHLUESSEL) continue; // der Personalstamm verlässt das Gerät nicht, auch nicht als Sicherung
       const v = s.getItem(k);
       if (v != null) eintraege[k] = v;
     }

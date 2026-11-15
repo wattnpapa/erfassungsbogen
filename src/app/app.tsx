@@ -9,8 +9,10 @@
 import { zeitraumLeer } from "./zeitraum-eingabe";
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, type ChangeEvent } from "react";
 import { START_ABSCHNITTE, type Teil } from "./start-inhalt";
-import type { Erfassungsbogen, Person } from "@bos/eeb-format/model";
+import type { Erfassungsbogen, OrganisationsTyp, Person } from "@bos/eeb-format/model";
 import { nachzueglerMerken } from "./vorlage-nachzuegler";
+import { stammLaden, type Personalstamm } from "./personalstamm";
+import { PersonalstammKarte, StammAuswahlFenster } from "./personalstamm-fenster";
 import {
   decodePayloadUrl,
   decodeVorlagePayloadUrl,
@@ -37,6 +39,7 @@ import {
   einheitOrt,
   bogenSpeichern,
   einzelpersonAbgleich,
+  ersteEbene,
   neuerBogen,
   schrittStatus,
 } from "./hilfen";
@@ -836,6 +839,9 @@ function AppInhalt() {
     !START_SOFORT && !!ENTWURF && (!erfassungsZielBeimStart() || ENTWURF.fremd?.startseite === true) && !NACH_ABGLEICH,
   );
   const [vorlagen, setVorlagen] = useState<Vorlage[]>(() => vorlagenLaden());
+  // Lokaler Personalstamm (personalstamm.ts): Gibt es einen, fragt „Neuen Bogen erstellen" zuerst „Wer ist dabei?".
+  const [stamm, setStamm] = useState<Personalstamm | null>(() => stammLaden());
+  const [stammWahl, setStammWahl] = useState(false);
   /** Vorige Fassung nach „Vorlage aktualisieren" — für „Rückgängig" (R2-D2). */
   const [vorlageRueckweg, setVorlageRueckweg] = useState<Vorlage | null>(null);
   // Absenderkarte (Gerätestand) — auch auf der Startseite einstellbar; die
@@ -1187,6 +1193,27 @@ function AppInhalt() {
   useEffect(() => {
     wendeOrgAkzentAn(bogen?.einheit.organisation);
   }, [bogen?.einheit.organisation]);
+
+  /**
+   * „Neuen Bogen erstellen": leerer Bogen, auf Wunsch schon mit den Personen aus „Wer ist dabei?" (Personalstamm)
+   * und der dort gewählten Organisation. Liefert false, wenn der offene Bogen nicht ersetzt werden soll.
+   */
+  async function leerenBogenAnfangen(personal: Person[] = [], organisation?: OrganisationsTyp): Promise<boolean> {
+    if (!(await darfBogenErsetzen({ titel: "Neuen Bogen anfangen?", was: "einen leeren Bogen", ok: "Neu anfangen" }))) return false;
+    const leer = neuerBogen();
+    setMeldung("");
+    setBogen({
+      ...leer,
+      ...(organisation != null && organisation !== leer.einheit.organisation
+        ? { einheit: { ...leer.einheit, organisation, hierarchie: [ersteEbene(organisation)] } }
+        : {}),
+      personal,
+    });
+    setzeEmpfang(null);
+    setSchritt(0);
+    setZeigeStart(false);
+    return true;
+  }
 
   async function musterungFertig(neuerArbeitsbogen: Erfassungsbogen, abgewaehlt: Person[] = [], alleDa?: string) {
     if (
@@ -2532,13 +2559,13 @@ function AppInhalt() {
                   Einsatz vorbereiten: {v.name}
                 </button>
               ))}
-              <button type="button" className={bogen || schnellVorlagen.length > 0 ? "" : "primaer"} onClick={async () => {
-                if (!(await darfBogenErsetzen({ titel: "Neuen Bogen anfangen?", was: "einen leeren Bogen", ok: "Neu anfangen" }))) return;
-                setMeldung("");
-                setBogen(neuerBogen());
-                setzeEmpfang(null);
-                setSchritt(0);
-                setZeigeStart(false);
+              <button type="button" className={bogen || schnellVorlagen.length > 0 ? "" : "primaer"} onClick={() => {
+                // Mit Personalstamm zuerst „Wer ist dabei?" — die Frage nach dem offenen Bogen folgt beim Anlegen,
+                // damit ein Abbruch der Auswahl nichts verändert.
+                if (stamm && stamm.personen.length > 0) {
+                  setMeldung("");
+                  setStammWahl(true);
+                } else void leerenBogenAnfangen();
               }}>
                 Neuen Bogen erstellen
               </button>
@@ -2605,6 +2632,26 @@ function AppInhalt() {
               frischeId={frischeVorlageId}
             />
           </section>
+        )}
+        {/* Helferliste der Dienststelle, einmal eingelesen (Wunsch OV Markt Schwaben, 11/2026). */}
+        <PersonalstammKarte stamm={stamm} onGeaendert={setStamm} />
+        {stamm && (
+          <StammAuswahlFenster
+            offen={stammWahl}
+            titel="Wer ist dabei?"
+            onSchliessen={() => setStammWahl(false)}
+            stamm={stamm}
+            organisation={neuerBogen().einheit.organisation}
+            organisationWaehlbar
+            bestand={[]}
+            okText={(n, staerkeText) => `Bogen anlegen · ${n} ${n === 1 ? "Person" : "Personen"} · ${staerkeText}`}
+            onUebernehmen={async (personal, _text, organisation) => {
+              if (await leerenBogenAnfangen(personal, organisation)) setStammWahl(false);
+            }}
+            onOhne={async (organisation) => {
+              if (await leerenBogenAnfangen([], organisation)) setStammWahl(false);
+            }}
+          />
         )}
         {/* Absender einmal einrichten, bevor der erste Bogen entsteht: hier auf
             der Startseite gefunden, gilt die Angabe für jeden späteren Transport.

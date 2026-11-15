@@ -12,6 +12,18 @@
 > umsetzen: SBOM, CSP ohne unsafe-inline, Entpack-Grenze") betrifft die Kapitel
 > 2.1, 8.3, 8.6, 8.7 und 11.2 — dort jeweils vermerkt.
 >
+> **Nachgezogen 2026-11-15 (Personalstamm):** Kap. 5, 8. Neue Bausteine in `src/app/`: `personalstamm.ts`
+> (Startbündel: Typen, Ablage unter `eeb.personalstamm.v1`, Alter), `personalstamm-fenster.tsx` (Startbündel: Abschnitt
+> der Startseite, Rahmen der Fenster) sowie nachgeladen `personalstamm-import.ts` (CSV- und .xlsx-Leser,
+> Spaltenzuordnung, Abgleich „neu / geändert / entfällt", Mustervorlage), `personalstamm-auswahl.ts` (Suche, Filter,
+> Umsetzung in `Person`) und `personalstamm-ui.tsx` (Fenster „Personal einlesen…" und „Wer ist dabei?"). Der
+> .xlsx-Leser kommt ohne neue Abhängigkeit aus: `zipEintrag` aus `word-bogen.ts`, pako und DOMParser; die
+> Mustervorlage schreibt ein eigener ZIP-Schreiber ohne Kompression. Laufzeit: „Neuen Bogen erstellen" öffnet bei
+> vorhandenem Stamm zuerst „Wer ist dabei?", Schritt 3 bietet „Aus Personalstamm hinzufügen…". Der Stamm speichert
+> Text statt Vokabular-Codes; erst beim Auswählen wird die Funktion ins Vokabular der Organisation des Bogens
+> übersetzt. Datenmodell, `SCHEMA_VERSION` und Transportformat unverändert. Die Datensicherung lässt den Schlüssel
+> aus (`sicherung.ts`, `BEIM_GERAET`).
+>
 > **Nachgezogen 2026-11-15 (Schema 13, Farbe des taktischen Zeichens):** Kap. 4.5, 5, 8.4, 12:
 > `Fahrzeug.zeichenfarbe` (`Zeichenfarbe.KOMMUNAL` = 1, `GRAU` = 2) für Gerät von Partnern, das eine Einheit
 > führt (Anhänger der Gemeinde, Abrollbehälter des Havariekommandos). Im QR Flag 64 des Fahrzeug-Bytes und ein
