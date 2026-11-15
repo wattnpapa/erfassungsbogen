@@ -1187,13 +1187,18 @@ export function pruefpunkte(
   hinweise.push(
     ...staerkePlausibilitaet(s).map((text) => ({ text, schritt: S_PERSONAL })),
   );
+  // Beide Richtungen: zu viele Portionen sind Verschwendung, zu wenige lassen
+  // Leute ohne Essen stehen (Wunsch aus der Erprobung, 11/2026). 0 bleibt ohne
+  // Hinweis — das ist die bewusste Meldung „Selbstversorger“ (R12-W2).
   if (
     b.sofortbedarf &&
     s.gesamt > 0 &&
-    b.sofortbedarf.verpflegungPersonen > s.gesamt
+    b.sofortbedarf.verpflegungPersonen > 0 &&
+    b.sofortbedarf.verpflegungPersonen !== s.gesamt
   ) {
+    const nur = b.sofortbedarf.verpflegungPersonen < s.gesamt ? "nur " : "";
     hinweise.push({
-      text: `Verpflegung für ${b.sofortbedarf.verpflegungPersonen} Personen angefordert, die Gesamtstärke ist aber ${s.gesamt}.`,
+      text: `Verpflegung ${nur}für ${b.sofortbedarf.verpflegungPersonen} Personen angefordert, die Gesamtstärke ist aber ${s.gesamt}.`,
       schritt: S_SOFORTBEDARF,
     });
   }

@@ -661,8 +661,18 @@
       background: var(--flaeche); border: var(--strich) solid var(--linie);
       border-radius: var(--radius); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
+    /* width: max-content — das Menü hängt absolut am Eintrag und nähme sonst
+       dessen Breite an („Alle Themen“: 80 px); die längeren Unterpunkte liefen
+       links und rechts aus dem Kasten. Die Unterpunkte stehen linksbündig:
+       Das zentrierende justify-content und das Mindestmaß der Leiste
+       (.kopfnav-links a) gelten für die Einträge oben, nicht für die Liste. */
+    .kopfnav-unter { width: max-content; }
+    /* Der letzte Eintrag steht am rechten Rand der Leiste: Sein Menü klappt
+       nach links auf, sonst ragte es über die Satzkante und auf schmaleren
+       Fenstern aus dem Bild. */
+    .kopfnav-eintrag:last-child .kopfnav-unter { left: auto; right: calc(-1 * var(--r-2)); }
     .kopfnav-unter-breit { grid-template-columns: 1fr 1fr; }
-    .kopfnav-unter a { display: flex; align-items: center; min-height: var(--ziel-basis); padding: 0 var(--r-2); }
+    .kopfnav-unter a { display: flex; align-items: center; justify-content: flex-start; min-width: 0; min-height: var(--ziel-basis); padding: 0 var(--r-2); }
     .kopfnav-unter a:hover { background: var(--flaeche-2); text-decoration: none; }
     /* Der unsichtbare Streifen überbrückt den Abstand zwischen Eintrag und
        Menü — ohne ihn klappt das Menü beim Hinüberfahren wieder zu. */

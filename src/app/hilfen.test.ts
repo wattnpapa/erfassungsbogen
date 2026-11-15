@@ -511,6 +511,22 @@ describe("plausibilitaet() — weitere Zweige", () => {
     });
     expect(plausibilitaet(b).some((h) => /mehr Vegetarier\/Veganer/.test(h))).toBe(true);
   });
+
+  it("meldet abweichende Verpflegung in beide Richtungen, 0 (Selbstversorger) aber nicht", () => {
+    const mit = (verpflegungPersonen: number) =>
+      plausibilitaet(
+        bogen({
+          personalErfassung: PersonalErfassung.NUR_STAERKE,
+          personal: [],
+          staerkeManuell: { fuehrer: 0, unterfuehrer: 1, mannschaft: 7, gesamt: 8 },
+          sofortbedarf: { verpflegungPersonen, dieselLiter: 0, benzinLiter: 0, gemischLiter: 0, unterbringung: false, ruhezeitErforderlich: false },
+        }),
+      ).filter((h) => /^Verpflegung /.test(h));
+    expect(mit(12)).toEqual(["Verpflegung für 12 Personen angefordert, die Gesamtstärke ist aber 8."]);
+    expect(mit(5)).toEqual(["Verpflegung nur für 5 Personen angefordert, die Gesamtstärke ist aber 8."]);
+    expect(mit(8)).toEqual([]);
+    expect(mit(0)).toEqual([]);
+  });
 });
 
 describe("Konstruktoren für neue Objekte", () => {
