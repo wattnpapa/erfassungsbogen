@@ -75,6 +75,15 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Geändert: 5.1, 5.5, 5.7 (Export-Stand ohne `xlsx`), Risiko R2 (nur noch PDF/CSV).
 > Ältere Nachträge darunter, die die Excel-Liste nennen, sind Geschichte.
 >
+> **Nachgezogen 2026-11-15 — Einzelperson:** Ein Bogen kann statt einer Einheit eine
+> einzeln anrückende Person mit Sonderaufgabe melden (Fachberater/in, Baufachberater/in,
+> Technische/r Berater/in). Es kommt **keine neue Datenkategorie** hinzu (5.4: Name,
+> Funktion, Erreichbarkeit wie bisher je Person). Neu ist der Personenbezug der Meldung
+> als Ganzes: Der Bogen steht für genau eine namentlich bekannte Person, und der
+> Fingerabdruck, über den die Einsatz-Sammlung Folgemeldungen zuordnet, enthält bei
+> Einzelpersonen deren Namen. Er bleibt wie die Sammlung auf dem Gerät. Fristen und
+> Löschwege (5.7) gelten unverändert.
+>
 > **Nachgezogen 2026-11-02 — Schema 12:** Datenkategorie Kontaktdaten erweitert (5.4):
 > der Funkrufname einer Person (`KontaktArt.FUNK`, z. B. „Heros Oldenburg 18/13-1")
 > als vierte Kontaktart neben Telefon und E-Mail. Dienstliche Kennung des

@@ -22,7 +22,7 @@ export interface Aenderung {
  */
 export const MONATE: Readonly<Record<string, string>> = {
   "2026-11":
-    "Rückmeldungen aus der Erprobung (FAG THW, OV Chemnitz): Stärke als 0 / 2 / 9 // 11, PDF im Raster der THW-Word-Vorlage mit Logo der Organisation und gezeichneten Kästchen, Fachzug Logistik nach StAN mit einzeln meldbaren Trupps, Ladungsträger wie Abrollbehälter, Funkrufname als Erreichbarkeit, orange und graue Zeichen für Gerät von Partnern, Import ausgefüllter THW-Word-Bögen und dieser Änderungsverlauf. Die Excel-Liste „Oldenburg“ entfällt. Die Einsatz-Sammlung für den Meldekopf ist jetzt eine eigene App (meldekopf.erfassungsbogen.app).",
+    "Rückmeldungen aus der Erprobung (FAG THW, OV Chemnitz): Stärke als 0 / 2 / 9 // 11, PDF im Raster der THW-Word-Vorlage mit Logo der Organisation und gezeichneten Kästchen, Fachzug Logistik nach StAN mit einzeln meldbaren Trupps, Ladungsträger wie Abrollbehälter, Funkrufname als Erreichbarkeit, orange und graue Zeichen für Gerät von Partnern, Import ausgefüllter THW-Word-Bögen, eigener Bogen für Einzelpersonen wie Fachberater und dieser Änderungsverlauf. Die Excel-Liste „Oldenburg“ entfällt. Die Einsatz-Sammlung für den Meldekopf ist jetzt eine eigene App (meldekopf.erfassungsbogen.app).",
   "2026-10":
     "Viele Prüfrunden aus Sicht von Helfern, Führungskräften und Meldekopf: sicherere Bedienung, Lagemonitor für den Bildschirm im Führungsfahrzeug, Dienststelle und Beruf je Person, USB-Handscanner überall, Einsatzzeitraum mit Uhrzeit und ein schnellerer Start.",
   "2026-09":
@@ -37,6 +37,8 @@ export const AENDERUNGEN: readonly Aenderung[] = [
   {
     datum: "2026-11-15",
     punkte: [
+      "Wer ohne Einheit in den Einsatz geht, etwa als Fachberaterin, Baufachberater oder Technische Beraterin, füllt jetzt einen eigenen Bogen aus: In Schritt 1 „Einzelperson“ wählen und die Funktion angeben. Der Bogen meldet dann genau eine Person, und als taktisches Zeichen erscheint die Raute der Person mit dem Kürzel der Funktion statt des Zeichens einer Gruppe.",
+      "Ältere Stände der App lesen einen solchen Bogen weiterhin, zeigen ihn aber wie bisher als Einheit mit der Stärke 0 / 0 / 1 // 1.",
       "Gerät von Partnern, etwa ein Anhänger der Gemeinde oder ein Abrollbehälter des Havariekommandos, bekommt in Schritt 4 über „Farbe des Zeichens“ ein oranges (kommunal) oder graues taktisches Zeichen statt der Farbe der eigenen Einheit. Die Farbe steht auch in der Übersicht, in der PDF und in der CSV. Ein Bogen mit einer solchen Farbe lässt sich erst mit dem App-Stand ab heute einlesen.",
     ],
   },

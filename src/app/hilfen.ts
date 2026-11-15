@@ -65,6 +65,8 @@ import {
 import {
   datumDeutsch,
   einheitOrt,
+  einzelpersonEinheitsTyp,
+  einzelpersonFunktion,
   funkrufText as funkrufTextEinfach,
   kennzeichenText,
   orgLabel,
@@ -94,6 +96,9 @@ export {
   einheitOrt,
   datumDeutsch,
   zeitgruppe,
+  einzelpersonVon,
+  einzelpersonFunktion,
+  einzelpersonEinheitsTyp,
 } from "@bos/meldekopf/darstellung";
 
 // Stempelzeit neuer Stände: die geprüfte Uhr (datenschutz-uhr.ts, R5-E2). Sie
@@ -988,6 +993,7 @@ export function pruefpunkte(
       : "";
   if (
     typFrei &&
+    !b.einheit.einzelperson &&
     b.personalErfassung !== PersonalErfassung.NUR_STAERKE &&
     vokabularFuer(b.einheit.organisation, "einheitstyp").length > 0
   ) {
@@ -998,7 +1004,21 @@ export function pruefpunkte(
   }
   // Die Schrittleiste zeigt „1 Einheit — offen", solange kein Typ gewählt ist; die Liste nannte den Grund nicht
   // (R12-S2). Ohne Typ fehlen taktisches Zeichen und Soll-Vergleich beim Meldekopf.
+  // Einzelperson: An die Stelle des Einheitstyps tritt die Funktion — ohne sie bleibt die Raute leer, und der
+  // Meldekopf weiß nicht, wen er vor sich hat. Mehr als eine Person ist keine Einzelperson.
+  if (b.einheit.einzelperson) {
+    if (!einzelpersonFunktion(b.einheit, b.personal).name) {
+      hinweise.push({ text: "Funktion fehlt — ohne sie steht im taktischen Zeichen keine Aufschrift.", schritt: S_EINHEIT });
+    }
+    if (b.personal.length > 1) {
+      hinweise.push({
+        text: `Als Einzelperson gemeldet, aber ${b.personal.length} Personen erfasst — in Schritt 1 auf „Einheit“ umstellen oder die übrigen entfernen.`,
+        schritt: S_PERSONAL,
+      });
+    }
+  }
   const typFehlt =
+    !b.einheit.einzelperson &&
     b.einheit.einheitsTyp.code == null &&
     !(b.einheit.einheitsTyp.freitext ?? "").trim() &&
     b.personalErfassung !== PersonalErfassung.NUR_STAERKE &&
@@ -1268,7 +1288,9 @@ export function pruefpunkte(
     !(nurVorgabe && eingetragenePersonen.length === 0)
   ) {
     hinweise.push({
-      text: "Keine telefonische Erreichbarkeit erfasst — mindestens eine Führungskraft sollte eine Nummer angeben.",
+      text: b.einheit.einzelperson
+        ? "Keine telefonische Erreichbarkeit erfasst — ohne Nummer kann der Meldekopf nicht zurückrufen."
+        : "Keine telefonische Erreichbarkeit erfasst — mindestens eine Führungskraft sollte eine Nummer angeben.",
       schritt: S_PERSONAL,
     });
   }
@@ -1645,6 +1667,31 @@ export function neuerBogen(): Erfassungsbogen {
     personalErfassung: PersonalErfassung.VOLLSTAENDIG,
     personal: [],
     fahrzeuge: [],
+  };
+}
+
+/**
+ * Hält einen Einzelpersonen-Bogen (`einheit.einzelperson`) in sich stimmig —
+ * nach jeder Änderung, gleich aus welchem Schritt sie kommt:
+ *  - Der Einheitstyp trägt die erste Funktion der Person als Freitext. So liest
+ *    auch ein älterer Stand „THW Siegburg Baufachberater/in", und die Funktion
+ *    lässt sich in Schritt 1 wie in Schritt 3 ändern, ohne dass beide Angaben
+ *    auseinanderlaufen.
+ *  - Das Personal ist namentlich erfasst (keine „Nur Stärke"-Zahlen).
+ * Eine Einheit geht unverändert durch.
+ */
+export function einzelpersonAbgleich(b: Erfassungsbogen): Erfassungsbogen {
+  if (!b.einheit.einzelperson) return b;
+  const typ = einzelpersonEinheitsTyp(b.einheit.organisation, b.personal[0]?.funktionen[0]);
+  const typStimmt = b.einheit.einheitsTyp.code == null && (b.einheit.einheitsTyp.freitext ?? "") === (typ.freitext ?? "");
+  if (typStimmt && b.personalErfassung === PersonalErfassung.VOLLSTAENDIG && b.staerkeManuell == null) return b;
+  return {
+    ...b,
+    einheit: typStimmt ? b.einheit : { ...b.einheit, einheitsTyp: typ },
+    personalErfassung: PersonalErfassung.VOLLSTAENDIG,
+    staerkeManuell: undefined,
+    unterbringungManuell: undefined,
+    verpflegungManuell: undefined,
   };
 }
 

@@ -7,11 +7,12 @@
  * Produkt.
  */
 
-import { OrganisationsTyp, Zeichenfarbe, type Einheit, type Fahrzeug } from "@bos/eeb-format/model";
-import { vokabText, vokabularFuer } from "@bos/meldekopf/darstellung";
+import { OrganisationsTyp, Zeichenfarbe, type Einheit, type Fahrzeug, type Person } from "@bos/eeb-format/model";
+import { einzelpersonFunktion, vokabText, vokabularFuer } from "@bos/meldekopf/darstellung";
 import {
   einheitZeichenSvg,
   fahrzeugZeichenSvg,
+  personZeichenSvg,
   type Zeichenfarbe as Zeichenfarbvariante,
   type Zeichenorganisation,
 } from "@bos/taktische-zeichen/zeichen";
@@ -61,8 +62,19 @@ export function fahrzeugSymbolSvg(f: Fahrzeug, org: OrganisationsTyp): string {
 /**
  * Taktisches Zeichen der Einheit selbst (taktische Formation, DV 102) — der
  * „Avatar" der Einheit in der Oberfläche.
+ *
+ * Meldet der Bogen eine Einzelperson (`einheit.einzelperson`), ist es keine
+ * Formation, sondern die Raute der Person mit Sonderfunktion; die Aufschrift
+ * kommt aus ihrer Funktion. `personal` ist dafür optional: ohne es trägt der
+ * Einheitstyp den Funktionsnamen (siehe einzelpersonFunktion).
  */
-export function einheitSymbolSvg(e: Einheit): string {
+export function einheitSymbolSvg(e: Einheit, personal?: readonly Person[]): string {
+  if (e.einzelperson) {
+    return personZeichenSvg({
+      organisation: ZEICHENBEREICH[e.organisation] ?? "sonstige",
+      ...einzelpersonFunktion(e, personal),
+    });
+  }
   const tabelle = vokabularFuer(e.organisation, "einheitstyp");
   return einheitZeichenSvg({
     organisation: ZEICHENBEREICH[e.organisation] ?? "sonstige",

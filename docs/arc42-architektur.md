@@ -753,6 +753,11 @@ Kern-Submodule auf ihren angehefteten Commits:
 
 > *Prüfvermerk:* Die vier Commit-Kennungen stimmen mit den Gitlinks auf `main`
 > überein (`git ls-tree main vendor/`).
+>
+> *Nachgezogen 2026-11-15 — Einzelperson:* Für die Einzelperson (Kap. 8.4,
+> `einheit.einzelperson`) sind `vendor/eeb-format`, `vendor/bos-meldekopf` und
+> `vendor/bos-taktische-zeichen` auf jüngere Stände gehoben. Die Tabelle oben
+> nennt weiter die analysierten Commits und ist insoweit veraltet.
 
 Die Architekturentscheidung ADR-003 („Aufnahmeregeln" für den geteilten Kern)
 ist nicht nur im Schwesterprojekt „S1-Control" dokumentiert, sondern liegt —
@@ -2056,6 +2061,15 @@ erreichbar (zuvor gleichlautend mit dem der Vorlagen, R5-D5).
   wird von älteren Versionen dann bewusst mit „nicht unterstützte
   Schema-Version" abgelehnt, statt eine Übung unmarkiert wie einen echten Einsatz
   anzuzeigen.
+- **Bewusste Ausnahme: Einzelperson** (`einheit.einzelperson`, 2026-11-15). Das
+  Kennzeichen für eine einzeln anrückende Person (Fachberater/in u. a.) belegt
+  ein freies Bit im Kopf der Einheit und fordert **keine** höhere
+  Schema-Version. Ältere Stände überlesen es und zeigen den Bogen als Einheit
+  mit Stärke 0/0/1//1 und dem Funktionsnamen als Typ – so, wie Einzelpersonen
+  vorher gemeldet wurden. Die Abwägung ist die umgekehrte wie bei der Übung: Die
+  ungenaue Anzeige schadet nicht, ein am älteren Meldekopf abgelehnter Bogen
+  schon. `einzelpersonAbgleich` (`src/app/hilfen.ts`) hält den Einheitstyp dafür
+  gleich der ersten Funktion der Person.
 - **Golden-Fixture-Tests** (`vendor/eeb-format/src/codec.migration.test.ts`,
   `features/fixtures.ts`) frieren echte QR-Payloads als Konstanten ein — einen
   v2-Bogen und einen v8-Bogen mit zwei Fahrzeugen; diese Bytes dürfen sich nie

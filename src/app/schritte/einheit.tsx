@@ -21,9 +21,11 @@ import {
   ORG_OPTIONEN,
   bogenHatInhalt,
   einheitAnzeigename,
+  einzelpersonEinheitsTyp,
   ersteEbene,
   fahrzeugUnbenannt,
   orgLabel,
+  neuePerson,
   personUnbenannt,
   pruefpunkte,
   verpflegungMitziehen,
@@ -483,6 +485,48 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
     );
   }
 
+  /**
+   * Einheit ↔ Einzelperson. Eine Einzelperson (Fachberater/in, Baufachberater/in, Technische/r Berater/in …) meldet
+   * sich mit eigenem Bogen: genau eine Person, ihre Funktion statt eines Einheitstyps, Raute statt Formation.
+   * Beim Umstellen bleibt die erste benannte Person; Sollplätze und unbenannte Fahrzeuge der bisherigen Einheit
+   * gehen weg. Gehen dabei Karten verloren, steht der Rückweg in der Leiste.
+   */
+  const einzel = e.einzelperson === true;
+  function einzelpersonSetzen(an: boolean) {
+    if (an === einzel) return;
+    if (!an) {
+      const { einzelperson: _weg, ...einheit } = e;
+      aendern({ einheit: { ...einheit, einheitsTyp: {} } });
+      return;
+    }
+    const person = bogen.personal.find((p) => !personUnbenannt(p)) ?? neuePerson();
+    const patch = {
+      einheit: { ...e, einzelperson: true, einheitsTyp: einzelpersonEinheitsTyp(e.organisation, person.funktionen[0]) },
+      personal: [person],
+      fahrzeuge: bogen.fahrzeuge.filter((f) => !fahrzeugUnbenannt(f)),
+      personalErfassung: PersonalErfassung.VOLLSTAENDIG,
+    };
+    const benannte = bogen.personal.filter((p) => !personUnbenannt(p)).length;
+    if (bogen.personal.length > 1 || bogen.fahrzeuge.length !== patch.fahrzeuge.length) {
+      aendernMitVorbelegungWeg(
+        patch,
+        benannte > 1
+          ? `Auf Einzelperson umgestellt: ${benannte - 1} weitere ${benannte === 2 ? "Person" : "Personen"} entfernt`
+          : "Auf Einzelperson umgestellt",
+        true,
+      );
+    } else {
+      aendern(patch);
+    }
+  }
+  /** Funktion der Einzelperson: steht als erste Funktion an der Person; der Einheitstyp folgt ihr (einzelpersonAbgleich). */
+  function einzelFunktionSetzen(v: Einheit["einheitsTyp"]) {
+    const person = bogen.personal[0] ?? neuePerson();
+    const gesetzt = v.code != null || (v.freitext ?? "") !== "";
+    const funktionen = gesetzt ? [v, ...person.funktionen.slice(1)] : person.funktionen.slice(1);
+    aendern({ personal: [{ ...person, funktionen }, ...bogen.personal.slice(1)] });
+  }
+
   /** „Vorbelegung entfernen": nur die unbenannten Karten, benannte bleiben. */
   function vorbelegungEntfernen() {
     aendernMitVorbelegungWeg(
@@ -770,7 +814,19 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
       </Auswahl>
     </Feld>
   );
-  const typZeile = (
+  const typZeile = einzel ? (
+    <div className="zeile">
+      <Feld titel="Funktion">
+        <VokabAuswahl
+          wert={bogen.personal[0]?.funktionen[0] ?? {}}
+          aendern={einzelFunktionSetzen}
+          tabelle={vokabularFuer(e.organisation, "funktion")}
+          platzhalter="z. B. Baufachberater/in, Fachberater/in Hochwasser"
+          suchbar
+        />
+      </Feld>
+    </div>
+  ) : (
     <div className="zeile">
       <Feld titel="Einheitstyp">
         <VokabAuswahl
@@ -839,6 +895,27 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
       {/* R20-N2: Auch im Vollassistenten steht der Ort — das einzige Pflichtfeld — gleich unter der Organisation, nicht hinter dem
           Absatz „Zugehörigkeit / Kontaktstellen" unter dem Falz. */}
       {!schnell && e.hierarchie[0] && ortBlock(e.hierarchie[0], 0)}
+      {/* Einzelperson statt Einheit: nur im eigenen Bogen. Die Schnellerfassung zählt Stärke ohne Namen — eine
+          Einzelperson ist genau das Gegenteil. */}
+      {!schnell && (
+        <fieldset className="einheit-art">
+          <legend>Wer meldet sich?</legend>
+          <label className="inline">
+            <input type="radio" name="einheit-art" checked={!einzel} onChange={() => einzelpersonSetzen(false)} />
+            Einheit
+          </label>
+          <label className="inline">
+            <input type="radio" name="einheit-art" checked={einzel} onChange={() => einzelpersonSetzen(true)} />
+            Einzelperson (z. B. Fachberater/in)
+          </label>
+        </fieldset>
+      )}
+      {!schnell && einzel && (
+        <p className="hinweis">
+          Der Bogen meldet eine Person mit Sonderaufgabe statt einer Einheit. Name und Erreichbarkeit folgen in
+          Schritt 3; ein Fahrzeug nur, wenn die Person mit einem eigenen kommt.
+        </p>
+      )}
       {!schnell && typZeile}
       {!schnell && vorbelegungHinweis}
 

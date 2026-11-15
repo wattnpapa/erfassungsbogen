@@ -626,11 +626,11 @@ export function Uebersicht(props: {
             Name und Stärke ist die Auskunft, wegen der die Ansicht geöffnet
             wird — die Vollständigkeitsprüfung ist ihr Befund und steht danach. */}
         <div className="einheit-kopf leitzeile">
-          <EinheitZeichen einheit={bogen.einheit} className="einheit-avatar gross" alt="Taktisches Zeichen der Einheit" />
+          <EinheitZeichen einheit={bogen.einheit} className="einheit-avatar gross" alt={bogen.einheit.einzelperson ? "Taktisches Zeichen der Person" : "Taktisches Zeichen der Einheit"} />
           <div>
             <p className="einheit-name">
               {orgLabel(org)}
-              {" · "}{vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "(Einheitstyp offen)"}
+              {" · "}{vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || (bogen.einheit.einzelperson ? "(Funktion offen)" : "(Einheitstyp offen)")}
               {" · "}{einheitOrt(bogen.einheit) || "(Ort offen)"}
             </p>
             <p className="einheit-staerke">
@@ -678,7 +678,7 @@ export function Uebersicht(props: {
       {abschnitt("Einheit", 0, (
         <dl className="paare">
           <dt>Organisation</dt><dd>{orgLabel(org)}{bogen.einheit.organisationName ? ` — ${bogen.einheit.organisationName}` : ""}</dd>
-          <dt>Einheitstyp</dt><dd>{vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "—"}</dd>
+          <dt>{bogen.einheit.einzelperson ? "Einzelperson" : "Einheitstyp"}</dt><dd>{vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "—"}</dd>
           {/* <div> statt <span>: in einer Definitionsliste ist nur <div> als
               Gruppierung zulässig, und Vorlesesoftware verliert sonst den
               Bezug zwischen Ebene und Name. `display: contents` hält die
@@ -1186,7 +1186,7 @@ export function Uebersicht(props: {
       {vollbild && qr && (
         <QrVollbild
           qr={qr}
-          einheit={`${orgLabel(org)} · ${vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || "(Einheitstyp offen)"} · ${einheitOrt(bogen.einheit) || "(Ort offen)"}`}
+          einheit={`${orgLabel(org)} · ${vokabText(bogen.einheit.einheitsTyp, vokabularFuer(org, "einheitstyp"), "name") || (bogen.einheit.einzelperson ? "(Funktion offen)" : "(Einheitstyp offen)")} · ${einheitOrt(bogen.einheit) || "(Ort offen)"}`}
           staerke={staerkeText}
           ohneNamen={nurStaerke ? 0 : bogen.personal.filter(personUnbenannt).length}
           teilIndex={vollbildTeil}

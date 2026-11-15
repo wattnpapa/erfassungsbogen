@@ -215,7 +215,8 @@ sie nicht.
 |---|---|---|
 | organisation | Enum `OrganisationsTyp` | THW, FEUERWEHR, POLIZEI, DRK, …, SONSTIGE |
 | organisationName | string | Pflicht bei SONSTIGE („Freiwillige Feuerwehr Wardenburg") |
-| einheitsTyp | `VokabularWert` | FGr K (A), Löschzug, SEG Sanität, … |
+| einheitsTyp | `VokabularWert` | FGr K (A), Löschzug, SEG Sanität, … Bei einer Einzelperson: der Name ihrer Funktion als Freitext |
+| einzelperson | bool | Der Bogen meldet keine Einheit, sondern **eine einzeln anrückende Person** mit Sonderaufgabe (Fachberater/in, Baufachberater/in, Technische/r Berater/in, BÖ). `personal` enthält genau diese Person; ihre erste Funktion ist die Bezeichnung und bestimmt das taktische Zeichen (Raute „Person mit Sonderfunktion" statt Formation). Im QR Bit 2 im Kopf der Einheit, **ohne eigene Schema-Version**: ältere Stände werten das Bit nicht aus und zeigen den Bogen als Einheit mit Stärke 0/0/1//1 und dem Funktionsnamen als Typ. Fehlt = Einheit. In der Einsatz-Sammlung trägt der Fingerabdruck einer Einzelperson zusätzlich ihren Namen (`einheitSchluessel`), damit zwei Personen gleicher Funktion und Dienststelle zwei Meldungen bleiben |
 | standortRef | number | Referenz ins mitgelieferte Standort-Verzeichnis (THW: offizielle OV-Nummer). Wenn gesetzt, entfällt die hierarchie im QR komplett; im Modell bleibt sie für Anzeige/PDF gefüllt |
 | hierarchie | `HierarchieEbene[]` | 1..n Ebenen, unterste zuerst. Die **erste Ebene ist die eigene Einheit** und Pflicht — Bezeichnung als Vokabular (`vendor/bos-vokabulare/src/ebenen.ts`: THW OV→RB→LV, FW Gemeinde→LK→Bezirk→Land, DRK OV→KV→LV, …; Codes steigen mit der Hierarchie), Name + optionale Kontakte |
 
