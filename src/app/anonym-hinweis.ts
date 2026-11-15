@@ -12,7 +12,7 @@ import { MINUTEN_JE_TAG, type EebZeitpunkt, type Erfassungsbogen } from "@bos/ee
 
 
 
-/** „Namen im Code gültig bis 17.10.2026" für den Ausdruck neben dem Code; leer bei Übungsbögen (keine Frist). */
+/** „Namen im Code lesbar bis 17.10.2026 (Datenschutzfrist)" für den Ausdruck neben dem Code; leer bei Übungsbögen (keine Frist). */
 export function codeGueltigBisText(
   b: Pick<Erfassungsbogen, "uebung" | "stand">,
   formatiere: (z: EebZeitpunkt) => string,
@@ -21,7 +21,7 @@ export function codeGueltigBisText(
 ): string {
   if (b.uebung) return "";
   const ende = formatiere(b.stand + DATENSCHUTZFRIST_TAGE * MINUTEN_JE_TAG);
-  return abgelaufen ? `Namen im Code seit ${ende} abgelaufen (Datenschutzfrist)` : `Namen im Code gültig bis ${ende}`;
+  return abgelaufen ? `Namen im Code seit ${ende} abgelaufen (Datenschutzfrist)` : `Namen im Code lesbar bis ${ende} (Datenschutzfrist)`;
 }
 
 

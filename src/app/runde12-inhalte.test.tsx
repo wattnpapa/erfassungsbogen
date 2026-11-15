@@ -51,7 +51,7 @@ describe("Anonymisierte Bögen auf Papier (R12-A1)", () => {
   it("das Gültigkeitsdatum im Code-Kasten heißt nach Ablauf „abgelaufen“", () => {
     const b = { uebung: false, stand: 1000 };
     const f = (z: number) => `Tag ${z}`;
-    expect(codeGueltigBisText(b, f)).toMatch(/gültig bis/);
+    expect(codeGueltigBisText(b, f)).toMatch(/lesbar bis/);
     expect(codeGueltigBisText(b, f, true)).toMatch(/abgelaufen/);
   });
 });
