@@ -91,7 +91,7 @@
       "PDF-Ausgabe im gewohnten Papier-Layout",
       "Kompletter Bogen als QR-Code — Übergabe ohne Internet, Server oder Kopplung der Geräte",
       "Meldekopf-Betrieb: fremde Bögen unter einem Einsatz sammeln und Stärke fortlaufend summieren",
-      "Beispielbögen und Landesvorlagen für THW, Feuerwehr, DLRG und den Katastrophenschutz der Länder",
+      "Übungsbögen und Landesvorlagen für THW, Feuerwehr, DLRG und den Katastrophenschutz der Länder",
       "Arbeitet vollständig lokal auf dem Gerät — ohne Anmeldung, ohne Server, ohne Cloud"
     ],
     "author": { "@id": "https://erfassungsbogen.app/#autor" }
@@ -2764,7 +2764,7 @@
       /* Kurze Einträge („THW", 29 px) auch in der Breite (R2-G3). */
       min-width: calc(var(--ziel-basis) + var(--ziel));
     }
-    /* Die Datenwege (Datensicherung, Beispielbögen, Geräteschlüssel, Alle
+    /* Die Datenwege (Datensicherung, Übungsbögen, Geräteschlüssel, Alle
        Daten löschen) sind Knöpfe, die etwas tun — sie bekommen zusätzlich
        12 px Luft zueinander, und der eine, der alles vernichtet, steht
        nochmals abgesetzt: der erste Griff daneben ist mit Handschuh die Regel,
@@ -2884,7 +2884,7 @@
       padding-block: calc((var(--ziel-basis) + var(--ziel) - 1.3em) / 2);
       margin-block: calc(0.28rem + 0.5 * var(--ziel) - (var(--ziel-basis) + var(--ziel) - 1.3em) / 2);
     }
-    /* Beispielbögen-Dialog. Die Erklärung steht zugeklappt und leise oben
+    /* Übungsbögen-Dialog. Die Erklärung steht zugeklappt und leise oben
        (R8-M5: die Liste kommt zuerst), darunter Pfad, Register und Tabelle. */
     .beispiele-erklaerung { margin: 0 0 var(--r-4); font-size: var(--t-s); color: var(--text-2); }
     .beispiele-erklaerung > summary {
@@ -2892,7 +2892,7 @@
       min-height: calc(var(--ziel-basis) + var(--ziel)); display: flex; align-items: center;
     }
     .beispiele-erklaerung > p { margin: var(--r-1) 0 0; max-width: 62ch; }
-    /* Suche über alle Beispielbögen (BB-S2, BB-K4). */
+    /* Suche über alle Übungsbögen (BB-S2, BB-K4). */
     .beispiel-suche { display: flex; flex-direction: column; gap: var(--r-1); margin: 0 0 var(--r-4); font-size: var(--t-s); font-weight: 600; color: var(--text-2); }
     .beispiel-suche input { width: 100%; max-width: 32rem; font-weight: 400; }
     /* Pfadleiste: Zurück-Knopf und der klickbare Pfad in einer Zeile. Klebt unter
@@ -2955,7 +2955,7 @@
     /* Quittung nach „PDF" (BB-H9, BB-A6) und Ladefehler über der Liste (BB-E5). */
     .beispiel-quittung { color: var(--gut); font-weight: 600; margin: 0 0 var(--r-3); }
     .beispiel-ladefehler { margin: 0 0 var(--r-3); }
-    /* Der Beispielbögen-Dialog hat eine feste Höhe: Vorher sprangen Kopfzeile und
+    /* Der Übungsbögen-Dialog hat eine feste Höhe: Vorher sprangen Kopfzeile und
        „Schließen" bei jedem Ordnerwechsel um 45 bis 110 px (BB-S7, BB-M6). Titel und
        „Schließen" bleiben in einer Zeile, auch im Modus „Feld" bei 360 px (BB-H11). */
     dialog.beispiele-dialog[open] { height: calc(100dvh - min(2rem, 32px)); }
@@ -2964,7 +2964,7 @@
     /* Zahl der Bögen im offenen Ordner, Ladestand dahinter. */
     .beispiel-zaehler { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--r-1) var(--r-3); margin: 0 0 var(--r-2); }
     .beispiel-zaehler .hinweis { margin: 0; }
-    /* Beispielbögen-Tabelle: taktisches Zeichen + Einheit, darunter jeweils die
+    /* Übungsbögen-Tabelle: taktisches Zeichen + Einheit, darunter jeweils die
        leisen Zusatzzeilen (Träger, Ebene, Fahrzeuge) — eine Zeile je Bogen mit
        den Aktionen rechts. */
     table.uebersicht.beispiele td { vertical-align: middle; }
@@ -3266,7 +3266,7 @@
       /* R8-G5: Steht eine zerstörende Wahl im Dialog, rückt „Abbrechen" zusätzlich ab (24 statt 16 px). */
       dialog.abfrage .abfrage-fuss .abfrage-aktionen.abgesetzt { margin-left: var(--r-2); }
     }
-    /* Dialoge mit Tabelle (Beispielbögen) brauchen mehr Breite als die
+    /* Dialoge mit Tabelle (Übungsbögen) brauchen mehr Breite als die
        Textdialoge: 80 % der Seitenbreite, damit die vier Spalten samt
        Zeilen-Aktionen nebeneinander passen. Der max()-Anteil hält den Dialog
        auf kleinen Fenstern so breit wie bisher (80 % wären dort unnötig
@@ -5006,7 +5006,7 @@
       html:has(.anzeige-balken) main, html:has(.anzeige-balken) footer.seite { padding-right: max(8px, calc(60px + env(safe-area-inset-right))); }
       main .karte { padding: 8px; }
     }
-    /* R8-M5: „Beispielbögen", „Datensicherung" und die übrigen einfachen Dialoge rollten als Ganzes, und „Schließen" (in der
+    /* R8-M5: „Übungsbögen", „Datensicherung" und die übrigen einfachen Dialoge rollten als Ganzes, und „Schließen" (in der
        Kopfzeile) lag am Listenende bei −173 px außerhalb des Bildes. Die Kopfzeile bleibt oben im Dialog stehen; Textknöpfe und
        die Zeilen der Beispielliste haben mindestens 44 px (vorher 30 bis 33 px). */
     dialog > .kopfzeile:first-child { position: sticky; top: 0; z-index: 3; background: var(--flaeche); padding-block: var(--r-2); box-shadow: 0 1px 0 var(--linie-fein); align-items: center; }
@@ -5644,7 +5644,7 @@
       .scanner-handscanner > .handscanner-lampe { grid-area: lampe; }
       .scanner-handscanner > .handscanner-hinweise { grid-area: hinweise; }
     }
-    /* R17-H1: Solange die Offline-Zeile wechselt (Laden, bereit, Beispielbögen n von m), hält sie die Höhe der längsten Fassung. */
+    /* R17-H1: Solange die Offline-Zeile wechselt (Laden, bereit, Übungsbögen n von m), hält sie die Höhe der längsten Fassung. */
     .offline-badge.offline-offen { min-height: 9rem; box-sizing: border-box; }
     /* R17-G8, H9: Verweise im Fließtext der Startseite sind Tippziele von 44 px mit 8 px Abstand zur Nachbarzeile. */
     .start-seo a { display: inline-flex; align-items: center; min-height: calc(var(--ziel-basis) + var(--ziel)); margin-block: 4px; }
@@ -6232,7 +6232,7 @@
         <p>Jeden Schritt erklärt die <a href="./anleitung.html">Anleitung zum Erfassungsbogen</a>; wie sich das Verfahren zum Papierbogen verhält, steht in <a href="./papier-oder-digital.html">Papier oder digital?</a>.</p>
         <h2>Für welche Organisationen?</h2>
         <p>Der Bogen ist BOS-übergreifend gebaut: Organisation, Einheit und Teileinheit sind Angaben im Bogen, keine feste Struktur. Eigene Seiten mit Beispielen und Hinweisen gibt es für den <a href="./thw.html">Erfassungsbogen im THW</a>, die <a href="./feuerwehr.html">Feuerwehr</a>, die <a href="./dlrg.html">DLRG</a>, das <a href="./drk.html">DRK</a>, die <a href="./johanniter.html">Johanniter</a>, die <a href="./malteser.html">Malteser</a>, den <a href="./asb.html">ASB</a> und den <a href="./katastrophenschutz.html">Katastrophenschutz der Länder</a>. Für die Feuerwehr ist der Aufbau der <a href="./staerkemeldung-feuerwehr.html">Stärkemeldung mit Beispiel</a> gesondert beschrieben. Alle Themenseiten — auch die zu BBK und Bundeswehr sowie die zwölf Länderseiten zum Katastrophenschutz — stehen in der <a href="./uebersicht.html">Übersicht</a>.</p>
-        <p>Als Vorbelegung liegen Beispielbögen bereit — vom THW-Zug nach StAN über die Einheiten der niedersächsischen Feuerwehrverordnung bis zu den Katastrophenschutzeinheiten der Länder sowie Einheiten von DRK und DLRG. Sie lassen sich anwenden und anpassen; eigene Vorlagen speichert die App auf dem Gerät und gibt sie wie einen Bogen per QR-Code weiter. Wie eine solche Vorbelegung im Einzelnen aussieht, zeigt die Seite zur <a href="./thw-fachgruppe-raeumen-erfassungsbogen.html">Fachgruppe Räumen</a>.</p>
+        <p>Als Vorbelegung liegen fertige Vorlagen bereit — vom THW-Zug nach StAN über die Einheiten der niedersächsischen Feuerwehrverordnung bis zu den Katastrophenschutzeinheiten der Länder sowie Einheiten von DRK und DLRG. Sie lassen sich anwenden und anpassen; eigene Vorlagen speichert die App auf dem Gerät und gibt sie wie einen Bogen per QR-Code weiter. Wie eine solche Vorbelegung im Einzelnen aussieht, zeigt die Seite zur <a href="./thw-fachgruppe-raeumen-erfassungsbogen.html">Fachgruppe Räumen</a>.</p>
         <h2>Offline statt Cloud</h2>
         <p>Alle Daten bleiben auf dem Gerät. Es gibt keinen Server, an den ein Bogen geschickt würde, keine Anmeldung und kein Konto. Nach dem ersten Aufruf läuft die Seite offline und lässt sich auf dem Startbildschirm ablegen; daneben gibt es Fassungen für Windows, macOS, Linux und Android. Wie gezählt wird, wer die Seite aufruft, steht im <a href="./datenschutz.html">Datenschutzhinweis</a>.</p>
         <p>Die App ist kostenlos und quelloffen unter der EUPL-1.2. Ein übergebener Bogen trägt ein Echtheits-Siegel des ausstellenden Geräts, das die Gegenstelle beim Einlesen prüft — wer möchte, hinterlegt zusätzlich Name und Rückkanal als Absender.</p>

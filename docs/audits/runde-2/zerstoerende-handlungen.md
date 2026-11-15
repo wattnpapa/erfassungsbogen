@@ -42,7 +42,7 @@ jeweils nachgeprüft. Szenarien:
 
 1. **Eigener Bogen:** „Verwerfen" auf der Startseite, „Neuer Bogen" in der
    Übersicht, Vorlage „Einsatz vorbereiten" → „Einsatz starten",
-   Beispielbogen öffnen, „Zuletzt verdrängten Bogen zurückholen". Person
+   Übungsbogen öffnen, „Zuletzt verdrängten Bogen zurückholen". Person
    entfernen in Karte und Tabelle, „Nur Stärke", Erreichbarkeit ✕, Ebene ✕,
    „StAN-Sollplätze laden". „In Einsatz aufnehmen…".
 2. **Vorlagen:** Löschen mit Rückgängig, Papierkorb, „Bearbeiten" →
@@ -104,7 +104,7 @@ was danach tatsächlich zurückführt. Alles in der Tabelle ist beobachtet.
 | --- | --- | --- |
 | Startseite „Verwerfen" | Rückfrage mit Name, Knopf rot, nennt Rückholung „bis ein anderer Bogen diesen Platz braucht" | „Zuletzt verdrängten Bogen zurückholen" ✓, aber nur ein Platz (siehe Verweis R2-N1/R2-E1) |
 | Übersicht „Neuer Bogen" | Rückfrage „… der gespeicherte Entwurf gelöscht", rot | Liegt trotzdem in der Rückholung ✓ (Text falsch, R2-W6) |
-| Beispielbogen öffnen / „Einsatz starten" aus Vorlage / Vorlage „Bearbeiten" bei offenem Bogen | Rückfrage mit Name, „bleibt … erreichbar" | Rückholung ✓, verdrängt aber den vorigen Inhalt des Rückholplatzes ohne Hinweis |
+| Übungsbogen öffnen / „Einsatz starten" aus Vorlage / Vorlage „Bearbeiten" bei offenem Bogen | Rückfrage mit Name, „bleibt … erreichbar" | Rückholung ✓, verdrängt aber den vorigen Inhalt des Rückholplatzes ohne Hinweis |
 | Person entfernen (Karte und Tabelle) | Rückfrage mit Namen, zählt Verlust auf, rot | keiner (Bestätigung genügt) |
 | Erreichbarkeit ✕ / Ebene ✕ | Rückfrage mit Nummer bzw. Telefon und E-Mail, rot | keiner |
 | „Nur Stärke" | Rückfrage mit Zahl der Personen und Startwert 0/2/7/9 | Zurückschalten ✓ |
@@ -386,11 +386,11 @@ gezählt:
   Bögen. Ich habe einen dritten Weg dorthin beobachtet. Ich habe den eigenen
   Bogen „Kirchehrenbach" verworfen (Rückholung ✓), dann aus der Vorlage
   „FGr W Bamberg" einen Einsatz gestartet und danach über die Fußzeile einen
-  Beispielbogen geöffnet. Die Rückfrage nennt nur „Bamberg … bleibt …
+  Übungsbogen geöffnet. Die Rückfrage nennt nur „Bamberg … bleibt …
   erreichbar". Danach liegt Bamberg auf dem Rückholplatz, Kirchehrenbach ist
   aus dem Entwurfsspeicher verschwunden, ohne dass eine Rückfrage es genannt
   hätte. Das betrifft nicht nur Meldekopf-Erfassungen, sondern jeden Weg,
-  der einen Bogen ersetzt (Beispielbogen, Vorlage, Vorlage bearbeiten,
+  der einen Bogen ersetzt (Übungsbogen, Vorlage, Vorlage bearbeiten,
   Link, Datei).
 - **R2-N2 [P1]:** „StAN-Sollplätze laden" löschte in der
   Vorlagen-Bearbeitung zehn Namen. Die Rückfrage nennt nur die Personenzahl,
@@ -430,7 +430,7 @@ gezählt:
   die Bezeichnung. Der Rückweg stellt die ursprüngliche Stärke exakt wieder
   her, die Spur („zusammengeführt", „abgeteilt aus …") bleibt sichtbar.
 - **Verdrängen mit Ansage:** Jeder Weg, der den offenen Bogen ersetzt
-  (Beispielbogen, Vorlage, Vorlage bearbeiten), fragt mit Namen nach.
+  (Übungsbogen, Vorlage, Vorlage bearbeiten), fragt mit Namen nach.
 - **„In Einsatz aufnehmen…"** lässt den eigenen Bogen offen und sagt das
   in Dialog und Quittung.
 
@@ -465,7 +465,7 @@ Grundlage: [../zerstoerende-handlungen.md](../zerstoerende-handlungen.md) und
 | D4 Abrücken ohne Quittung | teilweise | Quittung „… abgerückt 12:22 — Rückgängig" mit Uhrzeit, Rückgängig stellt Summen wieder her, Doppeltipp schaltet nicht mehr zurück. Die Quittung steht aber außerhalb des Bilds (R2-H4), bei „Entfernen" ebenso. |
 | D5 Aufnehmen schließt eigenen Bogen | bestätigt behoben | Dialog „bleibt hier geöffnet", Quittung „Dein Bogen bleibt geöffnet — Startseite → ‚Fortsetzen'", Entwurf im Speicher erhalten. |
 | D6 Vorlage stumm gelöscht | bestätigt behoben | Quittung mit „Rückgängig" im Bild, ein Tipp holt die Vorlage zurück. |
-| D7 Kein Papierkorb für eigenen Bogen | teilweise | Verworfener Bogen liegt unter „Zuletzt verdrängten Bogen zurückholen" ✓. Es gibt aber nur einen Platz. Jeder weitere Ersatz (Beispielbogen, Vorlage, Schnellerfassung) überschreibt ihn ohne Hinweis (R2-N1, R2-E1, dritter Weg oben). Der Text in der Übersicht spricht weiter von „gelöscht" (R2-W6). |
+| D7 Kein Papierkorb für eigenen Bogen | teilweise | Verworfener Bogen liegt unter „Zuletzt verdrängten Bogen zurückholen" ✓. Es gibt aber nur einen Platz. Jeder weitere Ersatz (Übungsbogen, Vorlage, Schnellerfassung) überschreibt ihn ohne Hinweis (R2-N1, R2-E1, dritter Weg oben). Der Text in der Übersicht spricht weiter von „gelöscht" (R2-W6). |
 
 Aus „Was gut funktioniert" in Runde 1 ist eine Aussage zu korrigieren.
 „Sicherung einspielen? sagt, dass alles ersetzt wird, und listet, was" gilt

@@ -49,7 +49,7 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Sammlung, Bilderstapel, Einsatz-Import und -Abgleich, Schnellerfassung für den
 > Meldekopf, Lagemonitor (`?lagemonitor=`), Papier-Abgleich, Sammel-PDF, Lageblatt,
 > Einsatz-CSV und Alle-Daten-CSV der Sammlung, Export-Stände, Aufteilen und
-> Zusammenführen, „Alle … in eine Übungs-Sammlung“ der Beispielbögen. Ein
+> Zusammenführen, „Alle … in eine Übungs-Sammlung“ der Übungsbögen. Ein
 > empfangener Bogen öffnet sich wieder direkt. Neu: Die Startseite verweist auf die
 > Meldekopf-App (ein Link, keine Netzverbindung der App; `src/app/meldekopf-weg.tsx`,
 > `meldekopf-app.ts`) und nennt Sammlungen, die noch unter `eeb.einsaetze.v1` auf

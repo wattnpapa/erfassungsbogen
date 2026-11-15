@@ -20,7 +20,7 @@ Playwright (globales Modul `/opt/node22/lib/node_modules/playwright`,
 `chromium.launch()` ohne Optionen, nichts installiert), `isMobile`/`hasTouch`,
 Locale de-DE, Viewports 390 × 844 (durchgehend) und 360 × 640 (Dialoge der
 Aufnahme, Sammel-PDF-Übernahme). Geräteuhr 26.10.2026. Je „Gerät" ein eigener
-Browserkontext. Zustände aus den Beispielbögen unter `examples/thw/` (Sinsheim
+Browserkontext. Zustände aus den Übungsbögen unter `examples/thw/` (Sinsheim
 FGr W (B), Albstadt Zugtrupp, Weinsberg FGr Öl (C), Radolfzell Tr Log-TS) mit
 `uebung: false`, Zeitraum heute. Eingang über „Aus Datei laden…", „Bögen
 einlesen…" (auch mehrere Dateien zugleich) und über Links („Weitere Formate →
@@ -136,7 +136,7 @@ im Text.
 **Fundstelle / Aufgabe:** Meldekopf, Stapel von Dateien über „Bögen einlesen…" bzw.
 Zusammenführen über Sammel-PDF.
 
-**Beobachtung:** Dieselben vier Beispielbögen lösen die Warnung unterschiedlich aus. Einzeln
+**Beobachtung:** Dieselben vier Übungsbögen lösen die Warnung unterschiedlich aus. Einzeln
 nacheinander oder als Stapel aus Sinsheim, Albstadt, Weinsberg erscheint sie nie. Im Stapel
 Sinsheim, Albstadt, Sinsheim (neuere Fassung), Weinsberg tragen Albstadt und Weinsberg die
 Marke „⚠ Anderer Einsatz?" und im Block „Neu seit der letzten Kenntnisnahme" den Satz „Bogen

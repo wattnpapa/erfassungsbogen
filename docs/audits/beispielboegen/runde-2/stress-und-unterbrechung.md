@@ -1,8 +1,8 @@
-# Prüfbericht Beispielbögen, Runde 2: Stress und Unterbrechung
+# Prüfbericht Übungsbögen, Runde 2: Stress und Unterbrechung
 
 - **Prüfer:** Rolle „Stress und Unterbrechung“ (thw-stress-test-user): erfahrener Helfer unter Zeitdruck, wird unterbrochen und hat wenig Aufmerksamkeit frei
 - **Datum:** 2026-11-09
-- **Prüfgegenstand:** nur der Bereich Beispielbögen: Dialog „Beispielbögen“ mit dem neuen Suchfeld, der klebenden Pfadleiste mit Verkürzung „Alle › … ›“, der festen Dialoghöhe, dem gemerkten Ordner (`sessionStorage` `eeb.beispiel-pfad.v1`), Escape bzw. Zurück-Geste eine Ebene hoch, PDF-Quittung, Offline-Hinweisen der Ortsverbände, Platzhaltern beim Nachladen
+- **Prüfgegenstand:** nur der Bereich Übungsbögen: Dialog „Übungsbögen“ mit dem neuen Suchfeld, der klebenden Pfadleiste mit Verkürzung „Alle › … ›“, der festen Dialoghöhe, dem gemerkten Ordner (`sessionStorage` `eeb.beispiel-pfad.v1`), Escape bzw. Zurück-Geste eine Ebene hoch, PDF-Quittung, Offline-Hinweisen der Ortsverbände, Platzhaltern beim Nachladen
 - **Code-Stand:** `main`, Commit `085a93b`, live auf `https://erfassungsbogen.app/` (Fußzeile `v2026.1109.833`); lokal nicht gebaut (privates Submodul fehlt). Code gelesen: `src/app/beispiele-dialog.tsx` (`suchTreffer`, `pfadSetzen`, `cancel`-Handler, `beispielHolen`), Styles `.beispiel-suche`, `.beispiel-pfad`, `dialog.beispiele-dialog` in `index.html`
 - **Zählung:** P0: 0 · P1: 2 · P2: 4 · P3: 3 · Hinweise: 4
 - **Nachprüfung Runde 1:** 9 Befunde und 6 Hinweise; behoben 4, teilweise 7, offen 4 (Einzelheiten unten)
@@ -47,15 +47,15 @@ Weg im Szenario, Erstaufruf, gemessen:
 | C: Suche „OV Oldenburg Bergung“ | 0 Treffer | 0 Treffer | – | Abbruch oder neuer Versuch |
 | D: zweiter Aufruf (gemerkter Ordner) | 2 Tipps, 3–4 Wischbewegungen, dazu Startseite | 2 Tipps, 3 Wischbewegungen | – | 10–15 s |
 
-Weg A im Einzelnen (360x640): „Beispielbögen ansehen“ → Suchfeld → „Oldenburg“ → Ordnertreffer „THW › Alle Einheiten aller Ortsverbände (nach Landesverband, Regionalstelle, OV) › Bremen, Niedersachsen › RSt Oldenburg“ (7 Zeilen hoch) → 1 Wischbewegung, „OV Oldenburg (NI)“ (y 686, unter dem Dialogrand bei 624) → 3 Wischbewegungen bis zur 5. Karte „Bergungsgruppe“ → „PDF“. Die Datei heißt `uebung-beispiel-thw-ortsverbaende-lv-bremen-niedersachsen-rst-oldenburg-ov-oldenburg-ni-ov-oldenburg-ni-05-1-tz-b.pdf` und kam nach rund 1,7 s.
+Weg A im Einzelnen (360x640): „Übungsbögen ansehen“ → Suchfeld → „Oldenburg“ → Ordnertreffer „THW › Alle Einheiten aller Ortsverbände (nach Landesverband, Regionalstelle, OV) › Bremen, Niedersachsen › RSt Oldenburg“ (7 Zeilen hoch) → 1 Wischbewegung, „OV Oldenburg (NI)“ (y 686, unter dem Dialogrand bei 624) → 3 Wischbewegungen bis zur 5. Karte „Bergungsgruppe“ → „PDF“. Die Datei heißt `uebung-beispiel-thw-ortsverbaende-lv-bremen-niedersachsen-rst-oldenburg-ov-oldenburg-ni-ov-oldenburg-ni-05-1-tz-b.pdf` und kam nach rund 1,7 s.
 
 ## Nachprüfung Runde 1
 
 | ID | Stand | Beobachtung Runde 2 |
 | --- | --- | --- |
-| BB-S1 | **teilweise** | Die Startseite meldet jetzt „Funktioniert komplett offline (außer den Beispielbögen der THW-Ortsverbände)“. Ordner und Ladefehler sagen „Ein Bogen braucht beim ersten Öffnen Netz und bleibt danach auf dem Gerät“ und bieten „Erneut laden“ an. Wer den Ordner nach fertigem Vorrat mit Netz geöffnet hatte (OV Varel), hatte offline alle 4 Bögen. Offen ist zweierlei: Offline zeigen die Karten weiter Dateinamen („ov-varel-02-1-tz-b“, „nicht geladen“) statt „Bergungsgruppe“; nur der Zug steht lesbar darunter. Und beim Erstbesuch hält das Versprechen nicht (BB2-S6). |
+| BB-S1 | **teilweise** | Die Startseite meldet jetzt „Funktioniert komplett offline (außer den Übungsbögen der THW-Ortsverbände)“. Ordner und Ladefehler sagen „Ein Bogen braucht beim ersten Öffnen Netz und bleibt danach auf dem Gerät“ und bieten „Erneut laden“ an. Wer den Ordner nach fertigem Vorrat mit Netz geöffnet hatte (OV Varel), hatte offline alle 4 Bögen. Offen ist zweierlei: Offline zeigen die Karten weiter Dateinamen („ov-varel-02-1-tz-b“, „nicht geladen“) statt „Bergungsgruppe“; nur der Zug steht lesbar darunter. Und beim Erstbesuch hält das Versprechen nicht (BB2-S6). |
 | BB-S2 | **teilweise** | Ein Suchfeld gibt es. Die Nachprüfung aus Runde 1 („Oldenburg Bergung“ in höchstens 4 Tipps bis zur PDF) scheitert aber: „Oldenburg Bergung“ ergibt 0 Treffer. Der beste Weg braucht 5 Tipps, 9 Zeichen und 3 bis 4 Wischbewegungen, und die Regionalstelle muss man dafür nicht mehr kennen. Siehe BB2-S1, BB2-S2. |
-| BB-S3 | **teilweise** | Nach „Schließen“ öffnet der Dialog im selben Ordner und an derselben Stelle der Liste (Bildlauf 1.500 px). Nach Neuladen und nach „Anzeigen“ öffnet er im gemerkten Ordner, dann von oben. Tab-Wechsel und Einfrieren halten Ordner und Bildlauf. Offen: Nach „Anzeigen“ und „‹ Startseite“ steht die Startseite oben, der Knopf „Beispielbögen ansehen“ liegt dann 2.127 px tief, und einen Rückweg „Zurück zu den Beispielbögen“ gibt es nicht. Neu: Die Escape-Kette zerstört den gemerkten Ordner (BB2-S3). Die Suche wird nicht gemerkt (BB2-S7). |
+| BB-S3 | **teilweise** | Nach „Schließen“ öffnet der Dialog im selben Ordner und an derselben Stelle der Liste (Bildlauf 1.500 px). Nach Neuladen und nach „Anzeigen“ öffnet er im gemerkten Ordner, dann von oben. Tab-Wechsel und Einfrieren halten Ordner und Bildlauf. Offen: Nach „Anzeigen“ und „‹ Startseite“ steht die Startseite oben, der Knopf „Übungsbögen ansehen“ liegt dann 2.127 px tief, und einen Rückweg „Zurück zu den Übungsbögen“ gibt es nicht. Neu: Die Escape-Kette zerstört den gemerkten Ordner (BB2-S3). Die Suche wird nicht gemerkt (BB2-S7). |
 | BB-S4 | **behoben** | Nach jedem Ordnerwechsel steht der Dialog auf Bildlauf 0, der Fokus liegt auf dem Ordnernamen. Die Pfadleiste klebt bei y 85 unter der Kopfzeile, „‹ Zurück“ ist von der letzten Karte aus ohne Wischen erreichbar. Neue Nebenwirkung siehe BB2-S4. |
 | BB-S5 | **teilweise** | Das Register zeigt „THW … Bögen“, bis der Baustein da ist, und die Suche sagt „Bögen der Ortsverbände werden noch geladen …“. Auf der THW-Ebene fehlt der angekündigte Platzhalter „Alle Einheiten aller Ortsverbände – wird geladen …“ aber. Er liegt im Code innerhalb der Ordnerliste, die ohne weitere Unterordner gar nicht erscheint (Bild `s-360-lade-thw.png`). Zu sehen sind „101 Bögen“ und „Alle 101 in eine Übungs-Sammlung“. Nach 4 s erscheint der Ordner oben, und die Karten rutschen um 135 px (erste Karte von y 502 auf 637). Damit bleibt die Fehlfolgerung „Es gibt nur 101 THW-Bögen“ möglich. |
 | BB-S6 | **teilweise** | Der Zähler sagt jetzt „101 Bögen direkt in ‚THW‘, außerhalb der Ordner oben“. Die 101 Einzelbögen liegen aber weiter neben dem Ordner, und worin sie sich von den OV-Bögen unterscheiden, steht nirgends. In der Suche fehlt der „Verstärkte Bergungszug Oldenburg (NI)“ bei „Oldenburg“; er erscheint nur bei „Bergung“. |
@@ -115,7 +115,7 @@ Weg A im Einzelnen (360x640): „Beispielbögen ansehen“ → Suchfeld → „O
 - **Erwartung der Rolle:** Die Zurück-Geste tut jedes Mal dasselbe. Wer den Dialog wegwischt, weil er angesprochen wird, findet beim Wiederöffnen den Ordner vor, in dem er zuletzt gearbeitet hat.
 - **Auswirkung im Einsatz:** Die Zurück-Geste ist unter Stress die häufigste Bedienung. Mal geht sie eine Ebene hoch, mal ist der Dialog weg. Nach dem Wiederöffnen steht der Zugführer zwei bis drei Ebenen über seinem OV und muss den Weg teilweise neu gehen. Damit kehrt BB-S3 auf diesem Weg zurück.
 - **Empfehlung:** Den gemerkten Ordner nicht schon bei jedem Schritt nach oben überschreiben, sondern erst bei einem bewussten Ordnerwechsel durch Antippen; alternativ zusätzlich den „tiefsten zuletzt geöffneten Ordner“ merken. Wenn die Plattform das Schließen erzwingt, beim Wiederöffnen dort weitermachen, wo vor der Escape-Kette gearbeitet wurde.
-- **Nachprüfung:** OV Oldenburg öffnen, Escape fünfmal schnell hintereinander, „Beispielbögen ansehen“: Der Dialog zeigt OV Oldenburg (NI) oder bietet ihn sichtbar als „Zuletzt: OV Oldenburg (NI)“ an.
+- **Nachprüfung:** OV Oldenburg öffnen, Escape fünfmal schnell hintereinander, „Übungsbögen ansehen“: Der Dialog zeigt OV Oldenburg (NI) oder bietet ihn sichtbar als „Zuletzt: OV Oldenburg (NI)“ an.
 - **Typ:** Unterbrechung/Zustand
 
 ### BB2-S4 [P2, Orientierung] Die klebende Pfadleiste ist auf dem Telefon drei Zeilen hoch und verdeckt die Überschrift der Karte, deren Knöpfe direkt darunter stehen
@@ -185,7 +185,7 @@ Weg A im Einzelnen (360x640): „Beispielbögen ansehen“ → Suchfeld → „O
 - **H1 Gemerkter Ordner wirkt:** Nach Neuladen, „Anzeigen“ und Schließen öffnet der Dialog in OV Oldenburg (NI). Der zweite Aufruf braucht 2 Tipps bis zur Karte. Das spart unter Stress am meisten.
 - **H2 Einfrieren und Hintergrund halten:** Nach 3 s Tab-Wechsel und 3 s „frozen“ stehen Dialog, Ordner und Bildlauf (2.652 px) unverändert.
 - **H3 Suche erst ab zwei Zeichen:** Ein Zeichen zeigt die Ordner, zwei Zeichen („Ol“) liefern schon 20 Ordner und 60 Bögen mit „Nicht alle Treffer gezeigt“. Das stört nicht, kostet aber beim Tippen Rechenzeit und bewegt die Liste mit jedem Zeichen.
-- **H4 Nach „Anzeigen“ liegt der Einstieg tiefer:** Mit offenem Beispielbogen auf der Startseite liegt „Beispielbögen ansehen“ 2.127 px tief statt 1.843 px. Ein Rückweg aus dem Bogen fehlt (siehe BB-S3).
+- **H4 Nach „Anzeigen“ liegt der Einstieg tiefer:** Mit offenem Übungsbogen auf der Startseite liegt „Übungsbögen ansehen“ 2.127 px tief statt 1.843 px. Ein Rückweg aus dem Bogen fehlt (siehe BB-S3).
 
 ## Abschluss
 

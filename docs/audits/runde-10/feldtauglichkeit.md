@@ -26,7 +26,7 @@ grob.**
 
 Zustände kamen über `localStorage`-Seeds (`uebung: false`, `stand` auf heute,
 Einsatzzeitraum auf den 25.10.2026 gesetzt, damit „Zeitraum vorbei“ aus den
-Beispielbögen die Messungen nicht überlagert): Entwurf „Verstärkter Bergungszug“
+Übungsbögen die Messungen nicht überlagert): Entwurf „Verstärkter Bergungszug“
 Oldenburg (38 Personen), Sammlung „Hochwasser Musterstadt“ mit sechs THW-Bögen,
 ein abgeschnittener Rohtext der Sammlung neben einem Entwurf „Ulm“. Daneben
 Bedienung ohne Seed (Neuer Bogen, Einheit manuell erfassen, Schnellerfassung).

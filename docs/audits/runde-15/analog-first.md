@@ -13,7 +13,7 @@ bekannte Grenze stehen (R14-E7, R14-S2, R14-H1, R14-W3, R13-W1/W6/H1, R12-W3/O2/
 
 Playwright (Chromium, `chromium.launch()` ohne Optionen; die Projektkopie fand keinen Browser, das globale
 Playwright-Modul schon), `isMobile`/`hasTouch`, Locale de-DE, Telefon 390 × 844 und 360 × 640, jeweils frischer
-Kontext. Einsatz-Sammlung mit 1, 2, 3 und 6 THW-Beispielbögen aus `examples/thw/` (auf `uebung: false`, Stand auf
+Kontext. Einsatz-Sammlung mit 1, 2, 3 und 6 THW-Übungsbögen aus `examples/thw/` (auf `uebung: false`, Stand auf
 „vor 60 bis 210 Minuten" gesetzt), eingelesen über „Bögen einlesen…" als JSON-Dateien und als Fotos (PNG der gedruckten
 Seiten, 110 und 150 dpi). Durchgespielt:
 
@@ -34,7 +34,7 @@ Geräteausfall weiter an der Wand; Sammel-PDF und Einzelbögen gehen als Ausdruc
 
 **Nicht prüfbar:** echtes Drucken (Druckrand, Graustufen), Kamera- und Handscanner, Safari, native Builds, echte
 Akku- oder Geräteausfälle, Android-Chrome (Verhalten von Blob-PDFs in neuen Tabs). Das Datumsfeld zeigte im
-Testbrowser das 12-Stunden-Format; das ist Eigenschaft des Testbrowsers und nicht gewertet. Bei Beispielbögen entstehende
+Testbrowser das 12-Stunden-Format; das ist Eigenschaft des Testbrowsers und nicht gewertet. Bei Übungsbögen entstehende
 Hinweise („Anderer Einsatz?", „Kennzeichen doppelt") sind Seed-Artefakte und nicht gewertet.
 
 **Kennzeichnung:** *gemessen* = im Testbrowser reproduziert (Seitentext, PDF-Text); *beobachtet* = gesehen;

@@ -16,7 +16,7 @@ Lücke, „n ohne Auftrag/Zug“ dicht über „Suchen, sortieren, filtern“, �
 
 Chromium über das globale `playwright`-Modul, `isMobile`, `hasTouch`, Pixeldichte 2, de-DE.
 Viewports 390 × 844, 360 × 640, 640 × 360. Zustand: neue Einsatz-Sammlung „Hochwasser Test“
-mit elf Beispielbögen THW (`examples/thw`, `uebung` false, `stand` auf „vor zwei Stunden“
+mit elf Übungsbögen THW (`examples/thw`, `uebung` false, `stand` auf „vor zwei Stunden“
 gesetzt, damit die Datenschutzfrist nicht anonymisiert), importiert über „Bögen einlesen…“.
 Gemessen sind Rechtecke (`getBoundingClientRect`), Tipps über `tap()`, Downloads über das
 Playwright-Ereignis `download`. Nicht prüfbar: echte Handschuhe, echte Bildschirmtastatur,

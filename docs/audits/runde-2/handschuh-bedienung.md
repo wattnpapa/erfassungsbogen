@@ -19,7 +19,7 @@ danach gelesen.
 Zustände per `localStorage`-Seed: `eeb.entwurf.v1` mit
 `examples/thw/014-weinsberg-fgr-oel-c.json` (19 Personen, 4 Fahrzeuge) und
 `eeb.einsaetze.v1` mit einer Sammlung „Hochwasser Neckar" aus den
-Beispielbögen 001–008 (acht Einheiten, zwei Züge, `uebung` auf `false`
+Übungsbögen 001–008 (acht Einheiten, zwei Züge, `uebung` auf `false`
 gesetzt). Neuer Bogen und Schnellerfassung habe ich über die Bedienung
 geöffnet.
 
@@ -361,7 +361,7 @@ Berichten beschrieben und werden hier nicht als eigene Befunde gezählt:
 - **Feld-Thema:** hebt Chips, Vorschläge, Schrittleiste und Kopfziele auf
   43–54 px und ist von jedem Screen mit einem Tipp erreichbar.
 - **Datenaktionen unten auf der Startseite** („Datensicherung",
-  „Beispielbögen", „Geräteschlüssel neu erzeugen", „Alle Daten löschen")
+  „Übungsbögen", „Geräteschlüssel neu erzeugen", „Alle Daten löschen")
   44–51 px hoch, 12 px Abstand.
 - **Hochformat 320 × 568:** Auf keinem Screen scrollt die Seite seitlich
   (`scrollWidth` 320).

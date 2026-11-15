@@ -187,24 +187,24 @@ P0: keine. P1: eine. P2: drei. P3: fünf.
   weiter auf „74 von 508 da, das Netz hakt — der nächste Versuch läuft von selbst“; der Zähler lief erst nach 59,3 s
   weiter, alles da nach 163 s.
 - **Folge:** Gering. Der Vorrat wird vollständig, die Zeile ist ehrlich; nur der Zeitpunkt, zu dem Themenseiten und
-  Beispielbögen wirklich da sind, verschiebt sich bis zu einer Minute nach hinten.
+  Übungsbögen wirklich da sind, verschiebt sich bis zu einer Minute nach hinten.
 - **Empfehlung:** Bei jedem erfolgreichen Abruf anderer Anfragen der Seite (oder beim Sichtbarwerden der Seite) die
   Pause zurücksetzen; die Obergrenze auf 15 bis 20 s senken.
 - **Nachprüfung:** Wie oben: Nach der Netzrückkehr läuft der Zähler innerhalb von 20 s wieder.
 
-#### R6-O7 – Nach einem Neuladen ohne Netz verliert die Offline-Zeile die Auskunft über fehlende Themenseiten und Beispielbögen (beobachtet)
+#### R6-O7 – Nach einem Neuladen ohne Netz verliert die Offline-Zeile die Auskunft über fehlende Themenseiten und Übungsbögen (beobachtet)
 
 - **Kennzeichnung:** beobachtet.
 - **Fundstelle:** `src/app/offline-bereit.ts`, `offlineText()` (zweiter Zweig „sicher ist nur der Kern“), `umfangLaden()`
   holt `offline-zusatz.json` nur mit Netz oder aus dem Laufzeit-Cache.
-- **Beobachtung:** Kern da, 41 von 508 der zweiten Stufe, dann echt offline: Zeile „… Beispielbögen und Themenseiten
+- **Beobachtung:** Kern da, 41 von 508 der zweiten Stufe, dann echt offline: Zeile „… Übungsbögen und Themenseiten
   fehlen noch (41 von 508), sie folgen beim nächsten Netz“. Nach einem Neuladen ohne Netz nur noch „✓ Offline bereit
   für Bogen, PDF, QR-Code und Empfang — alle Daten bleiben auf diesem Gerät.“ Themenseiten zeigen die Fehlerseite des
-  Browsers („No internet“), ein Beispielbogen meldet „Dieser Beispielbogen liegt noch nicht auf dem Gerät … (siehe
+  Browsers („No internet“), ein Übungsbogen meldet „Dieser Übungsbogen liegt noch nicht auf dem Gerät … (siehe
   Offline-Zeile der Startseite)“, die Zeile sagt dazu aber nichts mehr.
 - **Folge:** Gering. Der Verweis „siehe Offline-Zeile“ läuft ins Leere.
-- **Empfehlung:** Die Auskunft „Themenseiten und Beispielbögen fehlen“ in dem Fall aus dem letzten bekannten Stand
-  weiterführen oder die Meldung am Beispielbogen selbst vollständig machen.
+- **Empfehlung:** Die Auskunft „Themenseiten und Übungsbögen fehlen“ in dem Fall aus dem letzten bekannten Stand
+  weiterführen oder die Meldung am Übungsbogen selbst vollständig machen.
 - **Nachprüfung:** Wie oben, dann Neuladen offline: Die Zeile nennt weiter die Lücke.
 
 #### R6-O8 – Geräteuhr: Die Rückfrage „Datum stimmt — jetzt aufräumen?“ nennt bei einem Entwurf eine „Sammlung“ (beobachtet)
@@ -297,7 +297,7 @@ P0: keine. P1: eine. P2: drei. P3: fünf.
 - **Importe und Sicherung offline:** „Sicherung erstellen…“ (31 KB) und „Sicherung einspielen…“ (Rundlauf mit Rückfrage
   „Auf diesem Gerät — geht dabei verloren: …“); eine kaputte, eine abgeschnittene und eine fremde Datei werden mit
   klarer Meldung abgewiesen („Die Daten auf diesem Gerät sind unverändert“). „Aus Datei laden“: kaputter Bogen
-  wird abgewiesen, ein guter Beispielbogen geht auf, Entwurf „gespeichert · 15:36 Uhr · nur auf diesem Gerät“. „Einsatz
+  wird abgewiesen, ein guter Übungsbogen geht auf, Entwurf „gespeichert · 15:36 Uhr · nur auf diesem Gerät“. „Einsatz
   importieren…“: Sammel-PDF (3 Einheiten) geht, kaputte JSON-Datei wird abgewiesen.
 - **Anzeige „gespeichert“:** Speichern ist synchron (kein Aufschub, `useEffect` auf jede Änderung); „✓ gespeichert“
   steht nur nach gelungenem `setItem` und weicht bei Fehler der festen Leiste.

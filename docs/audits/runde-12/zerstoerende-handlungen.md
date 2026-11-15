@@ -19,7 +19,7 @@ nach dem Öffnen einer Rückfrage verwirft, ist R8-H5/S4 und wurde nicht gezähl
 Chromium über das globale `playwright`-Modul, `chromium.launch()` ohne Optionen,
 `isMobile`/`hasTouch`, Locale de-DE, Tipps als Touch-Tipp. Viewports 390 × 844 und
 360 × 640. Zustände über die Bedienung der App: Einsatz-Sammlung anlegen, vier
-THW-Beispielbögen aus `examples/thw/` (mit `uebung: false`) über „Bögen einlesen…"
+THW-Übungsbögen aus `examples/thw/` (mit `uebung: false`) über „Bögen einlesen…"
 aufnehmen, Datensicherung als echte Datei erzeugen und wieder einspielen. Kein
 Kamera-Scan, keine Handschuhe, keine nativen Builds, kein Zweitgerät.
 

@@ -62,13 +62,13 @@ der Startkarte und im Assistenten.
 
 Nach dem ersten vollständigen Laden arbeitet die App ohne Netz ohne Lücke: Neuladen offline, Entwurf fortsetzen,
 Bogen-PDF, QR-Vollbild, „Link teilen“, Lageblatt, Blanko-Vordruck, beide CSV, Excel-Liste, Sammel-PDF, Datensicherung
-erstellen und einspielen, „Aus Datei laden“, „Einsatz importieren…“, Beispielbögen und Themenseiten gingen offline.
+erstellen und einspielen, „Aus Datei laden“, „Einsatz importieren…“, Übungsbögen und Themenseiten gingen offline.
 Ein voller oder gesperrter Speicher wird gemeldet, die Eingabe bleibt offen, das Schließen fragt nach. Zwei Fenster
 überschreiben sich nicht still. Die Offline-Zeile sagt nichts Falsches, solange der Vorrat nicht vollständig ist.
 
 Reibung bleibt an drei Stellen, alle P2. **Erstens** steht die Warnung „Nicht gespeichert“ im Kopf, der mit der Seite
 wegscrollt. Wer mitten im Schritt tippt, sieht sie erst, wenn er nach oben scrollt oder „Weiter →“ drückt (R5-O1).
-**Zweitens** gibt das Nachladen der Beispielbögen und Themenseiten beim ersten Fehler auf. Bei flackerndem Netz steht
+**Zweitens** gibt das Nachladen der Übungsbögen und Themenseiten beim ersten Fehler auf. Bei flackerndem Netz steht
 der Zähler minutenlang bei „werden nachgeladen (25 von 474)“, obwohl nichts mehr geladen wird (R5-O2). **Drittens**
 braucht „Einsatz weitergeben / sichern“ bei 30 Bögen 18 s ohne jede Rückmeldung, der Knopf bleibt frei, und ein
 zweiter Tipp erzeugt eine zweite Datei (R5-O3). Dazu kommen vier Stellen mit P3.
@@ -107,13 +107,13 @@ P0: keine. P1: keine. P2: drei. P3: vier.
   Warnung ist ohne Scrollen sichtbar, solange der Speicher nicht annimmt, und verschwindet, wenn wieder gespeichert
   wird.
 
-#### R5-O2 – Das Nachladen der Beispielbögen und Themenseiten gibt beim ersten Fehler auf; die Zeile sagt weiter „werden nachgeladen“ (gemessen, 2 von 3 Läufen; Ursache im Code)
+#### R5-O2 – Das Nachladen der Übungsbögen und Themenseiten gibt beim ersten Fehler auf; die Zeile sagt weiter „werden nachgeladen“ (gemessen, 2 von 3 Läufen; Ursache im Code)
 
 - **Kennzeichnung:** gemessen (vier Läufe); der Hang bei einem Abruf ohne Antwort ist ein Risiko aus dem Code.
 - **Fundstelle:** Startseite, Offline-Zeile; `src/app/offline-vorrat.ts`, `zusatzNachladen()` (in der Schleife
   `catch { netzWeg = true; }`, alle vier Arbeiter enden), angestoßen in `src/app/offline-bereit.ts` nur durch den
   Effekt mit den Abhängigkeiten `[stand, umfang, online]`.
-- **Beobachtung:** Erstladen über 2 Mbit/s. Sobald der Kern da ist und die zweite Stufe läuft („Beispielbögen und
+- **Beobachtung:** Erstladen über 2 Mbit/s. Sobald der Kern da ist und die zweite Stufe läuft („Übungsbögen und
   Themenseiten werden nachgeladen (20 von 474)“), flackert die Leitung: fünfmal 10 s Funkloch, dazwischen 6 s Netz.
   Danach ist das Netz stabil. In drei von vier Läufen bleibt der Zähler stehen: im ersten Lauf (Flackern von Anfang an) bei 23 von 474, 311 s lang,
   im zweiten bei 25 von 474, 151 s lang ohne jede Bewegung, im dritten bei 117 von 474 (`navigator.onLine` blieb
@@ -123,9 +123,9 @@ P0: keine. P1: keine. P2: drei. P3: vier.
   473 von 474 stehen, auch noch 6 s nach einem Neuladen. Der Fehlschlag des ersten Abrufs beendet die
   Schleife, ein erneuter Versuch kommt nur mit einem `online`-Ereignis oder einem Seitenaufruf. Ein Abruf, der nie
   beantwortet wird (echtes Funkloch mit Balken), hat im Code keine Zeitgrenze.
-- **Folge:** Der Kern (Bogen, PDF, QR, Empfang) liegt im Gerät, daran ändert sich nichts. Es fehlen Beispielbögen und
+- **Folge:** Der Kern (Bogen, PDF, QR, Empfang) liegt im Gerät, daran ändert sich nichts. Es fehlen Übungsbögen und
   Themenseiten. Die Zeile verspricht aber „werden nachgeladen“ und zählt nicht weiter. Wer im Fahrzeug im Funkloch
-  den Beispielbogen eines anderen Verbands öffnen will, liest „Dieser Beispielbogen liegt noch nicht auf dem Gerät“,
+  den Übungsbogen eines anderen Verbands öffnen will, liest „Dieser Übungsbogen liegt noch nicht auf dem Gerät“,
   obwohl er die Seite lange mit Netz offen hatte. Die Meldung ist ehrlich, der Vorrat hätte aber vollständig sein
   können.
 - **Empfehlung:** Nach einem Fehlschlag in Abständen erneut versuchen, solange die Seite offen ist und `onLine` wahr
@@ -161,7 +161,7 @@ P0: keine. P1: keine. P2: drei. P3: vier.
 
 - **Kennzeichnung:** beobachtet.
 - **Fundstelle:** `thw.html`, `feuerwehr.html`, `drk.html` und die anderen Themenseiten, `anleitung.html`; Vorrat in
-  `vite.config.ts` / `scripts/precache-aufteilung.ts` (`offline-zusatz.json` enthält die Beispielbögen und Seiten,
+  `vite.config.ts` / `scripts/precache-aufteilung.ts` (`offline-zusatz.json` enthält die Übungsbögen und Seiten,
   aber nicht `bilder/*.jpg|webp` und `screenshots/*`).
 - **Beobachtung:** Nach vollständigem Laden („✓ Funktioniert komplett offline“), Server aus: Die Seiten gehen auf
   (Status 200), aber je Seite fehlt ein Bild: `bilder/thw-gkw-radolfzell.jpg`, `bilder/feuerwehr-loeschfahrzeug-…`,
@@ -247,7 +247,7 @@ P0: keine. P1: keine. P2: drei. P3: vier.
   Empfang nicht bestätigt“; der Link geht ohne Netz auf), Lageblatt (1,3 s), Blanko-Vordruck (0,2 s), „Übersicht als
   CSV“, „Alle Daten als CSV“, Excel-Liste „Oldenburg“, Sammel-PDF (siehe R5-O3). Keine Konsolenfehler, keine
   fehlgeschlagene Anfrage außer den Fotos (R5-O4).
-- **Importe offline:** „Aus Datei laden“ mit einem Beispielbogen geht. Eine abgeschnittene JSON-Datei meldet
+- **Importe offline:** „Aus Datei laden“ mit einem Übungsbogen geht. Eine abgeschnittene JSON-Datei meldet
   „… ist beschädigt oder unvollständig (etwa nach abgebrochener Übertragung) …“. „Einsatz importieren…“ mit dem
   Sammel-PDF der App geht.
 - **Datensicherung offline:** „Sicherung erstellen…“ (23 KB, „Letzte Sicherung auf diesem Gerät erstellt: 06.10.26,
@@ -257,8 +257,8 @@ P0: keine. P1: keine. P2: drei. P3: vier.
 - **Ohne Baustein, ohne Netz (Seite ohne Service Worker):** Jeder Knopf nennt die Lage: „Lageblatt: Der Baustein
   dafür ließ sich nicht nachladen. Dafür braucht die App einmal Netz …“. CSV geht, QR-Vollbild geht, die Meldung zu
   „PDF erzeugen“ steht im Bild, direkt unter dem Knopf, bei `y` 527 bis 623 px (R4-O2).
-- **Beispielbögen mit unvollständigem Vorrat:** Der Eintrag zeigt „nicht geladen“, „Anzeigen“, „PDF“ und „Link“
-  melden „Dieser Beispielbogen liegt noch nicht auf dem Gerät …“, im Bild.
+- **Übungsbögen mit unvollständigem Vorrat:** Der Eintrag zeigt „nicht geladen“, „Anzeigen“, „PDF“ und „Link“
+  melden „Dieser Übungsbogen liegt noch nicht auf dem Gerät …“, im Bild.
 - **Anzeige „gespeichert“:** Im Bogen „✓ gespeichert · 12:04 Uhr · nur auf diesem Gerät“. Ein älterer Entwurf trägt
   den Tag („gespeichert 06.10., 12:04 Uhr“). Die Startkarte zeigt dieselbe Zeit.
 - **Speicher voll (echt gefüllt bis 5 von 5 Mio. Zeichen):** Startseite „⚠ Gerätespeicher ist voll: 100 % (5 von 5

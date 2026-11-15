@@ -25,7 +25,7 @@ Gemessen je Zustand: Kontrast jedes Textknotens gegen die tatsächliche Fläche 
 „Ort eintragen…“, Scanner ohne Kamera, „Einheit manuell erfassen…“, Schnellerfassung (leer, ohne Ort, mit Ort,
 Stärke 0), „Bögen einlesen…“ (auch doppelt), „Stärke ändern…“, „Verschieben…“, „Als Einsatzmeldung zählen…“,
 Auftrag/Notiz, Zug zuordnen, Hinweise, Lagemonitor-Fenster, „Übergabe vermerken…“, „Einsatz als beendet markieren“,
-Startseite nach Abschluss, „Einsatz löschen…“, Datensicherung, Beispielbögen, „Alle Daten löschen“, Bogen Schritt 1
+Startseite nach Abschluss, „Einsatz löschen…“, Datensicherung, Übungsbögen, „Alle Daten löschen“, Bogen Schritt 1
 bis 5, Abrücken-Quittung, „Entfernen“-Rückfrage mit Tipp-Sperre, Papierkorb nach Neuladen, Weitergabe und Export
 bei vollem Speicher.
 

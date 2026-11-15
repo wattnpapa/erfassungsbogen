@@ -27,7 +27,7 @@ Die Zustände kamen als `localStorage`-Seeds aus `examples/thw/`, mit
   (Crailsheim, Albstadt, Ulm, Ansbach, Kirchehrenbach, Neu-Ulm, Schwabach,
   Füssen), Füssen abgerückt, vier Einheiten in „1. TZ" und „2. TZ", Eintreffzeiten
   im Abstand von 10 Minuten, Nr. nach Ankunft. Dazu „Grosslage" mit den
-  Beispielbögen 001–030.
+  Übungsbögen 001–030.
 - Für Seitenumbrüche außerdem `015-ansbach-fgr-log-mw` (9 Fahrzeuge) und
   `grossbogen-verstaerkter-bergungszug` (10 Fahrzeuge, 38 Personen) als eigener
   Bogen.
@@ -326,7 +326,7 @@ und die Dateinamen vollständig oder auf Antippen nennen.
 (Fahrzeuge 4, Personal 34, Qualifikationen 6).
 
 **Beobachtung:**
-- 6 der 101 Beispielbögen haben mehr als 4 Fahrzeuge (Ansbach und Hamburg-Mitte
+- 6 der 101 Übungsbögen haben mehr als 4 Fahrzeuge (Ansbach und Hamburg-Mitte
   FGr Log-MW je 9, Waldbröl 6, Schleswig und Westerburg 5, Großbogen 10). Der
   Großbogen hat zudem 38 Personen, die alle eine Zusatzqualifikation tragen.
 - Auf dem Blanko steht kein Satz wie „weitere Fahrzeuge auf zweitem Vordruck,
@@ -398,7 +398,7 @@ Kopf (siehe R5-A3).
 **Empfehlung:** „Bedarf gesamt" auf Seite 5 oder 1 unterbringen. Mit R5-A3
 zusammen lösen.
 
-**Verifikation:** Sammel-PDF der Beispielbögen 001–030: keine Seite unter 12
+**Verifikation:** Sammel-PDF der Übungsbögen 001–030: keine Seite unter 12
 Textzeilen.
 
 ### R5-A9 [P3] Lageblatt: Reihenfolge alphabetisch statt nach Nr., Bemerkung der Einheit am Zeilenende abgeschnitten
@@ -431,7 +431,7 @@ kostet die alphabetische Reihenfolge Suchzeit.
 eine eigene schmale Spalte. Gekürzte Bemerkungen mit „siehe Sammel-PDF" enden
 lassen.
 
-**Verifikation:** Lageblatt der 30 Beispielbögen: Nr. in einer eigenen Spalte,
+**Verifikation:** Lageblatt der 30 Übungsbögen: Nr. in einer eigenen Spalte,
 Reihenfolge nach Nr. einstellbar.
 
 **Nur Verweis:** Die gekürzten Rückfragen („Kennzeichen auf Anh steht mehr …")
@@ -554,17 +554,17 @@ Stand 17.10.2026, Paket 4 „Papier, PDF, Begriffe, Rest".
 Geprüft mit Typprüfung, Unit-Tests (2 875 grün), Verhaltenstests (137 Szenarien, 1 749 Schritte grün)
 und Nachmessung (PDFs mit `pdfinfo`, `pdftotext` und gerenderten Seiten; Browser
 360 × 640, `isMobile`/`hasTouch`, de-DE, Dev-Server Port 5180). Probemenge: alle
-443 Beispielbögen unter `examples/`; die Seitenzahlen blieben unverändert (Einzel
+443 Übungsbögen unter `examples/`; die Seitenzahlen blieben unverändert (Einzel
 772, mit zwei Codeteilen 998). Aufgeführt sind nur die Befunde dieses Pakets.
 
 | Befund | Stand | Umsetzung |
 | --- | --- | --- |
-| R5-A2 Meldekopf-Kasten nur auf dem Blanko | behoben | Jede Bogenseite trägt im oberen Seitenrand (kostet dem Satz keine Höhe) eine Kopfzeile. Einzel-PDF Seite 1: „Meldekopf: Nr. ____ · eingegangen ____ um ____ Uhr · übertragen [ ] von ____ um ____ Uhr“. Sammel-PDF Blatt 1: „Nr. 4 · THW Ansbach … · Blatt 1 von 3 · übertragen [ ] von …“ (der Kasten „Stand am Meldekopf“ bleibt). Die Aussage in `runde-4/analog-first.md`, das Einzel-PDF trage den Kasten schon, ist dort mit Datum korrigiert. Seitenzahlen der 443 Beispielbögen unverändert. |
+| R5-A2 Meldekopf-Kasten nur auf dem Blanko | behoben | Jede Bogenseite trägt im oberen Seitenrand (kostet dem Satz keine Höhe) eine Kopfzeile. Einzel-PDF Seite 1: „Meldekopf: Nr. ____ · eingegangen ____ um ____ Uhr · übertragen [ ] von ____ um ____ Uhr“. Sammel-PDF Blatt 1: „Nr. 4 · THW Ansbach … · Blatt 1 von 3 · übertragen [ ] von …“ (der Kasten „Stand am Meldekopf“ bleibt). Die Aussage in `runde-4/analog-first.md`, das Einzel-PDF trage den Kasten schon, ist dort mit Datum korrigiert. Seitenzahlen der 443 Übungsbögen unverändert. |
 | R5-A3 Folgeseiten ohne Einheit, Fahrzeugblock reißt | behoben | Folgeseiten tragen „Nr. ____ · Einheit · Blatt 2 von 4 dieses Bogens“ (Sammel-PDF mit der Nr. des Meldekopfs; die Startseite je Bogen misst ein Probesatz mit Platzhalterbildern, `bogenStart`). Fahrzeugblöcke sind unteilbar (`unbreakable`); gemessen am Großbogen (10 Fahrzeuge) und an Ansbach: kein Block auf zwei Seiten (Test über `pageNumbers`). Blanko Seite 2: Kopfzeile „Einheit: ____ · Nr. ____ · Blatt ____ von ____“. |
 | R5-A4 Handschriftlicher Blanko ohne Gegenstück in der Erfassung | behoben | „Einheit manuell erfassen…“ und die Schnellerfassung haben neben „Eingetroffen um“ die Felder „Nr. laut Zettel (leer = die App vergibt)“ und „Zug / Verband (laut Zettel)“. Die Nr. wird fest (wie nach dem Papier-Abgleich); eine ganze Zahl ab 1, schon vergebene Nr. werden mit dem Namen der Einheit abgewiesen, ohne etwas aufzunehmen. Ohne Nr. sagt die App nach dem Übernehmen, welche sie vergeben hat („… hat Nr. 7 — die Nummer auf dem Zettel eintragen“). Das Datum der Eintreffzeit bleibt heute (nur Uhrzeit). |
 | R5-A5 Stapelbericht: nicht gelesene Codeseiten „tragen keinen“ | teilweise behoben | Die Zeile heißt „n Bilder ohne lesbaren QR-Code (…)“, nennt bis zu zwölf Dateien vollständig (dann „und n weitere“) und sagt: Bogen- und Übersichtsseiten tragen keinen — war eines davon eine Codeseite, ist das Foto zu unscharf, zu klein oder verwackelt, neu fotografieren. Eine Trennung „nicht lesbar“ gegen „kein Code“ allein aus dem Bild gibt der Leser nicht her (er liefert nur Treffer oder nichts); die App weiß die erwartete Zahl der Bögen nicht. |
 | R5-A6 Blanko fasst 4 Fahrzeuge und 6 Qualifikationen | behoben | Kasten „Meldekopf“: „Blatt ____ von ____ · Reicht der Platz nicht (mehr als 4 Fahrzeuge oder 6 Qualifikationen): weiteren Vordruck als Beiblatt nehmen, dort Einheit und Nr. eintragen …“. Die Seitenzahl bleibt 2 (Personalzeilen 34 → 29, `blanko-vordruck.test.ts` grün, Datei neu erzeugt). |
 | R5-A7 Sofortbedarf-Kasten des Blanko | behoben | 3 pt Luft über und unter jeder Zeile des Kastens (Kästchen frei, „[ ] Betriebsstoff“ nicht angeschnitten, „____ vegan“ läuft nicht in die nächste Zeile); „Sonstiges“ als Feld mit drei Schreibzeilen statt einer. |
-| R5-A8 Restseiten der Sammel-PDF | behoben | „Bedarf gesamt“ und Zwischensummen stehen bei mehr als zwölf Einheiten unter der Kopfleiste, nicht als unteilbarer Block hinter der Tabelle. Die Grenze für „Restseite“ steigt von 110 auf 160 pt (gut zwölf Zeilen), solange das Enger-Setzen die Seite spart. Sammel-PDF der ersten 30 THW-Beispielbögen: 68 statt 69 Seiten, keine Seite unter 12 Zeilen (Test), Bedarf auf Seite 1. Die Kopfzeilen bleiben im Seitenrand. |
+| R5-A8 Restseiten der Sammel-PDF | behoben | „Bedarf gesamt“ und Zwischensummen stehen bei mehr als zwölf Einheiten unter der Kopfleiste, nicht als unteilbarer Block hinter der Tabelle. Die Grenze für „Restseite“ steigt von 110 auf 160 pt (gut zwölf Zeilen), solange das Enger-Setzen die Seite spart. Sammel-PDF der ersten 30 THW-Übungsbögen: 68 statt 69 Seiten, keine Seite unter 12 Zeilen (Test), Bedarf auf Seite 1. Die Kopfzeilen bleiben im Seitenrand. |
 | R5-A9 Lageblatt alphabetisch, Bemerkung abgeschnitten | behoben | Lageblatt und Sammel-PDF stehen nach Nr. (stabil, ohne Nr. zuletzt; Hinweis „Nach Nr. geordnet“); eine Umschaltung gibt es nicht. Gekürzte Bemerkungen enden mit „… (Rest: Sammel-PDF)“. |
 

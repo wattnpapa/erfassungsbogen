@@ -1,6 +1,6 @@
 # Beispiel-Erfassungsbögen — Bundeswehr im Katastropheneinsatz (Amtshilfe)
 
-8 Beispielbögen für Bundeswehr-Einheiten, die bei Katastrophen im
+8 Übungsbögen für Bundeswehr-Einheiten, die bei Katastrophen im
 Inland Amtshilfe leisten (Art. 35 GG).
 
 **Recherchestand:** Für die meisten angefragten Einheitstypen (Sanitätsregiment,
@@ -42,10 +42,10 @@ Quellen: [Wikipedia „Verbindungskommando"](https://de.wikipedia.org/wiki/Verbi
 **Anders als die KatS-StAN der Länder oder das BBK-Rahmenkonzept MTF ist hier
 KEINE vollständige Personalstärke je Einheit dokumentiert** — die Bögen bilden
 bewusst nur die öffentlich belegten Funktionen ab (siehe Kopfkommentar im
-Generator-Skript für Details je Einheitstyp). Die Beispielbögen liegen flach
+Generator-Skript für Details je Einheitstyp). Die Übungsbögen liegen flach
 hier (kein Bundesland-Unterordner, da Bundeswehr-Organisation) und erscheinen
 NICHT in der Landesvorlagen-Auswahl, sondern nur in der
-Beispielbögen-Übersicht der App — wie die BBK-, THW- und DLRG-Beispiele.
+Übungsbögen-Übersicht der App — wie die BBK-, THW- und DLRG-Beispiele.
 
 Alle Personen, Kontakte und Luftfahrzeugkennungen sind **fiktiv**.
 

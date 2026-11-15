@@ -1,9 +1,9 @@
-# Audit „Neuer Nutzer“, Beispielbögen Runde 2 (Helfer ohne Einweisung)
+# Audit „Neuer Nutzer“, Übungsbögen Runde 2 (Helfer ohne Einweisung)
 
 Prüfer: Rollenaudit `thw-new-user-reviewer` · Datum: 2026-11-09 ·
-Prüfgegenstand: Bereich „Beispielbögen“ der Live-Seite `https://erfassungsbogen.app/` (Code-Stand
+Prüfgegenstand: Bereich „Übungsbögen“ der Live-Seite `https://erfassungsbogen.app/` (Code-Stand
 `main` Commit `085a93b`, angezeigte Version `v2026.1109.833`): Abschnitt auf der Startseite, Dialog
-„Beispielbögen“ (jetzt nachgeladen), Folgen von „Anzeigen“, „PDF“, „Link“ und „Alle … in eine
+„Übungsbögen“ (jetzt nachgeladen), Folgen von „Anzeigen“, „PDF“, „Link“ und „Alle … in eine
 Übungs-Sammlung“ · Zählung neue Befunde: **P0 0 · P1 0 · P2 1 · P3 5 · Hinweise 6** · aus Runde 1
 noch zu beobachten: 1 offen, 5 teilweise (Befunde), dazu Hinweise siehe unten
 
@@ -59,7 +59,7 @@ eines Beispiels in eine echte Sammlung fragt vorher.
 Reibung entsteht jetzt vor allem bei der **neuen Suche**: Sie sucht nicht in dem, was ich auf den
 Karten lese, sondern in Dateinamen. „Bergungsgruppe“ ergibt „0 Ordner, 0 Bögen“, obwohl in fast jedem
 OV-Ordner eine Bergungsgruppe steht (BB2-N1). Dazu kommen Nebenwirkungen: Offline vor fertigem Vorrat
-ersetzt der Tipp auf „Beispielbögen ansehen“ die ganze App durch eine Fehlerseite (BB2-N2), die
+ersetzt der Tipp auf „Übungsbögen ansehen“ die ganze App durch eine Fehlerseite (BB2-N2), die
 Übungs-Sammlung heißt wie der ganze Ordnerpfad (BB2-N3) und entsteht bei jedem Tipp neu (BB2-N4),
 die klebende Leiste nimmt am Telefon ein Drittel des Dialogs (BB2-N5). Nach einem Neuladen gilt ein
 Beispiel wieder als „angefangener Bogen“ und die alte Löschfrage kommt zurück (BB-N1 teilweise).
@@ -71,7 +71,7 @@ Hilfe; die Aufgabe „eine bestimmte Einheitsart suchen“ scheitert.
 - **Nachgeladener Dialog:** öffnet bei vollem Netz in 0,46 s, bei 50 kB/s in 1,65 s; ein Doppeltipp
   während des Ladens öffnet ihn nur einmal. Nach fertigem Kern-Vorrat (hier nach 24 s) öffnet er auch
   offline.
-- **Gemerkter Ordner:** Nach „Anzeigen“ → „‹ Startseite“ → „Beispielbögen ansehen“ steht der Pfad
+- **Gemerkter Ordner:** Nach „Anzeigen“ → „‹ Startseite“ → „Übungsbögen ansehen“ steht der Pfad
   „Alle › … › RSt Oldenburg › OV Oldenburg (NI)“ mit 9 Bögen da, ebenso nach Neuladen der Seite.
   Endet man auf „Alle“, beginnt der Dialog auf „Alle“.
 - **Escape / Zurück-Geste:** Katastrophenschutz › Hessen: erstes Zurück → Katastrophenschutz, zweites
@@ -102,7 +102,7 @@ Hilfe; die Aufgabe „eine bestimmte Einheitsart suchen“ scheitert.
   — liegt im Download-Ordner.“ (6 s sichtbar), Kopfzeile „ÜBUNG — Dieser Bogen beschreibt keinen
   echten Einsatz.“
 - **Bezeichnungen:** Katastrophenschutz zeigt zwölf Länder in amtlicher Schreibweise, dazu „Noch ohne
-  Beispielbögen: Bremen, Hamburg, Sachsen-Anhalt, Schleswig-Holstein.“; THW zeigt während des Ladens
+  Übungsbögen: Bremen, Hamburg, Sachsen-Anhalt, Schleswig-Holstein.“; THW zeigt während des Ladens
   „… Bögen“ statt einer falschen Zahl.
 
 ## Nachprüfung Runde 1
@@ -110,7 +110,7 @@ Hilfe; die Aufgabe „eine bestimmte Einheitsart suchen“ scheitert.
 | ID | Stand | Beobachtung Runde 2 |
 | --- | --- | --- |
 | BB-N1 (P2) | **teilweise** | In derselben Sitzung behoben (siehe oben). Nach Neuladen der Seite steht das Beispiel auf der Startseite als „ÜBUNG“ mit „Entwurf vom 09.11.26, 08:47 Uhr wiederhergestellt. ‚Fortsetzen‘ öffnet ihn dort, wo du warst.“; das nächste „Anzeigen“ bringt wieder „Der angefangene Bogen ‚THW Oldenburg (NI) Fachgruppe Führungsunterstützung‘ wird … ersetzt. Der Bogen ‚THW Eigenbogen Bergungsgruppe‘ … wird dabei endgültig gelöscht“ mit zwei roten Knöpfen. Am Telefon lädt ein verworfener Hintergrund-Tab genau so neu; Restpriorität **P2**. Nachprüfung: wie Runde 1, zwischen den Beispielen einmal neu laden. |
-| BB-N2 (P3) | **behoben** | Ordner bleibt nach „Anzeigen“, „Schließen“, Escape auf oberster Ebene und Neuladen; Zurück geht eine Ebene hoch. Rest (bekannt, README Nr. 7): kein Weg „Zurück zu den Beispielbögen“ aus dem Bogen, der Startknopf liegt mit eigenem Bogen weiter tief auf der Startseite. |
+| BB-N2 (P3) | **behoben** | Ordner bleibt nach „Anzeigen“, „Schließen“, Escape auf oberster Ebene und Neuladen; Zurück geht eine Ebene hoch. Rest (bekannt, README Nr. 7): kein Weg „Zurück zu den Übungsbögen“ aus dem Bogen, der Startknopf liegt mit eigenem Bogen weiter tief auf der Startseite. |
 | BB-N3 (P3) | **behoben** | Nach Ordnerwechsel oben, Fokus auf Ordnername, Pfadleiste klebt, „›“ aus dem Ordnernamen entfernt („Alle Einheiten aller Ortsverbände (nach Landesverband, Regionalstelle, OV)“). Nebenwirkung: Höhe der klebenden Leiste, siehe BB2-N5. |
 | BB-N4 (P3) | **teilweise** | Zeitraum auf heute, Altersmeldungen weg; Katastrophenschutz › Thüringen und ASB öffnen ohne offenen Punkt. Weiter: DLRG „3. Personal fehlt“ und „2 offene Punkte“ (Geschlecht nur vorbelegt, „mehr Führer als Mannschaft“), Bundeswehr „Personal fehlt“ und „mehr Führer als Mannschaft“, Feuerwehr „4. Fahrzeuge fehlt“ und „14 brauchen eine andere Mitfahrgelegenheit“, Praktische Ausbildung „Kennzeichen H-JU XXX steht mehrfach“, THW OV Oldenburg Zugtrupp „Personal fehlt“. Restpriorität **P3**. |
 | BB-N5 (P3) | **teilweise** | Ländernamen und „SAR-Leitstelle“ behoben. Weiter in den Karten: Bundeswehr „übergeordnetes Landeskommando Landeskommando (fiktiv)“, als Ort „Panzerpionierzug Panzerpionierzug“, „Pioniermaschinenzug Pioniermaschinenzug“, „Holzdorf/Schönewalde Holzdorf/Schönewalde“; BBK „Landkreis/kreisfreie Stadt Landkreis Moorwehde“. Restpriorität **P3**. |
@@ -132,7 +132,7 @@ Hilfe; die Aufgabe „eine bestimmte Einheitsart suchen“ scheitert.
 ### BB2-N1 (P2, Bedienung) – Suche findet nicht, was auf den Karten steht
 
 - **Neu oder alt (Verweis):** neu (Folge der Suche, README Nr. 10).
-- **Fundstelle:** Dialog „Beispielbögen“, Feld „Suchen“ (Platzhalter „Ort, OV oder Einheit, z. B.
+- **Fundstelle:** Dialog „Übungsbögen“, Feld „Suchen“ (Platzhalter „Ort, OV oder Einheit, z. B.
   Oldenburg“); 360 x 640 und 390 x 844.
 - **Beobachtung:** Gemessene Treffer: „Bergungsgruppe“ → „0 Ordner, 0 Bögen“; „Bergung“ → 1 Bogen
   („Verstärkter Bergungszug“); „Zugtrupp“ → 18 Bögen, nur Johanniter und Feuerwehr, kein einziger
@@ -159,7 +159,7 @@ Hilfe; die Aufgabe „eine bestimmte Einheitsart suchen“ scheitert.
 
 - **Neu oder alt (Verweis):** neu (Folge des nachgeladenen Dialogs).
 - **Fundstelle:** Startseite beim ersten Besuch, Vorrat noch nicht fertig („⏳ Wird für den
-  Offline-Betrieb geladen: 0,4 von 8,0 MB“), Verbindung weg, „Beispielbögen ansehen“; 360 x 640.
+  Offline-Betrieb geladen: 0,4 von 8,0 MB“), Verbindung weg, „Übungsbögen ansehen“; 360 x 640.
 - **Beobachtung:** Statt des Dialogs ersetzt eine ganzseitige Meldung die App: „Hier ist etwas
   schiefgelaufen — Ein Teil der App konnte ohne Netz nicht geladen werden … Deine Daten und dein
   Einsatz sind unversehrt …“ mit „Seite neu laden“, „Zur Startseite“, „Daten sichern“. „Zur
@@ -172,7 +172,7 @@ Hilfe; die Aufgabe „eine bestimmte Einheitsart suchen“ scheitert.
   (gut), der Rückweg ist da.
 - **Empfehlung:** Fehlt der Dialog-Baustein, im Abschnitt oder einem kleinen Dialog sagen „Beispiele
   brauchen beim ersten Öffnen Netz“, statt die ganze App auszutauschen.
-- **Nachprüfung:** Frischer Browser, nach 1–2 s offline, „Beispielbögen ansehen“: Startseite bleibt,
+- **Nachprüfung:** Frischer Browser, nach 1–2 s offline, „Übungsbögen ansehen“: Startseite bleibt,
   Hinweis erscheint am Knopf.
 - **Typ:** Robustheit.
 
@@ -266,7 +266,7 @@ Hilfe; die Aufgabe „eine bestimmte Einheitsart suchen“ scheitert.
   will, hält den großen Knopf leicht für den Hauptweg.
 - **H2-5 – Treffer ohne Grund:** Bei „Oldenburg“ zeigen die ersten Karten Aurich und Emden; dass sie
   über „RSt Oldenburg“ passen, steht nicht an der Karte.
-- **H2-6 – Erklärung nennt die Suche nicht:** Der Aufklapper „Was sind Beispielbögen? Was heißen
+- **H2-6 – Erklärung nennt die Suche nicht:** Der Aufklapper „Was sind Übungsbögen? Was heißen
   Anzeigen, PDF und Link?“ erklärt weder Suche noch Sammelweg.
 
 ## Aufgabe

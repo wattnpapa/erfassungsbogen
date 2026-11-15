@@ -3,7 +3,7 @@
 - **Prüfer:** Rolle „Arbeitsablauf" (thw-workflow-reviewer), Helfer mit eigenem Bogen und Meldekopf-Bediener in einer Person
 - **Datum:** 2026-10-26
 - **Code-Stand:** Commit `36d549a` (`main` nach Runde 15), Produktionsbuild über `vite preview`, `http://localhost:4173`
-- **Methode:** Playwright (globales Modul, Chromium ohne Optionen), `isMobile`/`hasTouch`, Locale de-DE, Viewports 390 x 844 und 360 x 640, keine Kamera. Zustände über echte Bedienung und Dateiimport; als Bögen dienten die Beispielbögen aus `examples/thw/` mit `uebung: false` und aktuellem Stand. Kein Code geändert.
+- **Methode:** Playwright (globales Modul, Chromium ohne Optionen), `isMobile`/`hasTouch`, Locale de-DE, Viewports 390 x 844 und 360 x 640, keine Kamera. Zustände über echte Bedienung und Dateiimport; als Bögen dienten die Übungsbögen aus `examples/thw/` mit `uebung: false` und aktuellem Stand. Kein Code geändert.
 - **Zählung:** P0: 0 · P1: 0 · P2: 0 · P3: 3
 
 Nicht neu gemeldet wurden die in der Aufgabe genannten bekannten Grenzen (R15-E1, R15-E2, R15-D4, R15-S4, R15-M2, R15-O1 und die älteren Listen). Nicht prüfbar waren Kamera-Scan, Nahbereichs-Weitergabe, die Bildschirmtastatur, echte Handschuhe und die nativen Builds.

@@ -23,7 +23,7 @@ gesetzt (`eeb.entwurf.v1` mit 013 Ulm B, Links aus 003 Crailsheim und dem
 Großbogen), sonst durch Bedienung. Einen vollen Speicher habe ich erzeugt,
 indem ich `localStorage` mit Füllschlüsseln bis auf das letzte Zeichen
 gefüllt habe. Auf die Füllschlüssel hat die App keinen Einfluss. Die
-Beispielbögen tragen `uebung: true`, deshalb steht in allen Bildern der
+Übungsbögen tragen `uebung: true`, deshalb steht in allen Bildern der
 Übungs-Störer. Auf das Offline-Verhalten hat das keinen Einfluss.
 
 Getestet habe ich zuerst ohne Blick in frühere Berichte. Den Runde-1-Bericht,
@@ -40,7 +40,7 @@ Szenarien:
    Netz, das nach 40 Anfragen abbricht. Danach jeweils offline neu laden.
 2. **Kaltstart ohne Netz:** neuer Browserstart mit installiertem Service
    Worker im Offline-Modus. Startseite, „Fortsetzen", Anleitung,
-   Datenschutz, Beispielbögen, Blanko-Vorlage.
+   Datenschutz, Übungsbögen, Blanko-Vorlage.
 3. **Arbeiten ohne Netz:** Entwurf fortsetzen, Einsatzort ändern, mitten im
    Tippen mehrmals zwischen online und offline wechseln. Neuladen bei
    abbrechender Verbindung (Verbindungsabbruch bei jeder Anfrage) und bei 5 s
@@ -76,7 +76,7 @@ Excel-Liste gehen offline. Ein Wechsel zwischen online und offline mitten im
 Tippen ändert an der Oberfläche gar nichts, und das ist hier richtig. Die
 Statuszeile sagt ehrlich „bleibt auf diesem Gerät" und meldet einen vollen
 Speicher beim Tippen sofort mit dem letzten gesicherten Stand. Eine doppelt
-eingelesene Meldung wird als gleicher Inhalt übersprungen. Die Beispielbögen
+eingelesene Meldung wird als gleicher Inhalt übersprungen. Die Übungsbögen
 gehen jetzt offline.
 
 Reibung entsteht an drei Stellen. **Erstens** verspricht die Startseite
@@ -497,7 +497,7 @@ Grundlage: [../offline-und-speicher.md](../offline-und-speicher.md) und
 | Runde-1-Befund | Bewertung Runde 2 | Beobachtung |
 | --- | --- | --- |
 | O1 Voller Speicher: „gespeichert" ohne Speichern, Aufnahme verliert den Bogen | teilweise | Behoben: Die Statuszeile meldet „⚠ Nicht gespeichert … Letzter gesicherter Stand: 12:40 Uhr", und der Stand nach dem Neuladen stimmt damit überein. Scheitert das Ablegen des eigenen Bogens, bleibt der Entwurf erhalten. Offen: Die Meldung dazu erscheint nur auf der Startseite, nicht im Assistenten. Ein am Meldekopf empfangener Bogen wird bei vollem Speicher verworfen, die Meldung steht außerhalb des Bilds. „Als Vorlage speichern" und „Neue Einsatz-Sammlung…" scheitern ohne Meldung (R2-O2). |
-| O2 Beispielbögen reagieren offline nicht | bestätigt behoben | Offline: Fußzeile → „Beispielbögen" → THW → „Anzeigen" (101 Knöpfe) → Rückfrage → „Beispielbogen geöffnet — fiktive Daten …", Stärke 1/1/2/4. Der Offline-Cache umfasst jetzt 551 Einträge statt 108, die JSON-Beispiele gehören dazu. |
+| O2 Übungsbögen reagieren offline nicht | bestätigt behoben | Offline: Fußzeile → „Übungsbögen" → THW → „Anzeigen" (101 Knöpfe) → Rückfrage → „Übungsbogen geöffnet — fiktive Daten …", Stärke 1/1/2/4. Der Offline-Cache umfasst jetzt 551 Einträge statt 108, die JSON-Beispiele gehören dazu. |
 | O3 Rückfrage „bereits gemeldet" vor der Gleichheitsprüfung | bestätigt behoben | Zweiter Empfang desselben Links: Nach dem Zieldialog „Wohin damit?" gibt es keine Frage „bereits gemeldet", sondern direkt „Bereits vorhanden — übersprungen (gleicher Inhalt)". Die Sammlung hat einen Eintrag. |
 | O4 Kein Blick auf den Speicherstand | teilweise | Die Datensicherung zeigt „Belegter Speicher: etwa 0 von 5 MB" bzw. bei vollem Speicher die Warnung mit Aufräum-Hinweis. Die Zahl läuft dann aber auf „10 von 5 MB", und die 70-%-Warnung steht nur in diesem Dialog, nicht in Startseite oder Einsatzansicht (R2-O7). |
 

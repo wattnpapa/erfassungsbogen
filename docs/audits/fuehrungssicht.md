@@ -14,7 +14,7 @@ Reiner Prüfbericht, keine Codeänderung.
 
 Chromium (Playwright), Tablet 820 × 1180 und Telefon 360 × 640, de-DE.
 Sammlung „Hochwasser Neckar · BR Sporthalle Rottenburg" mit acht Einheiten
-aus den THW-Beispielbögen: drei im 1. Zug, drei im 2. Zug, zwei ohne Zug;
+aus den THW-Übungsbögen: drei im 1. Zug, drei im 2. Zug, zwei ohne Zug;
 eine abgerückt, eine als Übung gekennzeichnet, eine manuell erfasst; eine
 mit Ruhezeit und Unterbringung angefordert, eine mit 400 l Diesel; eine
 mit Folgemeldung (4 → 3). Geprüft aus Sicht der Führungskraft, die die

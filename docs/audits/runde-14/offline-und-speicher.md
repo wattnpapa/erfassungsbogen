@@ -5,7 +5,7 @@ Prüfer: Rollenaudit `thw-offline-resilience-reviewer` · Datum: 2026-10-26 · Z
 Reiner Prüfbericht, keine Codeänderung. Gegen die laufende App auf Port 4173 (Produktionsbuild, `vite preview`, Code-Stand
 Commit `429c41a`, `main` nach Runde 13), Playwright mit Chromium (globales Modul, die Projektkopie fand keinen Browser),
 Telefon 390 × 844, für die Dialoge der Datensicherung zusätzlich 360 × 640, `isMobile`/`hasTouch`, Locale de-DE, je Lauf ein
-eigener Browser-Kontext. Zustände über die Oberfläche (Einsatz anlegen, Beispielbögen als JSON einlesen, `uebung: false`)
+eigener Browser-Kontext. Zustände über die Oberfläche (Einsatz anlegen, Übungsbögen als JSON einlesen, `uebung: false`)
 und über `localStorage`. Voller Speicher mit `setItem`-Stub (Wachsen wirft `QuotaExceededError`, Verkleinern bleibt erlaubt) und
 echt (Datei größer als das Kontingent). Für unvollständigen Vorrat und für den Update-Hinweis lief ein eigener kleiner
 Dateiserver (Port 4181, Inhalt von `dist/`, mit Abbruch nach N Anfragen und einem Schalter, der `sw.js` um einen Kommentar
@@ -30,7 +30,7 @@ auf einem zweiten Gerät einspielen, sichern, wiederherstellen“ gelingen ohne 
 | Befund | Ergebnis | Messung |
 | --- | --- | --- |
 | R13-O1 Sicherung einspielen bei zu großer Datei | hält | Gerät mit Einsatz „Vorhandener Einsatz“ (2 Meldungen), Datei mit 6,5 Mio. Zeichen Nutzlast, bei 390 und 360 breit: Rückfrage mit Haken, dann „Nicht eingespielt: Der Speicher dieses Geräts reicht für diese Sicherung nicht. Ihre bisherigen Daten auf diesem Gerät sind unverändert.“ (`role="alert"`, bei 360 × 640 im Dialog sichtbar, Dialog rollt). Speicherschlüssel und Größen vorher und nachher gleich; nach Neuladen steht der Einsatz noch da. |
-| R13-O2 Fehlermeldung beim nicht geladenen Beispielbogen | hält | Vorrat bei 150 von 549 Anfragen abgebrochen, Netz weg, THW-Liste → „Anzeigen“ am ersten Bogen: `role="alert"` „Bogen konnte nicht geladen werden: Dieser Beispielbogen liegt noch nicht auf dem Gerät …“ bei 675 bis 795 px von 844 px, also im Bild. |
+| R13-O2 Fehlermeldung beim nicht geladenen Übungsbogen | hält | Vorrat bei 150 von 549 Anfragen abgebrochen, Netz weg, THW-Liste → „Anzeigen“ am ersten Bogen: `role="alert"` „Bogen konnte nicht geladen werden: Dieser Übungsbogen liegt noch nicht auf dem Gerät …“ bei 675 bis 795 px von 844 px, also im Bild. |
 | R13-O3 Rat bei vollem Speicher und leerem Papierkorb | hält | Einsatz löschen → „In den Papierkorb“ mit Stub: „Der Speicher ist voll, der Papierkorb leer — der Einsatz ist nicht gelöscht. Erst sichern … Platz schafft nur Verkleinern: unter „Mehr…“ Meldungen oder Einheiten entfernen, zuletzt „Alle Daten löschen“ (nach der Sicherung).“ Hinweis: Der Dialog bei Abrücken mit vollem Speicher nennt weiter „den Papierkorb leeren“, obwohl der Papierkorb leer ist; der Satz ist dort allgemein gehalten und führt nicht in die Irre (kein eigener Befund). |
 | R13-O4 „Neu laden“ nach Erstinstallation | hält | Eigener Server, Seite nach Erstbesuch offen, neue `sw.js` nach 6 s: Banner „Neue Version verfügbar. Neu laden · Später“; Tipp auf „Neu laden“: Seite lädt nach höchstens 3,5 s neu (Marker in `window` weg), Banner weg. |
 
@@ -95,14 +95,14 @@ auf einem zweiten Gerät einspielen, sichern, wiederherstellen“ gelingen ohne 
 
 ### P3
 
-#### R14-O2 – „Sicherung einspielen“ übernimmt den Vorratsstand des Herkunftsgeräts: Die Offline-Zeile meldet „komplett offline“, obwohl Beispielbögen auf diesem Gerät fehlen (gemessen)
+#### R14-O2 – „Sicherung einspielen“ übernimmt den Vorratsstand des Herkunftsgeräts: Die Offline-Zeile meldet „komplett offline“, obwohl Übungsbögen auf diesem Gerät fehlen (gemessen)
 
 - **Priorität:** P3
 - **Kennzeichnung:** gemessen bei 390 × 844 mit eigenem Server (Vorrat bei 150 Anfragen abgebrochen, 135 Einträge im
   Cache statt rund 628); zweite Messung ohne eigenen Server, nur Vergleich der Anzeige. Die Heilung nach Rückkehr des Netzes
   wurde ebenfalls gemessen.
-- **Fundstelle:** Startseite, grüne Offline-Zeile; Fußzeile → „Datensicherung“ → „Sicherung einspielen…“; „Beispielbögen“.
-- **Beobachtung:** Vor dem Einspielen steht „✓ Jetzt offline bereit für Bogen, PDF, QR-Code und Empfang. Beispielbögen und
+- **Fundstelle:** Startseite, grüne Offline-Zeile; Fußzeile → „Datensicherung“ → „Sicherung einspielen…“; „Übungsbögen“.
+- **Beobachtung:** Vor dem Einspielen steht „✓ Jetzt offline bereit für Bogen, PDF, QR-Code und Empfang. Übungsbögen und
   Themenseiten: 57 von 549 da, das Netz hakt — der nächste Versuch läuft von selbst“; `eeb.offline-zusatz.v1` hat
   `{"fertig":57,"gesamt":549}`. Die Sicherung von Gerät A trägt `{"fertig":549,"gesamt":549}` und überschreibt den Wert.
   Danach steht dort „✓ Funktioniert komplett offline — alle Daten bleiben auf diesem Gerät.“, der Cache hat unverändert 135
@@ -110,9 +110,9 @@ auf einem zweiten Gerät einspielen, sichern, wiederherstellen“ gelingen ohne 
   Neuladen und 30 s: 628 Einträge); ohne Netz bleibt die Zeile falsch.
 - **Erwartung der Rolle:** Die Offline-Zeile beschreibt, was auf diesem Gerät liegt, nicht was auf dem Gerät lag, von dem die
   Sicherung stammt.
-- **Auswirkung im Einsatz:** Gering. Betroffen sind nur Beispielbögen und Vorbelegung; Einsatzdaten, PDF, QR und Empfang
+- **Auswirkung im Einsatz:** Gering. Betroffen sind nur Übungsbögen und Vorbelegung; Einsatzdaten, PDF, QR und Empfang
   laufen. Wer ein Gerät nach Ausfall aus der Sicherung neu aufsetzt (der Fall, für den die Sicherung gedacht ist), glaubt es
-  vollständig offline bereit, und die Lücke fällt erst auf, wenn ein Beispielbogen ohne Netz „nicht geladen“ meldet.
+  vollständig offline bereit, und die Lücke fällt erst auf, wenn ein Übungsbogen ohne Netz „nicht geladen“ meldet.
 - **Empfehlung:** Den Vorratsstand beim Einspielen beim Gerät lassen, so wie es der Merkzettel der Geräteuhr schon tut
   (`eeb.uhr.v1`, Kommentar in `sicherung.ts`).
 - **Verifikation:** Gerät mit unvollständigem Vorrat, Netz weg, Sicherung eines vollständigen Geräts einspielen: Zeile nennt

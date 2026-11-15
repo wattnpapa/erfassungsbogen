@@ -23,7 +23,7 @@ Schrift unter 12 px, waagerechtes Rollen, Zielgrößen unter 44 px. Zustände: E
 Karte, „Mehr…", Tabelle, „Suchen, sortieren, filtern", „Ort eintragen…", Scanner ohne Kamera, „Einheit manuell
 erfassen…", „Einheit schnell erfassen…", „Bögen einlesen…", „Einsatz weitergeben / sichern", Lagemonitor-Fenster
 mit beiden Anschlägen der Helligkeitsstufe, „Übergabe vermerken…", „Einsatz als beendet markieren", „Einsatz
-löschen…", Datensicherung, Beispielbögen, „Alle Daten löschen", Bogen Schritt 1 bis 5, Startseite. Zusätzlich
+löschen…", Datensicherung, Übungsbögen, „Alle Daten löschen", Bogen Schritt 1 bis 5, Startseite. Zusätzlich
 Abrücken-Quittung, „Entfernen"-Rückfrage mit Tipp-Sperre, Papierkorb nach Neuladen, Dateinamen aller Downloads,
 Ränder interaktiver Elemente (Kontrast von Nicht-Text, Schwelle 3 : 1).
 

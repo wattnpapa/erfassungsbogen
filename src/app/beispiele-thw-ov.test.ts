@@ -11,7 +11,7 @@ import { THW_OV_ORDNER_LABEL } from "./beispiele-thw-ov-ordner";
 const WURZEL = "examples/thw/ortsverbaende";
 const ordner = (pfad: string) => readdirSync(pfad, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
 
-describe("Beispielbögen aller THW-Ortsverbände", () => {
+describe("Übungsbögen aller THW-Ortsverbände", () => {
   const ovs = ordner(WURZEL).flatMap((lv) =>
     ordner(join(WURZEL, lv)).flatMap((rst) => ordner(join(WURZEL, lv, rst)).map((ov) => ({ lv, rst, ov }))),
   );

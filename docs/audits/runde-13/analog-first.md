@@ -12,7 +12,7 @@ Reiner Prüfbericht, keine Codeänderung. Vorher gelesen: `docs/audits/README.md
 
 Playwright (Chromium, `chromium.launch()` ohne Optionen; die Projektkopie fand keinen Browser, das globale
 Playwright-Modul schon), `isMobile`/`hasTouch`, Locale de-DE, Telefon 390 × 844 und 360 × 640, jeweils frischer
-Kontext. Einsatz-Sammlung mit 3, 4, 6 und 30 THW-Beispielbögen aus `examples/thw/` (auf `uebung: false`, Stand auf
+Kontext. Einsatz-Sammlung mit 3, 4, 6 und 30 THW-Übungsbögen aus `examples/thw/` (auf `uebung: false`, Stand auf
 „vor 1 bis 3 Stunden" gesetzt; für die Datenschutzfrist zusätzlich unveränderte Bögen mit Stand Mitte Juli),
 eingelesen über „Bögen einlesen…". Durchgespielt: Zur Kenntnis nehmen, Auftrag/Notiz, Abrücken, „ändern" an Eintreff-
 und Abrückzeit (Abrückzeit vor Eintreffen), Folgemeldung mit geänderter Stärke (Wartezeit über zwei Minuten),
@@ -74,7 +74,7 @@ Bögen mit abgelaufener Datenschutzfrist und an zwei Formulierungen.
 
 - **Ort:** Einlesen von Bögen mit Stand über 90 Tage; Quittung, Marke „ANONYMISIERT" auf der Karte, Spalte „Auftrag /
   Notiz (Bemerkung der Einheit)" im Lageblatt, Sammel-PDF.
-- **Beobachtung (gemessen):** Der Beispielbogen Freiburg trägt „2 Sollplätze unbesetzt. Anh Plane/Spriegel in
+- **Beobachtung (gemessen):** Der Übungsbogen Freiburg trägt „2 Sollplätze unbesetzt. Anh Plane/Spriegel in
   Instandsetzung — nicht mit ausgerückt." Mit frischem Stand zeigen Karte, Lageblatt (mit „(Rest: Sammel-PDF)") und
   Sammel-PDF den Satz. Mit Stand vor 102 Tagen fehlt er überall: Karte ohne „Bemerkung der Einheit", Lageblatt-Zelle
   leer, `pdftotext` ohne Treffer auf „Plane" und „StAN-Soll" (Albstadt: „MzKW zusätzlich über StAN-Soll dabei"). Der

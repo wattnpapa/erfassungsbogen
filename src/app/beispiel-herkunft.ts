@@ -1,7 +1,7 @@
 /**
  * Woran sich erkennen lässt, dass Personal und Nummern eines Bogens noch aus einem Beispiel stammen (R14-E6).
  *
- * Die Beispielbögen sind als Übung gekennzeichnet und tragen erfundene Personen und Rufnummern. Wer sie als Vorlage nimmt
+ * Die Übungsbögen sind als Übung gekennzeichnet und tragen erfundene Personen und Rufnummern. Wer sie als Vorlage nimmt
  * und nur „Dies ist eine Übung" abwählt, gab diese Namen und Nummern als echte Rückkanäle in Link, QR-Code und PDF weiter.
  * Beim Öffnen eines Beispiels (oder einer Datei mit gesetzter Übungsmarke, oder nach „Beispielnamen erzeugen") merkt sich
  * dieses Modul die Namen und Nummern des Bogens; beim Abwählen der Übung und in der Übersicht fragt die App, solange davon
@@ -62,11 +62,11 @@ export function beispielRestText(b: B): string {
     ...(personen.length ? [`${personen.length} ${personen.length === 1 ? "Person" : "Personen"} (${personen.slice(0, 2).map((n) => `„${n}“`).join(", ")}${personen.length > 2 ? " …" : ""})`] : []),
     ...(nummern.size ? [`${nummern.size} ${nummern.size === 1 ? "Rufnummer" : "Rufnummern"}`] : []),
   ];
-  return teile.length ? `${teile.join(" und ")} stammen aus einem Beispiel- oder Übungsbogen und sind vermutlich erfunden.` : "";
+  return teile.length ? `${teile.join(" und ")} stammen aus einem als Übung gekennzeichneten Bogen und sind vermutlich erfunden.` : "";
 }
 
 /**
- * Prüfsumme des über „Anzeigen" geöffneten, noch unveränderten Beispielbogens
+ * Prüfsumme des über „Anzeigen" geöffneten, noch unveränderten Übungsbogens
  * (Prüfrunde Beispielbögen, Runde 2, BB2-D2): Bisher stand sie nur im
  * Arbeitsspeicher; nach dem Neuladen galt das Beispiel wieder als eigener
  * Entwurf, und das nächste Beispiel bot an, den echten Bogen auf dem

@@ -120,7 +120,7 @@ P0: keine. P1: keine. P2: eine. P3: zwei.
 
 ## Bestätigtes
 
-- **Erstladen und Bereitschaft:** „✓ Jetzt offline bereit für Bogen, PDF, QR-Code und Empfang. Beispielbögen und
+- **Erstladen und Bereitschaft:** „✓ Jetzt offline bereit für Bogen, PDF, QR-Code und Empfang. Übungsbögen und
   Themenseiten werden nachgeladen (99 von 549)“ nach 9 s; nach Neuladen ohne Netz „✓ Offline bereit … fehlen noch (144 von
   549), sie folgen beim nächsten Netz“. Nach 0,7 s offline gegangen: „⚠ Noch nicht offline bereit (0,3 von 7,0 MB geladen)“,
   Neuladen scheitert mit `ERR_INTERNET_DISCONNECTED`, die Warnung stimmt.

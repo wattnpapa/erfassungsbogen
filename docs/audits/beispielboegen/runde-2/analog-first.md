@@ -1,8 +1,8 @@
-# Audit „Analog first“, Schwerpunkt Beispielbögen, Runde 2 (Papier als Übungsunterlage)
+# Audit „Analog first“, Schwerpunkt Übungsbögen, Runde 2 (Papier als Übungsunterlage)
 
-Prüfer: Rollenaudit `thw-analog-first-reviewer` · Datum: 2026-11-09 · Prüfgegenstand: Bereich „Beispielbögen“ der
+Prüfer: Rollenaudit `thw-analog-first-reviewer` · Datum: 2026-11-09 · Prüfgegenstand: Bereich „Übungsbögen“ der
 Live-Seite https://erfassungsbogen.app/ (Stand `main`, Commit `085a93b`; Fußzeile „v2026.1109.833“): Dialog
-„Beispielbögen“ mit Knöpfen Anzeigen/PDF/Link und dem neuen Sammelweg „Alle … in eine Übungs-Sammlung“, die daraus
+„Übungsbögen“ mit Knöpfen Anzeigen/PDF/Link und dem neuen Sammelweg „Alle … in eine Übungs-Sammlung“, die daraus
 erzeugten Einzel-PDFs, Sammel-PDF und Lageblatt der Übungs-Sammlung, der Rückweg über „Bögen einlesen…“ und „Lage vom
 Papier abgleichen…“, verglichen mit dem Blanko-Vordruck im neuen Raster der THWin-Papiervorlage (Commit „Bogen-PDF im
 Raster der THWin-Papiervorlage“).
@@ -24,14 +24,14 @@ Playwright (Chromium, `chromium.launch()`), Locale de-DE, `deviceScaleFactor` 1,
 für Folgeschritte mit gespeichertem Speicherstand. Skripte, Bildschirmfotos, PDFs und Seitenbilder unter
 `/tmp/claude-0/r2-analog/`.
 
-- **PDF-Download** (`page.waitForEvent('download')`) von elf Beispielbögen: alle fünf aus „Praktische Ausbildung / JUH RV
+- **PDF-Download** (`page.waitForEvent('download')`) von elf Übungsbögen: alle fünf aus „Praktische Ausbildung / JUH RV
   Malter“, JUH Akkonia Zugtrupp, Hannover „2. Einsatzzug – Zugtrupp“ (nur Stärke), Hannover SEG Wunstorf (Karte 23 am
   Telefon), THW Albstadt ZTr TZ und THW Weinsberg FGr Öl (C) über die Suche; dazu der Blanko-Vordruck von der Startseite.
   Dateiname, Quittung und Dauer je Download notiert.
 - Gelesen mit `pdfinfo`, `pdftotext -layout` und `-bbox-layout`; Seiten mit `pdftoppm` gerastert (70/100/150 dpi Farbe,
   300 dpi Graustufen, Ausschnitte der Kopfzeile mit 200 dpi). Graustufen-Histogramm für das Wasserzeichen, Rand- und
   Kastenhöhen am 300-dpi-Bild gemessen, QR-Codes mit `zxing-cpp` aus den Rasterbildern dekodiert.
-- **Sammelweg:** „Beispielbögen ansehen → Praktische Ausbildung → JUH RV Malter → Alle 5 in eine Übungs-Sammlung“; danach
+- **Sammelweg:** „Übungsbögen ansehen → Praktische Ausbildung → JUH RV Malter → Alle 5 in eine Übungs-Sammlung“; danach
   „Einsatz weitergeben / sichern“ (Sammel-PDF) und „Lageblatt (A4 quer)“. Ebenso „OV Albstadt“ (3 Bögen) unter THW mit
   Lageblatt; Verfügbarkeit des Knopfs auf den Ebenen THW, Alle Ortsverbände, Landesverband, Regionalstelle.
 - **Rückweg:** In die Malter-Übungs-Sammlung über „Bögen einlesen… → Dateien wählen…“ die Einzel-PDFs Akkonia Zugtrupp
@@ -125,7 +125,7 @@ Ohne fremde Hilfe ist die Aufgabe zu schaffen, aber mit Umwegen.
 - **Offen:** Der PDF-Titel (`pdfinfo`) heißt weiter „Erfassungsbogen Johanniter (JUH) Malter Zugtrupp (Ztr), Stand
   09.11.2026, 08:43“, ohne Übung. Diesen Titel zeigen PDF-Betrachter und Druckwarteschlange an.
 
-### BB-A5 [P3, Layout/Abstand] Einseitige Beispielbögen haben keine Leerzeile für Nachträge von Hand — **teilweise**
+### BB-A5 [P3, Layout/Abstand] Einseitige Übungsbögen haben keine Leerzeile für Nachträge von Hand — **teilweise**
 
 - **Behoben, wo Platz ist (Seitenbild):** Albstadt ZTr TZ hat unter den vier Personen zwei leere Zeilen und eine leere
   Qualifikationszeile. Malter Zugtrupp hat dazu einen leeren Fahrzeugblock „Fahrzeug: / Kennzeichen: / FuRn: /
@@ -152,7 +152,7 @@ Ohne fremde Hilfe ist die Aufgabe zu schaffen, aber mit Umwegen.
 ### BB-A7 [P3, Text] Ordnernamen unter „Katastrophenschutz“ in Großbuchstaben ohne Umlaut — **behoben**
 
 - Alle zwölf Länder stehen in amtlicher Schreibweise da („Baden-Württemberg“, „Mecklenburg-Vorpommern“,
-  „Nordrhein-Westfalen“ …). Neu ist die Zeile „Noch ohne Beispielbögen: Bremen, Hamburg, Sachsen-Anhalt,
+  „Nordrhein-Westfalen“ …). Neu ist die Zeile „Noch ohne Übungsbögen: Bremen, Hamburg, Sachsen-Anhalt,
   Schleswig-Holstein.“
 
 ### BB-A8 [P3, Text] Übungsunterlagen voller Warnhinweise wegen alter Beispieldaten — **teilweise**
@@ -185,16 +185,16 @@ Ohne fremde Hilfe ist die Aufgabe zu schaffen, aber mit Umwegen.
   10.11.2026 ist vorbei — gilt dieser Bogen noch für den aktuellen Einsatz?“. Das Rücken auf heute geschieht beim
   Erzeugen und nicht beim Einlesen.
 - **Erwartung der Rolle:** Ein Übungsblatt, das ich am Abend vorher oder eine Woche vorher drucke, kommt beim Einlesen so
-  an wie direkt nach dem Druck. Derselbe Beispielbogen aus zwei Wegen ist derselbe Bogen und keine „ältere Fassung“ neben
+  an wie direkt nach dem Druck. Derselbe Übungsbogen aus zwei Wegen ist derselbe Bogen und keine „ältere Fassung“ neben
   einer „Schnellerfassung“.
 - **Auswirkung im Einsatz:** In der Übung bekommt der Meldekopf zu jedem zurückgegebenen Blatt eine Konfliktfrage mit
   falschen Begriffen. Die Vorgabe ist dabei, den Bogen der Einheit liegen zu lassen. Wer üben soll, wann der Bogen der
   Einheit Vorrang hat, lernt hier das Gegenteil. Liegt zwischen Druck und Übung ein Wochenende, trägt jeder eingelesene
   Bogen wieder die Warnung „vorbei“, die Runde 1 bemängelt hat (BB-A8).
-- **Empfehlung:** Für Beispielbögen einen festen Stand (z. B. Druckdatum, aber gleich für alle Wege eines Tages) oder
+- **Empfehlung:** Für Übungsbögen einen festen Stand (z. B. Druckdatum, aber gleich für alle Wege eines Tages) oder
   Gleichheit am Inhalt erkennen: Gleicher Inhalt heißt keine Rückfrage. Zeitwarnungen für Übungsbögen beim Einlesen
   ebenfalls auf heute beziehen oder abschwächen. Über den Sammelweg abgelegte Beispiele nicht „von Hand erfasst“ bzw.
-  „Schnellerfassung“ nennen, sondern „aus Beispielbogen“.
+  „Schnellerfassung“ nennen, sondern „aus Übungsbogen“.
 - **Verifikation:** Ordner Malter: erst Einzel-PDF laden, dann Sammelweg, dann die PDF einlesen. Keine Rückfrage, oder
   eine, die „gleicher Inhalt“ sagt. QR einer heute erzeugten PDF mit Datum +7 Tage öffnen: keine Meldung „vorbei“.
 
@@ -299,6 +299,6 @@ Gerät nach einer „Schnellerfassung“, die es nie gab.
   „Schnellerfassung“ und lässt ihn auf Vorgabe liegen (BB2-A1).
 - **Größtes Einsatzrisiko:** Geübt wird mit einer 3 mm hohen Meldekopf-Zeile ohne Zug und Abrücken, im Ernstfall liegt der
   Blanko-Kasten mit anderen Feldern auf dem Tisch (BB-A2).
-- **Top-Priorität für die nächste Iteration:** Beispielbögen mit festem Stand bzw. Inhaltsgleichheit, damit der Rückweg
+- **Top-Priorität für die nächste Iteration:** Übungsbögen mit festem Stand bzw. Inhaltsgleichheit, damit der Rückweg
   vom Papier ohne Konfliktfrage und ohne „vorbei“ läuft (BB2-A1); danach der Blanko-Kasten auf Seite 1 der Einzel-PDF
   (BB-A2).

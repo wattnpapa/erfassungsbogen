@@ -39,7 +39,7 @@ Safe-Area, WebKit, Kamera, Handschuhe, Licht, echter Auslieferungsserver.
   Anleitung vollständig, „QR aus Bild einlesen…" und „Fertig" im Bild.
 - Assistent quer: Schrittleiste in der Kopfzeile, Fußleiste 56 bis 65 px, Inhalt rund 63 % der Höhe.
 - Dialoge bei 320 x 568: „Alle Daten löschen" (Knöpfe bei 419 und 487 px), „Neue Einsatz-Sammlung…",
-  „Geräteschlüssel neu erzeugen" und „Beispielbögen" passen mit allen Aktionsknöpfen ins Bild.
+  „Geräteschlüssel neu erzeugen" und „Übungsbögen" passen mit allen Aktionsknöpfen ins Bild.
 - Tabelle am Telefon: Einheit, Stärke, Eingetroffen, Bedarf ohne Wischen bei 360 und 390;
   „Alle Spalten" wischt im eigenen Rahmen mit Hinweis.
 - „Warum?" und „Anderer Einsatz? Prüfen ▸": 44 px hohe Bedienziele; der Chip klappt die Karte auf und

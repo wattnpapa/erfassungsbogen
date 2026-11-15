@@ -18,7 +18,7 @@ Chromium über das globale `playwright`-Modul (`/opt/node22/lib/node_modules/pla
 `chromium.launch()` ohne Optionen, nichts installiert. `isMobile`/`hasTouch`, Locale de-DE.
 Viewports 390 × 844 (durchgehend) und 360 × 640 (Quittungsleiste, Dialoge, Karten- und
 Tabellenziele). Je Szenario ein frischer Browserkontext. Zustände über die Bedienung:
-Einsatz-Sammlung „Hochwasser Weser" anlegen, Beispielbögen `012-sinsheim`, `013-ulm`,
+Einsatz-Sammlung „Hochwasser Weser" anlegen, Übungsbögen `012-sinsheim`, `013-ulm`,
 `014-weinsberg` (Kopien außerhalb des Repositorys, `uebung: false`, `stand` fünf Minuten vor
 der Geräteuhr, Zeitraum heute) über „Bögen einlesen…" aufnehmen. Kein Kamera-Scan, keine
 Handschuhe, kein Zweitgerät, keine nativen Builds. Die Skripte haben vor dem Bestätigen die
@@ -31,7 +31,7 @@ setzen und leeren, Einsatzbeginn „Jetzt" und „Beginn entfernen", Einsatz lö
 Zurückholen bei gleichnamiger Sammlung, Sammel-PDF erzeugen und auf demselben Gerät einlesen
 (neuerer Stand, entfernte Meldung), Datensicherung erstellen und einspielen (Gerät hat inzwischen
 mehr Meldungen), „Alle Daten löschen", „Geräteschlüssel neu erzeugen" (ohne und mit vorhandenem
-Schlüssel), „Beispielbögen", Entwurf (Aus Datei laden, Neuen Bogen erstellen, Verwerfen,
+Schlüssel), „Übungsbögen", Entwurf (Aus Datei laden, Neuen Bogen erstellen, Verwerfen,
 Einsammel-Platz „Zuletzt geschlossener Bogen"), Vorlage speichern (gleicher Name), Schritt
 Personal („Nur Stärke" hin und zurück, Person entfernen mit Neuladen), Schritt Fahrzeuge
 (Fahrzeug entfernen), Einheit schnell erfassen mit Doppeltipp auf „In Einsatz übernehmen",

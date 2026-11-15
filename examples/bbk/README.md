@@ -1,6 +1,6 @@
 # Beispiel-Erfassungsbögen — Medizinische Task Force (MTF) des Bundes
 
-5 Beispielbögen nach dem „Rahmenkonzept Medizinische Task Force
+5 Übungsbögen nach dem „Rahmenkonzept Medizinische Task Force
 (MTF)" des Bundesamts für Bevölkerungsschutz und Katastrophenhilfe (BBK, Stand
 04/2018) — je Teileinheit ein Bogen. Zusammen ergeben sie die MTF-Gesamtstärke
 23/31/84/138
@@ -10,9 +10,9 @@ Quelle: [Rahmenkonzept MTF (PDF)](https://www.bbk.bund.de/SharedDocs/Downloads/D
 
 **Anders als die KatS-StAN der Länder oder die DRK-Verbandsgliederung ist die
 MTF-Gliederung ein bundesweit einheitliches Rahmenkonzept des BBK** — nicht
-Landesrecht. Die Beispielbögen liegen deshalb ohne Bundesland-Unterordner
+Landesrecht. Die Übungsbögen liegen deshalb ohne Bundesland-Unterordner
 flach hier und erscheinen nicht in der Landesvorlagen-Auswahl, sondern nur in
-der Beispielbögen-Übersicht der App (wie die bundesweiten THW- und
+der Übungsbögen-Übersicht der App (wie die bundesweiten THW- und
 DLRG-Beispiele).
 
 **Träger und Funkrufnamen sind modelliert, nicht amtlich:** Das Rahmenkonzept

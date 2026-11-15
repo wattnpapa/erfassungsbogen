@@ -103,7 +103,7 @@ Scrollen sichtbar.
 
 Fundstelle: Kopf jedes Schritts: „‹ Startseite" 80 × 30 px, 7 px neben dem
 Themenumschalter (4 Knöpfe à 30 px hoch, 0 px Abstand); Startseite und
-Einsatzansicht unten: „Datensicherung", „Beispielbögen", „Geräteschlüssel
+Einsatzansicht unten: „Datensicherung", „Übungsbögen", „Geräteschlüssel
 neu erzeugen", „Alle Daten löschen" (30 px hoch, 6 px Abstand), Link-Listen
 mit 24 px Zeilen und 6 px Abstand.
 Beobachtung: Der Rücksprung „‹ Startseite" liegt in der Zeile der Themenwahl;

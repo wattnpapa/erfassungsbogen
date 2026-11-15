@@ -358,7 +358,7 @@ Schritt 5). Gut: Die Zurück-Taste verlässt den Assistenten nicht.
   Marke „Schnellerfassung“ und dem Satz „Es reichen der Name der Einheit hier
   und die Stärke in Schritt 3“.
 - **Zurück-Verlauf der Startseitenfenster (R6-S3):** „Datensicherung“,
-  „Beispielbögen“, „Geräteschlüssel neu erzeugen?“, „Alle lokalen Daten
+  „Übungsbögen“, „Geräteschlüssel neu erzeugen?“, „Alle lokalen Daten
   löschen“, „Einsatz löschen?“, „Neue Einsatz-Sammlung anlegen“: Die
   Zurück-Taste schließt jeweils nur das Fenster, die Adresse bleibt.
 - **Rückfragen (R6-N1):** „Wohin damit?“ → „Einheit ist bereits gemeldet“

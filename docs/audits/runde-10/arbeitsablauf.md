@@ -23,7 +23,7 @@ Chromium (Playwright aus `node_modules`, `/opt/pw-browsers/chromium`,
 bei Gerätepixelfaktor 4) und `html { font-size: 200% }`. Jeder Lauf hatte einen
 eigenen Browser-Kontext; elf weitere Prüfer nutzten den Server gleichzeitig. Die
 Geräteuhr stand auf dem 25.10.2026; Seeds tragen `uebung: false` und einen Stand
-auf die Minute des Laufs. Die Einsatzzeiträume der Beispielbögen liegen teils in
+auf die Minute des Laufs. Die Einsatzzeiträume der Übungsbögen liegen teils in
 der Vergangenheit (dann erscheinen „Zeitraum vorbei" und „Anderer Einsatz?"; das
 ist eine Folge der Seeds und kein Befund). Für die Nachmeldung habe ich die
 Zeiträume der Seeds auf heute gesetzt. Tipp-Sperre mit mindestens 0,9 s

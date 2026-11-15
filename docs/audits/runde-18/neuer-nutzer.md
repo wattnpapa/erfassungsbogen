@@ -3,7 +3,7 @@
 - **Prüfer:** Rolle „Helfer ohne Einweisung" (Skill `thw-new-user-reviewer`)
 - **Datum:** 2026-10-27
 - **Gegenstand:** Web-App Erfassungsbogen, Produktionsbuild auf `http://localhost:4173`, Code-Stand Commit ae3a8e9 (`main`)
-- **Prüfaufbau:** Playwright mit Chromium (globales Modul, `chromium.launch()` ohne Optionen), `isMobile`/`hasTouch`, Locale de-DE, Viewports 390x844 und 360x640. Keine Kamera. Sammlung „Hochwasser Elbe" mit acht Beispielbögen aus `examples/thw/` (`uebung: false`, Stand und Zeitraum auf heute gesetzt) über „Bögen einlesen…". Downloads (Lageblatt-PDF, CSV) geöffnet und gelesen. Kein Code geändert.
+- **Prüfaufbau:** Playwright mit Chromium (globales Modul, `chromium.launch()` ohne Optionen), `isMobile`/`hasTouch`, Locale de-DE, Viewports 390x844 und 360x640. Keine Kamera. Sammlung „Hochwasser Elbe" mit acht Übungsbögen aus `examples/thw/` (`uebung: false`, Stand und Zeitraum auf heute gesetzt) über „Bögen einlesen…". Downloads (Lageblatt-PDF, CSV) geöffnet und gelesen. Kein Code geändert.
 - **Maßstab:** Keine „bekannten Grenzen"; auch früher als teilweise, offen oder nicht reproduzierbar geführte Punkte werden gemeldet, wenn sie im Browser noch zu sehen sind.
 - **Zählung:** P0: 0 · P1: 0 · P2: 0 · P3: 13
 

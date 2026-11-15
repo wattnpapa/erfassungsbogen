@@ -37,7 +37,7 @@ beschädigtem Gesamttext), Assistent Schritt 1 bis 6 samt Fuß- und Schrittleist
 Rückfragen „Bogen schließen?", „Nur die Stärke melden?", „Stärke nicht gezählt"
 (mit Sammlungswahl) und „Meine Fassung behalten?", Einsatzansicht als Karten und
 Tabelle, Lagemonitor (`?lagemonitor=<id>` samt „Optionen"), Musterung der Vorlage,
-Dialoge „Beispielbögen" und „Datensicherung", Kurz-Liste, Browser-Zurück und
+Dialoge „Übungsbögen" und „Datensicherung", Kurz-Liste, Browser-Zurück und
 -Vorwärts, Tablet.
 
 Gemessen habe ich `scrollWidth` gegen `innerWidth`, Lage und Höhe fester und
@@ -80,7 +80,7 @@ gemessen weg. Die Sprungmarke liegt ohne Fokus in allen Lagen bei −44 bis −8
 (bei 200 % −63 bis −8), also ganz außerhalb des Bildes, auch bei 320 × 568 und
 200 %. Der Rückfrage-Dialog hat bei 180 × 320 untereinanderstehende Knöpfe von
 130 × 44 px ohne Überlauf, der Rumpf ist 49 % der Fensterhöhe. Die Fußleiste ist
-bei 180 × 320 einzeilig (70 px, 22 %). „Beispielbögen" und „Datensicherung"
+bei 180 × 320 einzeilig (70 px, 22 %). „Übungsbögen" und „Datensicherung"
 behalten „Schließen" auch am Ende der Liste im Bild, die Listenzeilen sind 44 px
 hoch. Die Musterung klebt mit 21 bis 24 % der Höhe. Der Lagemonitor zeigt am
 Telefon Orga, Ort, Funkruf und F/U/M im ersten Bild (Einheitentyp entfällt). Die
@@ -465,7 +465,7 @@ Knöpfe mit je einer Aktion.
   bei 180 × 320; „←", „◐", „Weiter →" ohne Überlappung.
 - **„Bedarf:"-Zeile (R8-M9):** 94 × 92 px im 180er Fenster (29 % der Höhe;
   Runde 8: 288 px), 294 × 72 px bei 360 × 640.
-- **Dialoge „Beispielbögen" und „Datensicherung" (R8-M5):** „Schließen" bleibt auch
+- **Dialoge „Übungsbögen" und „Datensicherung" (R8-M5):** „Schließen" bleibt auch
   am Ende der Liste im Bild (33–77 px bei 360 × 640 und quer, 72–133 px bei
   320/200 %, 92–136 px im 180er Fenster); Listenzeilen 44 px, bei großer
   Schrift 114 bis 210 px.

@@ -822,13 +822,13 @@ describe("Assistenten-Durchlauf", () => {
   });
 
   /**
-   * Ein Beispielbogen ersetzt den offenen Bogen samt Entwurfssicherung — der
+   * Ein Übungsbogen ersetzt den offenen Bogen samt Entwurfssicherung — der
    * teuerste stille Verlust, den die App anbieten kann. Deshalb die Rückfrage,
    * und deshalb hier beide Richtungen: Abbrechen muss den eigenen Bogen
-   * behalten, Bestätigen muss den Beispielbogen wirklich bringen.
+   * behalten, Bestätigen muss den Übungsbogen wirklich bringen.
    */
   async function beispielAnzeigen(nutzer: ReturnType<typeof userEvent.setup>) {
-    // Die Beispielbögen liegen als Dateien neben der App und werden geholt —
+    // Die Übungsbögen liegen als Dateien neben der App und werden geholt —
     // in jsdom gibt es keinen Server dafür. Geliefert wird hier ein Bogen mit
     // Übungs-Flag, wie ihn examples/ enthält; geprüft wird die Rückfrage, nicht
     // das Laden.
@@ -849,8 +849,8 @@ describe("Assistenten-Durchlauf", () => {
 
       // Über den Einstieg auf der Startseite unter „So funktioniert's". Der Dialog
       // ist ein eigener, nachgeladener Baustein (beispiele-dialog.tsx), daher die Frist.
-      await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
-      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
+      await nutzer.click(screen.getByRole("button", { name: "Übungsbögen ansehen" }));
+      const dialog = await screen.findByRole("dialog", { name: "Übungsbögen" }, { timeout: 15000 });
       // Erst den Ordner der eigenen Organisation, dann stehen die Bögen da. Die
       // Angaben je Bogen laden nach — die Frist deckt das mit ab.
       await nutzer.click(within(dialog).getByRole("button", { name: /^THW/ }));
@@ -858,7 +858,7 @@ describe("Assistenten-Durchlauf", () => {
       await nutzer.click(anzeigen[0]!);
 
       // Die Rückfrage zeichnet die Dialogschicht einen Tick später.
-      const frage = await screen.findByRole("dialog", { name: "Beispielbogen öffnen?" });
+      const frage = await screen.findByRole("dialog", { name: "Übungsbogen öffnen?" });
       return { dialog, frage, fetchZurueck };
     } catch (e) {
       fetchZurueck();
@@ -880,15 +880,15 @@ describe("Assistenten-Durchlauf", () => {
     }
   }, 20000);
 
-  it("öffnet den Beispielbogen nach Bestätigung — als Übungsbogen", async () => {
+  it("öffnet den Übungsbogen nach Bestätigung — als Übungsbogen", async () => {
     const nutzer = userEvent.setup();
     const { dialog, frage, fetchZurueck } = await beispielAnzeigen(nutzer);
     try {
-      await nutzer.click(within(frage).getByRole("button", { name: "Beispielbogen öffnen" }));
+      await nutzer.click(within(frage).getByRole("button", { name: "Übungsbogen öffnen" }));
 
       expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
       expect(dialog.hasAttribute("open")).toBe(false);
-      // Beispielbögen sind ausnahmslos Übungsbögen — der Störer muss stehen.
+      // Übungsbögen sind ausnahmslos Übungsbögen — der Störer muss stehen.
       expect(screen.getByText(/als Übung gekennzeichnet/)).toBeDefined();
     } finally {
       fetchZurueck();
@@ -904,19 +904,19 @@ describe("Assistenten-Durchlauf", () => {
     const nutzer = userEvent.setup();
     const { frage, fetchZurueck } = await beispielAnzeigen(nutzer);
     try {
-      await nutzer.click(within(frage).getByRole("button", { name: "Beispielbogen öffnen" }));
+      await nutzer.click(within(frage).getByRole("button", { name: "Übungsbogen öffnen" }));
       expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
 
       await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
-      await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
-      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
+      await nutzer.click(screen.getByRole("button", { name: "Übungsbögen ansehen" }));
+      const dialog = await screen.findByRole("dialog", { name: "Übungsbögen" }, { timeout: 15000 });
       // Der Dialog steht wieder im zuletzt offenen Ordner (BB-S3, BB-W3) — kein zweites „THW".
       expect(within(dialog).getByText("THW", { selector: "[aria-current]" })).toBeDefined();
       const anzeigen = await within(dialog).findAllByRole("button", { name: "Anzeigen" }, { timeout: 15000 });
       await nutzer.click(anzeigen[1]!);
 
       expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
-      expect(screen.queryByRole("dialog", { name: "Beispielbogen öffnen?" })).toBeNull();
+      expect(screen.queryByRole("dialog", { name: "Übungsbogen öffnen?" })).toBeNull();
       // Der eigene Bogen liegt weiter auf dem Rückholplatz.
       expect(screen.getAllByText(/Dein eigener Bogen .*Eigenhausen.* liegt auf der Startseite/).length).toBeGreaterThan(0);
     } finally {
@@ -929,20 +929,20 @@ describe("Assistenten-Durchlauf", () => {
     const nutzer = userEvent.setup();
     const { frage, fetchZurueck } = await beispielAnzeigen(nutzer);
     try {
-      await nutzer.click(within(frage).getByRole("button", { name: "Beispielbogen öffnen" }));
+      await nutzer.click(within(frage).getByRole("button", { name: "Übungsbogen öffnen" }));
       expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
 
       // „Neuladen": App neu aufbauen, Speicher bleibt.
       cleanup();
       dialogeZuruecksetzen();
       render(<App />);
-      await nutzer.click(await screen.findByRole("button", { name: "Beispielbögen ansehen" }));
-      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
+      await nutzer.click(await screen.findByRole("button", { name: "Übungsbögen ansehen" }));
+      const dialog = await screen.findByRole("dialog", { name: "Übungsbögen" }, { timeout: 15000 });
       const anzeigen = await within(dialog).findAllByRole("button", { name: "Anzeigen" }, { timeout: 15000 });
       await nutzer.click(anzeigen[1]!);
 
       expect(await screen.findByRole("heading", { name: "Gesamtübersicht" })).toBeDefined();
-      expect(screen.queryByRole("dialog", { name: "Beispielbogen öffnen?" })).toBeNull();
+      expect(screen.queryByRole("dialog", { name: "Übungsbogen öffnen?" })).toBeNull();
       expect(screen.getAllByText(/Dein eigener Bogen .*Eigenhausen.* liegt auf der Startseite/).length).toBeGreaterThan(0);
     } finally {
       fetchZurueck();
@@ -950,7 +950,7 @@ describe("Assistenten-Durchlauf", () => {
   }, 40000);
 
   /** Prüfrunde Beispielbögen (BB-E1): Schließen während des Ladens bricht „Anzeigen" ab. */
-  it("öffnet keinen Beispielbogen mehr, wenn der Dialog während des Ladens geschlossen wurde", async () => {
+  it("öffnet keinen Übungsbogen mehr, wenn der Dialog während des Ladens geschlossen wurde", async () => {
     const bogenJson = JSON.stringify({ ...bogenMitName("Spaethausen"), uebung: true });
     const echtesFetch = globalThis.fetch;
     const wartend: (() => void)[] = [];
@@ -959,8 +959,8 @@ describe("Assistenten-Durchlauf", () => {
     try {
       const nutzer = userEvent.setup();
       render(<App />);
-      await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
-      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
+      await nutzer.click(screen.getByRole("button", { name: "Übungsbögen ansehen" }));
+      const dialog = await screen.findByRole("dialog", { name: "Übungsbögen" }, { timeout: 15000 });
       await nutzer.click(within(dialog).getByRole("button", { name: /^ASB/ }));
       const anzeigen = await within(dialog).findAllByRole("button", { name: "Anzeigen" });
       await nutzer.click(anzeigen[0]!);
@@ -971,7 +971,7 @@ describe("Assistenten-Durchlauf", () => {
       await new Promise((r) => setTimeout(r, 50));
 
       expect(screen.queryByRole("heading", { name: "Gesamtübersicht" })).toBeNull();
-      expect(screen.queryByRole("dialog", { name: "Beispielbogen öffnen?" })).toBeNull();
+      expect(screen.queryByRole("dialog", { name: "Übungsbogen öffnen?" })).toBeNull();
     } finally {
       globalThis.fetch = echtesFetch;
     }
@@ -981,8 +981,8 @@ describe("Assistenten-Durchlauf", () => {
   it("findet Beispiel-Ordner über die Suche und öffnet sie", async () => {
     const nutzer = userEvent.setup();
     render(<App />);
-    await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
-    const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
+    await nutzer.click(screen.getByRole("button", { name: "Übungsbögen ansehen" }));
+    const dialog = await screen.findByRole("dialog", { name: "Übungsbögen" }, { timeout: 15000 });
     await nutzer.type(within(dialog).getByRole("searchbox", { name: "Suchen" }), "hannover");
     const treffer = within(dialog).getByRole("list", { name: "Gefundene Ordner" });
     await nutzer.click(within(treffer).getByRole("button", { name: /^Einlagen Kräfte Hannover/ }));
@@ -994,8 +994,8 @@ describe("Assistenten-Durchlauf", () => {
   it("geht mit Escape im Beispiel-Dialog eine Ebene hoch statt zu schließen", async () => {
     const nutzer = userEvent.setup();
     render(<App />);
-    await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
-    const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
+    await nutzer.click(screen.getByRole("button", { name: "Übungsbögen ansehen" }));
+    const dialog = await screen.findByRole("dialog", { name: "Übungsbögen" }, { timeout: 15000 });
     await nutzer.click(within(dialog).getByRole("button", { name: /^Katastrophenschutz/ }));
     expect(within(dialog).getByText("Katastrophenschutz", { selector: "[aria-current]" })).toBeDefined();
 
@@ -1012,8 +1012,8 @@ describe("Assistenten-Durchlauf", () => {
   it("geht mit mehrfachem Escape Ebene für Ebene hoch", async () => {
     const nutzer = userEvent.setup();
     render(<App />);
-    await nutzer.click(screen.getByRole("button", { name: "Beispielbögen ansehen" }));
-    const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
+    await nutzer.click(screen.getByRole("button", { name: "Übungsbögen ansehen" }));
+    const dialog = await screen.findByRole("dialog", { name: "Übungsbögen" }, { timeout: 15000 });
     await nutzer.click(within(dialog).getByRole("button", { name: /^Katastrophenschutz/ }));
     await new Promise((r) => setTimeout(r, 450)); // Doppeltipp-Sperre
     await nutzer.click(within(dialog).getByRole("button", { name: /^Niedersachsen/ }));

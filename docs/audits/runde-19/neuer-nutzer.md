@@ -145,7 +145,7 @@ Sichtfelds und stilles Verhalten kurz nach einem Tipp. Nichts davon verhindert e
 
 - **Neu oder alt (Verweis):** alt – Rest von R18-N3 (zwei Zahlen widersprechen sich scheinbar;
   Aufnahme-Hinweis bleibt stehen).
-- **Ort:** Einsatz-Seite oben und Listenkopf nach „Bögen einlesen…" mit den Beispielbögen
+- **Ort:** Einsatz-Seite oben und Listenkopf nach „Bögen einlesen…" mit den Übungsbögen
   (Übungsmeldungen), 390 x 844 und 360 x 640.
 - **Beobachtung:** Kennzahlen „0 Einheiten · 0 Führer · 0 Unterf. · 0 Mannsch. · 0 Gesamt", darunter
   „8 Bögen aufgenommen. Aufnahme 02:37: …" und „Einheiten (8 gemeldet · 0 anwesend)". Die Erklärung
@@ -158,7 +158,7 @@ Sichtfelds und stilles Verhalten kurz nach einem Tipp. Nichts davon verhindert e
   umgekehrt hält ein Helfer die Kennzahlen für kaputt.
 - **Empfehlung:** In den Kennzahlen „0 (8 Übung, nicht gezählt)" ausschreiben; „0 anwesend" im
   Listenkopf mit „8 Übung" ergänzen; den Aufnahme-Hinweis nach der Kenntnisnahme ausblenden.
-- **Verifikation:** Acht Beispielbögen einlesen, Kennzahlen und Listenkopf ohne Scrollen lesen.
+- **Verifikation:** Acht Übungsbögen einlesen, Kennzahlen und Listenkopf ohne Scrollen lesen.
 
 ### R19-N7 (P3) – Fachwörter der Sammlung ohne Erklärung
 

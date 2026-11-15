@@ -3,7 +3,7 @@
 - **Prüfer:** Rolle „Arbeitsablauf“ (thw-workflow-reviewer), Meldekopf-Bediener und Helfer mit eigenem Bogen in einer Person
 - **Datum:** 2026-10-28
 - **Code-Stand:** Commit `0ac0d7f` (= `main`, Runde 18), Produktionsbuild, `http://localhost:4173`
-- **Methode:** Playwright (globales Modul, `chromium.launch()` ohne Optionen, frisches Profil je Lauf), `isMobile`/`hasTouch`, Locale de-DE, Viewports 360 x 640, 390 x 844 und 320 x 568 (nur Kartenhöhe). Bögen: fünf bis sechs THW-Beispielbögen aus `examples/thw/` mit `uebung: false` und aktuellem Stand. Downloads (Lageblatt, CSV, Nachtrags-CSV, Excel, Sammel-PDF) erzeugt und geöffnet. Kein Code geändert. Nicht geprüft: echte Kamera, Nahbereich, Bildschirmtastatur, native Builds.
+- **Methode:** Playwright (globales Modul, `chromium.launch()` ohne Optionen, frisches Profil je Lauf), `isMobile`/`hasTouch`, Locale de-DE, Viewports 360 x 640, 390 x 844 und 320 x 568 (nur Kartenhöhe). Bögen: fünf bis sechs THW-Übungsbögen aus `examples/thw/` mit `uebung: false` und aktuellem Stand. Downloads (Lageblatt, CSV, Nachtrags-CSV, Excel, Sammel-PDF) erzeugt und geöffnet. Kein Code geändert. Nicht geprüft: echte Kamera, Nahbereich, Bildschirmtastatur, native Builds.
 - **Maßstab:** Keine „bekannten Grenzen“. Auch Punkte, die in Runde 18 als offen oder teilweise geführt wurden, sind gemeldet, wenn sie im Browser noch zu sehen sind.
 - **Zählung:** P0: 0 · P1: 0 · P2: 1 · P3: 11
 

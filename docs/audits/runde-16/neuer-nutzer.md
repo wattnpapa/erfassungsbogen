@@ -3,7 +3,7 @@
 - **Prüfer:** Rolle „Helfer ohne Einweisung" (Skill `thw-new-user-reviewer`)
 - **Datum:** 2026-10-26
 - **Gegenstand:** Web-App Erfassungsbogen, Produktionsbuild (`vite preview`, Port 4173), Code-Stand Commit 36d549a (`main` nach Runde 15)
-- **Prüfaufbau:** Playwright mit Chromium (globales Modul), `isMobile`/`hasTouch`, Locale de-DE, Viewports 390x844 und 360x640 (Vollbild-QR zusätzlich 320x568 und 412x915). Keine Kamera. Für die Sammlung wurden Beispielbögen aus `examples/thw/` (mit `uebung: false` bzw. unverändert) über „Bögen einlesen…" aufgenommen. Es wurde kein Code geändert.
+- **Prüfaufbau:** Playwright mit Chromium (globales Modul), `isMobile`/`hasTouch`, Locale de-DE, Viewports 390x844 und 360x640 (Vollbild-QR zusätzlich 320x568 und 412x915). Keine Kamera. Für die Sammlung wurden Übungsbögen aus `examples/thw/` (mit `uebung: false` bzw. unverändert) über „Bögen einlesen…" aufgenommen. Es wurde kein Code geändert.
 - **Zählung:** P0: 0 · P1: 0 · P2: 0 · P3: 4
 
 ## Urteil aus Sicht der Rolle
@@ -24,12 +24,12 @@ Der Einstieg trägt: Die Startseite trennt „Meinen Bogen ausfüllen" und „B�
 
 ### R16-N1 (P3) – Tabelle der Sammlung: Spalte „Meldung vor" zeigt „⚠ Stand 101 Tagen"
 
-- **Fundstelle / Aufgabe:** Einsatz-Sammlung, Ansicht „Tabelle", Spalte „MELDUNG VOR", bei Bögen, deren Stand mehr als eine Stunde vor dem Eingang liegt (Beispielbögen, 390x844).
+- **Fundstelle / Aufgabe:** Einsatz-Sammlung, Ansicht „Tabelle", Spalte „MELDUNG VOR", bei Bögen, deren Stand mehr als eine Stunde vor dem Eingang liegt (Übungsbögen, 390x844).
 - **Beobachtung:** Der Spaltenkopf lautet „Meldung vor", die Zelle „⚠ Stand 101 Tagen" (DOM-Text der Zelle ebenfalls „⚠ Stand 101 Tagen", gemessen). Die Karte derselben Einheit schreibt richtig „⚠ Stand vor 101 Tagen". In der Tabelle fehlt das „vor", weil der Kopf es liefert; zusammen liest sich das als „Meldung vor | Stand 101 Tagen". Zusätzlich steht die Zahl in der Zelle im Dativ ohne Präposition.
 - **Erwartung der Rolle:** Eine Zelle, die für sich lesbar ist („vor 101 Tagen"), oder ein Kopf, der zum Zelltext passt („Alter der Angaben").
 - **Auswirkung im Einsatz:** Gering. Wer die Tabelle am Meldekopf überfliegt, muss „Stand" und „Meldung" gegeneinander auflösen und weiß nicht sicher, ob 101 Tage der Stand oder die Meldung betreffen. Die Warnmarke „⚠" trägt die Dringlichkeit trotzdem.
 - **Empfehlung:** Zelle wie in der Karte („Stand vor 101 Tagen") oder Spaltenkopf „Alter der Angaben" mit Zellen „⚠ vor 101 Tagen (Stand)".
-- **Verifikation:** Beispielbögen mit Stand älter als eine Stunde vor dem Eingang einlesen, Tabelle öffnen, Zelle und Karte vergleichen.
+- **Verifikation:** Übungsbögen mit Stand älter als eine Stunde vor dem Eingang einlesen, Tabelle öffnen, Zelle und Karte vergleichen.
 
 ### R16-N2 (P3) – Startseite: derselbe Einsatz steht zweimal untereinander, mit derselben Statuszeile
 
@@ -62,7 +62,7 @@ Der Einstieg trägt: Die Startseite trennt „Meinen Bogen ausfüllen" und „B�
 
 - Schwebende Leiste „Ansicht: Standard" unten links verdeckt auf der Sammlungsseite die letzte Zeile der Karte unter dem Daumen (bekannte Ansichtswahl, Runde 15 M3).
 - Eingabefelder „Zug" und „Auftrag/Notiz" in der aufgeklappten Karte tragen nur Platzhalter und ein „aria-label", kein sichtbares Etikett; der Knopf, der sie öffnet, steht direkt darüber. Beobachtung ohne Folge für die Aufgabe, deshalb nicht gezählt.
-- Die Beispielbögen sind in der Sammlung älter als 90 Tage und werden anonymisiert; das ist ein Zustand der Beispieldaten, kein Befund.
+- Die Übungsbögen sind in der Sammlung älter als 90 Tage und werden anonymisiert; das ist ein Zustand der Beispieldaten, kein Befund.
 
 ## Abschluss
 

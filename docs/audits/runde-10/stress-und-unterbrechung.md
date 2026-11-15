@@ -26,7 +26,7 @@ Zustände über `localStorage`-Seeds aus `examples/thw/`, mit `uebung: false` un
 (38 Personen, 10 Fahrzeuge) und `eeb.einsaetze.v1` mit der Sammlung
 „Hochwasser Musterstadt“ (6 Einheiten aus 001, 003, 009, 013, 016, 052). In den
 Seeds tragen die Karten „⚠ Anderer Einsatz?“ und „Zeitraum vorbei“, weil Ort und
-Zeitraum der Beispielbögen nicht zur Sammlung passen; das ist dem Seed
+Zeitraum der Übungsbögen nicht zur Sammlung passen; das ist dem Seed
 geschuldet und kein Befund. Skripte und Screenshots liegen im Scratchpad unter
 `runde10/s/`.
 

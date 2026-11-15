@@ -1,9 +1,9 @@
-# Audit „Helfer im Feld“, Schwerpunkt Beispielbögen, Runde 2 (Feldtauglichkeit)
+# Audit „Helfer im Feld“, Schwerpunkt Übungsbögen, Runde 2 (Feldtauglichkeit)
 
 Prüfer: Rollenaudit `thw-field-user-reviewer` · Datum: 2026-11-09 ·
 Prüfgegenstand: Live-Seite `https://erfassungsbogen.app/` (Stand `main`, Commit `085a93b`, angezeigte Fassung
-`v2026.1109.833`), nur der Bereich Beispielbögen: Startseiten-Abschnitt „Beispielbögen“, der nachgeladene Dialog
-„Beispielbögen“ (Suche, Register, klebende Pfadleiste, Karten, Sammelweg, Offline-Hinweise) und die Folgen von „Anzeigen“,
+`v2026.1109.833`), nur der Bereich Übungsbögen: Startseiten-Abschnitt „Übungsbögen“, der nachgeladene Dialog
+„Übungsbögen“ (Suche, Register, klebende Pfadleiste, Karten, Sammelweg, Offline-Hinweise) und die Folgen von „Anzeigen“,
 „PDF“, „Link“ und „Alle … in eine Übungs-Sammlung“.
 
 Zählung (neue Befunde): **P0 0 · P1 0 · P2 3 · P3 6 · Hinweise 6** (Hinweise ohne Priorität, nicht in der Zählung)
@@ -24,7 +24,7 @@ Skripte und Bildschirmfotos unter `/tmp/claude-0/r2-feld/` (`r*.js`, `bb/*.png`,
 zum Vergleich einzelne Läufe in „Standard“. DOM nicht verändert, kein Skript eingeschleust; gelesen wurden Lage, Größe,
 Bildlauf, Fokus und berechnete Stile.
 
-Wege: (1) Startseite → „Beispielbögen ansehen“ (Zeit bis zum offenen Dialog, auch gedrosselt 400 ms/50 kB/s);
+Wege: (1) Startseite → „Übungsbögen ansehen“ (Zeit bis zum offenen Dialog, auch gedrosselt 400 ms/50 kB/s);
 (2) THW › Alle Einheiten aller Ortsverbände › Bremen, Niedersachsen › RSt Oldenburg › OV Oldenburg (NI), je Ebene Bildlauf
 200 px und Lage der klebenden Pfadleiste gemessen, ans Ende gerollt; (3) Zurück-Geste (`goBack`) dreimal aus Tiefe 5, Escape,
 Schließen und Wiederöffnen, Neuladen und Wiederöffnen; (4) Suche: 14 Suchbegriffe, darunter Tippfehler, Umlaut-Ersatz,
@@ -35,11 +35,11 @@ Startseite → zweites Beispiel → Neuladen → drittes Beispiel; (6) „PDF“
 und „Alle 101 in eine Übungs-Sammlung“ (THW), Zustand alle 250 ms gelesen; (8) Offline: OV Oldenburg online geöffnet, bis
 „✓ Jetzt offline bereit“ gewartet (≈ 55 s) plus 30 s, Netz getrennt, neu geladen, Dialog im gemerkten Ordner, „Anzeigen“
 in OV Oldenburg (vorher online gesehen) und OV Norden (nie gesehen), Suche offline, Netz wieder an; (9) Stichprobe von
-elf Beispielbögen aus allen Registern nach „Anzeigen“ auf „⚠ offene Punkte“ und Reiter „fehlt“.
+elf Übungsbögen aus allen Registern nach „Anzeigen“ auf „⚠ offene Punkte“ und Reiter „fehlt“.
 
 ## Annahmen
 
-- Wie in Runde 1: Beispielbögen dienen Ausbildung, Übung, Dienstabend und Kennenlernen; selten Zeitdruck am Einsatzort.
+- Wie in Runde 1: Übungsbögen dienen Ausbildung, Übung, Dienstabend und Kennenlernen; selten Zeitdruck am Einsatzort.
 - Ein Helfer schaut mehr als ein Beispiel an und sucht zuerst „seinen“ OV oder „seine“ Einheit.
 - Mobile Browser verwerfen Tabs im Hintergrund und laden sie beim Zurückkehren neu; ein Neuladen ist also kein Sonderfall.
 - Die Bildschirmtastatur nimmt im Hochformat rund 45 %, im Querformat rund 55 bis 60 % der Höhe ein.
@@ -55,7 +55,7 @@ Neuladen); der Sammelweg offline (nicht ausgelöst).
 
 ## Urteil
 
-Aufgabe „Einen Beispielbogen meiner Einheit finden, ansehen, als PDF holen, Link weitergeben, ggf. alle Bögen meines OV als
+Aufgabe „Einen Übungsbogen meiner Einheit finden, ansehen, als PDF holen, Link weitergeben, ggf. alle Bögen meines OV als
 Übung sammeln“: **abgeschlossen, mit Mühe an einzelnen Stellen** — online hochkant ohne Hilfe, im Querformat mit Mühe.
 
 Die vier P2-Befunde aus Runde 1 sind behoben oder deutlich entschärft: Zurück geht eine Ebene hoch und der Dialog öffnet im
@@ -84,12 +84,12 @@ Dateikürzeln statt nach Einheitsnamen sucht.
 - **Zweites Beispiel:** ohne Rückfrage; Meldung „Solange du nichts änderst, ersetzt das nächste Beispiel ihn ohne
   Rückfrage. Dein eigener Bogen „THW Oldenburg“ liegt auf der Startseite unter „Zuletzt geschlossenen Bogen zurückholen“.“
   Startseitenkarte mit Kennzeichen „BEISPIEL“.
-- **Erstes Beispiel bei eigenem Bogen:** kurze Rückfrage mit „Beispielbogen öffnen“ / „Abbrechen“, eigener Bogen landet auf
+- **Erstes Beispiel bei eigenem Bogen:** kurze Rückfrage mit „Übungsbogen öffnen“ / „Abbrechen“, eigener Bogen landet auf
   dem Rückholplatz.
 - **Einsatzzeitraum:** keine Stichprobe meldet mehr „Einsatzzeitraum … ist vorbei“ (vorher 6 von 6).
 - **Katastrophenschutz:** „Baden-Württemberg“, „Mecklenburg-Vorpommern“, „Nordrhein-Westfalen“ usw. ausgeschrieben, darunter
-  „Noch ohne Beispielbögen: Bremen, Hamburg, Sachsen-Anhalt, Schleswig-Holstein.“
-- **Offline-Zeile:** „✓ Funktioniert komplett offline (außer den Beispielbögen der THW-Ortsverbände)“ — passt zum Dialog.
+  „Noch ohne Übungsbögen: Bremen, Hamburg, Sachsen-Anhalt, Schleswig-Holstein.“
+- **Offline-Zeile:** „✓ Funktioniert komplett offline (außer den Übungsbögen der THW-Ortsverbände)“ — passt zum Dialog.
   Der nachgeladene Dialog öffnet auch offline (Baustein im Vorrat). Netz zurück: Ordner lädt von selbst nach.
 - **Sammelweg:** „Alle 9 in eine Übungs-Sammlung“ nach 0,6 s, „Alle 101 …“ nach 7,4 s (Knopf solange gesperrt, Zähler
   „Angaben werden geladen … 29 → 100 von 101“); Ergebnis: Sammlung der Art „Übung“, alle Karten mit „ÜBUNG“, eigener Bogen
@@ -101,8 +101,8 @@ Dateikürzeln statt nach Einheitsnamen sucht.
 
 | Alte ID | Stand | Beobachtung Runde 2 |
 | --- | --- | --- |
-| BB-H1 | **teilweise** (Rest P2) | Ohne Neuladen behoben (s. o.). Nach Neuladen gilt das angesehene Beispiel als eigener Entwurf: Startseite „THW Oldenburg (NI) Zugtrupp Technischer Zug ÜBUNG · Entwurf vom 09.11.26, 08:51 Uhr wiederhergestellt“ (vorher „BEISPIEL“), und das nächste „Anzeigen“ bringt wieder die Rückfrage aus Runde 1: „… Der Bogen „THW Oldenburg“ … auf dem Platz „Zuletzt geschlossener Bogen“ wird dabei endgültig gelöscht …“ mit „Beispielbogen öffnen — den alten Bogen vorher als Datei sichern“ / „… — alten Bogen endgültig löschen“ (je 300 × 67) / „Abbrechen“. Da Telefone Hintergrund-Tabs verwerfen, trifft das den Helfer, der zwischendurch Funk oder Messenger bedient hat. Empfehlung: die Kennzeichnung „unverändertes Beispiel“ mit dem Bogen speichern statt nur im Arbeitsspeicher. |
-| BB-H2 | **behoben** | Zurück-Geste und Escape eine Ebene hoch, Dialog öffnet im letzten Ordner (auch nach Neuladen und nach „Anzeigen“). Offen wie im README vermerkt: kein Knopf „Zurück zu den Beispielbögen“ im geöffneten Bogen; die Startseite steht danach bei scrollY 0, der Abschnitt bei y = 2 678 (Hinweis 3). |
+| BB-H1 | **teilweise** (Rest P2) | Ohne Neuladen behoben (s. o.). Nach Neuladen gilt das angesehene Beispiel als eigener Entwurf: Startseite „THW Oldenburg (NI) Zugtrupp Technischer Zug ÜBUNG · Entwurf vom 09.11.26, 08:51 Uhr wiederhergestellt“ (vorher „BEISPIEL“), und das nächste „Anzeigen“ bringt wieder die Rückfrage aus Runde 1: „… Der Bogen „THW Oldenburg“ … auf dem Platz „Zuletzt geschlossener Bogen“ wird dabei endgültig gelöscht …“ mit „Übungsbogen öffnen — den alten Bogen vorher als Datei sichern“ / „… — alten Bogen endgültig löschen“ (je 300 × 67) / „Abbrechen“. Da Telefone Hintergrund-Tabs verwerfen, trifft das den Helfer, der zwischendurch Funk oder Messenger bedient hat. Empfehlung: die Kennzeichnung „unverändertes Beispiel“ mit dem Bogen speichern statt nur im Arbeitsspeicher. |
+| BB-H2 | **behoben** | Zurück-Geste und Escape eine Ebene hoch, Dialog öffnet im letzten Ordner (auch nach Neuladen und nach „Anzeigen“). Offen wie im README vermerkt: kein Knopf „Zurück zu den Übungsbögen“ im geöffneten Bogen; die Startseite steht danach bei scrollY 0, der Abschnitt bei y = 2 678 (Hinweis 3). |
 | BB-H3 | **teilweise** (Rest P3) | Startseite, Ordnerhinweis und Fehlermeldung sagen jetzt dasselbe. Weiter: Karten nicht geladener Bögen haben aktive Knöpfe (OV Norden offline: 5 × „nicht geladen“, „Anzeigen“ nicht gesperrt), der Fehler kommt erst nach dem Tipp. In OV Oldenburg, vorher online vollständig angezeigt („9 Bögen“ ohne Ladehinweis), fehlte offline einer der neun („ov-oldenburg-ni-04-1-tz-ztr-tz · nicht geladen“; einmal beobachtet, Ursache nicht ermittelt). Neue Nebenwirkungen siehe BB2-H6. |
 | BB-H4 | **behoben** | 640 × 360: Karten, alle drei Knöpfe in einer Reihe im Bild, kein Seitwärtsrollen. Neue Enge durch die klebende Pfadleiste: BB2-H1. Auf der obersten Ebene steht quer im Feld-Modus weiter nur ein Register (ASB) ganz im Bild (Kopf 73 px, Erklärung, Suchfeld davor). |
 | BB-H5 | **behoben** | Ordnerwechsel immer an den Anfang, Pfadleiste klebt unter dem Kopf (THW ans Ende gerollt, scrollTop 34 918: „‹ Zurück“ bei y = 106). Nebenwirkung Höhe: BB2-H1. |
@@ -132,7 +132,7 @@ Hinweise aus Runde 1:
 
 - **Typ:** Layout/Abstand
 - **Evidence:** Observed (640 × 360 Feld und Standard; 360 × 640 und 390 × 844 Feld).
-- **Ort:** Dialog „Beispielbögen“, Ebenen „Alle Einheiten aller Ortsverbände“ und „Bremen, Niedersachsen“, nach 200 px
+- **Ort:** Dialog „Übungsbögen“, Ebenen „Alle Einheiten aller Ortsverbände“ und „Bremen, Niedersachsen“, nach 200 px
   Bildlauf; OV-Ebene.
 - **Beobachtung:** Kopfzeile und Pfadleiste kleben übereinander. Freie Höhe unter der Pfadleiste bis Dialogende:
 
@@ -304,12 +304,12 @@ Hinweise aus Runde 1:
 1. **Titel im Feld-Modus getrennt:** „Beispiel-/bögen“ bei 360 px (Kopf 84 px statt 73 px wie bei 390 px).
 2. **Platzhalter abgeschnitten:** „Ort, OV oder Einheit, z. B. Old“ (360 × 640 Feld) bzw. „… z. B. Oldenb“ (390 × 844) — das
    Beispiel „Oldenburg“ ist gerade der Begriff, der zur Regionalstelle führt (BB2-H2).
-3. **Rückfrage-Knöpfe im Feld-Modus 48 px:** „Beispielbogen öffnen“ / „Abbrechen“ 300 × 48, im übrigen Feld-Modus 54 px.
+3. **Rückfrage-Knöpfe im Feld-Modus 48 px:** „Übungsbogen öffnen“ / „Abbrechen“ 300 × 48, im übrigen Feld-Modus 54 px.
 4. **Nachgeladener Dialog:** erstes Öffnen 0,9 bis 1,1 s ohne Rückmeldung am Knopf; unauffällig, auf langsamem Gerät aber
    ein möglicher Anlass für einen zweiten Tipp (nicht beobachtet, Doppeltipp-Sperre vorhanden).
 5. **„…“ in der Pfadleiste nicht antippbar:** Die ausgelassenen Ebenen (THW, Alle Einheiten …, Land) sind nur über „‹ Zurück“
    oder „Alle“ zu erreichen; für einen Sprung zum Land fehlt der Weg.
-6. **Rückweg aus dem Bogen:** wie im README vermerkt kein „Zurück zu den Beispielbögen“; mit Hinweis 3 der längste Weg im
+6. **Rückweg aus dem Bogen:** wie im README vermerkt kein „Zurück zu den Übungsbögen“; mit Hinweis 3 der längste Weg im
    Bereich.
 
 ## Comprehension check

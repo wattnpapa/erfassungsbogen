@@ -32,7 +32,7 @@ heute: Entwurf (`eeb.entwurf.v1`) aus `examples/thw/` (Bergungsgruppe Ulm,
 Zugtrupp Albstadt, Großbogen „Verstärkter Bergungszug“ Oldenburg), Einsatz-
 Sammlung „Hochwasser Musterstadt“ mit sechs THW-Bögen (`eeb.einsaetze.v1`),
 absichtlich abgeschnittene Sammlung, Vorlagenliste und Entwurf, ein Entwurf mit
-80 Tage altem Stand. Dass die Beispielbögen einen vergangenen Einsatzzeitraum
+80 Tage altem Stand. Dass die Übungsbögen einen vergangenen Einsatzzeitraum
 tragen („Zeitraum vorbei“, „Anderer Einsatz?“), ist Seed-Wirkung und kein
 Befund. Skripte und Bilder liegen im Scratchpad unter `runde9/h/`.
 
@@ -420,7 +420,7 @@ Dort zuerst festgehalten, von mir hier nachgemessen, nicht doppelt gezählt:
   Neuladen steht der Entwurf „THW Oldenburg“ auf der Startseite.
 - **Ohne Netz:** Dienst aktiv, danach Neuladen, Sammlung öffnen und Assistent
   öffnen funktionieren; die Startseite sagt „Offline bereit …
-  Beispielbögen und Themenseiten fehlen noch (74 von 549), sie folgen beim nächsten
+  Übungsbögen und Themenseiten fehlen noch (74 von 549), sie folgen beim nächsten
   Netz“.
 - **Eingabefelder:** Zahlen im Personal-Schritt `type="number"` mit
   `inputmode="numeric"`, 52 px hoch; Telefon `type="tel"`, E-Mail `type="email"`.

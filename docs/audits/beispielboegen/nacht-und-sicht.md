@@ -1,9 +1,9 @@
-# Audit „Nacht und Sicht", Schwerpunkt Beispielbögen
+# Audit „Nacht und Sicht", Schwerpunkt Übungsbögen
 
 Prüfer: Rollenaudit `thw-night-visibility-reviewer` · Datum: 2026-11-08 ·
 Prüfgegenstand: Live-Seite `https://erfassungsbogen.app/` (Fassung `v2026.1108.2056`, Code-Stand
-Commit `0dd56d4` = `main`), nur der Bereich Beispielbögen: Abschnitt „Beispielbögen" der Startseite mit
-dem Knopf „Beispielbögen ansehen" und der Dialog „Beispielbögen" (Aufklapper, Register, Pfadleiste,
+Commit `0dd56d4` = `main`), nur der Bereich Übungsbögen: Abschnitt „Übungsbögen" der Startseite mit
+dem Knopf „Übungsbögen ansehen" und der Dialog „Übungsbögen" (Aufklapper, Register, Pfadleiste,
 Tabelle bzw. Karten, Knöpfe) · Zählung: **P0 0 · P1 0 · P2 1 · P3 1 · Hinweise 6**
 
 Reiner Prüfbericht, keine Codeänderung. Vorab gelesen: `docs/audits/README.md`, der Bericht
@@ -41,7 +41,7 @@ Hannover, THW). Ein PDF-Knopf wurde ausgelöst („wird vorbereitet …", Downlo
 Skripte und Bildschirmfotos: `/tmp/claude-0/audit-nacht/` (u. a. `messen.js`, `zeichen.js`,
 `orgs.js`, `scan.js`, `zoom-vergleich.png`, `org-nacht-DRK.png`, `390x844-nacht-tabelle.png`).
 
-**Annahmen:** Wer die Beispielbögen nachts aufruft, tut das meist zum Üben oder Zeigen (Dienstabend,
+**Annahmen:** Wer die Übungsbögen nachts aufruft, tut das meist zum Üben oder Zeigen (Dienstabend,
 Fahrzeug, Zelt), nicht im laufenden Einsatz; die Bewertung folgt deshalb dem Maßstab der App selbst
 („Nacht: gedimmt, blendet nicht"), nicht einer Einsatzgefahr. Dass das Größenzeichen (Punkte, Striche
 über dem Rechteck) für Helfer eine gelesene Angabe ist, steht so in Runde 3 (R3-L5) und im Code.
@@ -70,12 +70,12 @@ dastehen. Dazu kommen Ordnernamen in Versalien ohne Umlaut (BB-L2) und einige kl
 
 | Prüfpunkt | Ergebnis |
 | --- | --- |
-| Startseite, Abschnitt „Beispielbögen" | Überschrift 12,45 : 1, Hinweis 6,77 : 1, Primärknopf Schrift 5,00 : 1 und Fläche 5,05 : 1 gegen Grund (Nacht); Standard 5,42 / 14,21; Dunkel 8,86 / 9,22; Feld 11,78 / 14,21 |
+| Startseite, Abschnitt „Übungsbögen" | Überschrift 12,45 : 1, Hinweis 6,77 : 1, Primärknopf Schrift 5,00 : 1 und Fläche 5,05 : 1 gegen Grund (Nacht); Standard 5,42 / 14,21; Dunkel 8,86 / 9,22; Feld 11,78 / 14,21 |
 | Register: Name, Bogenzahl (Monospace grau), „›" | Nacht 11,61 / 6,31 / 4,75; Dunkel 14,46 / 8,17 / 5,22; Standard 18,43 / 5,92 / 4,69; Feld 21 / 14,18 / 14,18 (ruhend) |
 | Register: Zielhöhe | 52 px (Feld 62,7 px) je Zeile, die ganze Zeile ist das Ziel |
 | Reiter in Kennfarbe (Hover, 1280 px) | Nacht #a8791a 4,24 : 1 gegen die Hover-Fläche, Dunkel 8,20, Standard 11,91, Feld 11,04; am Telefon (kein Hover) ohne Reiter, wie im Stil vorgesehen |
 | Fokus per Tab (Register, Zeilenknöpfe) | Ring 3 px (Feld 4 px) in Kennfarbe: Nacht 4,71 : 1, Dunkel 9,31, Standard und Feld 14,21; der Reiter erscheint nach 0,12 s Überblendung in allen Modi |
-| Aufklapper „Was sind Beispielbögen? …" | Nacht 6,69 : 1, Erklärtext 6,31 : 1; Standard 9,92 / 5,92; Ziel 44 px hoch |
+| Aufklapper „Was sind Übungsbögen? …" | Nacht 6,69 : 1, Erklärtext 6,31 : 1; Standard 9,92 / 5,92; Ziel 44 px hoch |
 | Pfadleiste | „‹ Zurück" 11,61 : 1, „Alle" 6,69 : 1, aktueller Ordner 11,61 : 1, Trenner 4,75 : 1 (Nacht) |
 | Tabellenkopf (1280 px) | Nacht 5,69 : 1, Dunkel 7,20, Standard 4,96, Feld 11,01 (13 px bzw. 15,7 px, Versalien, Monospace) |
 | Hinweiszeilen, „Stärke"-Vorsatz in den Karten | Nacht 6,31 : 1, Dunkel 8,17, Standard 5,92, Feld 14,18 |
@@ -88,7 +88,7 @@ dastehen. Dazu kommen Ordnernamen in Versalien ohne Umlaut (BB-L2) und einige kl
 
 ### BB-L1 (P2, Kontrast) Taktische Zeichen in der Beispieltabelle: in Dunkel und Nacht ohne Unterlage und Dämpfung — Größenzeichen unsichtbar, weiße Zeichen blenden
 
-- **Ort:** Dialog „Beispielbögen" → beliebiger Ordner mit Bögen, Spalte „Einheit" (Tabelle bei 1280 px, Karten bei 390 px), Ansichten Dunkel und Nacht. Code: `src/app/fusszeile.tsx` Zeile 1355 (`<EinheitZeichen einheit={b.einheit} aria-hidden="true" />` ohne `className`); die Regeln für dunkle Ansichten in `index.html` (Zeilen 4806, 4905, 4913 f.) greifen nur an `img.einheit-avatar`.
+- **Ort:** Dialog „Übungsbögen" → beliebiger Ordner mit Bögen, Spalte „Einheit" (Tabelle bei 1280 px, Karten bei 390 px), Ansichten Dunkel und Nacht. Code: `src/app/fusszeile.tsx` Zeile 1355 (`<EinheitZeichen einheit={b.einheit} aria-hidden="true" />` ohne `className`); die Regeln für dunkle Ansichten in `index.html` (Zeilen 4806, 4905, 4913 f.) greifen nur an `img.einheit-avatar`.
 - **Beobachtung:** Am Zeichen der Tabelle ist in Dunkel und Nacht `filter: none` und `background-color: transparent`; die Unterlage ist die Dialogfläche (#17150f bzw. #171a21). Die Zeichen sind für weißes Papier gezeichnet (Schwarz #000000 für Größenzeichen und Schrift, Weiß #FFFFFF, BBK Rot #FF0000, THW Blau #003399).
   - **Größenzeichen:** Schwarz auf der Dialogfläche misst 1,15 : 1 (Nacht) bzw. 1,21 : 1 (Dunkel). Im Bild sind die drei Punkte „Zug", die zwei Punkte „Gruppe" und der eine Punkt „Trupp" über dem Rechteck in Standard und Feld klar zu sehen, in Dunkel und Nacht praktisch nicht (Vergleich `zoom-vergleich.png`: THW „Zugtrupp", „Fachgruppe Ortung", BBK „Behandlungsbereitschaft", „Führungsgruppe"). Nachgerendert sind bei THW-Zeichen 1 bis 2 % der deckenden Pixel unter 1,5 : 1 zum Grund — genau die Größenzeichen.
   - **Helligkeit:** Bei ASB, DLRG, DRK, den Sanitätseinheiten des Katastrophenschutzes (z. B. „Bergrettungszug", „Einsatzeinheit Behandlung") und der Praktischen Ausbildung (Hannover) ist das Zeichen ein weißes Rechteck: je Zeichen 364 Pixel heller als die Schrift (Luma über 206), davon 312 reinweiß (Luma 255), also etwa 26 x 12 px. Bei DRK stehen acht solche Blöcke untereinander im Bild (`org-nacht-DRK.png`). Bei THW sind Schrift im Zeichen und Rand reinweiß (4 bis 52 Pixel je Zeichen, „Trupp Logistik-Schwerer Transport" 52), BBK und Feuerwehr zeigen ungedämpftes Vollrot. Das Bild der geöffneten Tabelle erreicht nachts Luma 255, mit offenem Register höchstens 206.
@@ -101,7 +101,7 @@ dastehen. Dazu kommen Ordnernamen in Versalien ohne Umlaut (BB-L2) und einige kl
 
 ### BB-L2 (P3, Text) Ordnernamen in Versalien ohne Umlaut und Bindestrich: „BADENWUERTTEMBERG", „MECKLENBURG VORPOMMERN"
 
-- **Ort:** Dialog „Beispielbögen" → „Katastrophenschutz" (Register) und die Pfadleiste darunter, alle Modi; Code: `ordnerLabel` in `src/app/fusszeile.tsx` (Zeile 85), Rückfall `ordner.replace(/-/g, " ").toUpperCase()` für Ordner ohne Eintrag in der Namensliste.
+- **Ort:** Dialog „Übungsbögen" → „Katastrophenschutz" (Register) und die Pfadleiste darunter, alle Modi; Code: `ordnerLabel` in `src/app/fusszeile.tsx` (Zeile 85), Rückfall `ordner.replace(/-/g, " ").toUpperCase()` für Ordner ohne Eintrag in der Namensliste.
 - **Beobachtung:** Unter „Katastrophenschutz" stehen zwölf Länder, acht davon als Versalien aus dem Verzeichnisnamen: „BADENWUERTTEMBERG", „BAYERN", „BERLIN", „HESSEN", „MECKLENBURG VORPOMMERN", „NORDRHEIN WESTFALEN", „RHEINLAND PFALZ", „SAARLAND"; daneben in normaler Schreibung „Brandenburg", „Niedersachsen", „Sachsen", „Thüringen". In der Pfadleiste bei 390 px bricht „BADENWUERTTEMBERG" in eine eigene Zeile, die mit dem Trenner „›" beginnt (`390-nacht-kats-bw.png`). Kontrast ist nicht betroffen (11,61 : 1 nachts).
 - **Erwartung der Rolle:** Ländernamen wie auf jeder Karte und jedem Schild: „Baden-Württemberg", „Mecklenburg-Vorpommern".
 - **Folge:** Versalien ohne Wortgrenze lesen sich bei wenig Licht und kleiner Displayhelligkeit langsamer (keine Ober- und Unterlängen als Wortbild); „BADENWUERTTEMBERG" muss man buchstabieren. Die gemischte Schreibung lässt die Liste unsortiert wirken; wer „Mecklenburg-Vorpommern" sucht, findet es nicht beim schnellen Überfliegen.
@@ -113,7 +113,7 @@ dastehen. Dazu kommen Ordnernamen in Versalien ohne Umlaut (BB-L2) und einige kl
 
 - **H1 Trennlinien unter 3 : 1.** Registerlinien, Tabellenzellen (1280 px) und Kartenrahmen (390 px) tragen `--linie`: Nacht #423c2d 1,67 : 1, Dunkel 1,70 : 1, Standard 1,77 : 1 (Feld 18,58 : 1, 2 px). Die Zeilen sind hoch genug (Tabelle rund 74 px, Karten mit 12 px Abstand und dem Zeichen als Kopf), dass die Zugehörigkeit der Knöpfe im Versuch nicht verloren ging; bei kleinster Displayhelligkeit ist sie nicht prüfbar.
 - **H2 Register-Pfeil „›" bei Hover.** Ruhend 4,75 : 1 (Nacht) bzw. 4,69 : 1 (Standard); auf der Hover-Fläche 4,29 : 1 (Nacht) bzw. 3,93 : 1 (Standard). Als Richtungszeichen reicht 3 : 1; nur der Vollständigkeit halber.
-- **H3 Aufklapper ohne Aufklappzeichen.** Die Zeile „Was sind Beispielbögen? Was heißen Anzeigen, PDF und Link?" ist `display: flex`; damit fällt das Dreieck des Browsers weg, und es gibt kein eigenes Zeichen. Ob die Zeile aufklappt und ob sie offen ist, sieht man nur an der Kennfarbe und am darunter erscheinenden Text. Bei 390 px trennt sie „Anzei-gen".
+- **H3 Aufklapper ohne Aufklappzeichen.** Die Zeile „Was sind Übungsbögen? Was heißen Anzeigen, PDF und Link?" ist `display: flex`; damit fällt das Dreieck des Browsers weg, und es gibt kein eigenes Zeichen. Ob die Zeile aufklappt und ob sie offen ist, sieht man nur an der Kennfarbe und am darunter erscheinenden Text. Bei 390 px trennt sie „Anzei-gen".
 - **H4 Ansicht bei offenem Dialog nicht umschaltbar.** Beide Umschalter (Kopf und Fußzeile) liegen unter dem modalen Dialog. Wer den Dialog nachts in Standard öffnet (Luma-Mittel des Dialogs 244 bei 390 px), muss ihn erst schließen, um auf Nacht zu gehen. Vorhersehbar, aber ein zusätzlicher Schritt.
 - **H5 Bogenzahl „THW" springt.** Direkt nach dem Laden zeigt das Register „THW 101 Bögen", nach dem Nachladen der Ortsverbands-Beispiele „THW 3.634 Bögen" (Unterordner „Alle Einheiten aller Ortsverbände (LV › RSt › OV)", 3.533 Bögen). Kein Kontrastpunkt; wer zweimal hinsieht, liest zwei verschiedene Zahlen.
 - **H6 „Alle" in der Pfadleiste schmal.** Das Ziel „Alle" ist 24 x 44 px (Feld 28 x 54 px), der aktuelle Ordner „DRK" 30 x 44 px; die Höhe stimmt, die Breite liegt unter 44 px. „‹ Zurück" daneben ist ein vollwertiger Knopf.

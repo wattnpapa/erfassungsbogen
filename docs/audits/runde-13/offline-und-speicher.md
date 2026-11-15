@@ -5,7 +5,7 @@ Prüfer: Rollenaudit `thw-offline-resilience-reviewer` · Datum: 2026-10-26 · Z
 Reiner Prüfbericht, keine Codeänderung. Gegen die laufende App auf Port 4173 (Produktionsbuild, `vite preview`, Code-Stand
 Commit `7637e61`, `main` nach Runde 12), Playwright mit Chromium (globales Modul, die Projektkopie fand keinen Browser),
 Telefon 390 × 844 und 360 × 640, `isMobile`/`hasTouch`, Locale de-DE, je Lauf ein eigener Browser-Kontext. Zustände über
-`localStorage`-Seeds aus den Beispielbögen (`uebung: false`). Voller Speicher auf zwei Wegen nachgestellt: `setItem`-Stub, der
+`localStorage`-Seeds aus den Übungsbögen (`uebung: false`). Voller Speicher auf zwei Wegen nachgestellt: `setItem`-Stub, der
 beim Überschreiten einer Gesamtgröße `QuotaExceededError` wirft (Verkleinern bleibt erlaubt, wie im Browser), und echt
 (Datei größer als das Kontingent des Browsers). Für Netzabbruch während des Vorratsladens und für den Update-Hinweis lief
 zusätzlich ein eigener kleiner Dateiserver (Port 4180, Inhalt von `dist/`, abschaltbar, mit künstlicher Verzögerung und
@@ -73,22 +73,22 @@ Papierkorb ins Leere läuft (R13-O3).
 - **Nachprüfung:** Datei erzeugen, die größer als das Kontingent ist, auf einem Gerät mit Daten einspielen: Hinweis vor dem
   Löschen oder unveränderter Bestand mit deutscher Meldung.
 
-#### R13-O2 – Fehlermeldung zu einem nicht geladenen Beispielbogen steht hinter der Liste, außerhalb des Bildes (gemessen)
+#### R13-O2 – Fehlermeldung zu einem nicht geladenen Übungsbogen steht hinter der Liste, außerhalb des Bildes (gemessen)
 
 - **Priorität:** P2
 - **Kennzeichnung:** gemessen bei 390 × 844 und 360 × 640, Vorrat unvollständig (eigener Server, Verbindung nach 28 von 549
   Dateien getrennt; die Liste zeigt je Bogen „nicht geladen“).
-- **Fundstelle:** Fußzeile → „Beispielbögen“ → Organisation (z. B. THW) → Zeile „001-albstadt-ztr-tz“ → „Anzeigen“, „PDF“
+- **Fundstelle:** Fußzeile → „Übungsbögen“ → Organisation (z. B. THW) → Zeile „001-albstadt-ztr-tz“ → „Anzeigen“, „PDF“
   oder „Link“.
 - **Beobachtung:** Nach dem Tipp ändert sich im sichtbaren Bild nichts (Aufnahme nach 2,5 s). Der Satz „Bogen konnte nicht
-  geladen werden: Dieser Beispielbogen liegt noch nicht auf dem Gerät — Beispielbögen werden nach dem ersten Laden mit Netz
+  geladen werden: Dieser Übungsbogen liegt noch nicht auf dem Gerät — Übungsbögen werden nach dem ersten Laden mit Netz
   nachgeladen (siehe Offline-Zeile der Startseite).“ steht im Quelltext als `<p class="fehler">` hinter der Tabelle, ohne
   `role="alert"`/`status`, und die Liste rollt nicht dorthin. Abstand zur Oberkante des Bildes: bei THW (101 Bögen) rund
   18 300 px bei 390 × 844 und rund 24 700 px bei 360 × 640; selbst bei ASB (4 Bögen) liegt sie bei 949 px, also unter dem
   unteren Bildrand von 844 px. Die frühere Beobachtung („im Bild“, R5/R6/R8) trifft nur bei sehr kurzen Listen zu.
 - **Erwartung der Rolle:** Die Rückmeldung erscheint an der angetippten Zeile oder rollt ins Bild, wie es R4-O2 beim PDF-
   Baustein behoben hat.
-- **Folge:** Wer ohne Netz einen Beispielbogen als Vorlage öffnen will, tippt „Anzeigen“, sieht nichts und tippt erneut,
+- **Folge:** Wer ohne Netz einen Übungsbogen als Vorlage öffnen will, tippt „Anzeigen“, sieht nichts und tippt erneut,
   oder wechselt zu „PDF“ und „Link“ mit demselben Ergebnis. Er hält die App für hängend, statt zu erfahren, dass der Bogen
   erst mit Netz kommt. Nur Übung und Vorbelegung betroffen, keine Einsatzdaten.
 - **Empfehlung:** Meldung an der Zeile selbst zeigen oder ins Bild rollen und als Statusmeldung auszeichnen; in der Liste

@@ -1,5 +1,5 @@
 /**
- * Beispielbögen beim Weitergeben auf den Stand eines neuen Bogens stellen
+ * Übungsbögen beim Weitergeben auf den Stand eines neuen Bogens stellen
  * (Prüfrunde Beispielbögen, BB-W5, BB-K6, BB-H6, BB-N4, BB-E9, BB-A8;
  * Rückmeldung 11/2026).
  *

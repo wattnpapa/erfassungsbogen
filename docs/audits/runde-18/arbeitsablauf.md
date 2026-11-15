@@ -3,7 +3,7 @@
 - **Prüfer:** Rolle „Arbeitsablauf“ (thw-workflow-reviewer), Meldekopf-Bediener und Helfer mit eigenem Bogen in einer Person
 - **Datum:** 2026-10-27
 - **Code-Stand:** Commit `ae3a8e9` (`main`), Produktionsbuild, `http://localhost:4173`
-- **Methode:** Playwright (globales Modul, `chromium.launch()` ohne Optionen, eigenes Profil je Lauf), `isMobile`/`hasTouch`, Locale de-DE, Viewports 360 x 640 und 390 x 844. Bögen: die THW-Beispielbögen aus `examples/thw/` mit `uebung: false` und Stand/Zeitraum auf heute. Downloads (Lageblatt, CSV, Nachtrags-CSV, Sammel-PDF) geöffnet und gelesen. Kein Code geändert. Nicht geprüft: Kamera-Scan, Nahbereich, Bildschirmtastatur, native Builds.
+- **Methode:** Playwright (globales Modul, `chromium.launch()` ohne Optionen, eigenes Profil je Lauf), `isMobile`/`hasTouch`, Locale de-DE, Viewports 360 x 640 und 390 x 844. Bögen: die THW-Übungsbögen aus `examples/thw/` mit `uebung: false` und Stand/Zeitraum auf heute. Downloads (Lageblatt, CSV, Nachtrags-CSV, Sammel-PDF) geöffnet und gelesen. Kein Code geändert. Nicht geprüft: Kamera-Scan, Nahbereich, Bildschirmtastatur, native Builds.
 - **Maßstab:** Keine „bekannten Grenzen“. Auch früher als teilweise oder offen geführte Punkte werden gemeldet, wenn sie im Browser noch zu sehen sind.
 - **Zählung:** P0: 0 · P1: 0 · P2: 0 · P3: 8
 

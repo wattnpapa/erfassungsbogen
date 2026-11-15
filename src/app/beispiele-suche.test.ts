@@ -4,7 +4,7 @@ import { join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { suchNorm, treffer, woerterVon } from "./beispiele-suche";
 
-describe("Suche der Beispielbögen (Prüfrunde Beispielbögen, Runde 2)", () => {
+describe("Suche der Übungsbögen (Prüfrunde Beispielbögen, Runde 2)", () => {
   it("vereinheitlicht Umlaute und Satzzeichen", () => {
     expect(suchNorm("Fachgruppe Wassergefahren (A) – Köln")).toBe("fachgruppe wassergefahren a koeln");
   });

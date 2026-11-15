@@ -7,7 +7,7 @@ Reiner Prüfbericht, keine Codeänderung. Gegen die laufende App auf `http://loc
 (`/opt/node22/lib/node_modules/playwright`, die Projektkopie findet keinen Browser), `chromium.launch()` ohne Optionen,
 `isMobile`/`hasTouch`, Locale de-DE, Viewports 390 x 844, 360 x 640, 320 x 568, quer 568 x 320 und 640 x 360. Je Lauf ein
 eigener Browser-Kontext. Netz weg über `context.setOffline` (Service Worker aktiv, Neuladen offline), Drosselung über CDP
-(100 KB/s, 200 ms, 4-fach CPU), voller Speicher durch Auffüllen von `localStorage` bis zum echten Quota-Fehler. Beispielbögen
+(100 KB/s, 200 ms, 4-fach CPU), voller Speicher durch Auffüllen von `localStorage` bis zum echten Quota-Fehler. Übungsbögen
 aus `examples/thw` über die Oberfläche („Bögen einlesen…", „Aus Datei laden…"). Zusätzlich lief eine Kopie von `dist/` außerhalb
 des Repositorys (statischer Server, einmal mit, einmal ohne die fehlende Datei aus R21-O1), nur um den Befund einzugrenzen und
 zu sehen, was hinter ihm liegt; gemeldet ist nur, was am unveränderten Build zu sehen ist. Vorab gelesen:
@@ -30,7 +30,7 @@ Aber: Die **nachgeladene Einsatzansicht lässt sich nicht aufbauen**, sobald das
 Dateien 404 liefert, auch mit Netz). Der Build verweist auf eine Stilvorlage, die es nicht gibt; ohne Netz scheitert das Laden,
 und es erscheint die Seite „Hier ist etwas schiefgelaufen". Das ist genau der Weg, den der Meldekopf im Funkloch braucht
 (R21-O1, P0). Die Daten bleiben erhalten; sicher bedienbar ist der Einsatz ohne Netz aber nicht. Wer die Datei gedanklich
-ergänzt, findet dahinter nichts Weiteres: Einsatz anlegen, Bögen einlesen, Neuladen offline, Beispielbögen, PDF und Sicherung
+ergänzt, findet dahinter nichts Weiteres: Einsatz anlegen, Bögen einlesen, Neuladen offline, Übungsbögen, PDF und Sicherung
 laufen offline, und die Statuszeile zum Vorladen sagt ehrlich, was fehlt.
 
 ## Nachprüfung der Behebungen aus Runde 20 (halten, nicht gemeldet)
@@ -69,9 +69,9 @@ laufen offline, und die Statuszeile zum Vorladen sagt ehrlich, was fehlt.
   Zeichen nach etwa 0,9 s; der Platzhalter belegt 42 x 42 px wie das Zeichen, die Zeile springt nicht. Beim Öffnen eines
   vorhandenen Einsatzes werden keine weiteren Teile nachgeladen (Ansicht nach 0,3 s).
 - **Nachgeladene Teile offline, ohne die Lücke aus R21-O1:** Nach dem ersten Laden Netz weg, Einsatz anlegen, drei Bögen einlesen,
-  Neuladen: alles da; Beispielbögen anzeigen, Zeichen „geladen", Bogen-PDF erzeugen: alles geht. Wird das Netz schon 1,2 s nach
-  dem ersten Laden getrennt, steht ehrlich „Rest fehlt noch (Beispielbögen, Themenseiten): 431 von 549, folgt beim nächsten
-  Netz", und die Beispielbögen und die Anleitung gehen trotzdem.
+  Neuladen: alles da; Übungsbögen anzeigen, Zeichen „geladen", Bogen-PDF erzeugen: alles geht. Wird das Netz schon 1,2 s nach
+  dem ersten Laden getrennt, steht ehrlich „Rest fehlt noch (Übungsbögen, Themenseiten): 431 von 549, folgt beim nächsten
+  Netz", und die Übungsbögen und die Anleitung gehen trotzdem.
 
 ## Befunde
 
@@ -109,7 +109,7 @@ laufen offline, und die Statuszeile zum Vorladen sagt ehrlich, was fehlt.
 
 - **Priorität:** P3
 - **Typ:** Layout/Abstand
-- **Kennzeichnung:** gemessen (360 x 640: y = 1 236; 390 x 844: y = 1 241; fünf Beispielbögen, Einsatz mit Übungsmeldungen)
+- **Kennzeichnung:** gemessen (360 x 640: y = 1 236; 390 x 844: y = 1 241; fünf Übungsbögen, Einsatz mit Übungsmeldungen)
 - **Neu oder alt (Verweis):** alt (R20-W6/H5/G6, dort als „nicht ganz erreicht" geführt)
 - **Ort:** Einsatz → „Bögen einlesen…" → Bögen wählen → Einsatzansicht, Karten.
 - **Beobachtung:** Über der ersten Karte „Nr. 1" stehen Kopf, Kennzahlen, „Nichts gezählt …", vier Aufnahmeknöpfe, die Quittung „5 Bögen aufgenommen. Aufnahme 11:24: …", „Neu seit der letzten Kenntnisnahme", „Bedarf", Sprunglinks, Einheitenkopf, Umschalter. Die Karte beginnt bei 1 236 bis 1 241 px.

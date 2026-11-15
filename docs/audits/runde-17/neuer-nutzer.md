@@ -3,7 +3,7 @@
 - **Prüfer:** Rolle „Helfer ohne Einweisung" (Skill `thw-new-user-reviewer`)
 - **Datum:** 2026-10-27
 - **Gegenstand:** Web-App Erfassungsbogen, Produktionsbuild (`vite preview`, Port 4173), Code-Stand Commit be6b396 (`main`)
-- **Prüfaufbau:** Playwright mit Chromium (globales Modul, `chromium.launch()` ohne Optionen), `isMobile`/`hasTouch`, Locale de-DE, Viewports 390x844, 360x640 und 320x568 (nur Überlauf geprüft). Keine Kamera. Für die Sammlung wurden acht Beispielbögen aus `examples/thw/` mit `uebung: false` und frischem Stand über „Bögen einlesen…" aufgenommen. Kein Code geändert.
+- **Prüfaufbau:** Playwright mit Chromium (globales Modul, `chromium.launch()` ohne Optionen), `isMobile`/`hasTouch`, Locale de-DE, Viewports 390x844, 360x640 und 320x568 (nur Überlauf geprüft). Keine Kamera. Für die Sammlung wurden acht Übungsbögen aus `examples/thw/` mit `uebung: false` und frischem Stand über „Bögen einlesen…" aufgenommen. Kein Code geändert.
 - **Maßstab ab dieser Runde:** Es gibt keine „bekannten Grenzen" zum Auslassen; auch teilweise behobene oder offene Punkte aus den Vorrunden werden gemeldet, wenn sie im Browser noch zu sehen sind.
 - **Zählung:** P0: 0 · P1: 0 · P2: 0 · P3: 11
 

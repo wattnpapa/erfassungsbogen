@@ -5,7 +5,7 @@ Prüfer: Rollenaudit `thw-offline-resilience-reviewer` · Datum: 2026-10-28 · Z
 Reiner Prüfbericht, keine Codeänderung. Gegen die laufende App auf `http://localhost:4173` (Code-Stand `7c06324` = `main`),
 Playwright mit Chromium (globales Modul, Projektkopie fand keinen Browser), Telefon 390 x 844 und 360 x 640, `isMobile`/`hasTouch`,
 Locale de-DE, je Lauf ein eigener Browser-Kontext. Netz weg über `context.setOffline` (Neuladen offline), voller Speicher durch
-Auffüllen von `localStorage` bis zum echten Quota-Fehler, zwei Tabs im selben Kontext. Beispielbögen aus `examples/thw`, alle über
+Auffüllen von `localStorage` bis zum echten Quota-Fehler, zwei Tabs im selben Kontext. Übungsbögen aus `examples/thw`, alle über
 die Oberfläche („Bögen einlesen…“). Vorab gelesen: `docs/audits/README.md`, „Stand der Behebung“ in Runde 19 und der
 Runde-19-Bericht „Offline und Speicher“. Es gelten keine „bekannten Grenzen“; auch als „offen“ oder „teilweise“ geführte Punkte sind
 gemeldet, wenn sie im Browser noch zu sehen waren.
@@ -52,7 +52,7 @@ veraltete Zeile in der Übergabe-Liste, verlorener Tipptext nach einem Speicherf
   keine Dubletten), Neuladen offline (Service Worker, Einsatz samt Papierkorb vorhanden), Abrücken offline mit „Rückgängig“, zwei
   Tabs (Abrücken in Tab A und in Tab B, danach beide abgerückt), Sicherung erzeugen offline und bei vollem Speicher (Datei entsteht),
   Scanner ohne Kamera bei 360 x 640 ohne inneres Scrollen.
-- **R19-K10 („7 Bögen aufgenommen, 7 bereits vorhanden“)** war mit sieben JSON-Beispielbögen in acht Läufen bei 390 x 844 nicht zu
+- **R19-K10 („7 Bögen aufgenommen, 7 bereits vorhanden“)** war mit sieben JSON-Übungsbögen in acht Läufen bei 390 x 844 nicht zu
   beobachten (immer „7 Bögen aufgenommen“); das Original lief mit PDFs, die hier nicht vorlagen. Deshalb weder bestätigt noch
   gemeldet.
 

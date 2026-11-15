@@ -138,7 +138,7 @@ export function VorlagenListe(props: {
       {vorlagen.map((v) => (
         <Kartenstapel className="karte" key={v.id} frisch={v.id === frischeId || v.id === zurueckgeholt}>
           <div className="kopfzeile">
-            {/* Vorlage aus einem Beispiel- oder Übungsbogen: auf der Karte sichtbar (Prüfrunde Beispielbögen, BB-W10, BB-D2). */}
+            {/* Vorlage aus einem Übungsbogen oder einem als Übung gekennzeichneten Bogen: auf der Karte sichtbar (Prüfrunde Beispielbögen, BB-W10, BB-D2). */}
             <h2>
               {v.name}
               {v.bogen.uebung && <span className="uebung-badge">ÜBUNG</span>}

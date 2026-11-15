@@ -1,12 +1,12 @@
-# Audit Beispielbögen – Offline und Speicher
+# Audit Übungsbögen – Offline und Speicher
 
 Prüfer: Rollenaudit `thw-offline-resilience-reviewer` · Datum: 2026-11-08 · Zählung: **P0 0 · P1 0 · P2 2 · P3 2 · Hinweise 3**
 
-Prüfgegenstand: nur der Bereich Beispielbögen auf der Live-Seite `https://erfassungsbogen.app/` (Stand `main` Commit `0dd56d4`,
-frisch deployt): Abschnitt „Beispielbögen“ auf der Startseite unter „So funktioniert’s“ mit dem Primärknopf „Beispielbögen
-ansehen“ (der Fußzeilen-Link ist entfallen), Dialog „Beispielbögen“ mit Register, Pfadleiste, Tabelle (Nachladen der Bögen des
+Prüfgegenstand: nur der Bereich Übungsbögen auf der Live-Seite `https://erfassungsbogen.app/` (Stand `main` Commit `0dd56d4`,
+frisch deployt): Abschnitt „Übungsbögen“ auf der Startseite unter „So funktioniert’s“ mit dem Primärknopf „Übungsbögen
+ansehen“ (der Fußzeilen-Link ist entfallen), Dialog „Übungsbögen“ mit Register, Pfadleiste, Tabelle (Nachladen der Bögen des
 offenen Ordners, Ladezustand „Angaben werden geladen … x von y“) und den Knöpfen Anzeigen, PDF und Link. Schwerpunkt: die
-Beispielbögen als zweite Stufe des Offline-Vorrats und der Ordner „THW › Alle Einheiten aller Ortsverbände“ (3 533 Bögen), der
+Übungsbögen als zweite Stufe des Offline-Vorrats und der Ordner „THW › Alle Einheiten aller Ortsverbände“ (3 533 Bögen), der
 erst beim Öffnen des Dialogs als eigener Baustein (`beispiele-thw-ov`) dazukommt.
 
 Reiner Prüfbericht, keine Codeänderung.
@@ -42,7 +42,7 @@ echter Beeinträchtigung der Aufgabe, Geschmacksfragen unter „Hinweise“ ohne
 
 ## Annahmen
 
-- Die Beispielbögen sind Ausbildungs- und Vorführmaterial, kein Einsatzweg. Ich nehme an, dass Ausbilder und
+- Die Übungsbögen sind Ausbildungs- und Vorführmaterial, kein Einsatzweg. Ich nehme an, dass Ausbilder und
   Fachberater sie auch dort zeigen wollen, wo kein Netz ist (Unterkunft, Übungsgelände, Bereitstellungsraum), und dass ein
   Helfer den Bogen seiner eigenen OV-Einheit als Muster öffnet. Ob das tatsächlich so genutzt wird, ist nicht belegt.
 - Wie oft jemand mehr als rund 100 OV-Ordner aufruft (der Schwellenwert für BB-O2), ist unbekannt. Realistisch wäre das
@@ -67,17 +67,17 @@ hat, ist auch nach Neuladen offline vollständig da.
 Die Reibung steckt im großen OV-Ordner. Seine Bögen sind **nie** Teil des Vorrats: 3 533 von 3 634 THW-Bögen fehlen
 offline, solange man den jeweiligen Ortsverband nicht vorher mit Netz geöffnet hat. Die Startseite sagt trotzdem
 „Funktioniert komplett offline“, und die Meldung im Dialog verspricht ein Nachladen, das für diese Bögen nie kommt (BB-O1).
-Wer viele OV-Ordner öffnet, verdrängt außerdem stillschweigend die eigentlich vorrätigen Beispielbögen und Themenfotos aus
+Wer viele OV-Ordner öffnet, verdrängt außerdem stillschweigend die eigentlich vorrätigen Übungsbögen und Themenfotos aus
 dem Gerät (BB-O2). Ohne fremde Hilfe ist die Aufgabe offline zu schaffen, nur für die OV-Bögen nicht, und vorher sieht man
 nicht, welche Bögen fehlen.
 
 ## Nachprüfung (hält, nicht gemeldet)
 
 - **Erstbesuch bis „offline bereit“** (frisches Profil, ungedrosselt): „⏳ Wird für den Offline-Betrieb geladen: 0,0 von 8,0
-  MB“ zählt hoch. Nach 15,1 s steht „✓ Bogen, PDF, QR-Code und Empfang gehen offline. Rest lädt noch (Beispielbögen,
+  MB“ zählt hoch. Nach 15,1 s steht „✓ Bogen, PDF, QR-Code und Empfang gehen offline. Rest lädt noch (Übungsbögen,
   Themenseiten): 0 von 549“, das läuft sichtbar bis 548 von 549, nach 44,2 s folgt „✓ Jetzt offline bereit. Funktioniert komplett
   offline“. Cache danach: 111 Kerndateien, 549 in `eeb-zusatz`, Speicherschätzung 18,5 MB.
-- **Startseiten-Einstieg:** Abschnitt „Beispielbögen“ mit Erklärsatz und Primärknopf „Beispielbögen ansehen“ bei y ≈ 1 523 px
+- **Startseiten-Einstieg:** Abschnitt „Übungsbögen“ mit Erklärsatz und Primärknopf „Übungsbögen ansehen“ bei y ≈ 1 523 px
   (Seitenhöhe 7 526 px). Der Knopf öffnet den Dialog, auch offline und auch während des ersten Ladens bei gedrosseltem Netz
   (nach 115 ms offen).
 - **Offline ohne Neuladen** (Dialog vorher mit Netz geöffnet): Register, Pfadleiste, kleine Ordner und ein schon geöffneter
@@ -108,25 +108,25 @@ nicht, welche Bögen fehlen.
 - **Kennzeichnung:** gemessen (frisches Profil bis „offline bereit“, danach Netz weg, harte Sperre über `route.abort`; OV
   Westerstede, OV Jever, OV Bingen, RSt-Ordner in Sachsen/Thüringen)
 - **Neu oder alt (Verweis):** neu (Folge von „Nur auf Abruf“ seit 2026-11-08, `istNurAufAbruf` in `scripts/precache-aufteilung.ts`)
-- **Fundstelle:** Startseite, Offline-Zeile; Dialog „Beispielbögen“ → „THW“ → „Alle Einheiten aller Ortsverbände (LV › RSt ›
+- **Fundstelle:** Startseite, Offline-Zeile; Dialog „Übungsbögen“ → „THW“ → „Alle Einheiten aller Ortsverbände (LV › RSt ›
   OV)“ → Landesverband → RSt → OV; Fehlerzeilen in `fusszeile.tsx` (`beispielBogen`, Sammelmeldung im Lade-Effekt).
 - **Beobachtung:** Nach „✓ Jetzt offline bereit. Funktioniert komplett offline“ enthält `eeb-zusatz` 549 Dateien und keinen
   einzigen der 3 533 OV-Bögen. Das Register zeigt offline unverändert „THW 3.634 Bögen“ und „Alle Einheiten aller
   Ortsverbände … 3.533 Bögen“, in jedem OV die volle Bogenzahl, ohne jeden Hinweis, dass davon nichts auf dem Gerät liegt.
   Öffnet man einen OV (z. B. „OV Westerstede 6 Bögen“), stehen 6 Zeilen mit technischen Dateinamen („ov-westerstede-01-
-  fz-log-ztr-fz-log“), „nicht geladen“, Stärke „—“ und je drei aktiven Knöpfen. Darunter steht: „Einige Beispielbögen liegen
+  fz-log-ztr-fz-log“), „nicht geladen“, Stärke „—“ und je drei aktiven Knöpfen. Darunter steht: „Einige Übungsbögen liegen
   noch nicht auf dem Gerät — sie werden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).“ Jeder Knopf meldet
-  „… Dieser Beispielbogen liegt noch nicht auf dem Gerät — Beispielbögen werden nach dem ersten Laden mit Netz nachgeladen
+  „… Dieser Übungsbogen liegt noch nicht auf dem Gerät — Übungsbögen werden nach dem ersten Laden mit Netz nachgeladen
   (siehe Offline-Zeile der Startseite).“ Die Offline-Zeile, auf die verwiesen wird, sagt „komplett offline“. Mit Netz werden
   diese Bögen aber nie von selbst nachgeladen, nur der gerade geöffnete OV kommt beim Öffnen in den Vorrat. Die Erklärung
-  „Was sind Beispielbögen?“ im Dialog sagt dazu nichts.
+  „Was sind Übungsbögen?“ im Dialog sagt dazu nichts.
 - **Erwartung der Rolle:** Nach „komplett offline“ geht alles, was die App anbietet, ohne Netz. Wenn nicht, will ich das
   **vorher** sehen, solange ich noch Netz habe: welche Ordner auf dem Gerät liegen und wie ich den Rest gezielt mitnehme.
 - **Folge:** Ein Ausbilder bereitet zu Hause mit Netz vor, sieht „komplett offline“ und steht im Übungsgelände ohne Netz vor
   „nicht geladen“ beim Bogen seines eigenen Ortsverbands. Die Meldung sagt ihm, das komme „mit Netz“ von selbst. Er wartet
-  also auf die nächste Verbindung, statt den Ordner gezielt zu öffnen. Das betrifft 97 % der THW-Beispielbögen. Daten gehen
+  also auf die nächste Verbindung, statt den Ordner gezielt zu öffnen. Das betrifft 97 % der THW-Übungsbögen. Daten gehen
   nicht verloren und die Einsatzwege sind nicht betroffen. Es kostet aber die vorbereitete Ausbildungseinheit.
-- **Empfehlung:** In der Offline-Zeile und im Register ehrlich trennen: „Beispielbögen: 484 auf dem Gerät, Ortsverbände nur
+- **Empfehlung:** In der Offline-Zeile und im Register ehrlich trennen: „Übungsbögen: 484 auf dem Gerät, Ortsverbände nur
   auf Abruf“. Am OV-Ordner (und am LV/RSt-Ordner) sichtbar kennzeichnen, ob er auf dem Gerät liegt („auf dem Gerät“ /
   „nur mit Netz“). Einen Weg anbieten, einen Ordner bewusst mitzunehmen („Für offline speichern“, mit Größe). Die Meldung für
   OV-Bögen ändern: „Dieser Ortsverband liegt nicht auf dem Gerät. Mit Netz einmal öffnen, dann geht er auch offline.“ Zeilen
@@ -135,7 +135,7 @@ nicht, welche Bögen fehlen.
   OV-Bögen fehlen; die Meldung im OV-Ordner nennt den richtigen Weg; nach „Für offline speichern“ (falls umgesetzt) und
   Neuladen offline sind alle Bögen des Ordners da.
 
-#### BB-O2 – Viele geöffnete OV-Ordner verdrängen still die vorrätigen Beispielbögen und Themenfotos
+#### BB-O2 – Viele geöffnete OV-Ordner verdrängen still die vorrätigen Übungsbögen und Themenfotos
 
 - **Priorität:** P2
 - **Typ:** Daten/Verlust (Offline-Vorrat geht ohne Zutun verloren)
@@ -144,19 +144,19 @@ nicht, welche Bögen fehlen.
 - **Neu oder alt (Verweis):** neu (OV-Bögen landen seit 2026-11-08 im selben Laufzeit-Cache `eeb-zusatz`)
 - **Fundstelle:** Service-Worker-Konfiguration `vite.config.ts`, `runtimeCaching`: Bögen-Route `CacheFirst`, `cacheName:
   "eeb-zusatz"`, `expiration: { maxEntries: 1500 }`, Foto-Route im selben Cache ebenfalls mit 1 500. Sichtbar auf der
-  Startseite (Offline-Zeile) und im Dialog „Beispielbögen“.
-- **Beobachtung:** Vorher: 550 Einträge, zweite Stufe 549/549, davon 484/484 Beispielbögen. Nach dem Abruf von 1 600
+  Startseite (Offline-Zeile) und im Dialog „Übungsbögen“.
+- **Beobachtung:** Vorher: 550 Einträge, zweite Stufe 549/549, davon 484/484 Übungsbögen. Nach dem Abruf von 1 600
   OV-Bögen (4,2 MB, entspricht etwa dem Durchklicken der Landesverbände Nordrhein-Westfalen, Bayern und Baden-Württemberg):
-  1 532 Einträge, davon 1 500 OV-Bögen, zweite Stufe nur noch **31/549**, Beispielbögen **0/484**. Es blieben nur die 31
+  1 532 Einträge, davon 1 500 OV-Bögen, zweite Stufe nur noch **31/549**, Übungsbögen **0/484**. Es blieben nur die 31
   Themenseiten, alle Fotos sind weg. Der Stand blieb über 30 s gleich. Es gab keine Meldung, die Startseite zeigte bis zum
   Neuladen weiter „offline bereit“. Nach Neuladen ohne Netz steht: „✓ Bogen, PDF, QR-Code und Empfang gehen offline. Rest
-  (Beispielbögen, Themenseiten): 31 von 549 da, das Netz hakt — der nächste Versuch läuft von selbst“. Im Dialog dann:
+  (Übungsbögen, Themenseiten): 31 von 549 da, das Netz hakt — der nächste Versuch läuft von selbst“. Im Dialog dann:
   ASB 4/4, BBK 5/5, Bundeswehr 8/8, DLRG 7/7, DRK 8/8, THW 101/101 Bögen „nicht geladen“, also **133 von 133** geprüften
   Bögen. Die Verdrängung beginnt rechnerisch schon ab rund 950 OV-Bögen (1 500 minus 549), das sind etwa 180 OV-Ordner.
   Mit Netz lädt die Startseite die zweite Stufe wieder nach, die dann ihrerseits OV-Bögen verdrängt.
 - **Erwartung der Rolle:** Was als „offline bereit“ gemeldet wurde, bleibt auf dem Gerät, bis ich es lösche. Weiteres
   Stöbern mit Netz darf den Vorrat nicht unbemerkt leeren.
-- **Folge:** Wer zur Ausbildungsvorbereitung viele Ortsverbände durchsieht, hat danach ohne Netz **weniger** Beispielbögen
+- **Folge:** Wer zur Ausbildungsvorbereitung viele Ortsverbände durchsieht, hat danach ohne Netz **weniger** Übungsbögen
   als vorher, auch die kleinen Ordner und die Fotos der Themenseiten fehlen. Die Startseite merkt es erst beim nächsten Laden
   und schiebt es auf „das Netz hakt“. Einsatzdaten sind nicht betroffen (die liegen in `localStorage`).
 - **Empfehlung:** Den Vorrat der zweiten Stufe von den auf Abruf geholten OV-Bögen trennen, sodass eine Grenze für die
@@ -174,10 +174,10 @@ nicht, welche Bögen fehlen.
 - **Typ:** Bedienung
 - **Kennzeichnung:** gemessen (harte Sperre; OV Jever → OV Oldenburg; OV Berlin Charlottenburg-Wilmersdorf mit Netzrückkehr)
 - **Neu oder alt (Verweis):** neu
-- **Fundstelle:** Dialog „Beispielbögen“, Fehlerzeile unter der Tabelle (`beispielFehler`); Lade-Effekt hängt nur am Pfad.
+- **Fundstelle:** Dialog „Übungsbögen“, Fehlerzeile unter der Tabelle (`beispielFehler`); Lade-Effekt hängt nur am Pfad.
 - **Beobachtung:** (a) In OV Jever (nicht vorrätig) „Anzeigen“ antippen, dann „‹ Zurück“ und „OV Oldenburg (NI)“ öffnen
   (vorrätig, 9/9 Bögen mit Angaben): Unter der vollständigen Tabelle steht weiter rot „Bogen konnte nicht geladen werden:
-  Dieser Beispielbogen liegt noch nicht auf dem Gerät …“ (Screenshot `14_veraltete_meldung.png`). Gelöscht wird die Zeile erst
+  Dieser Übungsbogen liegt noch nicht auf dem Gerät …“ (Screenshot `14_veraltete_meldung.png`). Gelöscht wird die Zeile erst
   beim nächsten Knopf oder beim Schließen des Dialogs. (b) Offline einen OV öffnen (9 × „nicht geladen“), Netz zurück, 8 s
   warten, Dialog offen lassen: weiter 9 × „nicht geladen“, kein neuer Versuch. Erst „‹ Zurück“ und erneutes Öffnen holt die
   Bögen (0 × „nicht geladen“).
@@ -198,7 +198,7 @@ nicht, welche Bögen fehlen.
 - **Kennzeichnung:** gemessen (360 x 640, OV Jever und OV Westerstede offline)
 - **Neu oder alt (Verweis):** neu im Bereich (die Fehlerzeile holt sich seit R2-L2 selbst ins Bild; hier ohne Anlass durch
   den Nutzer)
-- **Fundstelle:** Dialog „Beispielbögen“ → OV-Ordner ohne Netz; Sammelmeldung „Einige Beispielbögen liegen noch nicht auf
+- **Fundstelle:** Dialog „Übungsbögen“ → OV-Ordner ohne Netz; Sammelmeldung „Einige Übungsbögen liegen noch nicht auf
   dem Gerät …“ (`FehlerImBild` mit `scrollIntoView`).
 - **Beobachtung:** Direkt nach dem Antippen des Ordners steht kurz die Pfadleiste mit „‹ Zurück“ und der Ordnername oben.
   Sobald die Abrufe scheitern, rollt der Dialog von selbst ans Ende. Im Bild sind dann nur noch die letzte Karte
@@ -227,7 +227,7 @@ nicht, welche Bögen fehlen.
 - **H3 – Speicherbedarf:** Kern 8,3 MB (111 Dateien), zweite Stufe 7,7 MB (549 Dateien), Speicherschätzung nach „offline
   bereit“ 18,5 MB bei einer Quote von rund 10 GB im Testbrowser. Ein OV-Ordner mit 4 bis 10 Bögen kostet rund 10 bis 30 KB, alle
   3 533 OV-Bögen zusammen etwa 9,3 MB (gemessen 4,2 MB für 1 600 Bögen). Der Bedarf ist unkritisch. Die App nennt aber
-  nirgends, wie viel die Beispielbögen belegen und wie man sie wieder loswird. Auf Geräten mit knappem Speicher (iOS)
+  nirgends, wie viel die Übungsbögen belegen und wie man sie wieder loswird. Auf Geräten mit knappem Speicher (iOS)
   wäre das die erste Frage.
 
 ## Abschluss
@@ -235,9 +235,9 @@ nicht, welche Bögen fehlen.
 - **Aufgabe geschafft:** mit Umwegen (alle kleinen Ordner und THW-Direktbögen offline ja; OV-Bögen nur, wenn der Ortsverband
   vorher mit Netz geöffnet wurde)
 - **Fremde Hilfe nötig:** nein (die Meldungen sind verständlich, nur ihr Versprechen stimmt für die OV-Bögen nicht)
-- **Größtes Missverständnis:** „Funktioniert komplett offline“ gilt nicht für 3 533 der 3 634 THW-Beispielbögen, und die
+- **Größtes Missverständnis:** „Funktioniert komplett offline“ gilt nicht für 3 533 der 3 634 THW-Übungsbögen, und die
   Meldung sagt, sie kämen mit Netz von selbst.
 - **Größtes Einsatzrisiko:** Wer viele Ortsverbände durchsieht, leert damit unbemerkt den vorrätigen Bestand der übrigen
-  Beispielbögen und Themenfotos (BB-O2).
+  Übungsbögen und Themenfotos (BB-O2).
 - **Top-Priorität für die nächste Iteration:** BB-O1: vor dem Funkloch sichtbar machen, welche Beispielordner auf dem Gerät
   liegen, und die OV-Ordner gezielt mitnehmbar machen; zusammen mit der getrennten Ablage aus BB-O2.

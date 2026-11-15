@@ -16,7 +16,7 @@ Playwright/Chromium (globales Modul, `chromium.launch()` ohne Optionen; die
 Projektkopie fand keinen Browser), `isMobile`/`hasTouch`, Locale de-DE, Telefon
 360 × 640 und 390 × 844, frischer Kontext je Lauf. Tipps als Touch-Tipps mit
 Koordinaten, damit Abstände zwischen Tipps stimmen. Einsatzdaten: Sammlung
-„Übung Weser“ (Art „Übung“), darin 3, 4 oder 7 Beispielbögen aus `examples/thw/`
+„Übung Weser“ (Art „Übung“), darin 3, 4 oder 7 Übungsbögen aus `examples/thw/`
 über „Bögen einlesen…“; eigener Bogen im Assistenten (Husum); Schnellerfassung.
 
 Durchgespielt: Startseite (Erstbesuch mit Messung der Knopflage, Entwurf nach
@@ -35,7 +35,7 @@ Dunkelheit am Display, Kamera-Scan, echte Bildschirmtastatur und Autokorrektur
 (die Befunde zu Autokorrektur beruhen auf den Attributen der Felder), WebKit/Safari,
 echtes Drucken, voller Speicher, Inhalt der erzeugten PDF-Seiten, Datumsfelder in
 deutscher Darstellung (das Headless-Chromium zeigt `10/27/2026`). Die Hinweise
-„Anderer Einsatz?“ und „Zeitraum vorbei“ stammen aus der Herkunft der Beispielbögen
+„Anderer Einsatz?“ und „Zeitraum vorbei“ stammen aus der Herkunft der Übungsbögen
 und wurden nicht gewertet.
 
 ## Urteil

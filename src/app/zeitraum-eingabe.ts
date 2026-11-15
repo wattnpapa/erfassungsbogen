@@ -60,7 +60,7 @@ export function zeitraumLeer(z: Pick<Einsatz, "zeitraumVon" | "zeitraumBis">): b
   return z.zeitraumVon === 0 && z.zeitraumBis === 0;
 }
 
-/** Einsatzangaben ohne Inhalt: Zeitraum nicht angegeben, Ort/Auftrag leer (Beispielbögen). */
+/** Einsatzangaben ohne Inhalt: Zeitraum nicht angegeben, Ort/Auftrag leer (Übungsbögen). */
 export function einsatzLeer(): Einsatz {
   return { zeitraumVon: 0, zeitraumBis: 0, ortAuftrag: "" };
 }

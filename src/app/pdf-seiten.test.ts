@@ -130,7 +130,7 @@ describe("Einzel-PDF: Platz für Stiftnachträge, wo er keine Seite kostet (R3-A
     expect(seitenZahl(await pdfBytes(dd))).toBe(seitenZahl(await pdfBytes(pdfDokument(b, qrSatz(1)))));
   }, 20_000);
 
-  it("50 THW-Beispielbögen: freie Zeilen und Fahrzeugblock kosten nie eine Seite", async () => {
+  it("50 THW-Übungsbögen: freie Zeilen und Fahrzeugblock kosten nie eine Seite", async () => {
     for (const datei of readdirSync(new URL("../../examples/thw/", import.meta.url)).filter((d) => /^0[0-4]\d-.*\.json$/.test(d))) {
       const b = beispiel(datei);
       const ohne = seitenZahl(await pdfBytes(pdfDokument(b, qrSatz(1))));

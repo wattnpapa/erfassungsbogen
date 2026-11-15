@@ -14,7 +14,7 @@ Runden 6 bis 14 wurden nicht neu gemeldet (u. a. R14-E7, R14-S2, R14-H1, R14-W3)
 Playwright/Chromium (`chromium.launch()` ohne Optionen, globales Modul, da die
 Projektkopie keinen passenden Browser fand), `isMobile`/`hasTouch`, Locale de-DE,
 Telefon 360 × 640 und 390 × 844, einzelne Läufe quer (640 × 360). Frischer Kontext
-je Lauf, keine Kamera. Einsatzdaten: Kopien der Beispielbögen unter
+je Lauf, keine Kamera. Einsatzdaten: Kopien der Übungsbögen unter
 `examples/thw/` mit `uebung: false` (3, 5, 6 und 8 Dateien), über „Bögen
 einlesen…“ in eine frisch angelegte Sammlung eingespielt; eigener Bogen im
 Assistenten ausgefüllt (BGr, Oldenburg (NI)).
@@ -25,7 +25,7 @@ eigenen Bogens; Sammlung anlegen, Dateien einlesen (auch doppelt), „Zur Kenntn
 genommen“, Karte aufklappen, „Abrücken“ (auch Doppeltipp), „Mehr…“, „Stärke
 ändern…“, „Entfernen“, „Zug für N Einheiten ohne Zug“, Tabelle, Lageblatt,
 Sammel-PDF; Schnellerfassung mit Sammlungswahl; „Aus Datei laden…“ mit
-Fremddatei und Beispielbogen; Datensicherung (falsche Datei, dann Sicherung);
+Fremddatei und Übungsbogen; Datensicherung (falsche Datei, dann Sicherung);
 „Alle Daten löschen“, „Geräteschlüssel neu erzeugen“; Offline (Service Worker
 aktiv, Neuladen und Arbeiten ohne Netz); Neuladen und Browser-Zurück in der
 Sammlung und in der manuellen Erfassung.
@@ -33,7 +33,7 @@ Sammlung und in der manuellen Erfassung.
 **Nicht verifiziert:** echte Handschuhe und nasse Finger, Sonnenlicht und
 Dunkelheit am Display, Kamera-Scan, native Datums- und Zeitauswahl, echte
 Bildschirmtastatur und Autokorrektur, WebKit/Safari, echtes Drucken, voller
-Speicher. Hinweis: Die Beispielbögen tragen Stände von vor rund 100 Tagen; die
+Speicher. Hinweis: Die Übungsbögen tragen Stände von vor rund 100 Tagen; die
 dadurch erscheinenden Hinweise (Datenschutzfrist, „Zeitraum vorbei“, lange
 Aufnahmemeldung) sind ein Artefakt des Prüfaufbaus und wurden nicht gewertet. Ein
 Lauf, bei dem `fill()` unmittelbar nach dem Öffnen des Dialogs „Neue
@@ -108,7 +108,7 @@ ist eine **Annahme** (übliche Rufnamenbildung), keine geprüfte Vorgabe.
 Einheit (Oldenburg (NI))“; daraus abgeleitet Übersicht, PDF, Meldung.
 **Beobachtung:** Wählt der Helfer in Schritt 1 den Ortsvorschlag „Oldenburg (NI)“
 (Unterscheidung von „Oldenburg in Holstein“), wandert der Klammerzusatz „(NI)“ in den
-Funkrufnamen des Fahrzeugs. Beim Beispielbogen „Albstadt“ gibt es keinen Zusatz
+Funkrufnamen des Fahrzeugs. Beim Übungsbogen „Albstadt“ gibt es keinen Zusatz
 („Heros Albstadt 21/10“); nur Orte mit Zusatz sind betroffen.
 **Erwartung des Helfers:** Der Rufname enthält den Ort wie er gesprochen wird; die
 Zusatzangabe für das Bundesland ist ein Merkmal des Verzeichnisses, nicht des

@@ -1,4 +1,4 @@
-# Rollenaudits, Schwerpunkt Beispielbögen, Runde 2 (Stand 09.11.2026)
+# Rollenaudits, Schwerpunkt Übungsbögen, Runde 2 (Stand 09.11.2026)
 
 Zweite Prüfrunde nach der Behebung der 21 Sachverhalte aus [Runde 1](../README.md). Zwölf Prüfberichte
 (elf THW-Rollen und Mobile-UI), geprüft auf der Live-Seite https://erfassungsbogen.app/ (Fußzeile
@@ -82,7 +82,7 @@ Nr. 6 (Beispiel-Stand mit dem Entwurf speichern), Nr. 7 (Stand je Tag statt je E
 Behoben, Nr. 1 bis 6:
 
 1. `fusszeile.tsx` lädt den Dialog per `import()` mit Fehlerfang; ohne Netz kommt ein Hinweis, die App bleibt
-   stehen. Der Knopf „Beispielbögen ansehen" zeigt „werden geladen …", bis der Dialog offen ist.
+   stehen. Der Knopf „Übungsbögen ansehen" zeigt „werden geladen …", bis der Dialog offen ist.
 2. Sammelweg: Sperre 800 ms nach jedem Ordnerwechsel, Rückfrage „Übungs-Sammlung anlegen?", bei gleichem Namen
    „Vorhandene öffnen" oder „Zweite anlegen"; Name nur noch der offene Ordner. Alle Ordnerwechsel per Tipp
    (auch „‹ Zurück", „Alle", Pfad, Treffer) haben die 400-ms-Doppeltipp-Sperre.

@@ -10,7 +10,7 @@
 >
 > Runde 6 (23.10.2026, nach der Behebung von Runde 5): [runde-6/README.md](runde-6/README.md).
 >
-> Schwerpunkt Beispielbögen (08.11.2026, außerhalb der Rundenzählung, Live-Seite Stand `0dd56d4`): [beispielboegen/README.md](beispielboegen/README.md).
+> Schwerpunkt Übungsbögen (08.11.2026, außerhalb der Rundenzählung, Live-Seite Stand `0dd56d4`): [beispielboegen/README.md](beispielboegen/README.md).
 
 ## Verlauf
 
@@ -108,7 +108,7 @@ Abstand, Papierkorb für Einsätze und Vorlagen.
 Playwright gegen `vite preview` (Port 4173), Chromium aus
 `/opt/pw-browsers/chromium`, `isMobile`/`hasTouch`, Locale de-DE, keine
 Kamera. Zustände über `localStorage`-Seeds (`eeb.entwurf.v1`,
-`eeb.einsaetze.v1`, `eeb.vorlagen.v1`) aus den Beispielbögen in
+`eeb.einsaetze.v1`, `eeb.vorlagen.v1`) aus den Übungsbögen in
 `examples/thw/`, jeweils mit `uebung: false`; QR-Transport durch den
 inhaltsgleichen Link-Weg („Weitere Formate → Link teilen", `navigator.share`
 gestubbt) und durch PDF-Dateien ersetzt. Nicht prüfbar waren Kamera-Scan,
@@ -165,7 +165,7 @@ weil die vollständige Lösung das Meldeformat im Submodul `vendor/eeb-format`
 | N4 Systemeinstellung | behoben | Ohne gespeicherte Wahl startet die App bei System-Dunkel dunkel |
 | N5 Taktisches Zeichen leuchtet | behoben | Gedimmt im Dunkel- und Nacht-Thema |
 | O1 Voller Speicher | behoben | Ehrliche Statuszeile, Aufnahme scheitert sichtbar ohne Verlust des Bogens |
-| O2 Beispielbögen offline | behoben | Beispielbögen im Offline-Cache |
+| O2 Übungsbögen offline | behoben | Übungsbögen im Offline-Cache |
 | O3 Rückfrage vor Gleichheitsprüfung | behoben | Gleicher Inhalt wird ohne Frage quittiert |
 | O4 Speicherstand | behoben | Anzeige in der Datensicherung, Warnung ab 70 % |
 | S1 Stapel hält an | behoben | Im Stapel keine Rückfrage, Folgemeldung in der Quittung genannt |

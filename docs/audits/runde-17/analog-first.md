@@ -14,7 +14,7 @@ Verweis auf die alte Befund-ID. Behebungen, die im Browser nicht mehr zu beobach
 
 Playwright (Chromium, `chromium.launch()` ohne Optionen, globales Playwright-Modul, weil die Projektkopie keinen Browser
 findet), `isMobile`/`hasTouch`, Locale de-DE, Telefon 390 × 844 und 360 × 640, jeweils frischer Kontext. Einsatz-Sammlung
-mit 4 bis 24 THW-Beispielbögen aus `examples/thw/` (auf `uebung: false`, Stand 30 bis 210 Minuten alt, Zeitraum heute),
+mit 4 bis 24 THW-Übungsbögen aus `examples/thw/` (auf `uebung: false`, Stand 30 bis 210 Minuten alt, Zeitraum heute),
 eingelesen als JSON-Dateien und als PNG-Fotos (150 dpi) der Sammel-PDF. Durchgespielt:
 
 - Einsatzansicht: „Stärke ändern…" (Mannschaft 9 → 6), „Abrücken", „Bogen als PDF" (neuer Tab, Download aus dem Tab
@@ -33,7 +33,7 @@ den Stab und werden dort ohne die App weiterverarbeitet.
 
 **Nicht prüfbar:** echtes Drucken, Kamera- und Handscanner, Safari, native Builds, echte Akku- oder Geräteausfälle, PDF-Anzeige
 in Android-Chrome (Dateiname beim Speichern aus dem Tab), Zeitverhalten auf einem echten Telefon.
-Hinweise „Anderer Einsatz?", „Kennzeichen doppelt", „Stand vor …" und „Zeitraum vorbei" bei den Beispielbögen sind
+Hinweise „Anderer Einsatz?", „Kennzeichen doppelt", „Stand vor …" und „Zeitraum vorbei" bei den Übungsbögen sind
 Seed-Artefakte und nicht gewertet.
 
 **Kennzeichnung:** *gemessen* = im Testbrowser reproduziert (Seitentext, Dateiinhalt); *beobachtet* = gesehen.

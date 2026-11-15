@@ -26,7 +26,7 @@ Fremde Hilfe wäre nur beim Offline-Befund nötig, und selbst die hilft dort nic
 
 Chromium über das globale Playwright-Modul (`chromium.launch()` ohne Optionen, kein Install), `isMobile`, `hasTouch`,
 Pixeldichte 2, de-DE, Touch-Tipps (`tap()`). Viewports 390 x 844, 360 x 640, 320 x 568, quer 568 x 320 und 640 x 360, dazu 360 x 340
-und 390 x 350 als nachgestellte geöffnete Bildschirmtastatur. Zustand: Einsatz-Sammlung „Hochwasser Test“ mit sechs THW-Beispielbögen
+und 390 x 350 als nachgestellte geöffnete Bildschirmtastatur. Zustand: Einsatz-Sammlung „Hochwasser Test“ mit sechs THW-Übungsbögen
 (`examples/thw`, über „Bögen einlesen…“), teils zusätzlich eine per Schnellerfassung aufgenommene, gezählte Einheit; eigener Bogen im
 Assistenten; Modus „Feld“ über `eeb.anzeigemodus.v1`. Voller Speicher: `localStorage` bis zum Quota-Fehler gefüllt (5 242 880
 Zeichen). Offline: `context.setOffline(true)`, einmal im Profil mit abgeschlossenem Service-Worker-Vorrat (Meldung „Jetzt offline

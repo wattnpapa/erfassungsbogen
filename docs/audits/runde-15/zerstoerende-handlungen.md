@@ -20,7 +20,7 @@ Chromium über das globale `playwright`-Modul (`/opt/node22/lib/node_modules/pla
 `chromium.launch()` ohne Optionen, nichts installiert. `isMobile`/`hasTouch`, Locale
 de-DE, Tipps als Touch-Tipp. Viewports 390 × 844 (durchgehend) und 360 × 640 (Quittungsleiste,
 Löschen). Je Szenario ein frischer Browserkontext, eigenes Arbeitsverzeichnis im Scratchpad.
-Zustände über die Bedienung: Einsatz-Sammlung „Hochwasser Weser" anlegen, Beispielbögen
+Zustände über die Bedienung: Einsatz-Sammlung „Hochwasser Weser" anlegen, Übungsbögen
 `012-sinsheim`, `013-ulm`, `014-weinsberg` (Kopien außerhalb des Repositorys, `uebung: false`,
 `stand` auf 11:50 der Geräteuhr und Zeitraum auf heute) über „Bögen einlesen…" aufnehmen. Kein
 Kamera-Scan, keine Handschuhe, keine nativen Builds, kein Zweitgerät. Die Rückfragen haben

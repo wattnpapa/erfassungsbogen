@@ -19,7 +19,7 @@ Alle erzeugten PDFs habe ich heruntergeladen, als Text ausgelesen und als Bild
 gerendert (PyMuPDF im Scratchpad). Der eigene Bogen kam als
 `localStorage`-Seed (`eeb.entwurf.v1`) aus `examples/thw/001-…json`. Die
 Einsatz-Sammlungen habe ich über die Oberfläche angelegt („Neue
-Einsatz-Sammlung…", Art „Übung", weil die Beispielbögen `uebung: true`
+Einsatz-Sammlung…", Art „Übung", weil die Übungsbögen `uebung: true`
 tragen). Die Bögen kamen über „Bögen einlesen…" als JSON- und PDF-Dateien in
 die Sammlung.
 

@@ -20,7 +20,7 @@ Pixeldichte 2, Locale de-DE, je Lauf ein eigener Browser-Kontext. Viewports
 Viewporthöhen von 340, 330 und 300 px nachgestellt. Zustände per `localStorage`-Seed
 (`eeb.entwurf.v1`: Bogen „THW Albstadt Zugtrupp Technischer Zug“ mit 4 Personen,
 2 Fahrzeugen; `eeb.einsaetze.v1`: Sammlung „Hochwasser Musterstadt“ mit sechs
-Beispielbögen, alle mit `uebung: false`), dazu ein Lauf ohne Seed (Erstnutzung).
+Übungsbögen, alle mit `uebung: false`), dazu ein Lauf ohne Seed (Erstnutzung).
 
 Gemessen sind Rechtecke per `getBoundingClientRect` (Maßstab 44 px Kante, 8 px
 Abstand) und Tipps per `touchscreen.tap()`. Der Server wurde von weiteren Prüfern

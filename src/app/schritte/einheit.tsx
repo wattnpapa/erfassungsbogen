@@ -46,7 +46,7 @@ import { emailProblem, emailSatz } from "../email-pruefung";
 // Die beiden großen Datenpakete laden erst mit Schritt 1, nicht mit dem
 // Start-Bundle: das THW-OV-Verzeichnis (~190 KB Quelldaten) und die
 // Landesvorlagen, die über ihren eager-Glob sämtliche landesrechtlichen
-// Beispielbögen als Daten enthalten (~300 KB). Einmal geladen, bleiben die Module im Cache —
+// Übungsbögen als Daten enthalten (~300 KB). Einmal geladen, bleiben die Module im Cache —
 // der useState-Startwert greift dann sofort, ohne Nachlade-Flackern.
 export type OvDaten = typeof import("@bos/vokabulare/thw-ov") &
   typeof import("@bos/vokabulare/thw-ov-regionalstruktur");
@@ -676,7 +676,7 @@ export function SchrittEinheit({ bogen, aendern: aendernRoh }: SchrittProps) {
     setErgaenzt(null);
   }
 
-  // Landesvorlagen (KatS-Beispielbögen der Bundesländer) für Schritt 1.
+  // Landesvorlagen (KatS-Übungsbögen der Bundesländer) für Schritt 1.
   const lvModul = useLandesvorlagen();
   const [vorlageBundesland, setVorlageBundesland] = useState("");
   const [vorlageEinheit, setVorlageEinheit] = useState("");

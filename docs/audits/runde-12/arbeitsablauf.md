@@ -21,7 +21,7 @@ Chromium-Revision verlangt; `chromium.launch()` ohne Optionen, nichts installier
 `isMobile`/`hasTouch`, Locale de-DE, Viewports 390 × 844 und 360 × 640, je Gerät ein
 eigener Kontext, Tipp-Sperre von 0,9 s eingehalten. Geräteuhr 26.10.2026.
 Zustände über `localStorage`-Seed des Entwurfs (`eeb.entwurf.v1`) aus den
-Beispielbögen unter `examples/thw/` mit `uebung: false`, Zeitraum und `stand` auf
+Übungsbögen unter `examples/thw/` mit `uebung: false`, Zeitraum und `stand` auf
 heute gesetzt (sonst greift die Datenschutzfrist). Der Link-Weg ersetzt den
 QR-Transport (`navigator.share` gestubbt, Host auf `localhost:4173` umgeschrieben);
 PDFs und CSV wurden gespeichert und mit `pdftotext` gelesen. Nicht prüfbar:

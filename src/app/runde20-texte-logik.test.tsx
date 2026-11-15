@@ -81,7 +81,7 @@ describe("R20-H1 / N1: Organisation steht nicht doppelt im Namen", () => {
 describe("R20-N7: „Jetzt offline bereit“ erst, wenn alles geladen ist", () => {
   it("während das Nachladen läuft, steht der Kern getrennt vom Rest", () => {
     const laeuft = offlineText({ stand: "bereit", frischBereit: true, online: true, zweiStufen: true, zusatz: { fertig: 212, gesamt: 549 } });
-    expect(laeuft).toMatch(/^✓ Bogen, PDF, QR-Code und Empfang gehen offline\. Rest lädt noch \(Beispielbögen, Themenseiten\): 212 von 549/);
+    expect(laeuft).toMatch(/^✓ Bogen, PDF, QR-Code und Empfang gehen offline\. Rest lädt noch \(Übungsbögen, Themenseiten\): 212 von 549/);
     expect(laeuft).not.toContain("Jetzt offline bereit");
     const gezaehlt = offlineText({ stand: "bereit", frischBereit: true, online: true, zweiStufen: true });
     expect(gezaehlt).not.toContain("Jetzt offline bereit");

@@ -56,7 +56,7 @@ Szenarien:
    nach dem Rückgängig verglichen), „Abrücken" und „Entfernen" hintereinander,
    „Einsatz löschen…".
 5. **Eigener Bogen:** „Verwerfen", „Bogen schließen", „Neuen Bogen erstellen",
-   „Bogen aus Vorlage anlegen", „Beispielbogen öffnen", je mit leerem und mit
+   „Bogen aus Vorlage anlegen", „Übungsbogen öffnen", je mit leerem und mit
    belegtem Rückholplatz; „Vorbelegung entfernen" in Schritt 1 und 3;
    Vorlage „Löschen".
 6. **Gerät:** „Alle Daten löschen" (Rückfrage, Haken, Ausführung), zwei
@@ -104,7 +104,7 @@ Alles beobachtet bzw. im Speicher gemessen.
 | Handlung | Bestätigung | Rückweg (geprüft) |
 | --- | --- | --- |
 | Startseite „Verwerfen" | Rückfrage mit Name, bei belegtem Rückholplatz mit dem fallenden Bogen (Stand, Personenzahl, Einsatzort) | Rückholung ✓ |
-| „Bogen schließen", „Neuen Bogen erstellen", „Bogen aus Vorlage anlegen", „Beispielbogen öffnen" | je Rückfrage; bei belegtem Rückholplatz derselbe Satz „… wird dabei endgültig gelöscht" | Rückholung ✓ |
+| „Bogen schließen", „Neuen Bogen erstellen", „Bogen aus Vorlage anlegen", „Übungsbogen öffnen" | je Rückfrage; bei belegtem Rückholplatz derselbe Satz „… wird dabei endgültig gelöscht" | Rückholung ✓ |
 | „Vorbelegung entfernen" (Schritt 1 und 3) | keine, bewusst | Daumenleiste „Vorbelegung entfernt: 4 Personen (2 mit Geschlecht oder Ernährung) — Stärke 5 → 1", „Rückgängig" stellt alles her ✓; nach Neuladen weg |
 | Vorlage „Löschen" | keine, bewusst | Papierkorb, „Rückgängig" ✓ |
 | „Abrücken" | keine, bewusst | Quittung mit „Rückgängig"; zwei Quittungen stapeln sich ✓ |
@@ -367,7 +367,7 @@ Papierkörbe benennen („Papierkorb Vorlagen", „Papierkorb Einsätze").
 ## Bestätigtes
 
 - **Rückfragen beim Verdrängen** (Verwerfen, Bogen schließen, Neuen Bogen
-  anfangen, Bogen aus Vorlage anlegen, Beispielbogen öffnen): jedes Mal der
+  anfangen, Bogen aus Vorlage anlegen, Übungsbogen öffnen): jedes Mal der
   fallende Bogen mit Stand, Personenzahl und Einsatzort, bei leerem
   Rückholplatz nur der Hinweis auf die Rückholung.
 - **„Sicherung einspielen"-Rückfrage:** beide Seiten vollständig (Sammlungen

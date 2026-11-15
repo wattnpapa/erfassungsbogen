@@ -8,7 +8,7 @@
 
 ## Prüfaufbau
 
-Playwright (globales Modul `/opt/node22/lib/node_modules/playwright`, `chromium.launch()` ohne Optionen), `isMobile`/`hasTouch`, Locale de-DE, Dichte 2. Viewports 390 x 844 (Hauptlauf) und 360 x 640 (Startseite, Assistent Schritt 1 bis 6 auf seitlichen Überlauf und Fußleiste, Sammlung). Beispielbögen aus `examples/thw/` als Kopien mit `uebung: false`, aktuellem Stand und heutigem Zeitraum, über „Bögen einlesen…" aufgenommen (sechs Bögen; zusätzlich defekte Datei, älterer Stand, Doppeltes, Original-Beispielbögen als Übung). Nichts installiert, kein Prozess mit `pkill` beendet.
+Playwright (globales Modul `/opt/node22/lib/node_modules/playwright`, `chromium.launch()` ohne Optionen), `isMobile`/`hasTouch`, Locale de-DE, Dichte 2. Viewports 390 x 844 (Hauptlauf) und 360 x 640 (Startseite, Assistent Schritt 1 bis 6 auf seitlichen Überlauf und Fußleiste, Sammlung). Übungsbögen aus `examples/thw/` als Kopien mit `uebung: false`, aktuellem Stand und heutigem Zeitraum, über „Bögen einlesen…" aufgenommen (sechs Bögen; zusätzlich defekte Datei, älterer Stand, Doppeltes, Original-Übungsbögen als Übung). Nichts installiert, kein Prozess mit `pkill` beendet.
 
 Geprüft: Startseite, Assistent (Ort mit Mehrdeutigkeit, Telefon/E-Mail-Fehleingaben, Doppeltipp auf „Weiter", Neuladen mit „Fortsetzen", Browser-Zurück schrittweise, Zeitraum vertauscht, doppeltes Kennzeichen, Fahrzeug entfernen, Sofortbedarf mit 9999 / „-3" / „abc" / „1,5" / 9000, Übersicht, „Bogen übergeben…", „Bogen schließen"), „Namen einfügen…", Sammlung (anlegen mit Doppeltipp, Einlesen, Abrücken mit Doppeltipp, Meldung entfernen mit Doppeltipp auf die Bestätigung, Neuladen, Papierkorb, Zurückholen, Tabelle bei 390 und 360 px, Zurück-Geste, Stärke ändern mit Zahlendreher, Auftrag/Notiz, Weitergabe-Datei und Nachtrag-Zeilen, „Anderer Einsatz?"), Handscanner-Fenster ohne Kamera.
 
@@ -41,7 +41,7 @@ Die Fehlerabsicherung trägt: Zahlendreher werden vor der Wirkung erkannt („Ge
 ### R18-E2 (P3) „⚠ Anderer Einsatz?" steht auf jeder Karte und lässt sich nicht quittieren
 
 - **Neu oder alt (Verweis):** alt, wie R17-E4 / R14-W3, weiter offen.
-- **Ort:** Sammlung mit Ort „Oldenburg", vier Original-Beispielbögen eingelesen, Einheitenliste, 390 x 844.
+- **Ort:** Sammlung mit Ort „Oldenburg", vier Original-Übungsbögen eingelesen, Einheitenliste, 390 x 844.
 - **Beobachtung:** Alle vier Karten tragen „⚠ Anderer Einsatz?"; die aufgeklappte Karte nennt nur die Warnung und „Zeitraum vorbei", es gibt keinen Knopf „Passt so / Gehört zu dieser Lage" (Knopfliste der Karte: Details, Bogen als PDF, Abrücken, Zug zuordnen, Auftrag/Notiz, Mehr…).
 - **Folge:** Eine Warnung, die auf jeder Karte steht und nicht wegzubekommen ist, wird nicht mehr gelesen; der eine echte Fehlgriff (Bogen aus anderem Einsatz) geht darin unter.
 - **Empfehlung:** Je Karte eine Entscheidung „Gehört zu dieser Lage" zulassen, die die Marke auf Karte und Lageblatt entfernt.

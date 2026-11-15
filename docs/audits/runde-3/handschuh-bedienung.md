@@ -21,7 +21,7 @@ Zustände per `localStorage`-Seed, jeweils mit `uebung: false`:
 - `eeb.entwurf.v1` mit `examples/thw/015-ansbach-fgr-log-mw.json`
   (18 Personen, Fahrzeuge, Sofortbedarf), teils direkt auf Schritt 2, 3 oder 5.
 - `eeb.einsaetze.v1` mit einer Sammlung „Hochwasser Test" aus 1, 3, 5 oder 7
-  Beispielbögen (001, 013, 015, 022, 033, 044, 050).
+  Übungsbögen (001, 013, 015, 022, 033, 044, 050).
 - `eeb.vorlagen.v1` mit ein bis drei Vorlagen aus 015, 013 und 001.
 
 Neuer Bogen, Musterung („Einsatz vorbereiten") und Schnellerfassung habe ich

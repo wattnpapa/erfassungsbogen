@@ -40,7 +40,7 @@ describe("offlineText mit Fortschritt", () => {
   it("meldet den Kern bereit, solange die zweite Stufe nachlädt", () => {
     const t = offlineText({ stand: "bereit", frischBereit: true, online: true, zusatz: { fertig: 120, gesamt: 474 } });
     // R20-N7: kein „Jetzt offline bereit", solange der Rest lädt – Kern und Rest stehen getrennt.
-    expect(t).toMatch(/^✓ Bogen, PDF, QR-Code und Empfang gehen offline\. Rest lädt noch \(Beispielbögen, Themenseiten\): 120 von 474/);
+    expect(t).toMatch(/^✓ Bogen, PDF, QR-Code und Empfang gehen offline\. Rest lädt noch \(Übungsbögen, Themenseiten\): 120 von 474/);
     expect(t).not.toMatch(/komplett offline|Jetzt offline bereit/);
     expect(offlineText({ stand: "bereit", frischBereit: false, online: false, zusatz: { fertig: 120, gesamt: 474 } })).toMatch(
       /folgt beim nächsten Netz/,
@@ -56,10 +56,10 @@ describe("offlineText mit Fortschritt", () => {
 
   // Gleich nach dem Aktivieren ist die zweite Stufe noch nicht gezählt. Die
   // Zeile sagte dann rund 100 ms lang „komplett offline" — beim Neuladen ohne
-  // Netz auch dann, wenn noch kein einziger Beispielbogen im Gerät lag.
+  // Netz auch dann, wenn noch kein einziger Übungsbogen im Gerät lag.
   it("verspricht „komplett offline“ erst, wenn die zweite Stufe gezählt ist", () => {
     const frisch = offlineText({ stand: "bereit", frischBereit: true, online: true, zweiStufen: true });
-    expect(frisch).toMatch(/^✓ Bogen, PDF, QR-Code und Empfang gehen offline\. Der Rest \(Beispielbögen, Themenseiten\) wird noch gezählt — /);
+    expect(frisch).toMatch(/^✓ Bogen, PDF, QR-Code und Empfang gehen offline\. Der Rest \(Übungsbögen, Themenseiten\) wird noch gezählt — /);
     expect(frisch).not.toMatch(/Jetzt offline bereit/);
     expect(frisch).not.toMatch(/komplett offline/);
     expect(offlineText({ stand: "bereit", frischBereit: false, online: false, zweiStufen: true, zusatz: null })).not.toMatch(

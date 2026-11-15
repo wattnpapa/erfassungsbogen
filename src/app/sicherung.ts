@@ -30,7 +30,7 @@ const PRAEFIX = "eeb.";
 /** Merkzettel der Geräteuhr (datenschutz-uhr.ts) — bleibt beim Einspielen beim Gerät. */
 const UHR_SCHLUESSEL = "eeb.uhr.v1";
 /**
- * Vorratsstand der Beispielbögen und Themenseiten (offline-bereit.ts, `ZUSATZ_STAND_SCHLUESSEL`) — beschreibt, was auf
+ * Vorratsstand der Übungsbögen und Themenseiten (offline-bereit.ts, `ZUSATZ_STAND_SCHLUESSEL`) — beschreibt, was auf
  * DIESEM Gerät im Cache liegt, nicht auf dem Herkunftsgerät der Sicherung; bleibt beim Einspielen beim Gerät (R14-O2).
  */
 export const ZUSATZ_STAND_SCHLUESSEL = "eeb.offline-zusatz.v1";

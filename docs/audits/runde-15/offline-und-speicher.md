@@ -5,7 +5,7 @@ Prüfer: Rollenaudit `thw-offline-resilience-reviewer` · Datum: 2026-10-26 · Z
 Reiner Prüfbericht, keine Codeänderung. Gegen die laufende App auf Port 4173 (Produktionsbuild, Code-Stand Commit `a7874f0`,
 `main` nach Runde 14), Playwright mit Chromium (globales Modul, die Projektkopie fand keinen Browser), Telefon 390 × 844 und
 360 × 640, `isMobile`/`hasTouch`, Locale de-DE, je Lauf ein eigener Browser-Kontext. Zustände über die Oberfläche (Einsatz
-anlegen, Beispielbögen als JSON einlesen, eine Kopie mit `uebung: false`) und über `localStorage`. Zeitläufe mit echter
+anlegen, Übungsbögen als JSON einlesen, eine Kopie mit `uebung: false`) und über `localStorage`. Zeitläufe mit echter
 Wartezeit und mit der Uhr-Attrappe von Playwright (`page.clock`). Netz weg über `context.setOffline`. CPU-Last mit
 `Emulation.setCPUThrottlingRate`.
 
@@ -44,7 +44,7 @@ gelingen ohne fremde Hilfe.
   unter `/beispiele/…` ist ohne Netz nicht erreichbar und wird von der App auch nicht verlinkt.
 - **Sicherung ohne Netz:** Datei entsteht, Meldung nennt „Gesichert ist sie erst, wenn sie auf einem zweiten Gerät oder Datenträger
   liegt“; „Dauerhaften Speicher anfragen“ wird in Chromium abgelehnt und das offen gesagt.
-- **Großer Bestand:** 101 Beispielbögen: Einlesen 8,6 s, 320 Tsd. von 5 Mio. Zeichen („etwa 6 %“), Sammel-PDF 6,6 MB, Einlesen
+- **Großer Bestand:** 101 Übungsbögen: Einlesen 8,6 s, 320 Tsd. von 5 Mio. Zeichen („etwa 6 %“), Sammel-PDF 6,6 MB, Einlesen
   derselben Datei auf einem frischen Gerät 3,4 s, „101 Einheiten übernommen“.
 - **Entwurf der Karte:** Text im Feld „Auftrag/Notiz“ überlebt ein Neuladen vor dem Speichern (nicht in `localStorage`, Ablageort nicht geprüft), im Speicher des
   Einsatzes steht er nach Hintergrund-Ereignis.

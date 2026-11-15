@@ -16,7 +16,7 @@ R13-W6, R13-H1) wurden nicht neu gemeldet.
 
 Playwright (globales Modul, `chromium.launch()` ohne Optionen; die Projektkopie fand keinen Browser),
 `isMobile`/`hasTouch`, Locale de-DE, Dichte 2, Telefon 390 × 844 und 360 × 640. Neue Browser-Kontexte je
-Lauf, Zustände durch Bedienung; Beispielbögen aus `examples/thw/` als Dateien eingelesen. Nichts
+Lauf, Zustände durch Bedienung; Übungsbögen aus `examples/thw/` als Dateien eingelesen. Nichts
 installiert, kein Prozess beendet. Die Handscanner-Eingabe wurde über Tastatureingaben mit Enter
 nachgestellt (kein Kamerabild im Prüfaufbau).
 Nicht geprüft: echte Kamera, Nahbereich, native Builds, echte Bildschirmtastatur, Zeitverhalten auf einem
@@ -27,7 +27,7 @@ Geprüft: Startseite, Assistent (Schnellerfassung, Zahlen in Personal, Fahrzeuge
 Doppeltipp, Dateien einlesen, Zug zuordnen, Abrücken, Stärke ändern, Tabelle, Exporte), Einsatz
 weitergeben und wieder importieren (zweimal; abweichender Stand auf zwei Geräten), zwei Fenster
 gleichzeitig (Sammlung und Entwurf), Handscanner mit Fehlcodes, Datensicherung mit falschen Dateien,
-Absenderkarte, Beispielbögen, Dialoge bei 360 × 640.
+Absenderkarte, Übungsbögen, Dialoge bei 360 × 640.
 
 ## Urteil
 
@@ -47,7 +47,7 @@ Weiter bestätigt: Zwei Fenster gleichzeitig laufen sauber (Sammlung zieht nach,
 wird nichts gespeichert … Anderen Stand laden"); Einsatz-Import zweimal ergibt „keine neue Einheit … Datei
 war älter oder gleich"; ein auf zwei Geräten abweichender Stand wird zusammengeführt („1 Meldung
 aktualisiert: Albstadt abgerückt"); Doppeltipp auf „Einsatz anlegen" erzeugt nur einen Einsatz;
-Beispielbogen und Datei ersetzen einen angefangenen Bogen nur nach Rückfrage; die Fahrzeug-Entfernen-Frage
+Übungsbogen und Datei ersetzen einen angefangenen Bogen nur nach Rückfrage; die Fahrzeug-Entfernen-Frage
 nennt „Rückgängig … auch nach Neuladen"; verfälschte QR-Links (ein Zeichen geändert) werden abgewiesen.
 
 Der Helfer schafft alle geprüften Aufgaben ohne fremde Hilfe. Datenverlust im Hauptweg fand ich nicht. Der
@@ -70,7 +70,7 @@ eingelesen); Ursache im Ablauf des Absenders plausibel, nicht gemessen.
 die Summen stehen auf 0. Auf der Karte und in „Mehr…" gibt es keine Handlung, die Kennzeichnung zu ändern.
 „Stärke ändern…" erzeugt eine Folgemeldung und behält „ÜBUNG" („Nr. 1 … ÜBUNG · neue Fassung", weiter
 nicht gezählt). Bleiben „Entfernen" mit erneutem Erfassen von Hand oder eine neue Datei vom Absender.
-Auf Absenderseite kommt die Marke leicht in den Bogen: Die Beispielbögen sind als Übung geöffnet, die
+Auf Absenderseite kommt die Marke leicht in den Bogen: Die Übungsbögen sind als Übung geöffnet, die
 Anleitung nennt sie als Vorbelegung zum Anpassen, das Kästchen „Dies ist eine Übung" steht in Schritt 2
 unter dem Formular.
 
@@ -87,7 +87,7 @@ Eingaben doppelt).
 Summen nennt, Quittung und Rückgängig; die Änderung als eigene Zeile in der Historie. Alternativ „Stärke
 ändern…" um die Auswahl Übung/Einsatz erweitern.
 
-**Verifikation:** Beispielbogen einlesen, Karte auf „Einsatz" umstellen: Summen steigen, Historie nennt die
+**Verifikation:** Übungsbogen einlesen, Karte auf „Einsatz" umstellen: Summen steigen, Historie nennt die
 Änderung, Rückgängig stellt die Übung wieder her; Lageblatt und CSV zeigen die neue Kennzeichnung.
 
 ### R14-E2 [P3] Handscanner: Die Fehlermeldung für fremde Codes läuft über den Rand, der Satz ist abgeschnitten
@@ -201,7 +201,7 @@ Nummer) und bei Hinweis dieselbe Rückfrage „Trotzdem übernehmen / Nummer pr�
 **Verifikation:** „0170 abc" und „12" eintragen und „Übernehmen": Rückfrage erscheint; „0171 1234567 / 0441
 99": zweite Nummer wird genannt.
 
-### R14-E6 [P3] Beispielbogen als eigene Meldung: Nach Abwählen von „Übung" fehlt jeder Hinweis auf fiktive Personen und Nummern
+### R14-E6 [P3] Übungsbogen als eigene Meldung: Nach Abwählen von „Übung" fehlt jeder Hinweis auf fiktive Personen und Nummern
 
 **Priorität:** P3
 
@@ -210,7 +210,7 @@ für die Folge).
 
 **Fundstelle / Aufgabe:** Schritt 2 („Dies ist eine Übung"), Übersicht, Übergabe.
 
-**Beobachtung:** Der Beispielbogen trägt „ÜBUNG" und die Zeile „Beispielbogen geöffnet — fiktive Daten zum
+**Beobachtung:** Der Übungsbogen trägt „ÜBUNG" und die Zeile „Übungsbogen geöffnet — fiktive Daten zum
 Ansehen und Ausprobieren." Die Zeile steht nur beim Öffnen; nach Neuladen fehlt sie. Wird „Dies ist eine
 Übung" abgewählt und der Ort/Auftrag geändert, nennt die Übersicht als einzigen offenen Punkt „Einsatzzeitraum
 … ist vorbei". Personal („Lang, Sabine", „Sommer, Sandra" …) und Nummern („Mobil: 5556968346") stehen
@@ -220,14 +220,14 @@ unverändert und gehen so in Link, QR-Code und PDF.
 noch aus dem Beispiel stammen.
 
 **Folge im Einsatz:** Die Gegenstelle erhält erfundene Personen und Telefonnummern als echte Rückkanäle.
-Das Risiko besteht nur, wenn jemand den Beispielbogen als Vorlage nimmt und beide Schutzstellen (Übung,
+Das Risiko besteht nur, wenn jemand den Übungsbogen als Vorlage nimmt und beide Schutzstellen (Übung,
 Beispielzeile) umgeht.
 
 **Empfehlung:** Beim Abwählen von „Übung" bei einem Bogen, der aus einem Beispiel stammt, eine Rückfrage
 „Personal und Nummern stammen aus dem Beispiel — ersetzen?" und einen offenen Punkt in der Übersicht, bis
 Personal geändert ist.
 
-**Verifikation:** Beispielbogen öffnen, „Übung" abwählen: Rückfrage erscheint, Übersicht zeigt einen Punkt
+**Verifikation:** Übungsbogen öffnen, „Übung" abwählen: Rückfrage erscheint, Übersicht zeigt einen Punkt
 zum Personal, der nach Änderung der Namen verschwindet.
 
 ### R14-E7 [P3] Leerer Bogen lässt sich ohne Rückfrage in die Einsatz-Sammlung ablegen und zählt als „1 zählend"

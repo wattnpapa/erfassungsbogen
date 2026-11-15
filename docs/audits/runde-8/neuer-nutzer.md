@@ -58,7 +58,7 @@ Schlüsselfeld „lage“ im Umschlag.
 Hinweis zum Prüfwerkzeug: Ein zweiter Tipp auf „Weiter“ innerhalb von etwa
 0,6 s nach dem ersten wird nicht angenommen; nach 1,5 s geht er. Das ist die
 bekannte Sofort-Sperre (R5-G4/S2), kein neuer Befund. Die Seeds tragen die
-Zeiträume der Beispielbögen (Juli 2026); dass die Karten „Zeitraum vorbei“ und
+Zeiträume der Übungsbögen (Juli 2026); dass die Karten „Zeitraum vorbei“ und
 „Anderer Einsatz?“ melden, ist dadurch bedingt und nicht gewertet (Lage, nicht Fehler).
 
 ## Urteil
@@ -364,7 +364,7 @@ bleibt offen, was „nicht anwendbar“ heißt.
 - **Musterung:** „Einsatz vorbereiten“ öffnet die Ansicht „Mein Standard“ („Alle
   sind vorab angehakt — wer oder was fehlt, antippen und abwählen“), Zurück führt
   zur Startseite, die App wird nicht verlassen (R7-H2).
-- **Zurück-Verlauf:** Datensicherung, Beispielbögen, Löschen-Fenster: Zurück
+- **Zurück-Verlauf:** Datensicherung, Übungsbögen, Löschen-Fenster: Zurück
   schließt das Fenster, die Adresse bleibt; nach dem Schließen per Knopf und
   erneutem Öffnen schließt Zurück wieder nur das Fenster.
 - **Scan ohne Kamera:** „Dieses Gerät meldet keine nutzbare Kamera.“ mit Weg über

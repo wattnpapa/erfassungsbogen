@@ -18,7 +18,7 @@ Dichte 2, Viewports 390 × 844 und 360 × 640 (je neuer Browser-Kontext), dazu
 (100 ms bis 3 s nach der letzten Eingabe), Zurück-Geste mit `goBack()`,
 verstellte Uhr mit der Playwright-Uhr (45 Min und 3 h 45 Min). Zustände über die
 Oberfläche („Neue Einsatz-Sammlung…", „Bögen einlesen…" mit 5, 6, 12, 30 und 40
-Beispielbögen aus `examples/thw/`, „Einheit manuell erfassen…", „Einheit
+Übungsbögen aus `examples/thw/`, „Einheit manuell erfassen…", „Einheit
 schnell erfassen (nur Stärke)…", „Neuen Bogen erstellen", „Namen einfügen…",
 Fremddateien: `.txt`, fremdes `.json`, Zufallsbytes, kaputtes und leeres
 `.png`). Skripte im Scratchpad unter `.../scratchpad/s17/`.

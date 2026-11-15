@@ -3,11 +3,11 @@
 - Prüfer: Rolle „Helfer ohne Einweisung“ (thw-new-user-reviewer)
 - Datum: 2026-10-26
 - Zählung: P0 0 · P1 0 · P2 0 · P3 2
-- Prüfaufbau: Produktionsbuild auf http://localhost:4173 (Code-Stand Commit 7637e61, `main` nach Runde 12), Playwright/Chromium über das globale Modul (die Projektkopie fand keinen passenden Browser), Telefon 390×844 und 360×640, Touch, de-DE. Beispielbögen aus `examples/thw/` mit `uebung: false` und heutigem Zeitraum über „Bögen einlesen…“ eingespielt. Kamera, Handschuhe, Bildschirmtastatur, native Builds nicht prüfbar. Die bekannten Grenzen aus `docs/audits/README.md` sowie Runde 10 bis 12 wurden nicht neu gemeldet.
+- Prüfaufbau: Produktionsbuild auf http://localhost:4173 (Code-Stand Commit 7637e61, `main` nach Runde 12), Playwright/Chromium über das globale Modul (die Projektkopie fand keinen passenden Browser), Telefon 390×844 und 360×640, Touch, de-DE. Übungsbögen aus `examples/thw/` mit `uebung: false` und heutigem Zeitraum über „Bögen einlesen…“ eingespielt. Kamera, Handschuhe, Bildschirmtastatur, native Builds nicht prüfbar. Die bekannten Grenzen aus `docs/audits/README.md` sowie Runde 10 bis 12 wurden nicht neu gemeldet.
 
 ## Urteil
 
-Ein Helfer ohne Einweisung kommt ohne fremde Hilfe zum Ziel. Geprüft wurden Startseite, Assistent Schritt 1 bis 6 (Einheitstyp-Suche, Ortsverzeichnis, Organisationswechsel, Namen einfügen, Fahrzeuge, Kennzeichen), Übersicht, Datensicherung, Beispielbögen, Geräteschlüssel, „Alle Daten löschen“, Anlegen einer Einsatz-Sammlung und Einlesen von vier Bögen, Lagemonitor-Abschnitt sowie die Anleitung. Die Rückfragen sind verständlich; bei 360 px trat in keinem geprüften Dialog horizontaler Überlauf auf. Neue Befunde gibt es nur auf Stufe P3: ein falscher Verweis in der Anleitung und zwei Knöpfe mit gleicher Wirkung und verschiedener Beschriftung.
+Ein Helfer ohne Einweisung kommt ohne fremde Hilfe zum Ziel. Geprüft wurden Startseite, Assistent Schritt 1 bis 6 (Einheitstyp-Suche, Ortsverzeichnis, Organisationswechsel, Namen einfügen, Fahrzeuge, Kennzeichen), Übersicht, Datensicherung, Übungsbögen, Geräteschlüssel, „Alle Daten löschen“, Anlegen einer Einsatz-Sammlung und Einlesen von vier Bögen, Lagemonitor-Abschnitt sowie die Anleitung. Die Rückfragen sind verständlich; bei 360 px trat in keinem geprüften Dialog horizontaler Überlauf auf. Neue Befunde gibt es nur auf Stufe P3: ein falscher Verweis in der Anleitung und zwei Knöpfe mit gleicher Wirkung und verschiedener Beschriftung.
 
 ## Befunde
 
@@ -42,7 +42,7 @@ Ein Helfer ohne Einweisung kommt ohne fremde Hilfe zum Ziel. Geprüft wurden Sta
 
 ## Bestätigt (keine Befunde)
 
-- Dialoge „Datensicherung“, „Beispielbögen“, „Geräteschlüssel neu erzeugen“, „Alle Daten löschen“: Folge, Umfang und Ausweg sind benannt; „Alle Daten löschen“ zählt die betroffenen Daten auf und bietet vorher die Sicherung an.
+- Dialoge „Datensicherung“, „Übungsbögen“, „Geräteschlüssel neu erzeugen“, „Alle Daten löschen“: Folge, Umfang und Ausweg sind benannt; „Alle Daten löschen“ zählt die betroffenen Daten auf und bietet vorher die Sicherung an.
 - Schritt 1 ergänzt aus dem Ortsverzeichnis Kürzel, Telefon, E-Mail und übergeordnete Ebenen mit „Rückgängig“.
 
 Aufgabe geschafft: ja

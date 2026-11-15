@@ -51,7 +51,7 @@ function ersteWahl(feld: HTMLSelectElement): string {
 }
 
 describe("Schritt Einheit", () => {
-  // Die Landesvorlagen ziehen über ihren eager-Glob sämtliche Beispielbögen
+  // Die Landesvorlagen ziehen über ihren eager-Glob sämtliche Übungsbögen
   // herein (~300 KB); sie erst im Test zu laden hieße, deren Auflösung in die
   // Wartezeit einer Zusicherung zu legen — unter paralleler Last reicht die
   // Vorgabe von 1 s dafür nicht. Hier vorab geladen, ist das Modul beim Rendern

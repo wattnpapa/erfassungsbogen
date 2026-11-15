@@ -14,7 +14,7 @@ Playwright (global, 1.56.1), `chromium.launch()` ohne Optionen,
 `isMobile`/`hasTouch`, Locale de-DE, Viewports 360 × 640 und 390 × 844 (je
 eigener Browser-Kontext). Tipps mit `tap`/`touchscreen.tap`, Unterbrechung mit
 `reload()`, Zurück-Geste mit `goBack()`. Zustände über die Oberfläche
-(„Neue Einsatz-Sammlung…“, „Bögen einlesen…“ mit Beispielbögen aus
+(„Neue Einsatz-Sammlung…“, „Bögen einlesen…“ mit Übungsbögen aus
 `examples/thw/`, „Aus Datei laden…“). Skripte im Scratchpad unter `.../r12/`.
 
 Vorher gelesen: `docs/audits/README.md` und `docs/audits/runde-11/README.md`.

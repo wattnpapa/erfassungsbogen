@@ -26,7 +26,7 @@ Startseite, Einsatzansicht, Liste, aufgeklappte Karte, „Mehr…", Abrücken-Qu
 Karten/Tabelle, „Suchen, sortieren, filtern", „Ort eintragen…", „Bogen scannen…", „Einheit manuell
 erfassen…", „Einheit schnell erfassen…", „Bögen einlesen…", „Einsatz weitergeben / sichern" (mit laufender
 PDF-Erzeugung), „Einsatz löschen…", Lagemonitor-Fenster samt Helligkeitsstufen, Ansichtswahl, „Neue
-Einsatz-Sammlung…", „Alle Daten löschen", Datensicherung, Beispielbögen, Geräteschlüssel,
+Einsatz-Sammlung…", „Alle Daten löschen", Datensicherung, Übungsbögen, Geräteschlüssel,
 Impressum, Datenschutz, Name/Kontakt, „QR-Code scannen…", „Aus Datei laden…", „Einsatz importieren…",
 Bogen Schritt 1 bis 5, sowie acht statische Seiten (Anleitung, Meldekopf, Datenschutz, Impressum, Übersicht,
 THW, Vorlage, Autor) in Dunkel, Feld und Nacht. Bildschirmfotos für Nacht habe ich angesehen.

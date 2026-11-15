@@ -16,7 +16,7 @@ Kontrast). Geschmacksfragen stehen als „Hinweis“ ohne Priorität im eigenen 
 Playwright (Chromium, `chromium.launch()` bzw. `launchPersistentContext` ohne Optionen; die Projektkopie findet keinen
 Browser, deshalb das globale Modul `/opt/node22/lib/node_modules/playwright`), `isMobile`/`hasTouch`, Locale de-DE,
 Viewports 390 × 844, 360 × 640, 320 × 568, Querformat 640 × 360, 568 × 320, 844 × 390. Je Szenario ein frisches oder
-kopiertes Profil. Einsatz-Sammlung „Hochwasser Test“ mit sechs THW-Beispielbögen aus `examples/thw/` (Kopien mit
+kopiertes Profil. Einsatz-Sammlung „Hochwasser Test“ mit sechs THW-Übungsbögen aus `examples/thw/` (Kopien mit
 `uebung: false`, „Stand“ 30 bis 70 Minuten alt), über „Bögen einlesen…“ aufgenommen, dazu „THW Oldenburg“ per
 Schnellerfassung. Geprüft:
 
@@ -38,7 +38,7 @@ dort neu geladen.
 
 **Nicht prüfbar:** echtes Drucken, Kamera- und Handscanner, Safari, native Builds, echte Akku- oder Geräteausfälle,
 Zeitverhalten auf einem echten Telefon (gedrosselt nachgestellt), Aussehen nativer Zeit- und Datumsfelder. Die Hinweise
-„Anderer Einsatz?“, „Zeitraum vorbei“, „Kennzeichen doppelt“, „Sitzplätze fehlen“ an den Beispielbögen sind Artefakte der
+„Anderer Einsatz?“, „Zeitraum vorbei“, „Kennzeichen doppelt“, „Sitzplätze fehlen“ an den Übungsbögen sind Artefakte der
 Beispieldaten und nicht gewertet.
 
 ## Urteil
@@ -85,7 +85,7 @@ nicht zu erledigen, wohl aber „Papier weiterführen und später nacherfassen�
 
 - **Neu oder alt (Verweis):** neu. Folge des Nachladens der Einsatzansicht.
 - **Ort:** Neuladen oder Start, wenn die Sammlung in den letzten Stunden offen stand (360 × 640).
-- **Beobachtung (gemessen, `MutationObserver` und Layout-Shift-API):** Reihenfolge ohne Drosselung: Startseite (80 ms), seitenlose Ansicht nur mit Fußzeile „DATEN / Datensicherung / Beispielbögen …“ (190 ms, Dokumenthöhe 1 778 statt 5 300 px, kein Platzhalter im Hauptbereich), Einsatzansicht (280 ms). Layout-Shift-Wert 0,3. Bei 4-facher CPU-Drosselung dauert jede der beiden ersten Zustände rund 350 ms (Startseite 210 bis 560 ms, leere Seite 560 bis 910 ms), bei 100 kB/s und 300 ms Latenz kamen sie als entformatierte Startseite (Stylesheet noch nicht da) und danach als Fußzeile allein. Nach dem ersten Laden ist die Einsatzansicht stabil; die Zeichen im Assistenten sind sofort da (kein Platzhalter sichtbar, Zeile springt nicht).
+- **Beobachtung (gemessen, `MutationObserver` und Layout-Shift-API):** Reihenfolge ohne Drosselung: Startseite (80 ms), seitenlose Ansicht nur mit Fußzeile „DATEN / Datensicherung / Übungsbögen …“ (190 ms, Dokumenthöhe 1 778 statt 5 300 px, kein Platzhalter im Hauptbereich), Einsatzansicht (280 ms). Layout-Shift-Wert 0,3. Bei 4-facher CPU-Drosselung dauert jede der beiden ersten Zustände rund 350 ms (Startseite 210 bis 560 ms, leere Seite 560 bis 910 ms), bei 100 kB/s und 300 ms Latenz kamen sie als entformatierte Startseite (Stylesheet noch nicht da) und danach als Fußzeile allein. Nach dem ersten Laden ist die Einsatzansicht stabil; die Zeichen im Assistenten sind sofort da (kein Platzhalter sichtbar, Zeile springt nicht).
 - **Erwartung der Rolle:** Der erste sichtbare Bildschirm ist der, den ich öffne, oder ein ruhiger Platzhalter an seiner Stelle.
 - **Folge im Einsatz:** Auf einem schwächeren Telefon blitzen für rund eine halbe Sekunde Startseitenknöpfe an der Stelle der späteren Aufnahmeknöpfe auf; ein früher Tipp trifft „Neuen Bogen erstellen“ oder „Neue Einsatz-Sammlung…“ statt „Einheit manuell erfassen…“.
 - **Empfehlung:** Beim Wiederöffnen des Einsatzes keine Startseite zeigen, sondern einen ruhigen Platzhalter (Kopf mit Einsatzname) bis die Ansicht da ist, damit die Fußzeile nicht allein steht.

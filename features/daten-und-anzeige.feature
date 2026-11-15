@@ -2,7 +2,7 @@
 Funktionalität: Darstellung, Datensicherung und Auskunft
   Die App läuft im Einsatz auch draußen und nachts, hält alle Daten lokal und
   muss sie auf Wunsch sichern oder restlos löschen können — dazu die
-  Pflichtangaben und die Beispielbögen.
+  Pflichtangaben und die Übungsbögen.
 
   Szenario: Anzeigemodus umschalten und über den Neustart behalten
     Angenommen ich öffne die App
@@ -153,12 +153,12 @@ Funktionalität: Darstellung, Datensicherung und Auskunft
     Dann sehe ich den Dialog "Datenschutz"
     Und sehe ich die Überschrift "1. Verantwortlicher"
 
-  Szenario: Beispielbögen lassen sich durchblättern und öffnen
+  Szenario: Übungsbögen lassen sich durchblättern und öffnen
     Angenommen ich öffne die App
     # Einstieg ist der Abschnitt unter „So funktioniert’s“ — die Fußzeile hat keinen Link mehr.
-    Wenn ich auf "Beispielbögen ansehen" klicke
-    Dann sehe ich den Dialog "Beispielbögen"
-    Und sehe ich den Hinweis "Was sind Beispielbögen?"
+    Wenn ich auf "Übungsbögen ansehen" klicke
+    Dann sehe ich den Dialog "Übungsbögen"
+    Und sehe ich den Hinweis "Was sind Übungsbögen?"
     Und sehe ich den Hinweis "Praktische Ausbildung"
 
   Szenario: Der Erststart erklärt das Grundprinzip

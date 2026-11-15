@@ -33,7 +33,7 @@ aus 001, 003, 009, 013, 016, 052), für den Papier-Abgleich bei drei Einheiten
 Sammlung (Vorwärtssprung mit Folgen); ein abgebrochener `eeb.entwurf.v1`-Text
 für das Beiseitelegen. Skripte und Screenshots liegen im Scratchpad unter
 `runde8/s/`. In den Seeds trägt jede Karte „⚠ Anderer Einsatz? Zeitraum
-vorbei“, weil die Beispielbögen Zeiträume im Juli tragen; das ist dem Seed
+vorbei“, weil die Übungsbögen Zeiträume im Juli tragen; das ist dem Seed
 geschuldet und kein Befund.
 
 Getestet habe ich zuerst ohne Blick in die Berichte: Start mit Entwurf und

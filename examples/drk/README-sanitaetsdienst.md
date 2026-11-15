@@ -1,6 +1,6 @@
 # Beispiel-Erfassungsbögen — DRK-Sanitätsdienst (SEG San, BHP 25)
 
-8 Beispielbögen zu zwei bundesweit gebräuchlichen
+8 Übungsbögen zu zwei bundesweit gebräuchlichen
 DRK-Sanitätsdienstformationen: der Schnelleinsatzgruppe Sanität (SEG San) und
 den sieben Teileinheiten des Behandlungsplatzes 25 (BHP 25). Zusammen
 7/7/33/47.

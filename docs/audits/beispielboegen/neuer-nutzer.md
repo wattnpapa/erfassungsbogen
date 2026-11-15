@@ -1,8 +1,8 @@
-# Audit „Neuer Nutzer", Schwerpunkt Beispielbögen (Helfer ohne Einweisung)
+# Audit „Neuer Nutzer", Schwerpunkt Übungsbögen (Helfer ohne Einweisung)
 
 Prüfer: Rollenaudit `thw-new-user-reviewer` · Datum: 2026-11-08 ·
-Prüfgegenstand: Bereich „Beispielbögen" der Live-Seite `https://erfassungsbogen.app/` (frisch
-deployt, Code-Stand Commit `0dd56d4` = `main`): Abschnitt auf der Startseite, Dialog „Beispielbögen",
+Prüfgegenstand: Bereich „Übungsbögen" der Live-Seite `https://erfassungsbogen.app/` (frisch
+deployt, Code-Stand Commit `0dd56d4` = `main`): Abschnitt auf der Startseite, Dialog „Übungsbögen",
 Folgen von „Anzeigen", „PDF" und „Link" · Zählung: **P0 0 · P1 0 · P2 1 · P3 7 · Hinweise 9**
 
 Reiner Prüfbericht, keine Codeänderung. Vorab gelesen: `docs/audits/README.md` und
@@ -22,20 +22,20 @@ gibt es im Test-Chromium nicht, daher lief der Zwischenablage-Weg). Ladezustand 
 gedrosseltem Netz (50 kB/s, 300 ms Latenz, Service Worker gesperrt). Die PDF wurde mit `pdftotext`
 und als Bild geprüft. Skripte und Screenshots liegen unter `/tmp/claude-0/audit-neuer-nutzer/`.
 
-Durchlaufen: Startseite (Erststart und mit eigenem Bogen); „Beispielbögen ansehen"; Erklärung
+Durchlaufen: Startseite (Erststart und mit eigenem Bogen); „Übungsbögen ansehen"; Erklärung
 auf- und zugeklappt; alle neun Register der ersten Ebene; tiefe Ordner THW › Alle Einheiten aller
 Ortsverbände › Bremen, Niedersachsen › RSt Oldenburg › OV Oldenburg (NI), dazu Bayern und
 Katastrophenschutz › Thüringen; „‹ Zurück", Pfad-Links, „Schließen", Escape, Browser-Zurück;
 „Anzeigen" ohne eigenen Bogen, mit eigenem Bogen und zweimal nacheinander; „PDF"; „Link" und das
 Öffnen des kopierten Links in einem frischen Browser; danach „Neuen Bogen erstellen".
 
-**Annahmen:** Wer die Beispielbögen öffnet, will vor dem ersten Einsatz sehen, wie ein fertiger
+**Annahmen:** Wer die Übungsbögen öffnet, will vor dem ersten Einsatz sehen, wie ein fertiger
 Bogen aussieht, und mehrere Bögen (etwa die Einheiten des eigenen Ortsverbands) nacheinander
 ansehen. Ob THW-Helfer die Abkürzungen LV, RSt und OV kennen, wird vorausgesetzt (allgemeines
 THW-Wissen, kein Produktwissen).
 
 **Nicht prüfbar:** echtes Share-Sheet (Android/iOS), WebKit/Safari, native App (Electron, Android),
-echte Bildschirmleser, Handschuhe und Licht; der Offline-Fall der Beispielbögen nur über den
+echte Bildschirmleser, Handschuhe und Licht; der Offline-Fall der Übungsbögen nur über den
 Code-Text (der Vorrat lud im Test nicht vollständig, siehe Startseiten-Zeile „Rest lädt noch …").
 
 ## Urteil aus Sicht der Rolle
@@ -51,13 +51,13 @@ Reibung entsteht beim **Durchblättern mehrerer Beispiele**: Wer mit eigenem Bog
 nacheinander anzeigt, wird beim zweiten gefragt, ob der eigene Bogen „endgültig gelöscht" werden
 soll (BB-N1). Nach jedem „Anzeigen" beginnt der Dialog wieder ganz oben, der Weg zum eigenen
 Ortsverband kostet jedes Mal sechs Tipps (BB-N2). Dazu kommen Beschriftungen, die nach Rohdaten
-aussehen (BB-N5), und Beispielbögen, die sich selbst als fehlerhaft melden (BB-N4). Die Aufgabe
+aussehen (BB-N5), und Übungsbögen, die sich selbst als fehlerhaft melden (BB-N4). Die Aufgabe
 „einen fertigen Bogen ansehen, als PDF holen, weitergeben" gelingt ohne fremde Hilfe.
 
 ## Bestätigtes Verhalten (kein Befund)
 
-- **Abschnitt und Knopf:** „Beispielbögen" steht direkt unter „So funktioniert's" (Erklärfilm,
-  drei Schritte), Knopf „Beispielbögen ansehen" 182 x 44 px. Der Fußzeilen-Link ist entfallen.
+- **Abschnitt und Knopf:** „Übungsbögen" steht direkt unter „So funktioniert's" (Erklärfilm,
+  drei Schritte), Knopf „Übungsbögen ansehen" 182 x 44 px. Der Fußzeilen-Link ist entfallen.
 - **Register:** ganze Zeile antippbar (308 x 52 px bei 390), Bogenzahl rechts mit Tausenderpunkt
   („3.634 Bögen"), Pfeil „›".
 - **Pfadleiste:** „‹ Zurück" 84 x 44 px, „Alle" und Zwischenebenen als Links (44 px hoch), aktuelle
@@ -69,9 +69,9 @@ aussehen (BB-N5), und Beispielbögen, die sich selbst als fehlerhaft melden (BB-
 - **Ladezustand:** Zähler „101 Bögen" mit „Angaben werden geladen … 7 von 101"; der THW-Ordner war
   nach 3,0 s (Desktop) bzw. 5,7 s (360, kalt) fertig, Karten füllen sich schon vorher.
 - **Anzeigen ohne eigenen Bogen:** Dialog schließt, Bogen öffnet in der Übersicht, Streifen
-  „ÜBUNG — Dieser Bogen ist als Übung gekennzeichnet …", Quittung „Beispielbogen geöffnet — fiktive
+  „ÜBUNG — Dieser Bogen ist als Übung gekennzeichnet …", Quittung „Übungsbogen geöffnet — fiktive
   Daten zum Ansehen und Ausprobieren." (nach 9 s noch sichtbar).
-- **Anzeigen mit eigenem Bogen:** Rückfrage „Beispielbogen öffnen?" nennt den eigenen Bogen beim
+- **Anzeigen mit eigenem Bogen:** Rückfrage „Übungsbogen öffnen?" nennt den eigenen Bogen beim
   Namen und den Rückweg „Zuletzt geschlossenen Bogen zurückholen"; „Abbrechen" lässt den
   Beispieldialog offen.
 - **PDF:** „wird vorbereitet …" an der Karte, alle Knöpfe gesperrt, Download nach 2,9 s
@@ -87,22 +87,22 @@ aussehen (BB-N5), und Beispielbögen, die sich selbst als fehlerhaft melden (BB-
 ### BB-N1 (P2, Bedienung) – Zweites Beispiel droht den eigenen Bogen zu löschen
 
 - **Neu oder alt (Verweis):** neu.
-- **Fundstelle:** Startseite mit eigenem Bogen → „Beispielbögen ansehen" → ein Beispiel
-  „Anzeigen" → „Beispielbogen öffnen" → zurück zur Startseite → ein zweites Beispiel „Anzeigen";
+- **Fundstelle:** Startseite mit eigenem Bogen → „Übungsbögen ansehen" → ein Beispiel
+  „Anzeigen" → „Übungsbogen öffnen" → zurück zur Startseite → ein zweites Beispiel „Anzeigen";
   390 x 844.
 - **Beobachtung:** Beim ersten Beispiel wandert der eigene Bogen „THW Eigenbogen" auf den Platz
   „Zuletzt geschlossener Bogen" (Rückfrage sagt das richtig). Beim zweiten Beispiel lautet die
   Rückfrage: „Der angefangene Bogen „ASB-Kreisverband Rheindorf e. V. Betreuungskomponente
-  (Einsatzeinheit)" wird durch den Beispielbogen ersetzt. Der Bogen „THW Eigenbogen" … auf dem Platz
+  (Einsatzeinheit)" wird durch den Übungsbogen ersetzt. Der Bogen „THW Eigenbogen" … auf dem Platz
   „Zuletzt geschlossener Bogen" wird dabei endgültig gelöscht: Er fasst nur einen Bogen." Angeboten
-  werden ein roter Vollknopf „Beispielbogen öffnen — den alten Bogen vorher als Datei sichern", ein
-  rot umrandeter „Beispielbogen öffnen — alten Bogen endgültig löschen" (beide 58 px) und
+  werden ein roter Vollknopf „Übungsbogen öffnen — den alten Bogen vorher als Datei sichern", ein
+  rot umrandeter „Übungsbogen öffnen — alten Bogen endgültig löschen" (beide 58 px) und
   „Abbrechen" (Fokus). Das unveränderte Beispiel heißt dabei „angefangener Bogen" und belegt den
   einzigen Rückholplatz; einen Weg „Beispiel verwerfen, eigenen Bogen behalten" gibt es nicht.
 - **Erwartung der Rolle:** Beispiele anzusehen berührt meinen eigenen Bogen nicht. Ein Beispiel, an
   dem ich nichts geändert habe, wird beim nächsten Beispiel einfach weggelegt.
 - **Folge:** Wer zwei Beispiele vergleicht, steht vor einer Löschfrage zu einem Bogen, an den er
-  gerade nicht denkt. Der Text ist lang (sieben Zeilen bei 390 px); wer nur „Beispielbogen öffnen"
+  gerade nicht denkt. Der Text ist lang (sieben Zeilen bei 390 px); wer nur „Übungsbogen öffnen"
   liest, wählt einen der beiden roten Knöpfe. „Als Datei sichern" führt in einen Dateidialog, den
   ein neuer Nutzer nicht erwartet. Der eigene Bogen geht nicht still verloren (gut), aber das
   Ansehen von Beispielen wird zum Risiko für echte Daten.
@@ -117,9 +117,9 @@ aussehen (BB-N5), und Beispielbögen, die sich selbst als fehlerhaft melden (BB-
 ### BB-N2 (P3, Bedienung) – Dialog vergisst den Ordner: sechs Tipps je Beispiel
 
 - **Neu oder alt (Verweis):** neu.
-- **Fundstelle:** Dialog „Beispielbögen" nach „Anzeigen", „Schließen", Escape oder Browser-Zurück;
+- **Fundstelle:** Dialog „Übungsbögen" nach „Anzeigen", „Schließen", Escape oder Browser-Zurück;
   360 x 640 und 390 x 844.
-- **Beobachtung:** Bis zu den neun Bögen des OV Oldenburg sind es nach „Beispielbögen ansehen" fünf
+- **Beobachtung:** Bis zu den neun Bögen des OV Oldenburg sind es nach „Übungsbögen ansehen" fünf
   Ordner-Tipps (THW › Alle Einheiten aller Ortsverbände › Bremen, Niedersachsen › RSt Oldenburg › OV
   Oldenburg (NI)). Nach „Anzeigen" schließt der Dialog; beim nächsten Öffnen steht er wieder auf der
   ersten Ebene („Alle"). Dasselbe nach „Schließen" (zuvor in THW › … › Bayern) und nach Escape.
@@ -158,7 +158,7 @@ aussehen (BB-N5), und Beispielbögen, die sich selbst als fehlerhaft melden (BB-
   „Thüringen": Pfad und „45 Bögen" stehen oben im Bild.
 - **Typ:** Layout.
 
-### BB-N4 (P3, Text) – Beispielbögen melden sich selbst als fehlerhaft
+### BB-N4 (P3, Text) – Übungsbögen melden sich selbst als fehlerhaft
 
 - **Neu oder alt (Verweis):** neu.
 - **Fundstelle:** „Anzeigen" bei DLRG › „Wasserrettungsverband — Führungstrupp (ELW 1)" und
@@ -173,7 +173,7 @@ aussehen (BB-N5), und Beispielbögen, die sich selbst als fehlerhaft melden (BB-
 - **Folge:** Der Helfer lernt am Beispiel, dass Warnungen normal sind, oder zweifelt, ob das Beispiel
   (und damit sein Verständnis der Felder) stimmt. Die Warnungen verlieren ihren Wert, bevor der
   erste echte Bogen entsteht.
-- **Empfehlung:** Beispielbögen so pflegen, dass sie ohne offene Punkte und ohne „fehlt" öffnen
+- **Empfehlung:** Übungsbögen so pflegen, dass sie ohne offene Punkte und ohne „fehlt" öffnen
   (Zeitraum relativ zum heutigen Tag, Geschlecht gesetzt), oder die Einsatzzeit-Hinweise bei
   Beispielen weglassen.
 - **Nachprüfung:** Je Organisation ein Beispiel anzeigen: keine „offenen Punkte", kein „fehlt" an
@@ -234,7 +234,7 @@ aussehen (BB-N5), und Beispielbögen, die sich selbst als fehlerhaft melden (BB-
 - **Folge:** Wer nicht scrollt, beginnt einen leeren Bogen, ohne je ein Beispiel gesehen zu haben.
 - **Empfehlung:** Im ersten Bildschirm einen kurzen Verweis „Beispiel ansehen" (etwa neben „Neuen
   Bogen erstellen" oder im Untertitel) auf den Abschnitt bzw. den Dialog.
-- **Nachprüfung:** 360 x 640, Erststart: ein Weg zu den Beispielbögen ist ohne Scrollen sichtbar.
+- **Nachprüfung:** 360 x 640, Erststart: ein Weg zu den Übungsbögen ist ohne Scrollen sichtbar.
 - **Typ:** Layout.
 
 ### BB-N8 (P3, Text) – Startseite zeigt ein angezeigtes Beispiel als „meinen Bogen"
@@ -257,7 +257,7 @@ aussehen (BB-N5), und Beispielbögen, die sich selbst als fehlerhaft melden (BB-
 ## Hinweise (keine Priorität)
 
 - **H1 – Erklärung mit Fachwörtern:** Die aufgeklappte Erklärung (363 px hoch bei 360) spricht von
-  „Störer", „Share-Sheet" und „im aktuellen Layout"; die Zeile „Was sind Beispielbögen? …" ist
+  „Störer", „Share-Sheet" und „im aktuellen Layout"; die Zeile „Was sind Übungsbögen? …" ist
   blauer Text ohne Aufklapp-Zeichen und sieht aus wie ein Link.
 - **H2 – „Kopiert" nur am Knopf:** Nach „Link" steht 3 s lang „Kopiert" statt „Link", sonst keine
   Rückmeldung, was kopiert wurde und wohin damit.

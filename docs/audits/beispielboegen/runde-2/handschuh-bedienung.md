@@ -1,7 +1,7 @@
-# Audit „Handschuh-Bedienung“, Schwerpunkt Beispielbögen, Runde 2 (Nachprüfung und neue Befunde)
+# Audit „Handschuh-Bedienung“, Schwerpunkt Übungsbögen, Runde 2 (Nachprüfung und neue Befunde)
 
 Prüfer: Rollenaudit `thw-glove-touch-reviewer` · Datum: 2026-11-09 ·
-Prüfgegenstand: Live-Seite `https://erfassungsbogen.app/` (Code-Stand `085a93b`, `main`), nur der Bereich Beispielbögen
+Prüfgegenstand: Live-Seite `https://erfassungsbogen.app/` (Code-Stand `085a93b`, `main`), nur der Bereich Übungsbögen
 
 **Zählung:** P0: 0 · P1: 2 (BB2-G1, BB2-G2) · P2: 1 (BB2-G3) · P3: 4 (BB2-G4 bis BB2-G7) · Hinweise ohne Priorität: 3 (H1 bis H3)
 · Nachprüfung Runde 1: behoben 3 · teilweise 4 · offen 3 (je ID unten)
@@ -20,7 +20,7 @@ sind nach beliebig vielen Wischern mit einem Tipp erreichbar, „Alle“ ist 44 
 zwei Stellen, die beide mit den Korrekturen zusammenhängen: Die klebende Pfadleiste ist in tiefen Ordnern zwei bis vier Zeilen hoch
 und lässt im Querformat nur einen Streifen von 55 px (Feld) bzw. 145 px (Standard) frei, in dem nie Einheit und Knöpfe zusammen zu
 sehen sind; und der neue Knopf „Alle … in eine Übungs-Sammlung“ steht genau dort, wo der zweite Tipp eines Doppeltipps auf die
-Registerzeile landet, und legt dann ohne Rückfrage eine Übungs-Sammlung an und wechselt in sie. Die Aufgabe „Beispielbogen ansehen,
+Registerzeile landet, und legt dann ohne Rückfrage eine Übungs-Sammlung an und wechselt in sie. Die Aufgabe „Übungsbogen ansehen,
 als PDF holen oder Link weitergeben“ ist ohne fremde Hilfe zu schaffen, im Querformat eines Telefons (844 × 390) im Modus „Feld“ nur
 mit sehr genauem Rollen.
 
@@ -30,7 +30,7 @@ Chromium über das global installierte Playwright (`chromium.launch()` ohne Opti
 Locale de-DE, Touch-Tipps über `touchscreen.tap()`/`tap()`. Viewports 320 × 568, 360 × 640, 390 × 844, quer 640 × 360 und 844 × 390,
 jeweils Anzeigemodus „Standard“ und „Feld“ (über `eeb.anzeigemodus.v1` = `feld` vor dem Laden; Grundschrift 17,92 px). Für einzelne
 Messungen wurde der Einstiegsordner über `sessionStorage` `eeb.beispiel-pfad.v1` vor dem Laden gesetzt (dieselbe Funktion, die die
-App selbst benutzt); der Weg über Tipps wurde zusätzlich bei 360 × 640 durchgegangen. Weg: Startseite → „Beispielbögen ansehen“ →
+App selbst benutzt); der Weg über Tipps wurde zusätzlich bei 360 × 640 durchgegangen. Weg: Startseite → „Übungsbögen ansehen“ →
 „THW“ (101 Bögen direkt, Unterordner „Alle Einheiten aller Ortsverbände (nach Landesverband, Regionalstelle, OV)“ mit 3 533) →
 „Baden-Württemberg“ → „RSt Biberach“ → „OV Biberach/Riß“ (6 Karten), dazu Suche „Biberach“. Gemessen: Maße und Abstände per
 `getBoundingClientRect`, Treffer per `elementFromPoint`, Nachladen ungedrosselt und gedrosselt (150 ms Latenz, 200 KiB/s, über CDP),
@@ -39,7 +39,7 @@ Doppeltipps mit 150 bis 700 ms Abstand. DOM und CSS nicht verändert, kein einge
 
 **Annahmen:** Ein Handschuhfinger trifft mit etwa 8 bis 14 px Abweichung um die gezielte Stelle; Mindestmaß 44 × 44 px, im Modus
 „Feld“ 48 px. Ein Doppeltipp (prellender Finger, unsicheres „hat es reagiert?“) kommt mit Handschuh regelmäßig vor. Als bequem
-einhändig erreichbar gilt das untere bis mittlere Drittel des Bildschirms. Beispielbögen sind Übungs- und Ausbildungsmaterial, kein
+einhändig erreichbar gilt das untere bis mittlere Drittel des Bildschirms. Übungsbögen sind Übungs- und Ausbildungsmaterial, kein
 Einsatzweg; die Prioritäten sind daran gemessen.
 
 **Nicht prüfbar:** echte Handschuhe und echte Fingerauflage; die Bildschirmtastatur (Playwright blendet keine ein, daher ist offen,
@@ -75,7 +75,7 @@ Electron- und App-Fassung.
 | --- | --- | --- |
 | BB-G1 | **teilweise** | Im Querformat jetzt Karten (640 × 360 und 844 × 390, Standard und Feld): Tabellenrahmen `clientWidth` = `scrollWidth` (494/494, 625/625, Feld 556/556, 623/623), Anzeigen, PDF und Link in einer Zeile innerhalb des Dialogs, kein Seitwärtswisch mehr. Die Prüfbedingung „Einheit daneben lesbar“ ist aber nicht erfüllt: Von der Einheitszeile bis zur Unterkante der Knöpfe braucht eine Karte 214 px (Standard) bzw. 257 px (Feld), frei sind beim Rollen nur 207/145 px (Standard 640/844) bzw. 190/55 px (Feld). Siehe BB2-G1. |
 | BB-G2 | **teilweise** | 360 × 640, Ordner „THW“, sofort 600 px gerollt, Treffer an den Knopfmitten alle 150 ms bis zum Ende der Ladezeile: ungedrosselt 47, gedrosselt 55 Stichproben, **kein Fehltreffer**, Verschiebung höchstens 3 px (Feld 4 px). Rest: Bei 390 × 844 wandert die dritte sichtbare Knopfzeile um 18 px; die Liste wächst während des Ladens insgesamt um 1 063 px (22 965 → 24 028, rund 10 px je Karte), die Platzhalter sind also noch nicht ganz so hoch wie die fertige Karte. Im OV-Ordner (gedrosselt) springen die Knöpfe beim Verschwinden der Ladezeile um 20 px nach oben. Dazu kommt der verspätete Registereintrag über der Liste (BB2-G3). |
-| BB-G3 | **teilweise** | Nach „Anzeigen“ im OV-Ordner → „‹ Startseite“ → „Beispielbögen ansehen“ öffnet der Dialog wieder in „OV Biberach/Riß“ (Standard und Feld). Der Rückweg kostet aber weiterhin „‹ Startseite“ (172 × 44, oben links), Rollen bis zum Einstieg bei y 2 151 von 3 506 px (3,4 Bildschirme; Feld y 2 624 von 4 872, 4,1 Bildschirme) und einen Tipp; einen Knopf „Zurück zu den Beispielbögen“ im geöffneten Bogen gibt es nicht (kein sichtbarer Knopf mit „Beispiel“ im Text). Die Stelle in der Liste geht verloren (Dialog öffnet bei Bildlauf 0) – im Ordner „THW“ mit 101 Karten heißt das wieder rollen. |
+| BB-G3 | **teilweise** | Nach „Anzeigen“ im OV-Ordner → „‹ Startseite“ → „Übungsbögen ansehen“ öffnet der Dialog wieder in „OV Biberach/Riß“ (Standard und Feld). Der Rückweg kostet aber weiterhin „‹ Startseite“ (172 × 44, oben links), Rollen bis zum Einstieg bei y 2 151 von 3 506 px (3,4 Bildschirme; Feld y 2 624 von 4 872, 4,1 Bildschirme) und einen Tipp; einen Knopf „Zurück zu den Übungsbögen“ im geöffneten Bogen gibt es nicht (kein sichtbarer Knopf mit „Beispiel“ im Text). Die Stelle in der Liste geht verloren (Dialog öffnet bei Bildlauf 0) – im Ordner „THW“ mit 101 Karten heißt das wieder rollen. |
 | BB-G4 | **teilweise** | Breite behoben: „Alle“ 44 px (vorher 24), „THW“ als Link 44 bzw. 51 px (Feld), „RSt Biberach“ 94 px. Senkrechter Abstand zwischen umbrochenen Pfadzeilen weiter 0 px: 844 × 390 Standard „Alle“/„THW“ y 282–326, „Baden-Württemberg“ ab y 326; ein Treffer 8 px unter „Alle“ und unter „THW“ landet auf „Baden-Württemberg“. 320 × 568 Feld: „Alle“ bis y 414, „Baden-Württemberg“ ab y 413. |
 | BB-G5 | **behoben** | Pfadleiste mit „‹ Zurück“ klebt unter der Kopfzeile (`position: sticky`, gemessen y 85 bzw. Feld y 102 nach 400 und 900 px Bildlauf, alle Viewports). Folgeproblem der Höhe: BB2-G1; Lage oben: BB2-G6. |
 | BB-G6 | **offen** | Unverändert: 390 × 844 Standard sowie quer Anzeigen, PDF, Link in einer Zeile; 360 × 640 und 320 × 568 Standard sowie 360/390 Feld Anzeigen und PDF oben, Link darunter links; 320 × 568 Feld Anzeigen allein, PDF und Link darunter. Unten links ist also mal Link, mal PDF. |

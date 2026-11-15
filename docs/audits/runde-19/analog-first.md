@@ -13,7 +13,7 @@ Verweis auf die alte Befund-ID); Behebungen, die im Browser nicht mehr zu beobac
 
 Playwright (Chromium, `chromium.launch()` ohne Optionen, globales Playwright-Modul, weil die Projektkopie keinen Browser
 findet), `isMobile`/`hasTouch`, Locale de-DE, Telefon 390 × 844 und 360 × 640, jeweils frischer Kontext. Einsatz-Sammlung
-„Hochwasser Test" mit 5 THW-Beispielbögen aus `examples/thw/` (Kopien mit `uebung: false`, Stand 30 bis 62 Minuten alt,
+„Hochwasser Test" mit 5 THW-Übungsbögen aus `examples/thw/` (Kopien mit `uebung: false`, Stand 30 bis 62 Minuten alt,
 Zeitraum heute), eingelesen als JSON-Dateien. Durchgespielt:
 
 - Einsatzansicht: „Entfernen" (Rückfrage, Doppeltipp auf „Meldung entfernen", Quittung, Papierkorb, „Zurückholen", Neuladen),
@@ -32,7 +32,7 @@ Schlüssel zwischen Papier, Funk und Gerät; das Lageblatt hängt an der Wand; C
 
 **Nicht prüfbar:** echtes Drucken, Kamera- und Handscanner, Safari, native Builds, echte Akku- oder Geräteausfälle,
 Zeitverhalten auf einem echten Telefon, das Aussehen der nativen Zeit- und Datumsfelder auf einem echten Telefon. Die
-Hinweise „Anderer Einsatz?", „Kennzeichen doppelt", „Sitzplätze fehlen" und „alle als männlich" bei den Beispielbögen sind
+Hinweise „Anderer Einsatz?", „Kennzeichen doppelt", „Sitzplätze fehlen" und „alle als männlich" bei den Übungsbögen sind
 Seed-Artefakte und nicht gewertet.
 
 **Kennzeichnung:** *gemessen* = im Testbrowser reproduziert (Seitentext, Dateiinhalt, Messwert); *beobachtet* = gesehen.

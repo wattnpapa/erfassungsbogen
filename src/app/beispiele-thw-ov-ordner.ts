@@ -1,6 +1,6 @@
 /**
  * Anzeigenamen der Ordner unter examples/thw/ortsverbaende/ (Landesverband,
- * Regionalstelle, Ortsverband) für den Beispielbögen-Dialog.
+ * Regionalstelle, Ortsverband) für den Übungsbögen-Dialog.
  *
  * GENERIERT — nicht von Hand bearbeiten.
  * Neu erzeugen mit:  npm run beispiele:thw-ov

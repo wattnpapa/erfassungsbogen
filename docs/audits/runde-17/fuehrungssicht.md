@@ -17,7 +17,7 @@ Playwright (Chromium, `chromium.launch()` ohne Optionen, globales
 Playwright-Modul), Locale de-DE, Zeitzone Europe/Berlin, `isMobile`/`hasTouch`,
 Telefon 390x844 und 360x640; der Lagemonitor zusätzlich bei 1280x720,
 1920x1080 und 1280x420. Zustand: Sammlung „Hochwasser Neckar · BR Sporthalle
-Rottenburg"; sieben Beispielbögen THW (Nr. 1 bis 7) aus „Beispielbögen › PDF"
+Rottenburg"; sieben Übungsbögen THW (Nr. 1 bis 7) aus „Übungsbögen › PDF"
 über „Bögen einlesen…" aufgenommen. Die Beispiele tragen „Übung" und einen
 Stand von Juli 2026; sie wurden je Karte über „Mehr… › Als Einsatzmeldung
 zählen…" in die Lage gehoben (siehe R17-K1). Danach: Zug gesammelt („1. Zug")
@@ -78,7 +78,7 @@ Geprüft und in Ordnung (Behebungen aus Runde 16):
 „Stärke ändern…"), danach Kopf, Karten, Tabelle, Lageblatt, Lagemonitor,
 CSV, Block „Neu seit der letzten Kenntnisnahme".
 
-**Beobachtung (gemessen, 390x844):** Die sieben Beispielbögen tragen den Stand
+**Beobachtung (gemessen, 390x844):** Die sieben Übungsbögen tragen den Stand
 vom 16./17.07.2026 und stehen nach dem Einlesen mit „⚠ Stand vor 102 Tagen"
 (Nr. 1 bis 7: 102 bzw. 103 Tage). Die Rückfrage „Als Einsatzmeldung zählen?"
 nennt „zählt danach in Stärke, Verpflegung und Unterbringung mit (4 Personen).

@@ -235,7 +235,7 @@ When("ich die App vom Netz trenne", async function (this: EebWelt) {
     await navigator.serviceWorker.ready;
   });
   // Seit R3-O3 ist der Vorrat zweistufig: „ready" heißt nur, dass der Kern
-  // liegt; Beispielbögen und Themenseiten lädt die Seite danach nach. Die
+  // liegt; Übungsbögen und Themenseiten lädt die Seite danach nach. Die
   // Startseite sagt „Funktioniert komplett offline" erst, wenn beides da ist —
   // und so lange soll man sie mit Netz offen lassen. Genau das tut der Schritt.
   //

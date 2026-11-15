@@ -16,7 +16,7 @@ R12-O4, R12-G3).
 
 Chromium über das globale `playwright`-Modul (die Projektkopie fand keinen Browser),
 `isMobile`, `hasTouch`, Pixeldichte 2, de-DE. Viewports 390 × 844, 360 × 640, 640 × 360.
-Zustand: neue Einsatz-Sammlung „Hochwasser Test“ mit sechs Beispielbögen THW (aus
+Zustand: neue Einsatz-Sammlung „Hochwasser Test“ mit sechs Übungsbögen THW (aus
 `examples/thw`, `uebung` auf false gesetzt, importiert über „Bögen einlesen…“); eigener
 Bogen aus Datei geladen (Gesamtübersicht, Schritt 3). Gemessen sind Rechtecke
 (`getBoundingClientRect`), Tipps über `tap()` / `touchscreen.tap()`, Downloads über das

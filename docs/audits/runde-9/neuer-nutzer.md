@@ -55,7 +55,7 @@ Zusammenführen-Tipp (R7-N1).
 Hinweis zum Prüfwerkzeug: Ein Tipp 0,8 s nach dem Öffnen eines Schritts bzw. ein
 zweiter Tipp auf „Weiter“ nach 1 s wurde mehrfach nicht angenommen („Einen
 Moment …“ unten rechts); nach 1,5 s geht er. Das ist der bekannte Prellschutz
-(R8-H5/S4), kein neuer Befund. Die Seeds tragen die Zeiträume der Beispielbögen
+(R8-H5/S4), kein neuer Befund. Die Seeds tragen die Zeiträume der Übungsbögen
 (Juli 2026); dass Karten „Zeitraum vorbei“ und „Anderer Einsatz?“ melden, ist
 dadurch bedingt und nicht gewertet.
 

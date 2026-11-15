@@ -377,13 +377,13 @@ describe("Geräteschlüssel neu erzeugen", () => {
 });
 
 /**
- * „Link" in der Beispielbogen-Zeile: Ohne Share-Sheet (jsdom hat keins) geht der
+ * „Link" in der Übungsbogen-Zeile: Ohne Share-Sheet (jsdom hat keins) geht der
  * Link in die Zwischenablage. Geprüft wird, dass dort wirklich ein App-Link mit
  * Nutzlast landet — nicht die Beispiel-JSON-URL, aus der er entsteht. Die
  * Zwischenablage stellt userEvent selbst, gelesen wird sie darum über ihre
  * eigene API.
  */
-describe("Beispielbogen-Link kopieren", () => {
+describe("Übungsbogen-Link kopieren", () => {
   it("legt den Bogen-Link in die Zwischenablage", async () => {
     const bogenJson = JSON.stringify({ ...neuerBogen(), uebung: true });
     const echtesFetch = globalThis.fetch;
@@ -393,9 +393,9 @@ describe("Beispielbogen-Link kopieren", () => {
       buehne();
       // Geöffnet wird der Dialog von der Startseite aus (app.tsx); die
       // Fußzeile hat dafür keinen Link mehr.
-      expect(screen.queryByRole("button", { name: "Beispielbögen" })).toBeNull();
+      expect(screen.queryByRole("button", { name: "Übungsbögen" })).toBeNull();
       await act(async () => beispielboegenOeffnen());
-      const dialog = await screen.findByRole("dialog", { name: "Beispielbögen" }, { timeout: 15000 });
+      const dialog = await screen.findByRole("dialog", { name: "Übungsbögen" }, { timeout: 15000 });
       await nutzer.click(within(dialog).getByRole("button", { name: /^THW/ }));
       const knoepfe = await within(dialog).findAllByRole("button", { name: "Link" }, { timeout: 15000 });
       await nutzer.click(knoepfe[0]!);

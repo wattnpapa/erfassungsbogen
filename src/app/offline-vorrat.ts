@@ -9,7 +9,7 @@
  * 1. **Kern** — lädt der Service Worker. Wie weit er ist, liest die Seite aus
  *    dem Cache-Speicher des Browsers (Cache API) und vergleicht mit dem Umfang
  *    aus `offline-zusatz.json`: „2,1 von 6,7 MB".
- * 2. **Zusatz** — Beispielbögen und Themenseiten. Ist der Service Worker
+ * 2. **Zusatz** — Übungsbögen und Themenseiten. Ist der Service Worker
  *    aktiv, holt die Seite sie nach; der Service Worker legt sie dabei in
  *    seinen Laufzeit-Cache. Was schon da ist, wird übersprungen.
  *

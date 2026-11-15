@@ -1,10 +1,10 @@
-# Audit „Zerstörende Handlungen“, Schwerpunkt Beispielbögen (Anzeigen ersetzt den offenen Bogen, Übungskennzeichnung, Link)
+# Audit „Zerstörende Handlungen“, Schwerpunkt Übungsbögen (Anzeigen ersetzt den offenen Bogen, Übungskennzeichnung, Link)
 
 Prüfer: Rollenaudit `thw-destructive-action-reviewer` · Datum: 2026-11-08 ·
 Prüfgegenstand: Live-Seite `https://erfassungsbogen.app/` (Version `v2026.1108.2056`), Code-Stand
-Commit `0dd56d4` (`main`). Nur der Bereich Beispielbögen: Abschnitt „Beispielbögen“ unter
-„So funktioniert’s“ mit „Beispielbögen ansehen“, der Dialog „Beispielbögen“ (Register,
-Pfadleiste, Tabelle mit Anzeigen/PDF/Link) und was ein angezeigter Beispielbogen danach in der
+Commit `0dd56d4` (`main`). Nur der Bereich Übungsbögen: Abschnitt „Übungsbögen“ unter
+„So funktioniert’s“ mit „Übungsbögen ansehen“, der Dialog „Übungsbögen“ (Register,
+Pfadleiste, Tabelle mit Anzeigen/PDF/Link) und was ein angezeigter Übungsbogen danach in der
 App auslösen kann.
 
 **Zählung: P0 0 · P1 1 · P2 1 · P3 2 · Hinweise 5** (BB-D1 bis BB-D4; Hinweise H1 bis H5).
@@ -42,10 +42,10 @@ Durchgespielt:
 
 ## Annahmen
 
-- Wer die Beispielbögen öffnet, schaut sich typischerweise mehr als einen an (der Dialog führt
+- Wer die Übungsbögen öffnet, schaut sich typischerweise mehr als einen an (der Dialog führt
   101 THW-Bögen in einer Liste, die Ordner insgesamt über 3.600). Das ist die Grundlage für
   BB-D1.
-- Ein Helfer, der einen passenden Beispielbogen findet, nimmt ihn plausibel als Ausgangspunkt
+- Ein Helfer, der einen passenden Übungsbogen findet, nimmt ihn plausibel als Ausgangspunkt
   für die eigene Einheit (Vorlage oder Weiterbearbeiten). Ob das im THW so gewollt ist, ist
   nicht Gegenstand dieser Prüfung; die App sieht es mit „Als Vorlage speichern“ selbst vor.
 - In headless Chromium gibt es kein `navigator.share`; der Link-Weg lief deshalb über die
@@ -53,13 +53,13 @@ Durchgespielt:
 
 ## Urteil
 
-Die erste Rückfrage „Beispielbogen öffnen?“ ist klar: Sie nennt den eigenen Bogen mit Namen,
+Die erste Rückfrage „Übungsbogen öffnen?“ ist klar: Sie nennt den eigenen Bogen mit Namen,
 sagt, dass er auf den Rückholplatz wandert, die sichere Wahl hat den Fokus, die Knöpfe stehen
 24 px auseinander. Der Rückweg über „Zurückholen“ tauscht sauber. Eine offene fremde Erfassung
 wird rot und ausdrücklich als „wird verworfen“ angekündigt, eine angelegte Einsatz-Sammlung
 bleibt unberührt, und eine abgelegte Übungsmeldung zählt in der Lage nicht mit.
 
-Das Problem liegt einen Schritt weiter: **Der unveränderte Beispielbogen belegt danach den
+Das Problem liegt einen Schritt weiter: **Der unveränderte Übungsbogen belegt danach den
 einzigen Rückholplatz wie ein echter Entwurf.** Wer ein zweites Beispiel ansieht, das erste
 schließt oder einen neuen Bogen beginnt, verliert den eigenen Entwurf endgültig, ohne
 Papierkorb. Die Rückfrage warnt zwar, aber mit dem Knopf „alten Bogen endgültig löschen“, den
@@ -77,13 +77,13 @@ in die Falle von BB-D1.
 **Typ:** Bedienung (Datenverlust mit Warnung, missverständliche Knopfbeschriftung).
 **Kennzeichnung:** gemessen (360 × 640, mehrfach, frische Kontexte).
 
-**Fundstelle:** Dialog „Beispielbögen“ → „Anzeigen“ beim zweiten Beispiel; ebenso „Bogen
+**Fundstelle:** Dialog „Übungsbögen“ → „Anzeigen“ beim zweiten Beispiel; ebenso „Bogen
 schließen“ und „Neuen Bogen erstellen“, solange ein Beispiel offen ist und der eigene Entwurf
 auf dem Rückholplatz liegt.
 
 **Beobachtung:**
 1. Eigener Entwurf „THW Musterstadt-EIGEN“, dann Beispiel „Albstadt“ anzeigen. Rückfrage:
-   „Der angefangene Bogen „THW Musterstadt-EIGEN“ wird durch den Beispielbogen ersetzt. Der
+   „Der angefangene Bogen „THW Musterstadt-EIGEN“ wird durch den Übungsbogen ersetzt. Der
    Stand bleibt auf der Startseite unter „Zuletzt geschlossenen Bogen zurückholen“ erreichbar.“
    Dass dieser Platz nur einen Bogen fasst und schon das nächste Beispiel ihn braucht, steht
    hier nicht.
@@ -91,10 +91,10 @@ auf dem Rückholplatz liegt.
    Zug · Einsatz 17.07.2026 – 18.07.2026 · Fortsetzen / Bogen schließen“), darunter der eigene
    Entwurf als „Zuletzt geschlossener Bogen“.
 3. Zweites Beispiel „Biberach/Riß“ anzeigen. Rückfrage: „Der angefangene Bogen „THW Albstadt
-   Zugtrupp Technischer Zug“ wird durch den Beispielbogen ersetzt. Der Bogen „THW
+   Zugtrupp Technischer Zug“ wird durch den Übungsbogen ersetzt. Der Bogen „THW
    Musterstadt-EIGEN“ … auf dem Platz „Zuletzt geschlossener Bogen“ wird dabei endgültig
-   gelöscht …“. Knöpfe: „Beispielbogen öffnen — den alten Bogen vorher als Datei sichern“
-   (Primärfarbe), „Beispielbogen öffnen — alten Bogen endgültig löschen“ (rot), „Abbrechen“
+   gelöscht …“. Knöpfe: „Übungsbogen öffnen — den alten Bogen vorher als Datei sichern“
+   (Primärfarbe), „Übungsbogen öffnen — alten Bogen endgültig löschen“ (rot), „Abbrechen“
    (Fokus).
 4. Nach „alten Bogen endgültig löschen“: Rückholplatz enthält jetzt das **unveränderte**
    Beispiel „Albstadt“, der eigene Entwurf ist nirgends mehr im Speicher (geprüft über alle
@@ -118,7 +118,7 @@ Bogen, zu dem er zurückwollte.
 
 **Empfehlung:** Ein unverändertes Beispiel nicht auf den Rückholplatz legen (es ist jederzeit
 wieder aus der Liste zu holen); erst wenn im Beispiel etwas geändert wurde, wie ein Entwurf
-behandeln. Mindestens in den Rückfragen „Beispielbogen“ statt „angefangener Bogen“ sagen und
+behandeln. Mindestens in den Rückfragen „Übungsbogen“ statt „angefangener Bogen“ sagen und
 den Verlust-Knopf mit dem Namen des eigenen Bogens beschriften („„THW Musterstadt-EIGEN“
 endgültig löschen“) statt „alten Bogen“. Beim Schließen eines Beispiels anbieten, den eigenen
 Bogen gleich zurückzuholen.
@@ -171,7 +171,7 @@ kennzeichnen; beim Speichern einer Vorlage aus einem Beispiel kurz darauf hinwei
 **Nachprüfung:** Beispiel → Vorlage → schließen → „Einsatz vorbereiten“ → „Übung“ abwählen:
 Rückfrage „Beispieldaten im Bogen“ erscheint. Ebenso nach Schließen und Zurückholen.
 
-### BB-D3 [P3] Beispielbogen landet mit einem Tipp in einer echten Einsatz-Sammlung, ohne Hinweis auf „Beispiel“
+### BB-D3 [P3] Übungsbogen landet mit einem Tipp in einer echten Einsatz-Sammlung, ohne Hinweis auf „Beispiel“
 
 **Typ:** Bedienung/Text. **Kennzeichnung:** gemessen (360 × 640).
 
@@ -210,13 +210,13 @@ die Nummer, ohne Bestätigung keine Meldung.
 `s3-4-start-nach-beispiel.png`).
 
 **Fundstelle:** Startseite nach „Anzeigen“: Karte des offenen Bogens und Karte „Zuletzt
-geschlossener Bogen“; Rückfragen „Beispielbogen öffnen?“, „Geschlossenen Bogen zurückholen?“.
+geschlossener Bogen“; Rückfragen „Übungsbogen öffnen?“, „Geschlossenen Bogen zurückholen?“.
 
 **Beobachtung:** Die Karte „THW Albstadt Zugtrupp Technischer Zug · Einsatz 17.07.2026 –
 18.07.2026 · Stärke 1 / 1 / 2 // 4“ sieht aus wie ein eigener Entwurf; kein „Beispiel“, kein
 „ÜBUNG“. Gleiches für die Rückholkarte („… · 4 Personen“). Die Rückfragen nennen das Beispiel
 „Der angefangene Bogen „THW Albstadt …““. Erst in der Bogenansicht steht der Störer „ÜBUNG“
-und kurz „Beispielbogen geöffnet — fiktive Daten …“.
+und kurz „Übungsbogen geöffnet — fiktive Daten …“.
 
 **Erwartung der Rolle:** Auf einen Blick unterscheiden, welche Karte der eigene Bogen und
 welche ein Beispiel ist, gerade wenn beide gleichzeitig auf der Startseite stehen.
@@ -226,7 +226,7 @@ das Falsche zurück; zusammen mit BB-D1 wird unklar, welcher der zwei Bögen bei
 gelöscht“ gemeint ist.
 
 **Empfehlung:** Übungs-/Beispielmarke auf beiden Startseitenkarten (wie das „ÜBUNG“-Abzeichen
-auf den Einsatzkarten) und in den Rückfragen „Beispielbogen „…““ statt „angefangener Bogen“.
+auf den Einsatzkarten) und in den Rückfragen „Übungsbogen „…““ statt „angefangener Bogen“.
 
 **Nachprüfung:** Beispiel anzeigen, Startseite: beide Karten unterscheidbar, Rückfragen nennen
 das Beispiel als Beispiel.
@@ -242,7 +242,7 @@ Keine Beeinträchtigung der Aufgabe belegt; zur Entscheidung durch das Projekt.
   es ein Übungsbogen ist. Ob die Quittung per Screenreader angesagt wird, nicht geprüft.
 - **H2 [Text] Sicherung beim Verdrängen ohne Quittung.** „… vorher als Datei sichern“ lädt
   `eeb-THW_Musterstadt-EIGEN.json` herunter (Inhalt geprüft), die Meldung danach nennt nur
-  „Beispielbogen geöffnet — fiktive Daten …“, nicht Dateiname oder Ablage, und nicht, wie der
+  „Übungsbogen geöffnet — fiktive Daten …“, nicht Dateiname oder Ablage, und nicht, wie der
   Bogen aus der Datei zurückkommt („Aus Datei laden…“).
 - **H3 [Bedienung] Offene fremde Erfassung wird verworfen, ohne Sicherungsweg.** Rückfrage
   „Die angefangene Erfassung „THW Fremdort-ERFASSUNG“ … ist noch in keiner Sammlung und wird
@@ -258,8 +258,8 @@ Keine Beeinträchtigung der Aufgabe belegt; zur Entscheidung durch das Projekt.
 
 ## Geprüft ohne Befund
 
-- Erste Rückfrage „Beispielbogen öffnen?“ bei eigenem Entwurf: nennt den Bogen mit Namen und den
-  Rückholplatz, Fokus auf „Abbrechen“, 24 px Abstand zwischen „Beispielbogen öffnen“ und
+- Erste Rückfrage „Übungsbogen öffnen?“ bei eigenem Entwurf: nennt den Bogen mit Namen und den
+  Rückholplatz, Fokus auf „Abbrechen“, 24 px Abstand zwischen „Übungsbogen öffnen“ und
   „Abbrechen“, Knöpfe 302 × 44 px.
 - Rückweg „Zuletzt geschlossenen Bogen zurückholen“ bei offenem Beispiel: tauscht, eigener
   Entwurf wieder offen, Beispiel auf dem Rückholplatz; Quittung „Bogen „THW Musterstadt-EIGEN“

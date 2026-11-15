@@ -29,7 +29,7 @@ für „Nur Sollplätze" dieselbe Meldung mit leeren Namen), `eeb.einsaetze.v1`
 (Sammlung „Hochwasser Musterstadt", 6 Meldungen) und ein abgeschnittener
 Rohtext (`[{"id":"s1","name":"Kaputt","eintraege":[{`). Ein leerer Bogen entstand
 durch „Neuen Bogen erstellen". Der Hinweis „Zeitraum vorbei" an den Karten der
-Sammlung stammt aus den Daten der Beispielbögen und wird nicht gewertet.
+Sammlung stammt aus den Daten der Übungsbögen und wird nicht gewertet.
 
 Durchlaufen habe ich: Startseite (leer, mit Entwurf, mit beschädigtem
 Gesamttext), Assistent Schritt 1 bis 6, Rückfragen „Sofortbedarf entfernen?",

@@ -24,7 +24,7 @@ Diese Fähigkeiten werden erst durch die **Handlungsanweisung** zu konkreten
 in einer Umsetzungs-Variante „Standard (I)" und optionalen Alternativen. Diese
 Handlungsanweisung ist **verbindlich** (Fachaufsicht und Weisungsrecht nach
 § 4 Abs. 6 Satz 2 LBKG) und damit die maßgebliche Quelle für Personalstärke und
-Fahrzeuge dieser Beispielbögen.
+Fahrzeuge dieser Übungsbögen.
 
 **Modellierungsentscheidung:** Ein Bogen je Fähigkeitsmodul (analog Brandenburg,
 keine weitere Zerlegung in Teileinheiten) — jedes Modul IST bereits die

@@ -2,7 +2,7 @@
  * Die PDF-Schrift ist Helvetica mit WinAnsi-Kodierung. Was sie nicht kennt,
  * druckt pdfkit als Fremdzeichen: „Verpflegung 12 ≠ Stärke 8" stand auf dem
  * Lageblatt als „12 ″` Stärke 8" (Audit Runde 5, R5-K2). Der Test setzt alle
- * Texte der Dokumente aus echten Beispielbögen zusammen und prüft jedes
+ * Texte der Dokumente aus echten Übungsbögen zusammen und prüft jedes
  * Zeichen gegen Windows-1252.
  */
 import { describe, expect, it, vi } from "vitest";
@@ -97,7 +97,7 @@ describe("PDF-Texte nur in WinAnsi (R5-K2)", () => {
     expect(WINANSI.has("…")).toBe(true);
   });
 
-  it("Einzel-PDF aller Beispielbögen und der Blanko-Vordruck", () => {
+  it("Einzel-PDF aller Übungsbögen und der Blanko-Vordruck", () => {
     const funde = new Set<string>();
     for (const b of boegen) for (const f of fremdzeichen(pdfDokument(b, QR))) funde.add(f);
     expect([...funde]).toEqual([]);

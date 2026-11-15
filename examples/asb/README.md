@@ -1,6 +1,6 @@
 # Beispiel-Erfassungsbögen — ASB-Einsatzeinheit
 
-4 Beispielbögen zur vierteiligen Einsatzeinheit, wie sie der
+4 Übungsbögen zur vierteiligen Einsatzeinheit, wie sie der
 ASB gemeinsam mit den anderen Hilfsorganisationen im Katastrophenschutz
 Nordrhein-Westfalens stellt. Zusammen
 2/8/23/33.

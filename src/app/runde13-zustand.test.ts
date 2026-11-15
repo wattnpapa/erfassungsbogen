@@ -142,8 +142,8 @@ describe("R13-E1 Zahlfelder: Satz und gespeicherter Wert passen zusammen", () =>
   });
 });
 
-describe("R13-O2 Beispielbögen: Fehler im Bild", () => {
-  it("der Beispielbögen-Dialog zeigt den Fehler der Beispielliste mit FehlerImBild (Ansage und Scrollen)", () => {
+describe("R13-O2 Übungsbögen: Fehler im Bild", () => {
+  it("der Übungsbögen-Dialog zeigt den Fehler der Beispielliste mit FehlerImBild (Ansage und Scrollen)", () => {
     // Seit 2026-11-09 eigener, nachgeladener Baustein (vorher in fusszeile.tsx).
     const quelle = readFileSync(new URL("./beispiele-dialog.tsx", import.meta.url), "utf8");
     expect(quelle).toMatch(/\{beispielFehler && <FehlerImBild text=\{beispielFehler\} \/>\}/);

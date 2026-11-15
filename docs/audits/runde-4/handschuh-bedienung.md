@@ -26,7 +26,7 @@ die aktuelle Minute gesetzt:
   (12 Personen, 3 Fahrzeuge), direkt auf Schritt 1 bis 6; für die
   Nachprüfung von R3-G1 `015-ansbach-fgr-log-mw.json` (18 Personen).
 - `eeb.einsaetze.v1` mit einer Sammlung „Hochwasser Musterstadt" aus 1, 2,
-  4 oder 6 Beispielbögen (001, 003, 009, 013, 016, 021; für die
+  4 oder 6 Übungsbögen (001, 003, 009, 013, 016, 021; für die
   Quittungsleiste 052).
 - `eeb.vorlagen.v1` mit einer Vorlage aus 008.
 

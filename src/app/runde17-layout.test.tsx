@@ -96,7 +96,7 @@ describe("Ansichtsleiste zieht sich beim Lesen ein (R17-N3, H7, G5, K6)", () => 
 describe("Offline-Zeile in den ersten Sekunden (R17-H1)", () => {
   const basis: OfflineZustand = { stand: "bereit", frischBereit: true, online: true };
 
-  it("ist „offen“, solange sie wechselt: Laden, bereit ohne Zählung, Beispielbögen n von m", () => {
+  it("ist „offen“, solange sie wechselt: Laden, bereit ohne Zählung, Übungsbögen n von m", () => {
     expect(offlineZeileOffen({ ...basis, stand: "laedt" })).toBe(true);
     expect(offlineZeileOffen({ ...basis, zweiStufen: true })).toBe(true);
     expect(offlineZeileOffen({ ...basis, zweiStufen: true, zusatz: { fertig: 12, gesamt: 549 } })).toBe(true);

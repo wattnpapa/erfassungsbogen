@@ -16,7 +16,7 @@ Viewports 390 × 844 und 360 × 640 (je eigener Browser-Kontext). Tipps mit
 `tap`/`touchscreen.tap`, Unterbrechung mit `reload()`, Zurück-Geste mit
 `goBack()`, zweiter Tab im selben Kontext, Drehen des Viewports, Eingabetaste
 und Escape in Rückfragen. Zustände über die Oberfläche („Neue
-Einsatz-Sammlung…“, „Bögen einlesen…“ mit Beispielbögen aus `examples/thw/`,
+Einsatz-Sammlung…“, „Bögen einlesen…“ mit Übungsbögen aus `examples/thw/`,
 „Einheit manuell erfassen…“, Schnellerfassung, „Neuen Bogen erstellen“).
 Skripte im Scratchpad unter `.../scratchpad/r14/`.
 
@@ -165,7 +165,7 @@ oder Person im Bild.
 
 **Kennzeichnung:** gemessen (Skript `i2.js`, 390 × 844).
 
-**Fundstelle / Aufgabe:** Einsatz mit drei aufgenommenen Beispielbögen →
+**Fundstelle / Aufgabe:** Einsatz mit drei aufgenommenen Übungsbögen →
 Karte „Nr. 1 THW Albstadt …“ aufklappen („▾“).
 
 **Beobachtung:** Zugeklappt trägt jede Karte die Marke „neu“. Aufgeklappt

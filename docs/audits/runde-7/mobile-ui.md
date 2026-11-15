@@ -383,7 +383,7 @@ liegt in Ruhe unter dem Knopf oder Balken.
   Startseite → Assistent → Schritt 3 → Zurück → Zurück führt zur Startseite;
   der dritte Zurück verlässt die App. Keine Sackgasse, kein Sprung auf eine fremde
   Seite.
-- **Offline-Zeile:** online „Jetzt offline bereit … Beispielbögen und Themenseiten
+- **Offline-Zeile:** online „Jetzt offline bereit … Übungsbögen und Themenseiten
   werden nachgeladen (88 von 508)"; ohne Netz „… fehlen noch (92 von 508), sie
   folgen beim nächsten Netz". Die Zeile ist auf der Startseite 5 Zeilen hoch (bei
   360 px) und schiebt die Entwurfskarte nicht weg („Fortsetzen" bleibt im Bild).

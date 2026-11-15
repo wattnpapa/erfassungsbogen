@@ -50,7 +50,7 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Sammlung, Bilderstapel, Einsatz-Import und -Abgleich, Schnellerfassung für den
 > Meldekopf, Lagemonitor (`?lagemonitor=`), Papier-Abgleich, Sammel-PDF, Lageblatt,
 > Einsatz-CSV und Alle-Daten-CSV der Sammlung, Export-Stände, Aufteilen und
-> Zusammenführen, „Alle … in eine Übungs-Sammlung“ der Beispielbögen. Ein
+> Zusammenführen, „Alle … in eine Übungs-Sammlung“ der Übungsbögen. Ein
 > empfangener Bogen öffnet sich wieder direkt. Neu: Die Startseite verweist auf die
 > Meldekopf-App (ein Link, keine Netzverbindung der App; `src/app/meldekopf-weg.tsx`,
 > `meldekopf-app.ts`) und nennt Sammlungen, die noch unter `eeb.einsaetze.v1` auf
@@ -288,7 +288,7 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > (Verfügbarkeit, 5.5). Kein neuer Speicherort; das gemerkte Lese-Ergebnis
 > liegt nur im Arbeitsspeicher der geöffneten Seite.
 >
-> **Nachgezogen 2026-11-08:** Beispielbögen aller THW-Ortsverbände
+> **Nachgezogen 2026-11-08:** Übungsbögen aller THW-Ortsverbände
 > (`examples/thw/ortsverbaende/`, 3.533 Übungsbögen, erfundene Namen, Rufnummern
 > 555…). Sie gehören weder zum Kern noch zur Zusatzstufe des Offline-Vorrats
 > (`istNurAufAbruf` in `scripts/precache-aufteilung.ts`): Ein Bogen wird beim
@@ -300,20 +300,20 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > fehlen nur noch nicht geöffnete Bögen dieses Ordners (Verfügbarkeit 5.5, für
 > den Einsatz unkritisch), Startseite und Dialog sagen das. Keine neuen
 > Hosts zur Laufzeit, CSP unverändert, kein neuer `localStorage`-Schlüssel.
-> Seit 2026-11-09 merkt sich der Beispielbögen-Dialog den zuletzt offenen
+> Seit 2026-11-09 merkt sich der Übungsbögen-Dialog den zuletzt offenen
 > Ordner im `sessionStorage` des Tabs (`eeb.beispiel-pfad.v1`, nur die
 > Ordnernamen als JSON-Liste, keine Bogen- oder Personendaten; endet mit dem
 > Tab), damit „Anzeigen", Schließen und Neuladen nicht wieder bei „Alle"
 > beginnen (Prüfrunde Beispielbögen, BB-S3).
 > Seit 2026-11-09 (Runde 2) zusätzlich `eeb.beispiel-offen.v1` im
 > `localStorage`: nur eine Prüfsumme (Länge und FNV-1a-Wert) des unverändert
-> geöffneten Beispielbogens, keine Bogen- oder Personendaten; entfällt, sobald
+> geöffneten Übungsbogens, keine Bogen- oder Personendaten; entfällt, sobald
 > kein Bogen offen ist, und mit „Alle Daten löschen" (BB2-D2). Der Suchindex
-> der Beispielbögen (`src/app/beispiele-suchindex.json`, rund 190 KB,
+> der Übungsbögen (`src/app/beispiele-suchindex.json`, rund 190 KB,
 > Einheitstypen und Orte der fiktiven Beispiele) liegt als Datei in der
 > zweiten Stufe des Offline-Vorrats; keine Personendaten, kein neuer Host.
 > Ebenfalls seit 2026-11-09: Steuert der Service Worker die Seite noch nicht
-> (allererster Besuch), legt der Beispielbögen-Dialog geöffnete OV-Bögen selbst
+> (allererster Besuch), legt der Übungsbögen-Dialog geöffnete OV-Bögen selbst
 > in den Cache `eeb-ov-beispiele` (nur fiktive Übungsbögen, gleicher Ursprung). Lieferkette
 > (6.4): keine neue Abhängigkeit; die Einheitenliste je OV stammt von der
 > inoffiziellen OV-Karte thw.blafusel.de und wird nur beim Erzeugen abgerufen
@@ -322,7 +322,7 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > **Nachgezogen 2026-10-05:** Offline-Vorrat in zwei Stufen (Audit Runde 3,
 > R3-O3, `vite.config.ts`, `scripts/precache-aufteilung.ts`,
 > `src/app/offline-vorrat.ts`) — der Service Worker ist nach dem Kern
-> (6,7 MB) aktiv statt nach allen 10,7 MB; Beispielbögen und Themenseiten
+> (6,7 MB) aktiv statt nach allen 10,7 MB; Übungsbögen und Themenseiten
 > lädt die Seite danach in den Laufzeit-Cache `eeb-zusatz`. Die Liste dafür
 > (`offline-zusatz.json`) entsteht beim Build. Keine neuen Hosts, CSP
 > unverändert (nur Abrufe an die eigene Herkunft, `connect-src 'self'`), keine
@@ -740,7 +740,7 @@ Datenbank und keine Benutzerverwaltung.
 
 | # | Zielobjekt | Beschreibung | Plattform(en) |
 | --- | --- | --- | --- |
-| A1 | Web-App / PWA | Hauptauslieferungsform unter erfassungsbogen.app; als Progressive Web App vollständig offlinefähig (Service Worker precacht alle Bausteine; Beispielbögen und Themenseiten seit 2026-10-05 als zweite Stufe nach der Aktivierung, R3-O3). Zusätzlich aus demselben Build als GitLab Pages auf dem Open-CoDE-Spiegel veröffentlicht (`.gitlab-ci.yml`, Job `pages`) — identischer Code, anderer Host; Installer und Auto-Update laufen unverändert über GitHub | Browser (Desktop/Mobil) |
+| A1 | Web-App / PWA | Hauptauslieferungsform unter erfassungsbogen.app; als Progressive Web App vollständig offlinefähig (Service Worker precacht alle Bausteine; Übungsbögen und Themenseiten seit 2026-10-05 als zweite Stufe nach der Aktivierung, R3-O3). Zusätzlich aus demselben Build als GitLab Pages auf dem Open-CoDE-Spiegel veröffentlicht (`.gitlab-ci.yml`, Job `pages`) — identischer Code, anderer Host; Installer und Auto-Update laufen unverändert über GitHub | Browser (Desktop/Mobil) |
 | A2 | Desktop-App | Electron-Wrapper um dieselbe Web-App, für Windows, macOS und Linux; Auslieferung über GitHub Releases mit Auto-Update | Windows, macOS, Linux |
 | A3 | Android-App | Capacitor-Wrapper um dieselbe Web-App | Android |
 | A4 | iOS-App | Capacitor-Wrapper, laut Quellcode/Dokumentation in Vorbereitung, zum Analysezeitpunkt noch nicht produktiv | iOS (geplant) |
@@ -774,7 +774,7 @@ dem Vite-Build); es gibt keine serverseitige Variante.
 | D2l | Beiseitegelegter, unlesbarer Entwurf (seit 2026-10-14, R5-E1) | Der unveränderte Text eines gespeicherten Entwurfs, den die App nicht lesen kann (abgeschnitten, Pflichtfeld des Bogens fehlt), mit Ursache und Zeitpunkt — damit der nächste Entwurf ihn nicht überschreibt und die Startseite ihn nennen und als Datei sichern lässt. **Kann Personendaten enthalten**, die die Datenschutzfrist nicht erreicht (die App kann nicht anonymisieren): Er fällt deshalb nach 90 Tagen selbst weg, auf Wunsch früher („Entfernen…" mit Rückfrage), und mit „Alle Daten löschen" (`src/app/entwurf.ts`) | `localStorage` des Geräts (`eeb.entwurf.beschaedigt.v1`), wandert mit der Datensicherung mit |
 | D2m | Merker im Sitzungsspeicher (seit 2026-10-14, R5-S6, R5-D5) | (a) Der Link einer eingegangenen Meldung, auf deren „Wohin damit?" noch gewartet wird (`eeb.wartet.fragment`, `src/app/wartender-link.ts`): enthält den Bogen samt Personendaten wie jeder Link, damit ein Neuladen erneut fragt; gelöscht mit jeder Antwort (aufnehmen, öffnen, abbrechen), mit „Alle Daten löschen" und mit dem Schließen des Tabs. (b) Der Rückweg von „Vorbelegung entfernen" (`eeb.vorbelegung.rueckweg`, `src/app/vorbelegung-rueckweg.ts`): nur unbenannte Sollplätze (kein Name, keine Rufnummer), 15 Minuten, nur solange Personal und Fahrzeuge unverändert sind. (c) Der Rückweg im Schritt „Personal" (`eeb.personal.rueckweg`, `src/app/schritte/personal.tsx`, seit 2026-10-23, R6-S4, R6-D4): die zuletzt entfernte(n) Person(en) **mit Namen, Funktionen und Erreichbarkeiten** bzw. die Liste vor „Vorbelegung entfernen"; 15 Minuten, nur für dieselbe Einheit und solange die Namen der übrigen Personen unverändert sind | `sessionStorage` des Tabs, nicht in der Datensicherung, nicht im `localStorage` |
 | D2n | Einsatzbeginn und Funkrufname für den Lagemonitor (seit 2026-10-17) | Je Einsatz-Kennung der von Hand gesetzte Beginn als Zeitpunkt und der von Hand eingetragene, optionale Funkrufname der eigenen Führungsstelle als Freitext bis 60 Zeichen (`src/app/lagemonitor-beginn.ts`, `lagemonitor-speicher.ts`); beim Schreiben fallen Einträge zu nicht mehr vorhandenen Einsätzen weg; keine Namen von Personen vorgesehen | `localStorage` des Geräts (`eeb.lagebeginn.v1`, `eeb.lagefunkruf.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
-| D2o | Letzter Stand des Offline-Vorrats (seit 2026-10-23, R6-O7) | Zwei Zähler: wie viele Dateien der zweiten Stufe (Beispielbögen, Themenseiten) im Gerät liegen und wie viele es gibt (`src/app/offline-bereit.ts`) — damit die Zeile nach einem Neuladen ohne Netz weiter sagt, was fehlt; keine Namen, keine Personendaten | `localStorage` des Geräts (`eeb.offline-zusatz.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
+| D2o | Letzter Stand des Offline-Vorrats (seit 2026-10-23, R6-O7) | Zwei Zähler: wie viele Dateien der zweiten Stufe (Übungsbögen, Themenseiten) im Gerät liegen und wie viele es gibt (`src/app/offline-bereit.ts`) — damit die Zeile nach einem Neuladen ohne Netz weiter sagt, was fehlt; keine Namen, keine Personendaten | `localStorage` des Geräts (`eeb.offline-zusatz.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
 | D2p | Bestätigung „Geschlecht geprüft“ (seit 2026-11-12) | Prüfsummen (FNV-1a) über Namen und Geschlecht der Personen eines Bogens, dessen Besetzung jemand in Schritt 3 als „alle männlich“ bestätigt hat — damit der Hinweis auf die Geschlechts-Vorbelegung bei dieser Besetzung schweigt (`src/app/geschlecht-geprueft.ts`); höchstens 50 Einträge, die ältesten fallen heraus; keine Namen im Klartext, kein Merker im Bogen oder im Transportformat | `localStorage` des Geräts (`eeb.geschlecht-geprueft.v1`), wandert mit der Datensicherung mit, fällt mit „Alle Daten löschen" weg |
 | D2q | Lokaler Personalstamm (seit 2026-11-15) | Helferliste einer Dienststelle, einmal aus CSV oder Excel eingelesen (`src/app/personalstamm.ts`): je Person Name, Rolle (F/UF/H), Funktion, Qualifikationen, Fahrerlaubnisklassen, Teileinheit; Rufnummer nur, wenn beim Einlesen angehakt (Vorgabe: ja); Geschlecht und Ernährung nur, wenn beim Einlesen angehakt (Vorgabe: nein); dazu Dateiname und Zeitpunkt des Einlesens. Enthält auch Personen, die in keinem Bogen stehen; in Bogen, QR-Code, PDF und Exporte gelangen nur die in „Wer ist dabei?" ausgewählten | `localStorage` des Geräts (`eeb.personalstamm.v1`), wandert **nicht** mit der Datensicherung und bleibt beim Einspielen einer Sicherung liegen; fällt mit „Personalstamm löschen…" und mit „Alle Daten löschen" weg; die Startseite nennt das Datum des Einlesens und erinnert nach 90 Tagen |
 | D3 | Absenderkarte | Freiwillige Kontaktangabe (Name/E-Mail/Telefon) der meldenden Person | `localStorage` des Geräts |
@@ -1016,7 +1016,7 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   zehn Einheiten zwei Zeilen, der Bedarf stand bei 30 Einheiten allein auf
   einer vierten Seite. Zeilen werden nicht mehr über den Seitenrand geteilt.
   In der Sammel-PDF kostete der Kasten „Stand am Meldekopf" 36 von 443
-  Beispielbögen die letzte Zeile des Sofortbedarfs auf einer eigenen Seite;
+  Übungsbögen die letzte Zeile des Sofortbedarfs auf einer eigenen Seite;
   `einsatzPdfDokumentGesetzt` misst das in einem Probesatz ohne Bilder und ohne
   eingebettete Dateien und setzt nur diese Bögen enger (kleinerer
   Innenabstand), der Sofortbedarf-Kasten bleibt ganz. Jede Codeseite trägt eine

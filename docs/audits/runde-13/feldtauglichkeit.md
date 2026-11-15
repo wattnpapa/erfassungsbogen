@@ -20,7 +20,7 @@ Playwright/Chromium (`chromium.launch()` ohne Optionen, globales Modul, da die
 Projektkopie keinen passenden Browser fand), `isMobile`/`hasTouch`, Locale
 de-DE, Telefon 390 × 844 und 360 × 640; einzelne Läufe quer (640 × 360) und mit
 auf 300 px Höhe verkleinertem Fenster (Bildschirmtastatur nachgestellt). Jeder
-Lauf mit frischem Kontext. Einsatzdaten: die Beispielbögen unter
+Lauf mit frischem Kontext. Einsatzdaten: die Übungsbögen unter
 `examples/thw/` (Kopien mit `uebung: false`, heutiges Datum), über „Bögen
 einlesen…“ in eine frisch angelegte Sammlung eingespielt (3, 4, 5 und 8 Bögen).
 
@@ -36,7 +36,7 @@ Suche, Lageblatt (Text, Schriftgröße und Summen mit `pdftotext` geprüft),
 Sammel-PDF, „Einsatz löschen…“, Einsatz-Schnellerfassung „Nur Stärke“ bis zur
 Rückfrage „Nur Sollplätze“; (3) Offline: Dienstarbeiter aktiv, Netz getrennt,
 Neuladen, Anleitung und Themenseiten aus dem Zwischenspeicher; (4) Dialoge
-„Datensicherung“, „Beispielbögen“, „Geräteschlüssel“, „Alle Daten löschen“;
+„Datensicherung“, „Übungsbögen“, „Geräteschlüssel“, „Alle Daten löschen“;
 (5) Eingabe-Attribute aller Felder der Schritte 1 bis 5.
 
 **Nicht prüfbar** und deshalb *nicht verifiziert*: echte Handschuhe und nasse

@@ -1,10 +1,10 @@
-# Audit „Führungssicht“, Schwerpunkt Beispielbögen (Kräfteansatz für eine Übung zusammenstellen)
+# Audit „Führungssicht“, Schwerpunkt Übungsbögen (Kräfteansatz für eine Übung zusammenstellen)
 
 Prüfer: Rollenaudit `thw-command-reviewer` · Datum: 2026-11-08 ·
 Prüfgegenstand: Live-Seite https://erfassungsbogen.app/ (Version
 `v2026.1108.2056`), Code-Stand Commit `0dd56d4` (`main`). Nur der Bereich
-Beispielbögen: Abschnitt „Beispielbögen“ auf der Startseite mit dem Knopf
-„Beispielbögen ansehen“ und der Dialog „Beispielbögen“ (Register,
+Übungsbögen: Abschnitt „Übungsbögen“ auf der Startseite mit dem Knopf
+„Übungsbögen ansehen“ und der Dialog „Übungsbögen“ (Register,
 Pfadleiste, Tabelle Einheit/Herkunft/Stärke/Bogen, Aktionen Anzeigen/PDF/Link).
 Der Weg der Bögen in eine Einsatz-Sammlung wurde mitgeprüft, weil er zur
 Aufgabe der Rolle gehört.
@@ -59,7 +59,7 @@ Geprüft:
 - Für eine Übung ist es üblich, einen Zug aus einer Herkunft (ein OV, ein
   Landkreis) zusammenzustellen und die Stärke des Ansatzes vorab zu kennen.
   Das ist eine Annahme über die Übungsvorbereitung, keine Vorschrift.
-- Die Beispielbögen sind ausdrücklich zum „Ansehen, für Übungen oder zum
+- Die Übungsbögen sind ausdrücklich zum „Ansehen, für Übungen oder zum
   Testen des QR-Imports“ gedacht (Erklärung im Dialog); deshalb messe ich sie
   an der Aufgabe „Übung vorbereiten“.
 
@@ -102,18 +102,18 @@ Geprüft und in Ordnung (nicht gemeldet):
   unterscheidbar (THW-Liste: „Fachgruppe Wassergefahren (A)“ fünfmal, aus
   Crailsheim, Haßmersheim, Bamberg, Wilhelmshaven usw.); auf OV-Ebene trennt
   der Zughinweis zwei gleichnamige Bergungsgruppen (OV Landshut).
-- Mit Art „Übung“ zählt die Sammlung die eingelesenen Beispielbögen: sechs
+- Mit Art „Übung“ zählt die Sammlung die eingelesenen Übungsbögen: sechs
   Einheiten, 1/11/32//44 (OV Schweinfurt).
 - Telefon 390x844: Tabelle wird zu Karten, kein seitliches Rollen
   (308/308 px), alle drei Aktionen sichtbar.
 
 ## Befunde
 
-### BB-K1 [P1] Mehrere Beispielbögen lassen sich weder auf einmal weitergeben noch in eine Einsatz-Sammlung übernehmen; der naheliegende Weg fragt nach „endgültig löschen“
+### BB-K1 [P1] Mehrere Übungsbögen lassen sich weder auf einmal weitergeben noch in eine Einsatz-Sammlung übernehmen; der naheliegende Weg fragt nach „endgültig löschen“
 
 - **Typ:** Arbeitsablauf.
 - **Neu oder alt (Verweis):** neu.
-- **Ort:** Dialog „Beispielbögen“, Tabelle eines Ordners (geprüft OV
+- **Ort:** Dialog „Übungsbögen“, Tabelle eines Ordners (geprüft OV
   Schweinfurt, sechs Bögen), Aktionen „Anzeigen“, „PDF“, „Link“; danach
   „In Einsatz-Sammlung ablegen…“ im geöffneten Bogen. 1280x900.
 - **Beobachtung:** Jede Zeile hat nur Einzelaktionen; es gibt keine
@@ -122,14 +122,14 @@ Geprüft und in Ordnung (nicht gemeldet):
   - *Anzeigen → Ablegen:* Für den ersten Bogen 11 Klicks (Dialog öffnen,
     fünf Ordnerebenen, „Anzeigen“, „In Einsatz-Sammlung ablegen…“, „Neue
     Sammlung anlegen…“, Name, „Einsatz anlegen“), für jeden weiteren wieder
-    11 (Startseite, Dialog, „Anzeigen“, Rückfrage „Beispielbogen öffnen?“,
-    Ablegen, Sammlung wählen …). Der Beispielbogen wird dabei jedes Mal zum
+    11 (Startseite, Dialog, „Anzeigen“, Rückfrage „Übungsbogen öffnen?“,
+    Ablegen, Sammlung wählen …). Der Übungsbogen wird dabei jedes Mal zum
     „eigenen Bogen“ („Dein eigener Bogen ‚THW Schweinfurt Zugtrupp
     Technischer Zug‘ ist noch offen. Bogen fortsetzen“). Beim dritten Bogen
     lautet die Rückfrage: „Der Bogen ‚THW Schweinfurt Zugtrupp Technischer Zug‘
     … auf dem Platz ‚Zuletzt geschlossener Bogen‘ wird dabei endgültig
-    gelöscht“, mit den Knöpfen „Beispielbogen öffnen — den alten Bogen vorher
-    als Datei sichern“ und „Beispielbogen öffnen — alten Bogen endgültig
+    gelöscht“, mit den Knöpfen „Übungsbogen öffnen — den alten Bogen vorher
+    als Datei sichern“ und „Übungsbogen öffnen — alten Bogen endgültig
     löschen“ (rot). Dieser Bogen liegt zu dem Zeitpunkt längst als Nr. 1 in der
     Sammlung. Für einen Zug mit neun Einheiten (OV Forchheim) wären das rund
     100 Klicks und sieben solcher Rückfragen.
@@ -155,7 +155,7 @@ Geprüft und in Ordnung (nicht gemeldet):
   „alle in diesem Ordner“) mit den Aktionen „In Einsatz-Sammlung
   übernehmen…“ (Sammlung wählen oder neu anlegen, Art „Übung“ vorgewählt),
   „PDF der Auswahl“ (eine Datei oder ein Stapel) und „Links der Auswahl
-  kopieren“. Beispielbögen beim Übernehmen nicht über den Platz „eigener
+  kopieren“. Übungsbögen beim Übernehmen nicht über den Platz „eigener
   Bogen“ führen, damit keine Ersetzen-/Löschen-Rückfrage entsteht. Solange es
   das nicht gibt: den PDF-Umweg in der Erklärung nennen („Mehrere Bögen in
   eine Sammlung: PDF laden, dort ‚Bögen einlesen…‘ mit allen Dateien“) und den
@@ -169,7 +169,7 @@ Geprüft und in Ordnung (nicht gemeldet):
 
 - **Typ:** Layout.
 - **Neu oder alt (Verweis):** neu.
-- **Ort:** Dialog „Beispielbögen“, jede Tabelle (geprüft THW 101 Bögen,
+- **Ort:** Dialog „Übungsbögen“, jede Tabelle (geprüft THW 101 Bögen,
   OV Forchheim, Katastrophenschutz Hessen). 820x1180, Hochformat.
 - **Beobachtung:** Der Dialog ist 656 px breit (80 % der Fensterbreite), der
   Rollbereich der Tabelle endet bei x = 713. Die Knöpfe der ersten Zeile
@@ -220,7 +220,7 @@ Geprüft und in Ordnung (nicht gemeldet):
 
 - **Typ:** Navigation.
 - **Neu oder alt (Verweis):** neu.
-- **Ort:** Dialog „Beispielbögen“, Register und Tabellen. Alle Ansichten.
+- **Ort:** Dialog „Übungsbögen“, Register und Tabellen. Alle Ansichten.
 - **Beobachtung:** Ein bestimmter Ortsverband ist nur über „THW › Alle
   Einheiten aller Ortsverbände › Landesverband › Regionalstelle › OV“
   erreichbar (sechs Klicks ab Startseite); wer nicht weiß, dass Forchheim zur
@@ -283,14 +283,14 @@ Geprüft und in Ordnung (nicht gemeldet):
   Bögen zu einem Zug gehören, steht der Zug in derselben Form wie auf
   OV-Ebene.
 
-### BB-K6 [P3] Übernommene Beispielbögen sind sofort „veraltet“: „Stand vor 50 Tagen“, „älter als 24 h“, „Einsatzzeitraum … ist vorbei“
+### BB-K6 [P3] Übernommene Übungsbögen sind sofort „veraltet“: „Stand vor 50 Tagen“, „älter als 24 h“, „Einsatzzeitraum … ist vorbei“
 
 - **Typ:** Statusklarheit.
 - **Neu oder alt (Verweis):** neu.
 - **Ort:** Einsatz-Sammlung nach „Bögen einlesen…“ der sechs Bögen von
-  OV Schweinfurt (Art „Übung“), Tabellenansicht; geöffneter Beispielbogen
+  OV Schweinfurt (Art „Übung“), Tabellenansicht; geöffneter Übungsbogen
   nach „Anzeigen“. 1280x900.
-- **Beobachtung:** Alle Beispielbögen tragen einen Stand vom 19.09.2026.
+- **Beobachtung:** Alle Übungsbögen tragen einen Stand vom 19.09.2026.
   In der Sammlung steht bei jeder Einheit „⚠ Stand vor 50 Tagen“ und
   „19.09.2026, 06:36 älter als 24 h“; die Eintreffzeit ist die Einlesezeit
   mit „*“. Der geöffnete Bogen meldet „Einsatzzeitraum 19.09.2026 ist vorbei —
@@ -299,10 +299,10 @@ Geprüft und in Ordnung (nicht gemeldet):
   Warnzeichen. Teilnehmer lernen dabei, die Veraltet-Warnung zu übergehen,
   die im Ernstfall gerade auffallen soll; der Ausbilder muss jede Warnung vor
   der Übung erklären.
-- **Empfehlung:** Beispielbögen beim Öffnen und Übernehmen auf „jetzt“
+- **Empfehlung:** Übungsbögen beim Öffnen und Übernehmen auf „jetzt“
   datieren (Stand und Einsatzzeitraum), oder beim Übernehmen anbieten:
   „Stand auf heute setzen (Übung)“.
-- **Nachprüfung:** Sechs Beispielbögen in eine neue Übungs-Sammlung übernehmen:
+- **Nachprüfung:** Sechs Übungsbögen in eine neue Übungs-Sammlung übernehmen:
   keine Veraltet-Warnung, kein Hinweis „Einsatzzeitraum ist vorbei“.
 
 ### BB-K7 [P3] Zug aus der Liste und Art „Übung“ kommen in der Sammlung nicht an
@@ -314,7 +314,7 @@ Geprüft und in Ordnung (nicht gemeldet):
 - **Beobachtung:** Nach dem Einlesen steht „6 ohne Zug“ und „Zug für 6
   Einheiten ohne Zug: Zuordnen“; die Zugangabe aus dem Dialog ist nicht im
   Bogen. Über „In Einsatz-Sammlung ablegen…“ → „Neue Sammlung anlegen…“ ist
-  die Art „Einsatz“ vorgewählt, obwohl jeder Beispielbogen eine Übung ist;
+  die Art „Einsatz“ vorgewählt, obwohl jeder Übungsbogen eine Übung ist;
   dann steht die Lage auf 0/0/0//0 mit „Nichts gezählt: alle 2 eingegangenen
   Meldungen sind Übung und zählen nicht in diese Lage“. Mit Art „Übung“ zählt
   sie (1/11/32//44).
@@ -327,7 +327,7 @@ Geprüft und in Ordnung (nicht gemeldet):
   einem Übungsbogen heraus angelegt wird, Art „Übung“ vorwählen.
 - **Nachprüfung:** OV Landshut übernehmen: zwei Züge „1. Technischer Zug“
   (fünf Einheiten) und „2. Technischer Zug“ (sechs) ohne Nacharbeit; neue
-  Sammlung aus einem Beispielbogen hat Art „Übung“.
+  Sammlung aus einem Übungsbogen hat Art „Übung“.
 
 ### BB-K8 [P3] Ländernamen im Register „Katastrophenschutz“ teils in Großbuchstaben ohne Umlaut und Bindestrich
 
@@ -369,7 +369,7 @@ Beeinträchtigung der Aufgabe; nicht in der Zählung.
   OV Forchheim mit „0 Fahrzeuge“, „IuK-Zentrale (IuKZt)“ in Hessen ebenso.
   Ob das so gewollt ist, kann ich nicht beurteilen; in einer Übungslage fällt
   es auf und wird nachgefragt.
-- **H5 (Startseite):** Der Abschnitt „Beispielbögen“ steht bei 1280x900 erst
+- **H5 (Startseite):** Der Abschnitt „Übungsbögen“ steht bei 1280x900 erst
   ab y = 1 438 px, unter dem Erklärfilm und „So funktioniert's“. Für
   Erstnutzer passt das; wer regelmäßig Übungen vorbereitet, scrollt jedes Mal.
 - **H6 (Reihenfolge):** In OV Forchheim steht die „Fachgruppe
@@ -385,9 +385,9 @@ Beeinträchtigung der Aufgabe; nicht in der Zählung.
   Sammlung, es sei denn, man kommt selbst auf „PDF laden, dann Bögen
   einlesen…“.
 - **Größtes Missverständnis:** Die Rückfrage „alten Bogen endgültig löschen“
-  beim dritten Beispielbogen lässt glauben, dass beim Zusammenstellen gerade
+  beim dritten Übungsbogen lässt glauben, dass beim Zusammenstellen gerade
   eine schon abgelegte Einheit verloren geht.
-- **Größtes Einsatzrisiko:** Eine Übungslage, die aus Beispielbögen
+- **Größtes Einsatzrisiko:** Eine Übungslage, die aus Übungsbögen
   zusammengestellt ist, zeigt durchgehend Veraltet-Warnungen und, bei Art
   „Einsatz“, lauter Nullen; Teilnehmer üben so das Übersehen von Warnungen.
 - **Top-Priorität für die nächste Iteration:** Mehrfachauswahl im Dialog mit

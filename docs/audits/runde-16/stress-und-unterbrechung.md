@@ -16,7 +16,7 @@ Dichte 2, Viewports 360 × 640 und 390 × 844 (je neuer Browser-Kontext), dazu
 festen Koordinaten (Doppeltipp in Abständen von 60 bis 1 400 ms), Unterbrechung
 mit `reload()` (150 ms bis 3 s nach der letzten Eingabe), Zurück-Geste mit
 `goBack()`. Zustände über die Oberfläche („Neue Einsatz-Sammlung…", „Bögen
-einlesen…" mit 3, 5, 30 und 40 Beispielbögen aus `examples/thw/`, „Einheit
+einlesen…" mit 3, 5, 30 und 40 Übungsbögen aus `examples/thw/`, „Einheit
 manuell erfassen…", Schnellerfassung von der Startseite, „Neuen Bogen
 erstellen"). Skripte im Scratchpad unter `.../scratchpad/s16/`.
 
@@ -214,7 +214,7 @@ gemeldet".
 - Der Lagemonitor (Zweitfenster) zeigt bei drei eingelesenen Übungsbögen
   „Noch nichts gemeldet" und „Einheiten – Noch keine Einheit gemeldet", obwohl
   darüber „Eingetroffen: …" für drei Einheiten steht. Das ist die Folge der
-  Übungsmarkierung der Beispielbögen und gehört in die Rolle Führungssicht, hier
+  Übungsmarkierung der Übungsbögen und gehört in die Rolle Führungssicht, hier
   nicht gewertet.
 - Der Scanner (`Bogen scannen…`) ließ sich im Testbrowser ohne Kamera nicht
   öffnen; nicht ausgewertet.

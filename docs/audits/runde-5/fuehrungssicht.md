@@ -514,10 +514,10 @@ Stand 17.10.2026, Paket 4 „Papier, PDF, Begriffe, Rest".
 Geprüft mit Typprüfung, Unit-Tests (2 875 grün), Verhaltenstests (137 Szenarien, 1 749 Schritte grün)
 und Nachmessung (PDFs mit `pdfinfo`, `pdftotext` und gerenderten Seiten; Browser
 360 × 640, `isMobile`/`hasTouch`, de-DE, Dev-Server Port 5180). Probemenge: alle
-443 Beispielbögen unter `examples/`; die Seitenzahlen blieben unverändert (Einzel
+443 Übungsbögen unter `examples/`; die Seitenzahlen blieben unverändert (Einzel
 772, mit zwei Codeteilen 998). Aufgeführt sind nur die Befunde dieses Pakets.
 
 | Befund | Stand | Umsetzung |
 | --- | --- | --- |
-| R5-K2 Lageblatt druckt „≠“ als Fremdzeichen | behoben | „Verpflegung 12 statt Stärke 8“, „M/W/D weicht von Stärke ab“, „F+U+M weicht von Gesamt ab“ (App und Papier gleich). Dazu bildet `winAnsiText` alle Texte der PDFs auf WinAnsi ab („≠“ → „!=“, „→“ → „->“, „≥“ → „>=“, Akzentbuchstaben auf den Grundbuchstaben, sonst „?“): Freitext der Bögen enthielt „→“ und „≥“. Test `pdf-winansi.test.ts` setzt Lageblatt, Sammel-PDF, Einzel-PDF aller 443 Beispielbögen und den Blanko zusammen und prüft jedes Zeichen gegen Windows-1252. |
+| R5-K2 Lageblatt druckt „≠“ als Fremdzeichen | behoben | „Verpflegung 12 statt Stärke 8“, „M/W/D weicht von Stärke ab“, „F+U+M weicht von Gesamt ab“ (App und Papier gleich). Dazu bildet `winAnsiText` alle Texte der PDFs auf WinAnsi ab („≠“ → „!=“, „→“ → „->“, „≥“ → „>=“, Akzentbuchstaben auf den Grundbuchstaben, sonst „?“): Freitext der Bögen enthielt „→“ und „≥“. Test `pdf-winansi.test.ts` setzt Lageblatt, Sammel-PDF, Einzel-PDF aller 443 Übungsbögen und den Blanko zusammen und prüft jedes Zeichen gegen Windows-1252. |
 

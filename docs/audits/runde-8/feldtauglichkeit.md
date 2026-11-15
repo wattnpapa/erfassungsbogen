@@ -34,7 +34,7 @@ heute: Entwurf (`eeb.entwurf.v1`) aus `examples/thw/` (Bergungsgruppe Ulm mit
 38 Personen und 7 QR-Teilen), Vorlage (`eeb.vorlagen.v1`), Einsatz-Sammlung mit
 sechs THW-Bögen (`eeb.einsaetze.v1`), Uhrstand (`eeb.uhr.v1`) 100 Tage zurück
 bei einer 100 Tage alten Sammlung sowie absichtlich abgeschnittene
-Speicherinhalte. Dass die Beispielbögen einen vergangenen Einsatzzeitraum tragen
+Speicherinhalte. Dass die Übungsbögen einen vergangenen Einsatzzeitraum tragen
 („Zeitraum vorbei“, „Anderer Einsatz?“, „gilt er noch?“), ist Seed-Wirkung und
 kein Befund. Skripte und Bilder liegen im Scratchpad unter `runde8/h/`.
 

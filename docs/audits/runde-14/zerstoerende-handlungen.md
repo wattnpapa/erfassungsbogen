@@ -21,7 +21,7 @@ Chromium über das globale `playwright`-Modul (`/opt/node22/lib/node_modules/pla
 `chromium.launch()` ohne Optionen, nichts installiert. `isMobile`/`hasTouch`, Locale
 de-DE, Tipps als Touch-Tipp. Viewports 390 × 844 (durchgehend) und 360 × 640 (lange
 Dialoge, Abstände). Je Szenario ein frischer Browserkontext. Zustände über die Bedienung
-der App: Einsatz-Sammlung „Hochwasser Weser" anlegen, Beispielbögen aus
+der App: Einsatz-Sammlung „Hochwasser Weser" anlegen, Übungsbögen aus
 `examples/thw/` (Kopien außerhalb des Repositorys, `uebung: false`, Zeitraum und `stand`
 auf heute) über „Bögen einlesen…" aufnehmen, eigener Bogen über „Aus Datei laden…".
 Geräteuhr 26.10.2026. Kein Kamera-Scan, keine Handschuhe, keine nativen Builds, kein

@@ -29,7 +29,7 @@ Musterstadt“ (6 Einheiten aus 001, 003, 009, 013, 016, 052); `eeb.uhr.v1` mit
 `zuletzt` 400 Tage in der Zukunft; abgebrochene Texte für `eeb.entwurf.v1` und
 `eeb.einsaetze.v1`; Entwürfe mit `stand` 40, 80, 86 und 100 Tage in der
 Vergangenheit. In den Seeds trägt jede Karte „⚠ Anderer Einsatz?“, weil der
-Ort der Beispielbögen nicht zum Sammlungsort „Musterstadt“ passt; das ist dem
+Ort der Übungsbögen nicht zum Sammlungsort „Musterstadt“ passt; das ist dem
 Seed geschuldet und kein Befund. Skripte und Screenshots liegen im Scratchpad
 unter `runde9/s/`.
 

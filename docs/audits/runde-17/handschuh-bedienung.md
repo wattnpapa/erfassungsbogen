@@ -17,7 +17,7 @@ nicht als Befund, sondern nur in der Nachprüfungstabelle.
 Chromium über das Playwright-Modul (`chromium.launch()` ohne Optionen, nichts installiert), `isMobile`,
 `hasTouch`, Pixeldichte 2, de-DE. Viewports 390 x 844 und 360 x 640, dazu 320 x 568, 375 x 667, 385 x 800,
 412 x 915 sowie quer 640 x 360, 568 x 320, 844 x 390. Tipps über `tap()` und `touchscreen.tap()` an festen
-Koordinaten. Zustand: frisch angelegte Einsatz-Sammlung „Hochwasser Test“ mit elf THW-Beispielbögen
+Koordinaten. Zustand: frisch angelegte Einsatz-Sammlung „Hochwasser Test“ mit elf THW-Übungsbögen
 (`examples/thw`, `uebung` false, `stand` auf „vor fünf Minuten“, über „Bögen einlesen…“), eigener Bogen im
 Assistenten, Schnellerfassung und manuelle Aufnahme. Die Maße stammen aus `getBoundingClientRect()` aller
 Knöpfe, Verweise, Felder und Reiter; Lücken sind der kleinste Randabstand zwischen Nachbarn mit
@@ -289,7 +289,7 @@ Der Dialog lässt sich scrollen (457 px Inhalt bei 360 px); nach 200 px Scrollen
 
 ### R17-G13 [P3] Bögen einlesen: mehrere unlesbare Dateien erzeugen elfmal denselben roten Absatz
 
-**Kennzeichnung:** gemessen (360 x 640, elf Beispielbögen mit einem Zeitfeld, das das Format nicht erkennt, in einem Zug gewählt).
+**Kennzeichnung:** gemessen (360 x 640, elf Übungsbögen mit einem Zeitfeld, das das Format nicht erkennt, in einem Zug gewählt).
 
 **Ort:** Einsatzansicht, Meldung nach „Bögen einlesen…“.
 

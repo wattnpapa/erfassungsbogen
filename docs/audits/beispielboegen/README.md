@@ -1,12 +1,12 @@
-# Rollenaudits, Schwerpunkt Beispielbögen (Stand 08.11.2026)
+# Rollenaudits, Schwerpunkt Übungsbögen (Stand 08.11.2026)
 
 > Runde 2 (09.11.2026, nach der Behebung von Nr. 1 bis 21): [runde-2/README.md](runde-2/README.md).
 
 Schwerpunktrunde außerhalb der Rundenzählung: zwölf Prüfberichte (elf THW-Rollen und
-Mobile-UI), geprüft wurde nur der Bereich Beispielbögen. Prüfgegenstand ist die Live-Seite
+Mobile-UI), geprüft wurde nur der Bereich Übungsbögen. Prüfgegenstand ist die Live-Seite
 https://erfassungsbogen.app/ auf Stand `main` Commit `0dd56d4`, also nach dem Umbau vom
-08.11.2026: eigener Abschnitt „Beispielbögen“ auf der Startseite unter „So funktioniert’s“
-mit Primärknopf „Beispielbögen ansehen“, Fußzeilen-Link entfallen, Dialog mit Register,
+08.11.2026: eigener Abschnitt „Übungsbögen“ auf der Startseite unter „So funktioniert’s“
+mit Primärknopf „Übungsbögen ansehen“, Fußzeilen-Link entfallen, Dialog mit Register,
 Pfadleiste, Bogenzahl und einzeiligen Aktionen. Gegen einen lokalen Produktionsbuild ließ
 sich nicht prüfen, weil das private Submodul `vendor/bos-meldekopf` in der Prüfumgebung
 fehlte. Reine Prüfberichte ohne Codeänderung. Befund-IDs `BB-<Rolle><Nr.>`.
@@ -46,7 +46,7 @@ bleiben 21 Sachverhalte; die Priorität ist jeweils die höchste, die ein Berich
 | 10 | Keine Suche, kein Filter, keine Sortierung; ein OV nur über LV › RSt › OV (6–7 Tipps) | P2 | BB-S2, BB-K4, BB-W8 |
 | 11 | Inhalte springen beim Nachladen: Karten rutschen bis 50 px (Fehltipp „Link“ → „Anzeigen“ der nächsten Karte), der OV-Ordner erscheint später über der Liste, die THW-Zahl springt von 101 auf 3 634 | P2 | BB-G2, BB-S5, BB-H10, BB-N6 |
 | 12 | Übungskennzeichnung geht nach der Übernahme verloren: über Vorlage oder Zurückholen lässt sich „Übung“ ohne Rückfrage abwählen, die fiktiven Personen bleiben; Startseite, Vorlage und Rückfragen zeigen kein „Beispiel“; Ablage in echte Sammlung ohne Rückfrage | P2 | BB-D2, BB-D3, BB-D4, BB-E8, BB-N8, BB-W10, BB-W7 |
-| 13 | Vielen OV-Ordnern öffnen verdrängt alle übrigen Beispielbögen und Themenfotos aus dem Gerät (gemeinsame Grenze `eeb-zusatz`, `maxEntries: 1500`) | P2 | BB-O2 |
+| 13 | Vielen OV-Ordnern öffnen verdrängt alle übrigen Übungsbögen und Themenfotos aus dem Gerät (gemeinsame Grenze `eeb-zusatz`, `maxEntries: 1500`) | P2 | BB-O2 |
 | 14 | Taktische Zeichen in Dunkel und Nacht ohne helle Unterlage und Dämpfung (1,15 : 1); dem Bild fehlt die Klasse `einheit-avatar` | P2 | BB-L1 |
 | 15 | Ein weitergegebener Beispiel-Link öffnet beim Teilnehmer als „Meldung einer fremden Einheit“; die App warnt vor dem Schritt, den er tun soll | P2 | BB-W6 |
 | 16 | Beispieldaten veraltet und warnungsreich: vergangene Zeiträume („Stand vor 50/995 Tagen“), „Tippfehler im Jahr?“, Geschlecht nur vorbelegt, „Personal fehlt“; Übungslagen innerhalb eines Zuges verschieden | P2 | BB-W5, BB-K6, BB-H6, BB-N4, BB-E9, BB-A8, BB-W9 |
@@ -65,8 +65,8 @@ deshalb zuerst zu beheben:
 - Nr. 9: `.beispiel-aktionen` bricht seit dem Umbau nicht mehr um; dadurch wird die Tabelle
   zwischen Kartengrenze und Desktop breiter als der Dialog.
 - Nr. 8: Pfadleiste ohne Fokusführung, ohne Anheften, Pfadziele schmal.
-- Nr. 21 (BB-M7): Der Primärknopf „Beispielbögen ansehen“ ist der dritte auf der Startseite.
-- Hinweise: Der Aufklapper „Was sind Beispielbögen?“ verlor durch `display: flex` sein
+- Nr. 21 (BB-M7): Der Primärknopf „Übungsbögen ansehen“ ist der dritte auf der Startseite.
+- Hinweise: Der Aufklapper „Was sind Übungsbögen?“ verlor durch `display: flex` sein
   Aufklappzeichen (Nacht und Sicht H3, Feldtauglichkeit H1); der Reiter in der Kennfarbe im
   Register widerspricht laut Mobile-UI H3 einer Regel in DESIGN.md.
 
@@ -82,7 +82,7 @@ Behoben, Nr. 1 bis 6 der Tabelle:
    geschlossen und belegt den Rückholplatz nicht; die Meldung nach „Anzeigen" nennt den wartenden eigenen
    Bogen. Nur im Arbeitsspeicher: nach dem Neuladen gilt das Beispiel wieder als gewöhnlicher Bogen.
 2. Bögen der Ortsverbände in eigenem Laufzeit-Cache `eeb-ov-beispiele` (4000 Einträge); Startseite
-   („außer den Beispielbögen der THW-Ortsverbände"), Ordner und Fehlermeldung sagen, dass sie nur mit Netz
+   („außer den Übungsbögen der THW-Ortsverbände"), Ordner und Fehlermeldung sagen, dass sie nur mit Netz
    kommen; fehlt der Ordner ohne Netz, sagt der Dialog es und lädt ihn bei Netzrückkehr nach.
 3. „Alle … in eine Übungs-Sammlung" im Ordner: neue Sammlung der Art „Übung", Sammel-PDF und Lageblatt
    dort wie gewohnt.
@@ -98,7 +98,7 @@ Behoben am 09.11.2026, Nr. 7 bis 12:
 
 7. Der Dialog öffnet im zuletzt offenen Ordner (`sessionStorage` `eeb.beispiel-pfad.v1`, auch nach
    „Anzeigen" und Neuladen); Escape und die Zurück-Geste (`cancel`) gehen eine Ebene hoch bzw. leeren die
-   Suche. Ein eigener Knopf „Zurück zu den Beispielbögen" im geöffneten Bogen fehlt weiter.
+   Suche. Ein eigener Knopf „Zurück zu den Übungsbögen" im geöffneten Bogen fehlt weiter.
 8. Nach einem Ordnerwechsel rollt der Dialog nach oben, der Fokus liegt auf dem Ordnernamen, eine
    Live-Region sagt Ordner und Zahl an. Die Pfadleiste klebt unter der Kopfzeile; unter 40 rem stehen nur
    „Alle", „…" und die letzten zwei Ebenen; Pfadziele mindestens 44 px breit; „›" aus dem Ordnernamen
@@ -124,7 +124,7 @@ Bearbeitet am 09.11.2026, Nr. 13 bis 21:
     auf heute, der Stand auf jetzt (`src/app/beispiel-heute.ts`, mit Test). Warnungen aus den Daten selbst
     („Geschlecht nur vorbelegt", „mehr Führer als Mannschaft") bleiben offen.
 17. Ländernamen unter „Katastrophenschutz" ausgeschrieben, Ersatzwert ohne Versalien; keine Doppelwörter
-    bei der obersten Ebene; Hinweis auf lose Bögen neben Unterordnern; „Noch ohne Beispielbögen: …" nennt
+    bei der obersten Ebene; Hinweis auf lose Bögen neben Unterordnern; „Noch ohne Übungsbögen: …" nennt
     fehlende Länder. Offen: uneinheitlicher Aufbau der Herkunft in einzelnen Ordnern (Hessen).
 18. Nur teilweise: Das Abgleich-Formular nennt jetzt die Kopfzeile „Meldekopf" des Bogens und den Kasten
     „Stand am Meldekopf" der Sammel-PDF getrennt. Der Kasten des Blanko-Vordrucks passt nicht in die
@@ -137,7 +137,7 @@ Bearbeitet am 09.11.2026, Nr. 13 bis 21:
     (bewusst nur, wo sie keine Seite kostet, R3-A6).
 21. Feste Dialoghöhe (Kopfzeile springt nicht), Titel und „Schließen" in einer Zeile, Doppeltipp-Sperre
     400 ms im Register. Bewusst nicht geändert: Lage des Abschnitts unter „So funktioniert's" und der
-    Primärknopf „Beispielbögen ansehen" (beides ausdrücklicher Wunsch, BB-N7, BB-M7).
+    Primärknopf „Übungsbögen ansehen" (beides ausdrücklicher Wunsch, BB-N7, BB-M7).
 
 Außerdem: Der Dialog liegt jetzt in eigenem Baustein `src/app/beispiele-dialog.tsx` und lädt erst beim
 ersten Öffnen; das Startbündel war mit den Korrekturen über dem Budget (754 562 > 753 492 Byte).

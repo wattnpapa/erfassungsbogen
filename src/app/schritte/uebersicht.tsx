@@ -589,7 +589,7 @@ export function Uebersicht(props: {
         {fehler && <p className="fehler">{fehler}</p>}
         {uebungEmpfangen && !props.vorlageBearbeitung && (
           <p className="hinweis uebung-empfangen-hinweis">
-            Empfangener Übungsbogen: Zum Melden am Meldekopf „Bogen übergeben…“ (QR-Code, PDF oder Link). Wer den
+            Empfangener Bogen, als Übung gekennzeichnet: Zum Melden am Meldekopf „Bogen übergeben…“ (QR-Code, PDF oder Link). Wer den
             Meldekopf spielt, liest ihn in der Meldekopf-App in eine Sammlung der Art „Übung“ ein.
           </p>
         )}

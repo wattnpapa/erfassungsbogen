@@ -27,7 +27,7 @@ denselben Server gleichzeitig; Zeiten habe ich deshalb nicht gemessen.
   angelegt. Über „Bögen einlesen…" die PDF von A und fünf Bögen als JSON
   (`003`, `005`, `010`, `011`, `014`, später `012`, `020`, `016`), je
   `uebung: false` und Stand auf den Prüftag; die Einsatzangaben dieser
-  Beispielbögen (Juli 2026, andere Orte) habe ich bewusst stehen lassen.
+  Übungsbögen (Juli 2026, andere Orte) habe ich bewusst stehen lassen.
   Zug zuordnen, Auftrag/Notiz, Abrücken, Schnellerfassung, Folgemeldung,
   alter Bogen nach neuem.
 - **C** (Ablösung bzw. Stab): „Einsatz importieren…" mit der Sammel-PDF von

@@ -422,7 +422,7 @@ function SoFunktionierts() {
 }
 
 /**
- * Einstieg in die Beispielbögen direkt unter „So funktioniert's". Bisher
+ * Einstieg in die Übungsbögen direkt unter „So funktioniert's". Bisher
  * standen sie nur als Link in der Fußzeile unter „Daten" — zum Ausprobieren
  * sind sie aber der schnellste Weg, einen fertigen Bogen samt QR-Code zu
  * sehen. Der Knopf öffnet denselben Dialog wie der Fußzeilen-Link.
@@ -431,10 +431,10 @@ function BeispielboegenStart() {
   // Der Dialog ist ein nachgeladener Baustein: Bis er offen ist, sagt der Knopf es (BB2-M5, BB2-E4).
   const [laedt, setLaedt] = useState(false);
   return (
-    <section className="start-vorlagen start-beispiele" aria-label="Beispielbögen">
-      <h2>Beispielbögen</h2>
+    <section className="start-vorlagen start-beispiele" aria-label="Übungsbögen">
+      <h2>Übungsbögen</h2>
       <p className="hinweis">
-        Ausgefüllte Bögen fiktiver Einheiten zum Ansehen und Ausprobieren, sortiert nach Organisation und
+        Ausgefüllte Bögen fiktiver Einheiten zum Üben und Ausprobieren, sortiert nach Organisation und
         Thema. Jeder lässt sich in der App öffnen, als PDF erzeugen oder als Link weitergeben.
       </p>
       <button
@@ -447,7 +447,7 @@ function BeispielboegenStart() {
           void beispielboegenOeffnen().finally(() => setLaedt(false));
         }}
       >
-        {laedt ? "Beispielbögen werden geladen …" : "Beispielbögen ansehen"}
+        {laedt ? "Übungsbögen werden geladen …" : "Übungsbögen ansehen"}
       </button>
     </section>
   );
@@ -1308,7 +1308,7 @@ function AppInhalt() {
     }
     if (!(await darfBogenErsetzen({ titel: "Bogen aus Datei öffnen?", was: "den Bogen aus der Datei", ok: "Datei öffnen" }))) return;
     const b = geladen.bogen;
-    if (b.uebung) beispielMerken(b); // Namen und Nummern aus einem Übungs-/Beispielbogen: Rückfrage beim Abwählen von „Übung" (R14-E6)
+    if (b.uebung) beispielMerken(b); // Namen und Nummern aus einem Übungs-/Übungsbogen: Rückfrage beim Abwählen von „Übung" (R14-E6)
     setBogen(b);
     setzeEmpfang(null); // Datei-Import: kein signierter Transport
     setSchritt(UEBERSICHT);
@@ -1369,7 +1369,7 @@ function AppInhalt() {
    * hätte (dann ist die Erfassung verworfen, siehe `folgenFuerOffenenBogen`).
    */
   function merkeVerdraengt(b: Erfassungsbogen, opt: { tausch?: boolean } = {}): AblageErgebnis {
-    // Unverändertes Beispiel: liegt jederzeit wieder unter „Beispielbögen" bereit.
+    // Unverändertes Beispiel: liegt jederzeit wieder unter „Übungsbögen" bereit.
     if (beispielUnveraendert(b)) return "uebersprungen";
     const alt = opt.tausch ? null : ersetztenEntwurfLaden();
     // Bearbeitung einer gespeicherten Vorlage (R3-D1): Unverändert ist sie
@@ -1441,7 +1441,7 @@ function AppInhalt() {
     if (beispielUnveraendert()) {
       const r = opt.tausch ? null : ersetztenEntwurfLaden();
       const wartet = r && !r.fremd && bogenHatInhalt(r.bogen) ? ` Dein Bogen „${einheitAnzeigename(r.bogen.einheit)}" bleibt auf der Startseite zurückholbar.` : "";
-      return { satz: `Der Beispielbogen liegt weiter unter „Beispielbögen“ bereit.${wartet}`, verlust: false };
+      return { satz: `Der Übungsbogen liegt weiter unter „Übungsbögen“ bereit.${wartet}`, verlust: false };
     }
     const alt = opt.tausch ? null : ersetztenEntwurfLaden();
     const altName = alt ? einheitAnzeigename(alt.bogen.einheit) : "";
@@ -1765,7 +1765,7 @@ function AppInhalt() {
       setBogen(null);
       setzeEmpfang(null);
       setSchritt(0);
-      setMeldung(["Beispielbogen geschlossen — er liegt weiter unter „Beispielbögen“ bereit.", eigenerBogenWartetHinweis()].filter(Boolean).join(" "));
+      setMeldung(["Übungsbogen geschlossen — er liegt weiter unter „Übungsbögen“ bereit.", eigenerBogenWartetHinweis()].filter(Boolean).join(" "));
       return;
     }
     // Verworfen heißt nicht verloren: Der Bogen wandert in dieselbe Rückholung
@@ -1825,13 +1825,13 @@ function AppInhalt() {
   }
 
   /**
-   * Beispielbogen aus der Fußzeile öffnen — bewusst derselbe Weg wie bei einem
+   * Übungsbogen aus der Fußzeile öffnen — bewusst derselbe Weg wie bei einem
    * frisch gescannten Bogen (Übersicht, keine Signatur). Er ersetzt den offenen
    * Bogen inkl. Entwurfssicherung, daher vorher rückfragen. Rückgabe false =
-   * abgelehnt, der Beispielbögen-Dialog bleibt dann offen.
+   * abgelehnt, der Übungsbögen-Dialog bleibt dann offen.
    */
   async function oeffneBeispiel(b: Erfassungsbogen): Promise<boolean> {
-    if (!(await darfBogenErsetzen({ titel: "Beispielbogen öffnen?", was: "den Beispielbogen", ok: "Beispielbogen öffnen" }))) {
+    if (!(await darfBogenErsetzen({ titel: "Übungsbogen öffnen?", was: "den Übungsbogen", ok: "Übungsbogen öffnen" }))) {
       return false;
     }
     beispielMerken(b); // erfundene Personen und Nummern (R14-E6)
@@ -1843,7 +1843,7 @@ function AppInhalt() {
     setZeigeStart(false);
     setFehler("");
     setMeldung(
-      ["Beispielbogen geöffnet — fiktive Daten zum Ansehen und Ausprobieren. Solange du nichts änderst, ersetzt das nächste Beispiel ihn ohne Rückfrage.", eigenerBogenWartetHinweis()]
+      ["Übungsbogen geöffnet — fiktive Daten zum Ansehen und Ausprobieren. Solange du nichts änderst, ersetzt der nächste Übungsbogen ihn ohne Rückfrage.", eigenerBogenWartetHinweis()]
         .filter(Boolean)
         .join(" "),
     );
@@ -2341,8 +2341,8 @@ function AppInhalt() {
               <span className="entwurf-text">
                 <strong>
                   {einheitAnzeigename(bogen.einheit)}
-                  {/* Beispiel oder Übung auf einen Blick (BB-D4, BB-E8, BB-N8). */}
-                  {bogen.uebung && <span className="uebung-badge">{beispielUnveraendert() ? "BEISPIEL" : "ÜBUNG"}</span>}
+                  {/* Mitgelieferter Übungsbogen oder eigene Übung auf einen Blick (BB-D4, BB-E8, BB-N8). */}
+                  {bogen.uebung && <span className="uebung-badge">{beispielUnveraendert() ? "ÜBUNGSBOGEN" : "ÜBUNG"}</span>}
                 </strong>
                 {/* Vorlagen-Bearbeitung: Die Karte trug denselben Titel wie der
                     eigene Bogen darunter und wurde als Doppelung verworfen (R3-D1). */}
@@ -2807,7 +2807,7 @@ function AppInhalt() {
     {bogen.uebung && (
       <div className="uebungs-band" role="status">
         <strong>ÜBUNG</strong> — Dieser Bogen ist als Übung gekennzeichnet und beschreibt keinen echten Einsatz.
-        {" "}Übungsbögen unterliegen keiner Datenschutzfrist.
+        {" "}Als Übung gekennzeichnete Bögen unterliegen keiner Datenschutzfrist.
       </div>
     )}
     <FristBand bogen={bogen} />
@@ -2820,7 +2820,7 @@ function AppInhalt() {
       tabIndex={-1}
       className={schritt === UEBERSICHT ? "ohne-nav" : undefined}
     >
-      {/* Rückmeldungen (Vorlage gespeichert, Beispielbogen geöffnet …) gehören
+      {/* Rückmeldungen (Vorlage gespeichert, Übungsbogen geöffnet …) gehören
           dorthin, wo die Aktion ausgelöst wurde. Ohne diese Zeile blieben sie
           im Assistenten unsichtbar und tauchten später unvermittelt auf der
           Startseite auf. */}
@@ -2935,7 +2935,7 @@ function AppInhalt() {
     </main>
     {/* Im Assistenten nur die Pflichtzeile: unter einem halb ausgefüllten
         Formular haben Datensicherung, „Alle Daten löschen" und die
-        Beispielbögen nichts zu suchen — die stehen auf der Startseite. */}
+        Übungsbögen nichts zu suchen — die stehen auf der Startseite. */}
     <Fusszeile onBogenOeffnen={oeffneBeispiel} kompakt />
     </>
   );

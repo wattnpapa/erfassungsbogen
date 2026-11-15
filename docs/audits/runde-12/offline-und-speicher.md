@@ -5,7 +5,7 @@ Prüfer: Rollenaudit `thw-offline-resilience-reviewer` · Datum: 2026-10-26 · Z
 Reiner Prüfbericht, keine Codeänderung. Gegen die laufende App auf Port 4173 (Produktionsbuild, `vite preview`, Code-Stand
 Commit `2c96abe`), Playwright mit Chromium (globales Modul, die Projektkopie fand keinen Browser), Telefon 390 × 844 und
 360 × 640, `isMobile`/`hasTouch`, Locale de-DE, je Lauf ein eigener Browser-Kontext. Zustände über `localStorage`-Seeds aus
-den Beispielbögen (`uebung: false`), voller Speicher sowohl per `setItem`-Stub als auch echt (Schlüssel gefüllt, bis der
+den Übungsbögen (`uebung: false`), voller Speicher sowohl per `setItem`-Stub als auch echt (Schlüssel gefüllt, bis der
 Browser ablehnt).
 
 Nicht neu gemeldet sind die bekannten Grenzen (R6-O9, R7-G4/M8, R7-G8/H9, R7-N1, R7-N9, R8-A1, R8-M6, R9-M3, R9-G5,

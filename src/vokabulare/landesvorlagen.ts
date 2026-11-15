@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 /**
- * Landesvorlagen: aus den landesrechtlichen Beispielbögen abgeleitete, im Editor
+ * Landesvorlagen: aus den landesrechtlichen Übungsbögen abgeleitete, im Editor
  * anwendbare Vorlagen für Schritt 1 — das Pendant zur code-basierten
  * THW-StAN-Vorbelegung (thw-stan-personal.ts / thw-stan-fahrzeuge.ts), nur
  * freitext-basiert und automatisch aus den vorhandenen Beispieldaten gewonnen.
@@ -11,7 +11,7 @@
  * per Glob eingelesen und steht dann als Vorlage der jeweiligen Organisation und
  * des jeweiligen Bundeslands zur Verfügung. Neue Bundesländer oder Einheiten
  * (z. B. aus künftigen StAN- oder Verordnungsunterlagen) erscheinen dadurch ohne
- * Codeänderung, sobald der Beispielbogen abgelegt ist. Der Bereich gruppiert die
+ * Codeänderung, sobald der Übungsbogen abgelegt ist. Der Bereich gruppiert die
  * Auswahlliste, weil unter derselben Organisation und demselben Bundesland zwei
  * Regelwerke stehen können (KatS-StAN und Feuerwehrverordnung des Landes).
  * Siehe docs/entwicklung.md.

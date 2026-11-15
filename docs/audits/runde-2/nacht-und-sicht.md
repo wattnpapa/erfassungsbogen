@@ -16,7 +16,7 @@ Anzeigemodus gesetzt. Zusätzlich lief ein Durchgang ohne gespeicherte Wahl,
 einmal mit `colorScheme` light und einmal mit dark. Als Zustände dienten ein
 Entwurf aus `examples/thw/014-weinsberg-fgr-oel-c.json` (Seed
 `eeb.entwurf.v1`) und eine Übungs-Sammlung „Hochwasser Neckar“. Diese habe
-ich über die Bedienung angelegt: sechs Beispielbögen über „Bögen einlesen…“,
+ich über die Bedienung angelegt: sechs Übungsbögen über „Bögen einlesen…“,
 eine Einheit abgerückt.
 
 Rolle: Helfer, der das Telefon nachts in der Fahrzeugkabine oder im Zelt

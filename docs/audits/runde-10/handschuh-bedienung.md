@@ -25,7 +25,7 @@ gemessen.
 
 Zustände per `localStorage`-Seed mit `uebung: false` und `stand` auf heute:
 `eeb.entwurf.v1` (Großbogen Verstärkter Bergungszug, 38 Personen, 10 Fahrzeuge)
-und `eeb.einsaetze.v1` (Sammlung „Hochwasser Musterstadt“, sechs Beispielbögen).
+und `eeb.einsaetze.v1` (Sammlung „Hochwasser Musterstadt“, sechs Übungsbögen).
 
 Blindprüfung: Die Berichte unter `docs/audits/` habe ich erst nach den ersten
 Messungen gelesen (Startseite, Schritte 1 bis 6 in vier Lagen, Zielgrößen und

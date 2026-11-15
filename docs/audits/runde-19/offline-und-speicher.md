@@ -6,7 +6,7 @@ Reiner Prüfbericht, keine Codeänderung. Gegen die laufende App auf Port 4173 (
 Playwright mit Chromium, Telefon 390 × 844, 360 × 640 und 320 × 568, `isMobile`/`hasTouch`, Locale de-DE, je Lauf ein eigener
 Browser-Kontext. Netz weg über `context.setOffline`, gesperrter Speicher über einen Init-Script-Stub (`localStorage` wirft
 `SecurityError`), voller Speicher durch Auffüllen von `localStorage` bis zum echten Quota-Fehler, zwei Tabs im selben Kontext.
-Beispielbögen aus `examples/thw`, alle über die Oberfläche (Dateiauswahl „Bögen einlesen…“).
+Übungsbögen aus `examples/thw`, alle über die Oberfläche (Dateiauswahl „Bögen einlesen…“).
 
 Nach dem Auftrag gelten keine „bekannten Grenzen“ mehr als ausgenommen. Gemeldet ist alles, was im Browser noch zu beobachten war.
 

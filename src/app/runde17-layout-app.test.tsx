@@ -32,7 +32,7 @@ vi.mock("./nativ", async () => {
   };
 });
 vi.mock("./pdf-qr", () => ({ qrTexteAusPdfBytes: async () => [] }));
-// Die Landesvorlagen (rund 300 Beispielbögen per Glob) braucht hier niemand; der späte Import risse nach dem Testende ab.
+// Die Landesvorlagen (rund 300 Übungsbögen per Glob) braucht hier niemand; der späte Import risse nach dem Testende ab.
 vi.mock("../vokabulare/landesvorlagen", () => ({
   bereichLabel: (s: string) => s,
   bundeslandLabel: (s: string) => s,

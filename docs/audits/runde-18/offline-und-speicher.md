@@ -7,7 +7,7 @@ Playwright mit Chromium (globales Modul), Telefon 390 × 844 und 360 × 640, `is
 Browser-Kontext. Netz weg über `context.setOffline`, CPU-Last über `Emulation.setCPUThrottlingRate`, zwei Tabs im selben Kontext,
 gesperrter Browser-Speicher über einen Init-Script-Stub (`localStorage` wirft `SecurityError`, wie im privaten Modus), voller Speicher
 durch Auffüllen von `localStorage` bis zum echten Quota-Fehler. Einsätze, Bögen, Sicherung und Sammel-PDF über die Oberfläche
-(Beispielbögen aus `examples/thw`).
+(Übungsbögen aus `examples/thw`).
 
 Nach dem Auftrag gelten keine „bekannten Grenzen“ mehr als ausgenommen. Gemeldet ist alles, was im Browser noch zu beobachten war.
 
@@ -33,7 +33,7 @@ erzeugen“ gelingt ohne fremde Hilfe.
 | Parallele Änderungen in zwei Tabs | hält | Drei Bögen aus zwei Tabs: beide Tabs und der Speicher zeigen 3, nichts überschrieben. |
 | Sicherung und Wiederherstellung | hält | Sicherung offline erzeugt (Quittung „Gesichert ist sie erst, wenn sie auf einem zweiten Gerät oder Datenträger liegt“), Speicher geleert, eingespielt: „Sicherung eingespielt“. |
 | Einsatz-Import (Sammel-PDF) | hält | Offline importiert: „3 Einheiten, davon 3 anwesend“. Erneut mit lokal geändertem Stand (eine Einheit abgerückt): „Datei war älter oder gleich: keine Änderung übernommen, dieser Stand bleibt.“ |
-| Vorratsanzeige / Themenseiten offline | hält | Netz bei 0,5 s weg: ehrlicher Satz „fehlen noch (191 von 549), sie folgen beim nächsten Netz“; Anleitung, Fachgruppe Räumen, Feuerwehr und Beispielbögen-Auswahl (Katastrophenschutz → Länderliste) laden offline. |
+| Vorratsanzeige / Themenseiten offline | hält | Netz bei 0,5 s weg: ehrlicher Satz „fehlen noch (191 von 549), sie folgen beim nächsten Netz“; Anleitung, Fachgruppe Räumen, Feuerwehr und Übungsbögen-Auswahl (Katastrophenschutz → Länderliste) laden offline. |
 | Browser sperrt Speicher, Entwurf | hält | „⚠ Nicht gespeichert — dieser Browser lässt die App nichts speichern. Jetzt „Bogen übergeben“ (PDF).“ |
 | Tabelle am Telefon (360 px) | hält | Tabelle 326 px in 360 px, kein Seitenüberlauf, Kernspalten Einheit/Stärke/Meldung vor/Bedarf. |
 | Layoutsprung der Startseite (R17-H1) | hält | Layout-Shift beim Erstbesuch und Neuladen bei 4-facher CPU-Drosselung: 0,0004 bis 0,0008, unterhalb der Wahrnehmung. |

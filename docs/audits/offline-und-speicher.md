@@ -17,7 +17,7 @@ Chromium (Playwright), 360 × 640, `isMobile`/`hasTouch`, de-DE. Erstbesuch
 online (Service Worker installiert, 108 Einträge im Cache), danach Netz
 abgeschaltet und: Seite neu geladen, Entwurf fortgesetzt, Person ergänzt,
 PDF erzeugt, Link geteilt, Scanner geöffnet (WebAssembly-Decoder),
-Beispielbögen aufgerufen, Anleitung und drei Themenseiten geöffnet, einen
+Übungsbögen aufgerufen, Anleitung und drei Themenseiten geöffnet, einen
 Bogen-Link empfangen; dann Netz zurück. Getrennt: dieselbe Meldung zweimal
 aufnehmen (Unsicherheit, ob der Scan geklappt hat) und der Speicher am
 Limit (localStorage bis auf 0 Byte gefüllt, dann Entwurf bearbeitet und in
@@ -35,7 +35,7 @@ Netz: Neustart, Bearbeiten, PDF, QR-Code, Link, Scanner samt Decoder,
 Anleitung, Themenseiten, sogar ein per Link eintreffender Bogen. Die
 Statuszeile sagt ehrlich, was gilt („bleibt auf diesem Gerät"), und eine
 versehentlich doppelt aufgenommene Meldung wird als „gleicher Inhalt"
-erkannt und übersprungen. Zwei Dinge fallen aus dem Bild: Die Beispielbögen
+erkannt und übersprungen. Zwei Dinge fallen aus dem Bild: Die Übungsbögen
 werden bei Bedarf nachgeladen und reagieren offline gar nicht. Und wenn der
 Gerätespeicher voll ist, behauptet die App „automatisch gespeichert", obwohl
 nichts gespeichert wurde — und „In Einsatz aufnehmen" verwirft den Bogen
@@ -76,9 +76,9 @@ Verifikation: Speicher füllen, Person ergänzen — die Statuszeile muss den
 Fehler nennen; „In Einsatz aufnehmen" muss scheitern, ohne den Entwurf zu
 löschen.
 
-### O2 [P2] Beispielbögen reagieren offline nicht
+### O2 [P2] Übungsbögen reagieren offline nicht
 
-Fundstelle: Fußzeile „Beispielbögen" → Organisation → „Anzeigen" / „PDF" /
+Fundstelle: Fußzeile „Übungsbögen" → Organisation → „Anzeigen" / „PDF" /
 „Link".
 Beobachtung: Der Dialog öffnet sich offline und listet alle 101 THW-Bögen;
 „Anzeigen" tut nichts — kein Bogen, keine Fehlermeldung, der Dialog bleibt.
@@ -86,14 +86,14 @@ Die Bögen liegen als einzelne JSON-Dateien auf dem Server und gehören nicht
 zum Offline-Cache (108 Einträge, keine JSON darunter).
 Erwartung der Rolle: Was die App anbietet, geht auch offline — oder sie
 sagt, dass es Netz braucht.
-Auswirkung im Einsatz: Die Beispielbögen sind der Weg, den QR-Import zu
+Auswirkung im Einsatz: Die Übungsbögen sind der Weg, den QR-Import zu
 üben und eine Vorlage nach StAN zu ziehen; genau im Bereitstellungsraum
 ohne Netz stehen sie nicht zur Verfügung, und niemand erfährt, warum.
-Empfehlung: Beispielbögen mit in den Offline-Cache nehmen (rund 450
-Dateien, kleine JSON) oder beim Öffnen ohne Netz sagen: „Beispielbögen
+Empfehlung: Übungsbögen mit in den Offline-Cache nehmen (rund 450
+Dateien, kleine JSON) oder beim Öffnen ohne Netz sagen: „Übungsbögen
 brauchen einmalig Netz — beim nächsten Aufruf mit Verbindung werden sie
 gespeichert."
-Verifikation: Offline einen Beispielbogen anzeigen — er muss erscheinen
+Verifikation: Offline einen Übungsbogen anzeigen — er muss erscheinen
 oder eine Meldung den Grund nennen.
 
 ### O3 [P3] Die Rückfrage „bereits gemeldet" kommt vor der Gleichheitsprüfung

@@ -1,12 +1,12 @@
-# Audit Beispielbögen, Runde 2 – Offline und Speicher
+# Audit Übungsbögen, Runde 2 – Offline und Speicher
 
 Prüfer: Rollenaudit `thw-offline-resilience-reviewer` · Datum: 2026-11-09 · Zählung: **P0 0 · P1 1 · P2 0 · P3 2 · Hinweise 4**
 
-Prüfgegenstand: nur der Bereich Beispielbögen auf der Live-Seite `https://erfassungsbogen.app/` (Stand `main` Commit `085a93b`).
+Prüfgegenstand: nur der Bereich Übungsbögen auf der Live-Seite `https://erfassungsbogen.app/` (Stand `main` Commit `085a93b`).
 Geprüft wurde der Stand nach der Behebung vom 08./09.11.2026 (siehe „Stand der Behebung“ in
 [../README.md](../README.md)). Neu seit Runde 1 sind vor allem: der Dialog als eigener Baustein `beispiele-dialog-*.js`, der
 erst beim ersten Öffnen lädt; der eigene Laufzeit-Cache `eeb-ov-beispiele` (4 000 Einträge) für die Bögen der Ortsverbände; die
-eingeschränkte Zusage auf der Startseite („Funktioniert komplett offline (außer den Beispielbögen der THW-Ortsverbände)“); Hinweise
+eingeschränkte Zusage auf der Startseite („Funktioniert komplett offline (außer den Übungsbögen der THW-Ortsverbände)“); Hinweise
 im Dialog, „Erneut laden“, Nachladen bei Netzrückkehr, Platzhalter für den OV-Ordner, die Suche, der gemerkte Ordner
 (`sessionStorage` `eeb.beispiel-pfad.v1`) und „Alle … in eine Übungs-Sammlung“.
 
@@ -40,11 +40,11 @@ Kontrast); P3 nur bei echter Beeinträchtigung der Aufgabe, Geschmacksfragen unt
 
 ## Annahmen
 
-- Wie in Runde 1: Die Beispielbögen sind Ausbildungs- und Vorführmaterial, kein Einsatzweg. Ich nehme an, dass sie auch dort
+- Wie in Runde 1: Die Übungsbögen sind Ausbildungs- und Vorführmaterial, kein Einsatzweg. Ich nehme an, dass sie auch dort
   gezeigt werden, wo kein Netz ist, und dass ein Helfer den Bogen seines eigenen OV als Muster öffnet.
 - Für BB2-O1 nehme ich an, dass Erstbesuche in schwachem Netz vorkommen, etwa bei einem neuen Helfer, der per Link oder QR-Code
   am Übungsgelände kommt. Der Kern-Vorrat (8,0 MB) braucht auch ungedrosselt 26,7 s, bei schwachem Mobilfunk Minuten. Ob in
-  dieser Zeit jemand die Beispielbögen öffnet, ist nicht belegt. Sie stehen aber als Primärknopf auf der Startseite.
+  dieser Zeit jemand die Übungsbögen öffnet, ist nicht belegt. Sie stehen aber als Primärknopf auf der Startseite.
 
 ## Nicht prüfbar
 
@@ -62,7 +62,7 @@ ehrlich. Fehlerzeile, Mitrollen und Netzrückkehr verhalten sich wie gewünscht.
 „Alle … in eine Übungs-Sammlung“ gehen offline.
 
 Die neue Reibung kommt aus dem Nachladen des Dialogs. **Vor** „offline bereit“ ist der Baustein noch nicht auf dem Gerät. Wer
-dann ohne Netz „Beispielbögen ansehen“ antippt, verliert die ganze App an einen Fehlerschirm. Dessen Knöpfe „Seite neu laden“
+dann ohne Netz „Übungsbögen ansehen“ antippt, verliert die ganze App an einen Fehlerschirm. Dessen Knöpfe „Seite neu laden“
 und „Zur Startseite“ führen ohne Netz zur Fehlerseite des Browsers (BB2-O1). In Runde 1 öffnete der Dialog in dieser Lage
 nach 115 ms. Kleiner: Scheitert nur der OV-Baustein einmal, kommt der Ordner trotz Zusage auch mit Netz nicht wieder (BB2-O2).
 Bei langsamem Erstbesuch fehlt jede Rückmeldung zum Laden, und der Platzhalter für den OV-Ordner erscheint nicht (BB2-O3). Nach
@@ -82,7 +82,7 @@ Bei langsamem Erstbesuch fehlt jede Rückmeldung zum Laden, und der Platzhalter 
 
 ### BB-O1 – teilweise behoben
 
-- **Gemessen:** Startseite nach Erstbesuch: „✓ Jetzt offline bereit. Funktioniert komplett offline (außer den Beispielbögen der
+- **Gemessen:** Startseite nach Erstbesuch: „✓ Jetzt offline bereit. Funktioniert komplett offline (außer den Übungsbögen der
   THW-Ortsverbände)“. Offline nach Neuladen steht „✓ Funktioniert komplett offline (außer …)“. In jedem Ordner unter „Alle
   Einheiten aller Ortsverbände“ steht oben: „Die Bögen der THW-Ortsverbände lädt die App nicht vorab: Ein Bogen braucht beim
   ersten Öffnen Netz und bleibt danach auf dem Gerät.“ Die Sammelmeldung und die Meldungen der Knöpfe tragen denselben Satz.
@@ -143,7 +143,7 @@ im ersten Bildschirm (`05_offline_ov_westerstede.png`). Meldungen nach einem Kno
 
 ### P1
 
-#### BB2-O1 – Vor „offline bereit“ ersetzt „Beispielbögen ansehen“ ohne Netz die ganze App durch einen Fehlerschirm ohne Ausweg
+#### BB2-O1 – Vor „offline bereit“ ersetzt „Übungsbögen ansehen“ ohne Netz die ganze App durch einen Fehlerschirm ohne Ausweg
 
 - **Priorität:** P1
 - **Typ:** Bedienung (Ablauf ohne Netz nicht fortsetzbar)
@@ -151,11 +151,11 @@ im ersten Bildschirm (`05_offline_ov_westerstede.png`). Meldungen nach einem Kno
   zweimal, Ergebnis gleich)
 - **Neu oder alt (Verweis):** neu, Folge der Auslagerung des Dialogs in `beispiele-dialog.tsx` („Stand der Behebung“, letzter
   Absatz). In Runde 1 öffnete der Dialog in derselben Lage (erstes Laden, gedrosselt) nach 115 ms.
-- **Fundstelle:** Startseite, Abschnitt „Beispielbögen“, Knopf „Beispielbögen ansehen“; `src/app/fusszeile.tsx`
+- **Fundstelle:** Startseite, Abschnitt „Übungsbögen“, Knopf „Übungsbögen ansehen“; `src/app/fusszeile.tsx`
   (`lazy(() => import("./beispiele-dialog"))` in `<Suspense fallback={null}>` ohne eigenen Fehlerfänger);
   `src/app/fehlerfaenger.tsx` (Fehlerschirm um die ganze App).
 - **Beobachtung:** Die Offline-Zeile sagt korrekt „⚠ Noch nicht offline bereit (0,0 von 8,0 MB geladen) — ohne Netz diese Seite
-  nicht neu laden …“. Nach dem Antippen von „Beispielbögen ansehen“ scheitert der Abruf von
+  nicht neu laden …“. Nach dem Antippen von „Übungsbögen ansehen“ scheitert der Abruf von
   `assets/beispiele-dialog-bw_VuAYn.js` („Failed to fetch dynamically imported module“). Die **ganze Startseite** verschwindet.
   An ihrer Stelle steht „Hier ist etwas schiefgelaufen · Ein Teil der App konnte ohne Netz nicht geladen werden. Das Gerät meldet
   gerade keine Verbindung. Deine Daten und dein Einsatz sind unversehrt …“ mit dem Primärknopf „Seite neu laden“, darunter „Zur
@@ -166,13 +166,13 @@ im ersten Bildschirm (`05_offline_ov_westerstede.png`). Meldungen nach einem Kno
 - **Erwartung der Rolle:** Ein Knopf, der gerade nicht geht, sagt „geht erst mit Netz“. Der Rest der App bleibt, wie er war,
   vor allem der Bogen, an dem ich arbeite.
 - **Folge:** Ein neuer Helfer öffnet die Seite am Übungsgelände bei schwachem Netz und tippt auf den auffälligen Knopf
-  „Beispielbögen ansehen“. Ab da hat er keine App mehr, auch nicht für den eigenen Bogen, bis wieder Netz da ist. Die Knöpfe
+  „Übungsbögen ansehen“. Ab da hat er keine App mehr, auch nicht für den eigenen Bogen, bis wieder Netz da ist. Die Knöpfe
   des Fehlerschirms führen ihn ins Leere. Die Daten liegen weiter in `localStorage` und gehen nicht verloren, sind aber bis
   zur nächsten Verbindung nicht erreichbar. Das Zeitfenster reicht ungedrosselt 27 s, bei schwachem Mobilfunk mehrere Minuten.
 - **Empfehlung:** Ein gescheitertes Nachladen des Dialogs darf nur den Dialog betreffen. Am Knopf oder in einer kurzen Meldung
-  „Beispielbögen gehen erst, wenn die App offline bereit ist (siehe Offline-Zeile)“ sagen und den nächsten Versuch zulassen.
+  „Übungsbögen gehen erst, wenn die App offline bereit ist (siehe Offline-Zeile)“ sagen und den nächsten Versuch zulassen.
   Ein Fehlerschirm, der ohne Netz und ohne fertigen Vorrat erscheint, sollte nicht „Seite neu laden“ als Hauptweg anbieten.
-- **Nachprüfung:** Frisches Profil, Seite laden, vor „Bogen, PDF, QR-Code und Empfang gehen offline“ Netz hart weg, „Beispielbögen
+- **Nachprüfung:** Frisches Profil, Seite laden, vor „Bogen, PDF, QR-Code und Empfang gehen offline“ Netz hart weg, „Übungsbögen
   ansehen“ tippen: Startseite bleibt bedienbar, eine Meldung erklärt den Grund. Nach Netzrückkehr öffnet derselbe Knopf den
   Dialog ohne Neuladen.
 
@@ -185,7 +185,7 @@ im ersten Bildschirm (`05_offline_ov_westerstede.png`). Meldungen nach einem Kno
 - **Kennzeichnung:** gemessen, nachgestellt (`s9.js`: nur `beispiele-thw-ov-*.js` per `route.abort` gesperrt, danach Sperre
   aufgehoben und `online`-Ereignis ausgelöst, dreimal; nur Chromium)
 - **Neu oder alt (Verweis):** neu (Nachladen bei Netzrückkehr seit Nr. 2 der Behebung, BB-E3)
-- **Fundstelle:** Dialog „Beispielbögen“, Register und Ordner „THW“; `ovBeispieleLaden` mit `window.addEventListener("online",
+- **Fundstelle:** Dialog „Übungsbögen“, Register und Ordner „THW“; `ovBeispieleLaden` mit `window.addEventListener("online",
   laden)` in `beispiele-dialog.tsx`.
 - **Beobachtung:** Der Hinweis „Ohne Netz fehlt unter „THW“ der Ordner „Alle Einheiten aller Ortsverbände“. Er erscheint, sobald
   das Netz zurück ist.“ steht wie vorgesehen (`16_ov_baustein_fehlt.png`). Nach Netzrückkehr wurde das `online`-Ereignis einmal
@@ -207,7 +207,7 @@ im ersten Bildschirm (`05_offline_ov_westerstede.png`). Meldungen nach einem Kno
 - **Typ:** Bedienung
 - **Kennzeichnung:** gemessen (`s8.js`: Dialog-Baustein um 4 s verzögert; `s10.js`: OV-Baustein um 5 s verzögert)
 - **Neu oder alt (Verweis):** (a) neu, Folge der Auslagerung; (b) Rest von Runde 1 H2 bzw. Nr. 11 der Behebung (BB-S5, BB-H10)
-- **Fundstelle:** (a) Knopf „Beispielbögen ansehen“, `<Suspense fallback={null}>` in `fusszeile.tsx`; (b) Dialog → „THW“.
+- **Fundstelle:** (a) Knopf „Übungsbögen ansehen“, `<Suspense fallback={null}>` in `fusszeile.tsx`; (b) Dialog → „THW“.
   Der Platzhalter „wird geladen …“ steht in `beispiele-dialog.tsx` innerhalb der Register-Liste, und die erscheint nur, wenn
   es schon Unterordner gibt (`beispielOrdner.length > 0`). Unter „THW“ gibt es vor dem Baustein keinen.
 - **Beobachtung:** (a) Nach dem Antippen passiert 4,6 s lang sichtbar nichts. Der Knopf bleibt unverändert, ohne Ladezeichen
@@ -235,11 +235,11 @@ im ersten Bildschirm (`05_offline_ov_westerstede.png`). Meldungen nach einem Kno
   (Weg B), und dort ist er der einzige Weg, weil das Telefon in einem WLAN ohne Internet kein `online`-Ereignis schickt.
 - **H3 – Wie man einen OV mitnimmt, steht nirgends:** „Ein Bogen braucht beim ersten Öffnen Netz“ legt nahe, jeden Bogen einzeln
   anzuzeigen. Tatsächlich reicht es, den OV-Ordner einmal mit Netz zu öffnen und zu warten, bis die Angaben geladen sind.
-  Umgekehrt sagt die Offline-Zeile auch dann noch „außer den Beispielbögen der THW-Ortsverbände“, wenn alle 3 529 auf dem Gerät
+  Umgekehrt sagt die Offline-Zeile auch dann noch „außer den Übungsbögen der THW-Ortsverbände“, wenn alle 3 529 auf dem Gerät
   liegen (siehe BB-O1, offen).
 - **H4 – Speicherbedarf (Runde 1 H3, offen):** Nach „offline bereit“ schätzt der Browser 18,6 MB, nach dem Abruf aller OV-Bögen
   54,0 MB (die Dateien selbst 6,1 MB, der Rest ist Verwaltungsaufwand bzw. Aufrundung des Browsers). `eeb-ov-beispiele` hat keine
-  Altersgrenze. Die App sagt weiter nirgends, wie viel die Beispielbögen belegen und wie man sie wieder loswird.
+  Altersgrenze. Die App sagt weiter nirgends, wie viel die Übungsbögen belegen und wie man sie wieder loswird.
 
 ## Abschluss
 
@@ -249,7 +249,7 @@ im ersten Bildschirm (`05_offline_ov_westerstede.png`). Meldungen nach einem Kno
   nicht klar.
 - **Größtes Missverständnis:** Der Fehlerschirm empfiehlt „Seite neu laden“, obwohl die Offline-Zeile eben noch „ohne Netz diese
   Seite nicht neu laden“ gesagt hat.
-- **Größtes Einsatzrisiko:** Ein einziger Tipp auf „Beispielbögen ansehen“ im Funkloch vor „offline bereit“ nimmt dem Helfer
+- **Größtes Einsatzrisiko:** Ein einziger Tipp auf „Übungsbögen ansehen“ im Funkloch vor „offline bereit“ nimmt dem Helfer
   bis zur nächsten Verbindung die ganze App, auch den eigenen Bogen (BB2-O1).
 - **Top-Priorität für die nächste Iteration:** BB2-O1: Scheitert das Nachladen des Dialogs, darf das nur den Dialog betreffen,
   mit einem verständlichen Hinweis und einem neuen Versuch bei Netz.

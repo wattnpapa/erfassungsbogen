@@ -21,7 +21,7 @@ Die Funkrufnamen folgen dem OPTA-Schema Niedersachsen mit dem Kennwort
 „Rotkreuz": die örtliche Kennung (87) ist frei erfunden, Fahrzeug- und
 Ordnungskennung entsprechen Anlage 2 des Erlasses — sie tragen den Fahrzeugtyp
 und sind damit die eigentliche Aussage. Genauso halten es die
-KatS-Beispielbögen der Länder.
+KatS-Übungsbögen der Länder.
 
 Neu erzeugen mit: `npm run beispiele:drk-nds` (deterministisch, fester Zufalls-Seed).
 

@@ -24,7 +24,7 @@ Lagemonitor das Fenster, das „Lagemonitor öffnen" selbst aufmacht. Jeder Lauf
 hatte einen eigenen Browser-Kontext; elf weitere Prüfer nutzten den Server
 gleichzeitig. Die Geräteuhr der Testumgebung stand auf dem 24.10.2026; alle
 Seeds tragen `uebung: false` und einen Stand auf die Minute des Laufs, die
-Einsatzzeiträume der Beispielbögen liegen teils in der Vergangenheit (dann
+Einsatzzeiträume der Übungsbögen liegen teils in der Vergangenheit (dann
 erscheinen „Zeitraum vorbei" und „Anderer Einsatz?", das ist eine Folge der
 Seeds und kein Befund). Die Tipp-Sperre habe ich in den Skripten meist mit 1,5 s
 oder mehr eingehalten; wo ein Tipp früher kam, steht es im Abgleich.
@@ -209,7 +209,7 @@ ersten nennt beide Werte.
 Bild)
 
 **Fundstelle / Aufgabe:** „Bogen übergeben… → PDF erzeugen" mit Bogen, dessen
-erste Person „Мария Иванова" heißt (Beispielbogen `001`, zwei Personen geändert:
+erste Person „Мария Иванова" heißt (Übungsbogen `001`, zwei Personen geändert:
 „Мария Иванова", „Zoë Łukasz"). Code: PDF-Ausgabe und Quittung zu nicht
 darstellbaren Zeichen.
 

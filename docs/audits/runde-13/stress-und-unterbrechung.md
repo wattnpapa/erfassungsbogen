@@ -15,7 +15,7 @@ Playwright (global, `/opt/node22/lib/node_modules/playwright`),
 Viewports 360 × 640 und 390 × 844 (je eigener Browser-Kontext). Tipps mit
 `tap`/`touchscreen.tap`, Unterbrechung mit `reload()`, Zurück-Geste mit
 `goBack()`, zweiter Tab im selben Kontext, `setOffline(true)`. Zustände über die
-Oberfläche („Neue Einsatz-Sammlung…“, „Bögen einlesen…“ mit Beispielbögen aus
+Oberfläche („Neue Einsatz-Sammlung…“, „Bögen einlesen…“ mit Übungsbögen aus
 `examples/thw/`, „Einheit manuell erfassen…“, Schnellerfassung). Skripte im
 Scratchpad unter `.../scratchpad/r13/`.
 
@@ -34,7 +34,7 @@ abgeleitet, nicht nachgestellt.
 **Nicht geprüft:** echte Kamera, Lärm, Handschuhe, echte Bildschirmtastatur
 (damit auch das Verhalten der Zurück-Taste bei offener Tastatur), WebKit,
 native Builds, Zwei-Geräte-Abgleich, 180 × 320, Tablet. Die Tipp-Sperre bei
-Ausgaben (R12-G2) ließ sich mit den Übungs-Beispielbögen nicht nachstellen
+Ausgaben (R12-G2) ließ sich mit den Übungs-Übungsbögen nicht nachstellen
 (kein Download ausgelöst) und ist daher nicht bestätigt.
 
 ## Urteil

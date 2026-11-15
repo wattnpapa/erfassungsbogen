@@ -116,14 +116,14 @@ P0: keine. P1: keine. P2: eine. P3: eine.
 
 ## Bestätigtes
 
-- **Erstladen und Bereitschaft:** Zeile „✓ Jetzt offline bereit für Bogen, PDF, QR-Code und Empfang. Beispielbögen und
+- **Erstladen und Bereitschaft:** Zeile „✓ Jetzt offline bereit für Bogen, PDF, QR-Code und Empfang. Übungsbögen und
   Themenseiten werden nachgeladen (92 von 508)“ nach 5 s, „… Funktioniert komplett offline“ nach rund 15 s (Last durch
   andere Prüfer). Zu früh offline (4,0 von 6,9 MB): „⚠ Noch nicht offline bereit … ohne Netz diese Seite nicht neu
   laden; beim nächsten Netz wird der Rest geladen“; Neuladen schlägt dann tatsächlich fehl, die Warnung stimmt. Nach
-  Neuladen ohne Netz nennt die Zeile die Lücke („Beispielbögen und Themenseiten fehlen noch (43 von 508), sie folgen beim
+  Neuladen ohne Netz nennt die Zeile die Lücke („Übungsbögen und Themenseiten fehlen noch (43 von 508), sie folgen beim
   nächsten Netz“).
-- **Beispielbögen ohne Vorrat:** Bei toter Leitung zeigt die Liste je Bogen „nicht geladen“, und „Anzeigen“, „PDF“, „Link“
-  antworten mit „… konnte nicht … werden: Dieser Beispielbogen liegt noch nicht auf dem Gerät — Beispielbögen werden nach
+- **Übungsbögen ohne Vorrat:** Bei toter Leitung zeigt die Liste je Bogen „nicht geladen“, und „Anzeigen“, „PDF“, „Link“
+  antworten mit „… konnte nicht … werden: Dieser Übungsbogen liegt noch nicht auf dem Gerät — Übungsbögen werden nach
   dem ersten Laden mit Netz nachgeladen (siehe Offline-Zeile der Startseite)“.
 - **Themenseiten im Funkloch (R7-O6):** Proxy *hängt*, Vorrat voll: `thw.html` 502 ms, `datenschutz.html` 503 ms,
   `feuerwehr.html` 853 ms, `anleitung.html` 677 ms, `meldekopf.html` 992 ms bis zum ersten Inhalt (inklusive Öffnen der

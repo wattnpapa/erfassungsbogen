@@ -34,7 +34,7 @@ heute: Entwurf (`eeb.entwurf.v1`) aus `examples/thw/` (Bergungsgruppe Ulm mit
 7 QR-Teilen, dazu auf 9, 12 und 13 Personen gekürzt), Vorlage
 (`eeb.vorlagen.v1`, der Großbogen), Einsatz-Sammlung mit sechs THW-Bögen
 (`eeb.einsaetze.v1`) und ein Uhrstand (`eeb.uhr.v1`) 100 Tage zurück bei einer
-100 Tage alten Sammlung. Dass die Beispielbögen einen vergangenen
+100 Tage alten Sammlung. Dass die Übungsbögen einen vergangenen
 Einsatzzeitraum tragen („Zeitraum vorbei“, „Anderer Einsatz?“), ist
 Seed-Wirkung und kein Befund. Skripte und Bilder liegen im Scratchpad unter
 `runde7/`.
@@ -308,7 +308,7 @@ Personen (Großbogen gekürzt). Code: `src/app/schritte/personal.tsx`.
 **Beobachtung:** 9 Personen: 14 481 px (Karten, rund 23 Bildschirme);
 12 Personen: 18 760 px (29 Bildschirme); 13 Personen: 3 876 px (Kurz-Liste
 ist Voreinstellung); 38 Personen: 8 826 px. Die Schwelle 13 und die Länge der
-Karten sind unverändert gegenüber Runde 6. Die Beispielbögen tragen
+Karten sind unverändert gegenüber Runde 6. Die Übungsbögen tragen
 Zusatzqualifikationen und Kontakte, deshalb liegen die Werte über Runde 6.
 
 **Erwartung der Rolle:** Wer eine Person ändern will, findet sie ohne 20
@@ -496,7 +496,7 @@ Dort zuerst festgehalten, von mir hier nachgemessen, nicht doppelt gezählt:
 - **Offline-Zeile:** Erster Besuch: „⏳ Wird für den Offline-Betrieb geladen:
   1,9 von 6,9 MB — bitte mit Netz geöffnet lassen. Danach gehen Bogen, PDF,
   QR-Code und Empfang ohne Netz.“ Danach: „✓ Jetzt offline bereit für Bogen,
-  PDF, QR-Code und Empfang. Beispielbögen und Themenseiten werden nachgeladen
+  PDF, QR-Code und Empfang. Übungsbögen und Themenseiten werden nachgeladen
   (19 von 508) — alle Daten bleiben auf diesem Gerät.“ Die Zeile trennt den
   Kernweg (bereit) vom Nachladen, das ist für den Helfer richtig.
 - **Meldekopf:** Sammlung zeigt oben „6 Einheiten · 1 Führer · 15 Unterf. · 43

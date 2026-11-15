@@ -12,7 +12,7 @@ die Befundüberschriften aller früheren Analog-first-Berichte (R2 bis R11).
 
 Playwright (Chromium, `chromium.launch()` ohne Optionen; die Projektkopie fand keinen Browser, das globale
 Playwright-Modul schon), `isMobile`/`hasTouch`, Locale de-DE, Telefon 390 × 844 und 360 × 640, jeweils frischer
-Kontext. Einsatz-Sammlung „Hochwasser Test" mit 6 THW-Beispielbögen aus `examples/thw/` (auf `uebung: false`), über
+Kontext. Einsatz-Sammlung „Hochwasser Test" mit 6 THW-Übungsbögen aus `examples/thw/` (auf `uebung: false`), über
 „Bögen einlesen…". Durchgespielt: „Zur Kenntnis genommen", Aufklappen/Hinweise, „Meldung entfernen" (Rückfrage mit
 Nummernfolge), „Einheit manuell erfassen…" mit „Angaben vom Zettel" (Nr. 2 doppelt, Uhrzeit 23:50, Zug), „Stärke fehlt"-
 Rückfrage, Abrücken mit Quittung, Lageblatt (6 Einheiten; mit 1 Abgerückten), Sammel-PDF (13 Seiten), Blanko-Vordruck,
@@ -23,7 +23,7 @@ Bogen aus Datei mit frischem Stand, „Bogen übergeben", Neuladen offline (`set
 Geräteausfall weiter an der Wand; die Sammel-PDF wird als Übergabe an die Ablösung gedruckt.
 
 **Nicht prüfbar:** echtes Drucken, Kamera- und Handscanner, Safari, native Builds, echte Akku- oder Geräteausfälle.
-Die Beispielbögen tragen Stände von Mitte Juli; dadurch greift die Datenschutzfrist (über 90 Tage). Das ist hier
+Die Übungsbögen tragen Stände von Mitte Juli; dadurch greift die Datenschutzfrist (über 90 Tage). Das ist hier
 genau der geprüfte Fall, kein Seed-Artefakt: Ein Bogen mit solchem Stand wird im Einsatz genauso behandelt.
 
 **Bekannte Grenzen, nicht neu gemeldet:** alle in der Aufgabe genannten (R6-O9 bis R11-M3). Der Tipp auf „Einsatz

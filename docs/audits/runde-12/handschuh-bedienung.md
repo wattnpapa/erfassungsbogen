@@ -23,7 +23,7 @@ de-DE, je Lauf ein eigener Browser-Kontext. Viewports 390 × 844 und 360 × 640
 280 px, dazu 180 × 320 für die Dialoge. Zustände per `localStorage`-Seed
 (`eeb.entwurf.v1`: Bogen „THW Albstadt Zugtrupp Technischer Zug“ mit 4 Personen,
 2 Fahrzeugen, Stand „jetzt“, damit die Datenschutzfrist nicht anspringt;
-`eeb.einsaetze.v1`: Sammlung „Hochwasser Musterstadt“ mit sechs Beispielbögen,
+`eeb.einsaetze.v1`: Sammlung „Hochwasser Musterstadt“ mit sechs Übungsbögen,
 `uebung: false`).
 
 Gemessen sind Rechtecke per `getBoundingClientRect` (Maßstab 44 px Kante, 8 px
@@ -36,7 +36,7 @@ Sichtbarkeit nach dem Antippen, auch mit niedriger Tastatur); Erfassung im Einsa
 („Einheit manuell erfassen…“, Zettelangaben, „In Einsatz übernehmen“); Schnellerfassung;
 Einsatzansicht (Karten, Tabelle, aufgeklappte Karte, „Mehr…“, „Abrücken“ mit Quittung,
 „Stärke ändern…“, „Aufteilen…“, „Entfernen“, „Verschieben…“); Scanner ohne Kamera;
-Dialoge „Bogen übergeben…“, „Einsatz löschen…“, „Datensicherung“, „Beispielbögen“,
+Dialoge „Bogen übergeben…“, „Einsatz löschen…“, „Datensicherung“, „Übungsbögen“,
 „Alle Daten löschen“; Ansicht „Feld“; Querformat; alle Ausgaben der Einsatzansicht
 (Sammel-PDF, Lageblatt, Blanko, CSV, Excel) und die Bestätigungsknöpfe der Rückfragen auf
 Doppeltipp.

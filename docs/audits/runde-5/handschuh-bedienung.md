@@ -28,7 +28,7 @@ Zustände per `localStorage`-Seed, jeweils mit `uebung: false`:
   `examples/thw/grossbogen-verstaerkter-bergungszug.json` für das mehrteilige
   QR-Vollbild (7 Teile).
 - `eeb.einsaetze.v1` mit einer Sammlung „Hochwasser Musterstadt“ aus sechs
-  Beispielbögen (001, 003, 009, 013, 016, 052).
+  Übungsbögen (001, 003, 009, 013, 016, 052).
 - `eeb.vorlagen.v1` habe ich nicht gebraucht.
 
 Gemessen habe ich alle sichtbaren Bedienelemente per `getBoundingClientRect`

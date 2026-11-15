@@ -49,7 +49,7 @@ Hinweis zum Prüfwerkzeug: Ein „Weiter"-Tipp kurz (unter etwa einer Sekunde) n
 einem Schrittwechsel wurde unter Last mehrfach nicht angenommen („Einen Moment …"
 unten rechts). Mit 1,5 bis 2 s Abstand ging jeder Tipp durch. Das ist der bekannte
 Prellschutz (R8-H5/S4), kein neuer Befund. Die Seeds tragen die Zeiträume der
-Beispielbögen (Juli 2026); „Zeitraum vorbei" und „Anderer Einsatz?" an allen
+Übungsbögen (Juli 2026); „Zeitraum vorbei" und „Anderer Einsatz?" an allen
 Karten sind dadurch bedingt und nicht gewertet.
 
 ## Urteil

@@ -81,7 +81,7 @@ export interface OfflineZustand {
   online: boolean;
   /** Erste Stufe (Kern) beim Laden: Bytes im Vorrat / gesamt (R3-O3). */
   kern?: { geladen: number; gesamt: number } | null;
-  /** Zweite Stufe (Beispielbögen, Themenseiten): Dateien da / gesamt. */
+  /** Zweite Stufe (Übungsbögen, Themenseiten): Dateien da / gesamt. */
   zusatz?: { fertig: number; gesamt: number } | null;
   /**
    * Das Nachladen der zweiten Stufe hakt: Abrufe scheiterten, ein neuer Versuch
@@ -314,7 +314,7 @@ export function useOfflineStand(): OfflineZustand {
 
 /**
  * Die Zeile ist noch nicht in ihrer Endfassung (R17-H1): Sie wechselt in den ersten Sekunden mehrfach zwischen zwei und sechs
- * Zeilen (Laden, „bereit", Beispielbögen n von m) und schob Knöpfe darüber oder darunter um 42 bis 58 px. Solange es so ist,
+ * Zeilen (Laden, „bereit", Übungsbögen n von m) und schob Knöpfe darüber oder darunter um 42 bis 58 px. Solange es so ist,
  * hält das Stylesheet (`.offline-offen`) die Höhe der längsten Fassung frei; nur der Wechsel auf die Endfassung ändert sie noch.
  */
 export function offlineZeileOffen(s: OfflineZustand): boolean {
@@ -372,7 +372,7 @@ export function offlineText(s: OfflineZustand): string {
   const Daten = daten.charAt(0).toUpperCase() + daten.slice(1);
   if (s.stand === "bereit") {
     // Zweite Stufe noch unvollständig: Bogen, PDF, QR und Empfang gehen
-    // schon ohne Netz, Beispielbögen und Themenseiten folgen (R3-O3).
+    // schon ohne Netz, Übungsbögen und Themenseiten folgen (R3-O3).
     if (s.zusatz && s.zusatz.fertig < s.zusatz.gesamt) {
       // R20-N7: „Jetzt offline bereit" erst, wenn alles geladen ist – hier steht nur, dass der Kern bereit ist,
       // und der Rest getrennt als „lädt noch".
@@ -380,24 +380,24 @@ export function offlineText(s: OfflineZustand): string {
       // Hakt das Nachladen, sagt die Zeile es und dass der Versuch weiterläuft
       // (R5-O2) — „werden nachgeladen" bei stehendem Zähler war falsch.
       if (s.online && s.zusatzHakt) {
-        return `${kopf}. Rest (Beispielbögen, Themenseiten): ${s.zusatz.fertig} von ${s.zusatz.gesamt} da, das Netz hakt — der nächste Versuch läuft von selbst — ${daten}`;
+        return `${kopf}. Rest (Übungsbögen, Themenseiten): ${s.zusatz.fertig} von ${s.zusatz.gesamt} da, das Netz hakt — der nächste Versuch läuft von selbst — ${daten}`;
       }
       return s.online
-        ? `${kopf}. Rest lädt noch (Beispielbögen, Themenseiten): ${s.zusatz.fertig} von ${s.zusatz.gesamt} — ${daten}`
-        : `${kopf}. Rest fehlt noch (Beispielbögen, Themenseiten): ${s.zusatz.fertig} von ${s.zusatz.gesamt}, folgt beim nächsten Netz — ${daten}`;
+        ? `${kopf}. Rest lädt noch (Übungsbögen, Themenseiten): ${s.zusatz.fertig} von ${s.zusatz.gesamt} — ${daten}`
+        : `${kopf}. Rest fehlt noch (Übungsbögen, Themenseiten): ${s.zusatz.fertig} von ${s.zusatz.gesamt}, folgt beim nächsten Netz — ${daten}`;
     }
     // Zweite Stufe noch nicht gezählt (gleich nach dem Aktivieren, oder das
     // Verzeichnis der Stufen fehlt): sicher ist nur der Kern. Vorher stand hier
-    // kurz „komplett offline", obwohl noch keine Beispielbögen im Gerät lagen.
+    // kurz „komplett offline", obwohl noch keine Übungsbögen im Gerät lagen.
     if (s.zweiStufen && !s.zusatz) {
-      return `✓ Bogen, PDF, QR-Code und Empfang gehen offline. Der Rest (Beispielbögen, Themenseiten) wird noch gezählt — ${daten}`;
+      return `✓ Bogen, PDF, QR-Code und Empfang gehen offline. Der Rest (Übungsbögen, Themenseiten) wird noch gezählt — ${daten}`;
     }
     // Prüfrunde Beispielbögen (BB-S1, BB-O1): Die Bögen der THW-Ortsverbände
     // lädt die App nie vorab (precache-aufteilung.ts, istNurAufAbruf). Die
     // Zeile nennt die Ausnahme, statt „komplett" ohne Einschränkung zu sagen.
     return s.frischBereit
-      ? `✓ Jetzt offline bereit. Funktioniert komplett offline (außer den Beispielbögen der THW-Ortsverbände) — ${daten}`
-      : `✓ Funktioniert komplett offline (außer den Beispielbögen der THW-Ortsverbände) — ${daten}`;
+      ? `✓ Jetzt offline bereit. Funktioniert komplett offline (außer den Übungsbögen der THW-Ortsverbände) — ${daten}`
+      : `✓ Funktioniert komplett offline (außer den Übungsbögen der THW-Ortsverbände) — ${daten}`;
   }
   if (s.stand === "ohne") {
     return `Offline-Vorrat ist in diesem Browser nicht möglich (etwa im Privatmodus) — ohne Netz lässt sich die Seite nicht neu laden. ${Daten}`;

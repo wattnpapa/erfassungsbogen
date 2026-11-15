@@ -1,8 +1,8 @@
-# Prüfbericht Schwerpunkt Beispielbögen: Arbeitsablauf
+# Prüfbericht Schwerpunkt Übungsbögen: Arbeitsablauf
 
 - **Prüfer:** Rolle „Arbeitsablauf“ (thw-workflow-reviewer). Ich spiele drei Personen nacheinander: den Ausbilder, der eine Übung vorbereitet, den Teilnehmer, der eine Einheit spielt, und den Meldekopf, der die Bögen aufnimmt.
 - **Datum:** 2026-11-08
-- **Prüfgegenstand:** Nur der Bereich Beispielbögen auf der Live-Seite `https://erfassungsbogen.app/`, Stand `main` Commit `0dd56d4` (Fußzeile `v2026.1108.2056`). Geprüft sind der Abschnitt „Beispielbögen“ auf der Startseite mit dem Knopf „Beispielbögen ansehen“, der Dialog „Beispielbögen“ (Erklärung, Register, Pfadleiste, tiefe Ordner, Tabelle und Karten, Ladezustand) und alles, was danach kommt: „Anzeigen“, „PDF“ und „Link“. Dazu die Folgeschritte Vorlage, Einsatz-Sammlung und Rückweg.
+- **Prüfgegenstand:** Nur der Bereich Übungsbögen auf der Live-Seite `https://erfassungsbogen.app/`, Stand `main` Commit `0dd56d4` (Fußzeile `v2026.1108.2056`). Geprüft sind der Abschnitt „Übungsbögen“ auf der Startseite mit dem Knopf „Übungsbögen ansehen“, der Dialog „Übungsbögen“ (Erklärung, Register, Pfadleiste, tiefe Ordner, Tabelle und Karten, Ladezustand) und alles, was danach kommt: „Anzeigen“, „PDF“ und „Link“. Dazu die Folgeschritte Vorlage, Einsatz-Sammlung und Rückweg.
 - **Code zum Nachschlagen (nicht geändert):** `src/app/fusszeile.tsx` (Dialog, `beispielAnsehen`, `beispielHolen`, `beispielLinkHolen`, `beispieleOeffnen`), `src/app/app.tsx` (`BeispielboegenStart`, `oeffneBeispiel`), Stile in `index.html`.
 - **Maßstab:** Der ganze Ablauf zählt mehr als der einzelne Bildschirm. Je Ursache gibt es einen Befund. Geschmacksfragen stehen unter den Hinweisen.
 - **Zählung:** P0: 0 · P1: 2 · P2: 4 · P3: 4 · Hinweise (ohne Priorität): 6
@@ -12,7 +12,7 @@
 - Playwright (`require('playwright')`, `chromium.launch()` ohne Optionen), Locale de-DE, `deviceScaleFactor` 1, `hasTouch`. Für 360 × 640 zusätzlich `isMobile`. Jeder Lauf startet mit einem frischen Profil gegen die Live-Seite. Skripte und Bildschirmfotos liegen in `/tmp/claude-0/audit-ablauf/`.
 - Viewports: 360 × 640 (Hauptlauf) und 820 × 1180 (Tablet: Ausbilder am Schreibtisch, Meldekopf).
 - Durchgespielte Abläufe:
-  1. **Übungsvorbereitung.** Startseite › „Beispielbögen ansehen“ › THW › Alle Einheiten aller Ortsverbände › Bayern › RSt Bad Tölz › OV Bad Aibling. Dort drei Bögen als PDF geladen und einen Link kopiert.
+  1. **Übungsvorbereitung.** Startseite › „Übungsbögen ansehen“ › THW › Alle Einheiten aller Ortsverbände › Bayern › RSt Bad Tölz › OV Bad Aibling. Dort drei Bögen als PDF geladen und einen Link kopiert.
   2. **Teilnehmer.** Den kopierten Link in einem zweiten, leeren Profil geöffnet.
   3. **Meldekopf.** „Neue Einsatz-Sammlung…“ mit Art „Übung“, dann die drei PDFs über „Bögen einlesen…“ aufgenommen. Dasselbe mit vier PDFs aus „Praktische Ausbildung › Einlagen Kräfte Hannover“. Dazu der Weg über „Anzeigen“ › „In Einsatz-Sammlung ablegen…“ in eine Sammlung mit der Vorgabe „Einsatz“.
   4. **Durchblättern.** Mehrere Beispiele nacheinander mit „Anzeigen“ geöffnet, einmal ohne und einmal mit eigenem angefangenem Bogen („THW Musterstadt“).
@@ -24,15 +24,15 @@
 ## Annahmen
 
 - **A1 (Ablauf, Annahme):** Für eine Meldekopf-Übung sucht der Ausbilder vorab passende Bögen aus, zum Beispiel einen Zug oder die Einheiten einer Region. Er gibt sie den Teilnehmern als Ausdruck oder Link. Die Teilnehmer melden sich damit am Meldekopf, und dort wird gescannt oder eingelesen. Am Ende soll die Lage stimmen, also Einheitenzahl und Stärke. Eine THW-Vorschrift dazu kenne ich nicht.
-- **A2:** Wer einen Beispielbogen als Ausgangspunkt nimmt, will daraus seinen eigenen Bogen oder eine Vorlage seiner Einheit machen und die fiktiven Namen ersetzen.
-- **A3:** Die Rangfolge „echter eigener Bogen vor Beispielbogen“ ist für den Nutzer selbstverständlich. Ein Beispiel lässt sich jederzeit neu laden, der eigene Entwurf nicht.
+- **A2:** Wer einen Übungsbogen als Ausgangspunkt nimmt, will daraus seinen eigenen Bogen oder eine Vorlage seiner Einheit machen und die fiktiven Namen ersetzen.
+- **A3:** Die Rangfolge „echter eigener Bogen vor Übungsbogen“ ist für den Nutzer selbstverständlich. Ein Beispiel lässt sich jederzeit neu laden, der eigene Entwurf nicht.
 
 ## Nicht prüfbar
 
 - Das echte Share-Sheet (App, iOS/Android). Headless gab es nur den Weg über die Zwischenablage („Kopiert“).
 - Kamera-Scan eines gedruckten Beispiel-PDFs. Ersatzweise habe ich die PDF-Datei über „Bögen einlesen…“ aufgenommen.
 - Ausdruck und Lesbarkeit des Wasserzeichens auf Papier. Der Text „ÜBUNG — Dieser Bogen beschreibt keinen echten Einsatz.“ steht im PDF (geprüft mit `pdftotext`).
-- Beispielbögen ohne Netz (zweite Stufe des Offline-Vorrats). Native Builds.
+- Übungsbögen ohne Netz (zweite Stufe des Offline-Vorrats). Native Builds.
 
 ## Urteil aus Sicht der Rolle
 
@@ -49,14 +49,14 @@ Sobald man mehr als einen Bogen braucht, wird es mühsam:
 
 ### BB-W1 [P1] Typ Daten/Verlust: Beim Durchblättern mehrerer Beispiele wird der eigene angefangene Bogen verdrängt, ab dem zweiten Beispiel bis zum „endgültig löschen“
 
-- **Fundstelle:** Dialog „Beispielbögen“ › Tabelle › „Anzeigen“, zweimal hintereinander (dazwischen „‹ Startseite“ › „Beispielbögen ansehen“). 360 × 640 und 820 × 1180. Code: `oeffneBeispiel` mit `darfBogenErsetzen` in `src/app/app.tsx`.
+- **Fundstelle:** Dialog „Übungsbögen“ › Tabelle › „Anzeigen“, zweimal hintereinander (dazwischen „‹ Startseite“ › „Übungsbögen ansehen“). 360 × 640 und 820 × 1180. Code: `oeffneBeispiel` mit `darfBogenErsetzen` in `src/app/app.tsx`.
 - **Beobachtung:**
-  - Mit eigenem Entwurf „THW Musterstadt“ fragt das erste „Anzeigen“: „Der angefangene Bogen „THW Musterstadt“ wird durch den Beispielbogen ersetzt. Der Stand bleibt auf der Startseite unter „Zuletzt geschlossenen Bogen zurückholen“ erreichbar.“ Das ist richtig und klar.
-  - Beim zweiten „Anzeigen“ heißt der **unveränderte Beispielbogen** plötzlich „Der angefangene Bogen „DRK-Kreisverband Moorlande e. V. Betreuungsgruppe (Bereitschaft, BT-Kombi)““. Weiter steht dort: „Der Bogen „THW Musterstadt“ … auf dem Platz „Zuletzt geschlossener Bogen“ wird dabei endgültig gelöscht: Er fasst nur einen Bogen.“ Zur Wahl stehen „Beispielbogen öffnen — den alten Bogen vorher als Datei sichern“, „Beispielbogen öffnen — alten Bogen endgültig löschen“ und „Abbrechen“.
+  - Mit eigenem Entwurf „THW Musterstadt“ fragt das erste „Anzeigen“: „Der angefangene Bogen „THW Musterstadt“ wird durch den Übungsbogen ersetzt. Der Stand bleibt auf der Startseite unter „Zuletzt geschlossenen Bogen zurückholen“ erreichbar.“ Das ist richtig und klar.
+  - Beim zweiten „Anzeigen“ heißt der **unveränderte Übungsbogen** plötzlich „Der angefangene Bogen „DRK-Kreisverband Moorlande e. V. Betreuungsgruppe (Bereitschaft, BT-Kombi)““. Weiter steht dort: „Der Bogen „THW Musterstadt“ … auf dem Platz „Zuletzt geschlossener Bogen“ wird dabei endgültig gelöscht: Er fasst nur einen Bogen.“ Zur Wahl stehen „Übungsbogen öffnen — den alten Bogen vorher als Datei sichern“, „Übungsbogen öffnen — alten Bogen endgültig löschen“ und „Abbrechen“.
   - Ohne eigenen Bogen fragt schon das zweite Beispiel nach („Der angefangene Bogen „DRK … BT-Kombi“ wird … ersetzt“). Beim dritten kommt die „endgültig gelöscht“-Rückfrage für das erste Beispiel, das niemand angefasst hat.
   - Einen Weg, ein Beispiel nur anzusehen, ohne dass es „mein Bogen“ wird, gibt es nicht. „PDF“ ist die einzige Alternative.
 - **Folge:** Ein Ausbilder, der vier oder fünf Bögen vergleicht, um passende für seine Übung zu finden, bekommt ab dem zweiten Bogen Rückfragen, die nach Datenverlust klingen. Spätestens beim dritten muss er über seinen echten Entwurf entscheiden. Unter Zeitdruck drückt man die Variante „endgültig löschen“, weil man ja nur Beispiele ansieht, und der Entwurf der eigenen Einheit ist weg. Gleichzeitig belegt ein beliebig neu ladbares fiktives Beispiel den einzigen Rückholplatz.
-- **Empfehlung:** Ein unverändertes Beispiel nicht als „angefangenen Bogen“ behandeln. Es sollte ohne Rückfrage ersetzt werden und weder den Rückholplatz belegen noch einen echten Entwurf von dort verdrängen. Erst eine Änderung am Beispiel macht es zu einem eigenen Bogen. Alternativ „Anzeigen“ als reine Ansicht neben dem eigenen Bogen öffnen, mit „Zurück zu den Beispielbögen“.
+- **Empfehlung:** Ein unverändertes Beispiel nicht als „angefangenen Bogen“ behandeln. Es sollte ohne Rückfrage ersetzt werden und weder den Rückholplatz belegen noch einen echten Entwurf von dort verdrängen. Erst eine Änderung am Beispiel macht es zu einem eigenen Bogen. Alternativ „Anzeigen“ als reine Ansicht neben dem eigenen Bogen öffnen, mit „Zurück zu den Übungsbögen“.
 - **Nachprüfung:** Eigenen Entwurf anlegen, dann drei Beispiele nacheinander mit „Anzeigen“ öffnen. Höchstens beim ersten kommt eine Rückfrage. Danach liegt „THW Musterstadt“ weiter unter „Zuletzt geschlossenen Bogen zurückholen“, und keine Rückfrage enthält „endgültig“.
 
 ### BB-W2 [P1] Typ Daten/Inhalt: „Praktische Ausbildung › Einlagen Kräfte Hannover“: vier verschiedene Bögen werden am Meldekopf zu einer Einheit zusammengelegt
@@ -72,14 +72,14 @@ Sobald man mehr als einen Bogen braucht, wird es mühsam:
 
 ### BB-W3 [P2] Typ Navigation: Nach „Anzeigen“ führt kein Weg zurück zu den Beispielen. Der Einstieg liegt tief auf der Startseite, und der Dialog beginnt wieder ganz oben
 
-- **Fundstelle:** Geöffnetes Beispiel › „‹ Startseite“ › Abschnitt „Beispielbögen“ › „Beispielbögen ansehen“. Code: `beispieleOeffnen` setzt `setBeispielPfad([])`.
+- **Fundstelle:** Geöffnetes Beispiel › „‹ Startseite“ › Abschnitt „Übungsbögen“ › „Übungsbögen ansehen“. Code: `beispieleOeffnen` setzt `setBeispielPfad([])`.
 - **Beobachtung:**
-  - Nach „Anzeigen“ schließt der Dialog und es erscheint „Beispielbogen geöffnet — fiktive Daten zum Ansehen und Ausprobieren.“ Einen Knopf „Zurück zu den Beispielbögen“ gibt es nicht. Die Zurück-Taste des Browsers führt zur Startseite, nicht in den Dialog.
-  - Auf der Startseite liegt der Knopf „Beispielbögen ansehen“ beim Erststart bei y = 1 843 (360 × 640), also auf dem dritten Bildschirm, und bei y = 1 570 auf dem Tablet (Bild 1 180 hoch). Sobald ein Bogen offen ist, wandert der Abschnitt ans Ende hinter „Absender“ und „So funktioniert’s“, auf y = 2 214 (3,5 Bildschirme).
+  - Nach „Anzeigen“ schließt der Dialog und es erscheint „Übungsbogen geöffnet — fiktive Daten zum Ansehen und Ausprobieren.“ Einen Knopf „Zurück zu den Übungsbögen“ gibt es nicht. Die Zurück-Taste des Browsers führt zur Startseite, nicht in den Dialog.
+  - Auf der Startseite liegt der Knopf „Übungsbögen ansehen“ beim Erststart bei y = 1 843 (360 × 640), also auf dem dritten Bildschirm, und bei y = 1 570 auf dem Tablet (Bild 1 180 hoch). Sobald ein Bogen offen ist, wandert der Abschnitt ans Ende hinter „Absender“ und „So funktioniert’s“, auf y = 2 214 (3,5 Bildschirme).
   - Der Dialog beginnt danach wieder bei „Alle“. Zurück zu „OV Bad Aibling“ sind fünf Tipps nötig (THW › Alle Einheiten … › Bayern › RSt Bad Tölz › OV Bad Aibling), dazu Warten auf den Ladezustand.
   - Aus der Einsatz-Sammlung gibt es keinen Zugang. In der Einsatzansicht steht weder ein Knopf noch ein Hinweis, auch nicht in der vollen Fußzeile. Ebenso wenig im geöffneten Bogen.
 - **Folge:** Vergleichen („Ist die Bergungsgruppe oder die FGr N passender?“) kostet je Bogen etwa acht Tipps und drei Bildschirme Scrollen. Wer nicht mehr weiß, wo der Einstieg war, findet ihn nur auf der Startseite. Das ist neu, weil der Fußzeilen-Link entfallen ist.
-- **Empfehlung:** Den zuletzt geöffneten Ordner beim erneuten Öffnen beibehalten, zumindest innerhalb einer Sitzung. Im geöffneten Beispiel einen Knopf „Zurück zu den Beispielbögen“ an die Meldung „Beispielbogen geöffnet …“ setzen. Ob die Einsatz-Sammlung einen Zugang braucht, siehe BB-W4.
+- **Empfehlung:** Den zuletzt geöffneten Ordner beim erneuten Öffnen beibehalten, zumindest innerhalb einer Sitzung. Im geöffneten Beispiel einen Knopf „Zurück zu den Übungsbögen“ an die Meldung „Übungsbogen geöffnet …“ setzen. Ob die Einsatz-Sammlung einen Zugang braucht, siehe BB-W4.
 - **Nachprüfung:** OV öffnen, „Anzeigen“, dann mit einem Tipp zurück in denselben Ordner, mit derselben Tabelle und ohne Scrollen auf der Startseite.
 
 ### BB-W4 [P2] Typ Ablauf: Für eine Übung gibt es keinen Sammelweg. Jeder Bogen wird einzeln geladen, und der Weg in die Sammlung ist nicht beschrieben
@@ -90,9 +90,9 @@ Sobald man mehr als einen Bogen braucht, wird es mühsam:
   - Drei PDFs von Bad Aibling dauerten 4,0 s, 0,8 s und 0,7 s, jedes als eigener Download und ohne Meldung im Dialog.
   - Der Weg über „Anzeigen“ › „In Einsatz-Sammlung ablegen…“ funktioniert. Er kostet aber je Bogen: Startseite, Scrollen, Dialog, fünf Ordnertipps, „Anzeigen“, Rückfrage (BB-W1), „In Einsatz-Sammlung ablegen…“ und Sammlung wählen.
   - Der kurze Weg (alle PDFs laden, in der Sammlung „Bögen einlesen…“ mit Mehrfachauswahl) funktioniert und hat aus drei Dateien drei Einheiten gemacht. Er steht aber nirgends. Die Erklärung im Dialog spricht nur von „zum Testen des QR-Imports“.
-  - Die Einsatz-Sammlung mit Art „Übung“ bietet im leeren Zustand nur „Noch keine Meldung. Bogen scannen oder manuell erfassen.“ und keinen Hinweis auf Beispielbögen.
+  - Die Einsatz-Sammlung mit Art „Übung“ bietet im leeren Zustand nur „Noch keine Meldung. Bogen scannen oder manuell erfassen.“ und keinen Hinweis auf Übungsbögen.
 - **Folge:** Eine Übung mit einem Zug (5 bis 8 Bögen) oder einer Einlage (23 Bögen) vorzubereiten, kostet viele einzelne Downloads oder sehr viele Tipps. Wer den Umweg über „Bögen einlesen…“ nicht kennt, legt jeden Bogen einzeln ab und gerät dabei in die Rückfragen aus BB-W1.
-- **Empfehlung:** Je Ordner „Alle n Bögen als PDF“ (ein Sammel-PDF zum Drucken und Verteilen) und „Alle in eine Einsatz-Sammlung übernehmen…“ anbieten. In einer leeren Sammlung der Art „Übung“ einen Verweis „Mit Beispielbögen füllen…“ setzen. Damit wäre die Frage aus dem Auftrag beantwortet: Ein Zugang aus der Sammlung ist für Meldekopf-Übungen nötig, für echte Einsätze nicht.
+- **Empfehlung:** Je Ordner „Alle n Bögen als PDF“ (ein Sammel-PDF zum Drucken und Verteilen) und „Alle in eine Einsatz-Sammlung übernehmen…“ anbieten. In einer leeren Sammlung der Art „Übung“ einen Verweis „Mit Übungsbögen füllen…“ setzen. Damit wäre die Frage aus dem Auftrag beantwortet: Ein Zugang aus der Sammlung ist für Meldekopf-Übungen nötig, für echte Einsätze nicht.
 - **Nachprüfung:** Ordner „OV Bad Aibling“: Mit höchstens drei Tipps liegen alle sechs Bögen als eine PDF vor bzw. als sechs Einheiten in einer Übungs-Sammlung.
 
 ### BB-W5 [P2] Typ Inhalt/Zustand: Alle Beispiele tragen vergangene Zeiträume. Eine Übungslage ist dadurch voller Warnungen
@@ -101,7 +101,7 @@ Sobald man mehr als einen Bogen braucht, wird es mühsam:
 - **Beobachtung:**
   - Im geöffneten Beispiel steht „⚠ 1 offener Punkt für die Weitergabe — Einsatzzeitraum 19.09.2026 – 20.09.2026 ist vorbei — gilt dieser Bogen noch für den aktuellen Einsatz?“. Beim Teilnehmer, der den Bogen per Link öffnet, steht dasselbe.
   - Am Meldekopf zeigt jede Karte „⚠ Stand vor 50 Tagen“ und „Zeitraum vorbei“, der Kopf meldet „⚠ älteste Meldung vor 50 Tagen, 3 von 3 älter als 1 Std“. Bei der Hannover-Einlage steht „vor 995 Tagen“, im Bogen außerdem „liegt mehr als ein Jahr“.
-- **Folge:** Eine Übung mit Beispielbögen übt vor allem das Wegklicken von Warnungen. Die Warnung „Zeitraum vorbei“, im Ernstfall ein wichtiger Hinweis auf einen alten Bogen, verliert ihren Wert. Wer die Daten anpassen will, muss jeden Bogen einzeln bearbeiten.
+- **Folge:** Eine Übung mit Übungsbögen übt vor allem das Wegklicken von Warnungen. Die Warnung „Zeitraum vorbei“, im Ernstfall ein wichtiger Hinweis auf einen alten Bogen, verliert ihren Wert. Wer die Daten anpassen will, muss jeden Bogen einzeln bearbeiten.
 - **Empfehlung:** Beim Öffnen, im PDF, im Link und beim Übernehmen eines Beispiels Zeitraum und Stand auf „heute“ setzen, oder das Datum beim Sammelweg (BB-W4) einmal für alle abfragen. Die Übung-Kennung bleibt dabei erhalten.
 - **Nachprüfung:** Drei Beispiele in eine Übungs-Sammlung übernehmen. Es erscheint weder „Stand vor … Tagen“ noch „Zeitraum vorbei“.
 
@@ -111,8 +111,8 @@ Sobald man mehr als einen Bogen braucht, wird es mühsam:
 - **Beobachtung:**
   - Der Link (588 Zeichen) öffnet den Bogen direkt. Erste und dunkel hervorgehobene Schaltfläche ist „In Einsatz-Sammlung ablegen…“. Darunter steht: „Meldung einer fremden Einheit: Sie gehört in eine Einsatz-Sammlung. „Bogen übergeben…“ gäbe sie mit dem Siegel dieses Geräts weiter. Ändern macht daraus einen eigenen Bogen dieses Geräts.“ und „Empfangen als: ✓ signiert von e78b ef37 …“.
   - Öffnet der Ausbilder denselben Bogen über „Anzeigen“, ist es dagegen sein eigener Bogen: „Bogen übergeben…“ steht vorn, und es heißt „Signiert mit dem Echtheits-Siegel dieses Geräts“.
-- **Folge:** Der Teilnehmer soll die Einheit spielen und sich mit dem QR-Code am Meldekopf melden (Annahme A1). Die App rät ihm, den Bogen in eine eigene Sammlung zu legen, und warnt vor genau dem Schritt, den er tun soll. Er fragt den Ausbilder, oder die Übung beginnt mit einem Fehlgriff. Derselbe Beispielbogen verhält sich je nach Weg anders.
-- **Empfehlung:** Ein Link aus den Beispielbögen öffnet beim Empfänger wie „Anzeigen“, also als eigener Übungsbogen mit „Bogen übergeben…“ vorn, oder er sagt ausdrücklich „Beispielbogen — zum Melden am Meldekopf: Bogen übergeben…“. In der Erklärung des Dialogs ein Satz zum Weitergeben an Übungsteilnehmer.
+- **Folge:** Der Teilnehmer soll die Einheit spielen und sich mit dem QR-Code am Meldekopf melden (Annahme A1). Die App rät ihm, den Bogen in eine eigene Sammlung zu legen, und warnt vor genau dem Schritt, den er tun soll. Er fragt den Ausbilder, oder die Übung beginnt mit einem Fehlgriff. Derselbe Übungsbogen verhält sich je nach Weg anders.
+- **Empfehlung:** Ein Link aus den Übungsbögen öffnet beim Empfänger wie „Anzeigen“, also als eigener Übungsbogen mit „Bogen übergeben…“ vorn, oder er sagt ausdrücklich „Übungsbogen — zum Melden am Meldekopf: Bogen übergeben…“. In der Erklärung des Dialogs ein Satz zum Weitergeben an Übungsteilnehmer.
 - **Nachprüfung:** Link im leeren Profil öffnen. Als erste Aktion steht „Bogen übergeben…“, der Text nennt kein „fremde Einheit“ und warnt nicht vor dem Übergeben.
 
 ### BB-W7 [P3] Typ Ablauf: In einer Sammlung mit der Vorgabe „Einsatz“ zählen abgelegte Beispiele nicht
@@ -153,7 +153,7 @@ Sobald man mehr als einen Bogen braucht, wird es mühsam:
   - Die Vorlage heißt „THW Bad Aibling Bergungsgruppe“, und die Karte zeigt „THW · Bergungsgruppe · Stärke 0 / 2 / 7 // 9 · 9 Personen · 2 Fahrzeuge“, ohne „Übung“ oder „Beispiel“.
   - Der Bogen aus der Vorlage startet richtig in Schritt 2 mit leerem Zeitraum. Er bleibt als Übung gekennzeichnet (Störer, Haken „Dies ist eine Übung“) und enthält die neun fiktiven Namen.
 - **Folge:** Gering. Wer das Beispiel als Grundlage für die eigene Einheit nimmt, sieht erst im Bogen, dass er Übung abwählen und neun Namen ersetzen muss. Wer mehrere Vorlagen hat, unterscheidet die Beispiel-Vorlage nicht von einer echten.
-- **Empfehlung:** Vorlagen aus Beispielen auf der Karte mit „Übung · aus Beispielbogen“ kennzeichnen. Beim Speichern anbieten: „Als Grundlage für meine Einheit — Namen leeren, Übung abwählen?“.
+- **Empfehlung:** Vorlagen aus Beispielen auf der Karte mit „Übung · aus Übungsbogen“ kennzeichnen. Beim Speichern anbieten: „Als Grundlage für meine Einheit — Namen leeren, Übung abwählen?“.
 - **Nachprüfung:** Vorlage aus Beispiel speichern. Die Karte trägt die Kennzeichnung, und auf Wunsch entsteht ein Bogen ohne fiktive Namen und ohne Übung.
 
 ## Hinweise (ohne Priorität)

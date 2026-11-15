@@ -81,7 +81,7 @@ const UEBUNG_FARBE = "#b02a1e";
  * uebung-wasserzeichen.ts) — nicht markierbar und nicht kopierbar.
  */
 // 8 % (Grauwert 241/255) ging beim Schwarzweiß-Kopieren unter (Prüfrunde
-// Beispielbögen, BB-A3); 14 % bleibt hinter dem Text lesbar.
+// Übungsbögen, BB-A3); 14 % bleibt hinter dem Text lesbar.
 const UEBUNG_DECKKRAFT = 0.14;
 
 function uebungsWasserzeichen(): TDocumentDefinitions["background"] {
@@ -228,7 +228,7 @@ function rahmenLayout(dicht = false): CustomTableLayout {
  * 0,75 mm je Modul (Version 16 ≈ 0,82 mm) und liegt damit in derselben
  * Größenordnung wie ein Segment-Teil.
  *
- * Der Platzpreis wurde über alle 73 einteiligen Beispielbögen gemessen: 10
+ * Der Platzpreis wurde über alle 73 einteiligen Übungsbögen gemessen: 10
  * davon wachsen von einer auf zwei Seiten (101 → 111 Seiten gesamt), weil der
  * QR-Block als `unbreakable` nicht mehr unter das Formular passt. Bei 175 pt
  * wären es 7 — die Kurve ist flach, ein kleinerer Wert kauft wenig zurück.
@@ -1130,7 +1130,7 @@ function qrBlock(
   });
   // Jede Codeseite nennt ihre Einheit (R4-A5). Beim Einzelcode steht die Zeile
   // in der freien Spalte neben dem Bild — über dem Bild kostete sie 36 von 443
-  // Beispielbögen eine zweite Seite; auf den eigenen Seiten mehrteiliger Codes
+  // Übungsbögen eine zweite Seite; auf den eigenen Seiten mehrteiliger Codes
   // steht sie unter der Überschrift.
   const einheitZeile = (): Content => ({
     text: einheit,
@@ -1148,7 +1148,7 @@ function qrBlock(
   // Fett und direkt am Code: Wer den Ausdruck scannt, soll vorher aufs
   // Kästchen schauen (R2-A4). Beim Einzelcode steht er in der freien Spalte
   // links NEBEN dem Bild — unter dem Code kostete die Zeile 6 von 101
-  // THW-Beispielbögen eine zweite Seite (unbreakable-Block).
+  // THW-Übungsbögen eine zweite Seite (unbreakable-Block).
   // Dazu, bis wann der Code Namen liefert: wer sein Papier frisch druckt, ohne den Bogen zu ändern, hält
   // sonst ein Blatt mit lesbaren Namen, dessen Code sie nach der Datenschutzfrist nicht mehr trägt (R11-A1).
   const stift = (): Content => ({
@@ -2151,7 +2151,7 @@ export function pdfDokument(
 /**
  * Einzel-PDF mit Platz für Stiftnachträge — aber nur, wo er keine Seite
  * kostet (Audit Runde 3, R3-A6). Zwei freie Personalzeilen hätten 15 von 133
- * Beispielbögen um eine Seite verlängert, darunter den einseitigen Bogen des
+ * Übungsbögen um eine Seite verlängert, darunter den einseitigen Bogen des
  * Zugtrupps Albstadt. Deshalb ein Probesatz: Er liest über pdfmakes
  * `pageBreakBefore` ab, wie viel Platz hinter dem Formular (mehrteiliger Code
  * auf eigenen Seiten) bzw. hinter dem Code auf derselben Seite bleibt. Passen

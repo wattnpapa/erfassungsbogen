@@ -18,7 +18,7 @@ Chromium über das Projekt-`playwright`, `chromium.launch()` ohne Optionen, nich
 installiert, kein Code geändert. `isMobile`/`hasTouch`, Locale de-DE, Tipps über
 `touchscreen.tap`. Je Szenario ein frischer Browserkontext. Viewports 390 × 844,
 360 × 640, 320 × 568 sowie quer 844 × 390, 740 × 360 und 640 × 360. Zustand über die
-Bedienung: Einsatz-Sammlung „Hochwasser Weser“ anlegen, die THW-Beispielbögen 012 bis 016
+Bedienung: Einsatz-Sammlung „Hochwasser Weser“ anlegen, die THW-Übungsbögen 012 bis 016
 aus `examples/thw` als Kopien außerhalb des Repositorys (`uebung: false`, `stand` fünf
 Minuten vor der Geräteuhr) über „Bögen einlesen…“ aufnehmen. Voller Speicher:
 `localStorage` bis zum Quota-Fehler gefüllt. Netz: `context.setOffline(true)` nach dem
@@ -116,7 +116,7 @@ Aufgaben ließen sich ohne fremde Hilfe erledigen; offline fehlt nur der Meldeko
 
 **Typ:** Layout/Abstand. **Kennzeichnung:** gemessen (360 × 640: Zelle „Ruhezeit · Diesel 60 l · Gemisch 10 l“ `scrollWidth` 85 > `clientWidth` 80; Kopf „Stärke gesamt“ 47 > 46). Bei 390 und 320 keine abgeschnittene Zelle.
 
-**Ort:** Einsatzansicht → „Tabelle“ (5 Beispielbögen), Spalte „Bedarf“, Zeile Nr. 2 „THW Ulm Bergungsgruppe“.
+**Ort:** Einsatzansicht → „Tabelle“ (5 Übungsbögen), Spalte „Bedarf“, Zeile Nr. 2 „THW Ulm Bergungsgruppe“.
 
 **Beobachtung:** Der Text der Bedarfszelle ragt rund 5 px über die Zelle hinaus und wird am Tabellenrand abgeschnitten: sichtbar „Gemisch 10“, das „l“ fehlt. Der Name „Materialwirtschaft“ bricht in „Materialwirtsch / aft“.
 
@@ -124,7 +124,7 @@ Aufgaben ließen sich ohne fremde Hilfe erledigen; offline fehlt nur der Meldeko
 
 **Empfehlung:** Spaltenbreite oder Umbruch so, dass auch „Gemisch 10 l“ bei 360 px vollständig steht.
 
-**Nachprüfung:** Beispielbögen 012 bis 016 einlesen, Tabelle bei 360 × 640: keine Zelle mit `scrollWidth` > `clientWidth`.
+**Nachprüfung:** Übungsbögen 012 bis 016 einlesen, Tabelle bei 360 × 640: keine Zelle mit `scrollWidth` > `clientWidth`.
 
 ### R21-D4 [P3] Die erste Einheitenkarte liegt nach dem Einlesen rund 1100 bis 1130 px unter dem Seitenanfang
 

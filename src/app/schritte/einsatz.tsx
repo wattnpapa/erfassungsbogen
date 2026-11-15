@@ -34,7 +34,7 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
    * er nie berührt hat.
    */
   const bisFolgtVon = ez.zeitraumBis === ez.zeitraumVon;
-  /** Zeitraum nicht angegeben (Beispielbogen): Datumsfelder leer, Uhrzeit erst nach dem Datum. */
+  /** Zeitraum nicht angegeben (Übungsbogen): Datumsfelder leer, Uhrzeit erst nach dem Datum. */
   const leer = zeitraumLeer(ez);
   /**
    * Uhrzeitfeld zum Zeitraum (ab Schema 11, im Bogen als ISO 8601 mit dem Offset der Gerätezeitzone). Geleert = nur
@@ -198,7 +198,7 @@ export function SchrittEinsatz({ bogen, aendern }: SchrittProps) {
           {/* Die Ausnahme von der Datenschutzfrist hängt allein an diesem Haken —
               wer ihn setzt, soll wissen, dass Namen dann unbefristet lesbar bleiben. */}
           <p className="warnung">
-            Übungsbögen unterliegen <strong>keiner Datenschutzfrist</strong>: Namen, Funktionen,
+            Als Übung gekennzeichnete Bögen unterliegen <strong>keiner Datenschutzfrist</strong>: Namen, Funktionen,
             Qualifikationen und Erreichbarkeiten bleiben unbefristet lesbar — hier und auf jedem
             Gerät, das den Bogen empfängt. Echte Personaldaten nur eintragen, wenn das vertretbar ist.
           </p>

@@ -4,7 +4,7 @@ Prüfer: Rollenaudit `thw-offline-resilience-reviewer` · Datum: 2026-10-26 · Z
 
 Reiner Prüfbericht, keine Codeänderung. Gegen die laufende App auf Port 4173 (Produktionsbuild, Code-Stand Commit `36d549a`,
 `main` nach Runde 15), Playwright mit Chromium (globales Modul), Telefon 390 × 844 und 360 × 640, `isMobile`/`hasTouch`,
-Locale de-DE, je Lauf ein eigener Browser-Kontext. Zustände über die Oberfläche (Einsatz anlegen, Beispielbögen als JSON einlesen)
+Locale de-DE, je Lauf ein eigener Browser-Kontext. Zustände über die Oberfläche (Einsatz anlegen, Übungsbögen als JSON einlesen)
 und über `localStorage`/`sessionStorage`. Netz weg über `context.setOffline`, CPU-Last über `Emulation.setCPUThrottlingRate`.
 
 Nicht neu gemeldet sind die bekannten Grenzen aus den Runden 6 bis 15 (laut Auftrag und `docs/audits/README.md`).
@@ -20,9 +20,9 @@ einlesen, Netz weg, neu laden, nach Unterbrechung weiterarbeiten“ gelingen ohn
 
 | Befund | Ergebnis | Messung |
 | --- | --- | --- |
-| R15-S1 Import unterbrochen | hält | 40 Beispielbögen mit CPU 20-fach gedrosselt, Neuladen nach 1,5 s: Einsatz zeigt „Import unterbrochen: 40 Dateien waren gewählt, 11 Meldungen kamen an. Es kann etwas fehlen — dieselben Dateien nochmal …“. Erneutes Wählen derselben 40 Dateien: „29 Bögen aufgenommen, 11 bereits vorhanden“, 40 Einheiten, Hinweis danach weg, keine Doppelten. |
+| R15-S1 Import unterbrochen | hält | 40 Übungsbögen mit CPU 20-fach gedrosselt, Neuladen nach 1,5 s: Einsatz zeigt „Import unterbrochen: 40 Dateien waren gewählt, 11 Meldungen kamen an. Es kann etwas fehlen — dieselben Dateien nochmal …“. Erneutes Wählen derselben 40 Dateien: „29 Bögen aufgenommen, 11 bereits vorhanden“, 40 Einheiten, Hinweis danach weg, keine Doppelten. |
 | R15-A4 Zwischenstand Papier-Abgleich | hält | Eingabe „42“ in „Nr.“ einer Einheit; neuer Browserstart (nur `localStorage` übertragen, Sitzungsspeicher leer): Hinweis „Angefangene Eingaben für 1 Einheit sind noch da (… höchstens drei Tage)“. Mit um 4 Tage zurückgesetztem Zeitstempel ist der Zwischenstand weg (wie im Text angekündigt, ohne weiteren Hinweis). |
-| Statusmeldung zum Vorrat | hält | Netz weg nach 1,5 s: „Offline bereit für Bogen, PDF, QR-Code und Empfang. Beispielbögen und Themenseiten fehlen noch (458 von 549), sie folgen beim nächsten Netz“. Alle 37 HTML-Seiten des Builds antworten dabei offline mit 200; der Beispielbögen-Dialog mit allen 101 THW-Bögen öffnet. |
+| Statusmeldung zum Vorrat | hält | Netz weg nach 1,5 s: „Offline bereit für Bogen, PDF, QR-Code und Empfang. Übungsbögen und Themenseiten fehlen noch (458 von 549), sie folgen beim nächsten Netz“. Alle 37 HTML-Seiten des Builds antworten dabei offline mit 200; der Übungsbögen-Dialog mit allen 101 THW-Bögen öffnet. |
 
 ## Weiter geprüft, ohne Befund
 

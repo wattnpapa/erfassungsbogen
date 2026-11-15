@@ -15,7 +15,7 @@ Kopf jedes Befunds (Daten/Verlust, Bedienung, Layout/Abstand, Text, Kontrast).
 Playwright/Chromium (globales Modul, `chromium.launch()` ohne Optionen), `isMobile`/`hasTouch`, Locale de-DE,
 Telefon 390 × 844, 360 × 640, 320 × 568, Querformat 568 × 320 / 640 × 360, frischer Kontext je Lauf, Tipps als
 Touch-Tipps. Einsatzdaten: Sammlung „Übung Weser“ mit drei per Schnellerfassung abgelegten Einheiten
-(„THW Oldenburg“, „Feuerwehr Husum“, „DRK Bremen“) und vier Beispielbögen aus `examples/thw/`; eigener Bogen im
+(„THW Oldenburg“, „Feuerwehr Husum“, „DRK Bremen“) und vier Übungsbögen aus `examples/thw/`; eigener Bogen im
 Assistenten (Entwurf, Schließen, Zurückholen). Voller Speicher: `localStorage` mit Füllschlüsseln bis zum
 Quota-Fehler gefüllt.
 
@@ -157,7 +157,7 @@ Der Rest sind Kleinigkeiten (P3), überwiegend Reste.
 - **Typ:** Layout/Abstand
 - **Neu oder alt (Verweis):** alt, R20-H5 / R20-W6 / R20-G6 (Rest; R19-W4).
 - **Evidence:** Observed (360 × 640).
-- **Ort:** Einsatzansicht nach Schnellerfassung (3 Einheiten) und nach „Bögen einlesen…“ (4 Beispielbögen).
+- **Ort:** Einsatzansicht nach Schnellerfassung (3 Einheiten) und nach „Bögen einlesen…“ (4 Übungsbögen).
 - **Beobachtung:** Überschrift „Einheiten (…)“ liegt bei y = 887 bis 897, die erste Karte „Nr. 1“ bei y = 1 010
   (drei Einheiten) und y = 1 153 (sieben, nach dem Einlesen); der Bildschirm ist 640 px hoch. Davor stehen Kennzahlen,
   die vier Aufnahmeknöpfe, Quittung, „Neu seit der letzten Kenntnisnahme“, Zug-Formular, Bedarf und Sprungverweise.

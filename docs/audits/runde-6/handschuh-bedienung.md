@@ -37,7 +37,7 @@ aktuellem `stand` (sonst anonymisiert die Datenschutzfrist die Namen):
   `examples/thw/grossbogen-verstaerkter-bergungszug.json` (38 Personen,
   Kurz-Liste ab 13, 7-teiliger QR-Code).
 - `eeb.einsaetze.v1`: Sammlung „Hochwasser Musterstadt“ aus sechs
-  Beispielbögen (001, 003, 009, 013, 016, 052) bzw. aus Bogen 013.
+  Übungsbögen (001, 003, 009, 013, 016, 052) bzw. aus Bogen 013.
 - `eeb.vorlagen.v1`: Vorlage „Mein OV“ aus dem Großbogen (Musterung).
 
 Gemessen habe ich alle sichtbaren Bedienelemente per `getBoundingClientRect`

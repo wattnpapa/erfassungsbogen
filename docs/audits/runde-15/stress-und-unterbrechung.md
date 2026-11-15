@@ -18,7 +18,7 @@ quer). Tipps mit `tap` und `touchscreen.tap` an festen Koordinaten (Doppeltipp
 in Abständen von 80 bis 1 500 ms), Unterbrechung mit `reload()` (0 bis
 3 000 ms nach der letzten Eingabe), Zurück-Geste mit `goBack()`/`goForward()`.
 Zustände über die Oberfläche („Neue Einsatz-Sammlung…", „Bögen einlesen…" mit
-Beispielbögen aus `examples/thw/`, „Einheit manuell erfassen…",
+Übungsbögen aus `examples/thw/`, „Einheit manuell erfassen…",
 Schnellerfassung, „Neuen Bogen erstellen"). Skripte im Scratchpad unter
 `.../scratchpad/stress15/`. Hinweis: Das Scratchpad-Verzeichnis `.../r15/` wurde
 von einem zweiten Prüflauf gleichzeitig beschrieben (dessen `lib.js` hat meines
@@ -139,7 +139,7 @@ die unvollständige Aufnahme.
 
 ### R15-S2 [P3] Nach einem Stapelimport liegt die Einheitenliste fast drei Bildschirme unter dem Kopf
 
-**Kennzeichnung:** gemessen (Skript `y.js`, 360 × 640, 30 Beispielbögen).
+**Kennzeichnung:** gemessen (Skript `y.js`, 360 × 640, 30 Übungsbögen).
 
 **Fundstelle / Aufgabe:** Einsatz → „Bögen einlesen…" mit 30 Bögen → die
 neuen Einheiten ansehen.

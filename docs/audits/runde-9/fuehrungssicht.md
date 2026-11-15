@@ -240,8 +240,8 @@ soweit nicht oben genannt). R9-K1 ergänzt R8-A1 nur um die fehlende Marke am
 Monitor und auf der Kachel.
 
 Beobachtung, kein Befund: Auf allen Karten des Seeds steht „⚠ Anderer Einsatz?"
-(die Beispielbögen nennen einen anderen Ort); dadurch trägt jede Karte ein
-Warnzeichen. Das ist Seed-Artefakt (Beispielbögen aus verschiedenen Einsätzen),
+(die Übungsbögen nennen einen anderen Ort); dadurch trägt jede Karte ein
+Warnzeichen. Das ist Seed-Artefakt (Übungsbögen aus verschiedenen Einsätzen),
 würde im Betrieb aber nur bei echter Abweichung erscheinen.
 
 ## Bestätigtes

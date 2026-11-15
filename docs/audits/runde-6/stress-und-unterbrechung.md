@@ -177,7 +177,7 @@ Zurück; Skripte `t24`, `t25`). Auf dem Telefon: Risiko, die Geste der
 installierten PWA ist nicht prüfbar.
 
 **Fundstelle / Aufgabe:** Startseite im ersten Verlaufseintrag, Fenster
-„Alle lokalen Daten löschen“, „Datensicherung“, „Beispielbögen“, „Impressum“,
+„Alle lokalen Daten löschen“, „Datensicherung“, „Übungsbögen“, „Impressum“,
 „Datenschutz“. Code: Fenster der Startseite in `src/app/app.tsx`, Abfangweg
 `ersteEbeneBetreten` in `src/app/modal-overlay.ts`.
 
@@ -203,7 +203,7 @@ für Rückfragen.
 
 **Nachprüfung:** App frisch öffnen, „Datensicherung“ tippen, Zurück: Die
 Startseite steht, das Fenster ist zu. Ebenso „Alle Daten löschen“, „Impressum“,
-„Datenschutz“, „Beispielbögen“.
+„Datenschutz“, „Übungsbögen“.
 
 ### R6-S4 [P3] „Rückgängig“ nach „Person entfernen“ verschwindet beim Schrittwechsel; die entfernte Person, auch die Ansprechperson, ist dann nicht mehr zurückzuholen
 
@@ -348,7 +348,7 @@ mit „Stand der Behebung“ und [../runde-5/README.md](../runde-5/README.md).
 | R5-S2 Die Fingerstellen-Sperre schweigt (P2) | behoben | **hält, im Vollbild nur teilweise** | Außerhalb des Vollbilds „Einen Moment …“ und gestrichelter Rahmen (Karten ▲/▼, Rückfragen). Im QR-Vollbild nicht zu sehen (R6-H1). Die Sperre selbst bleibt bei 1,5 s. |
 | R5-S3 „Person entfernen“: Nachtipps, „Rückgängig“ nur für die letzte (P2) | behoben | **hält, mit Rest** | Fünf Nachtipps 150 bis 1 000 ms: eine Person, keine zweite Rückfrage; Sammel-„Rückgängig“ für zwei Personen. Rest: „Rückgängig“ endet beim Schrittwechsel (R6-S4). |
 | R5-S4 Konfliktwarnung verdeckt bei Tastatur das Feld (P2) | behoben | **hält** | 360 × 380 px: eingeklappt, 53 px, Fokusfeld frei. Bei 360 × 640 px steht sie erst aufgeklappt, 184 px (29 % des Bildes, Runde 5: 240 px / 37 %); „Weniger“ klappt auf rund 122 px. Die Inhalte der Warnung und der Weg „laden“ bleiben Thema (R6-S1, R6-S2). |
-| R5-S5 Zurück bei Rückfrage im ersten Verlaufseintrag verlässt die App (P3) | behoben | **teilweise** | Alle Rückfragen schließen mit Zurück. Fünf Fenster der Startseite („Alle lokalen Daten löschen“, „Datensicherung“, „Beispielbögen“, „Impressum“, „Datenschutz“) verlassen die App weiter (R6-S3). Die Nebenwirkung nach bestätigter Rückfrage steht in R6-E4. |
+| R5-S5 Zurück bei Rückfrage im ersten Verlaufseintrag verlässt die App (P3) | behoben | **teilweise** | Alle Rückfragen schließen mit Zurück. Fünf Fenster der Startseite („Alle lokalen Daten löschen“, „Datensicherung“, „Übungsbögen“, „Impressum“, „Datenschutz“) verlassen die App weiter (R6-S3). Die Nebenwirkung nach bestätigter Rückfrage steht in R6-E4. |
 | R5-S6 Wartende Meldung nach Neuladen weg (P3) | behoben | **hält** | Nach einem und zwei Neuladen fragt die App erneut, nennt die Sammlung beim Namen; im neuen Tab nicht (Sitzungsspeicher, wie beschrieben). |
 | R5-S7 „Bogen öffnen“ bei eigenem Bogen: zwei Rückfragen (P3) | behoben | **hält** | Eine Rückfrage mit Folge und Rückholplatz; Doppeltipp: eine Übernahme. |
 

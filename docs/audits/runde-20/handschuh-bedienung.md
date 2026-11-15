@@ -25,7 +25,7 @@ Ansichtsschalter für „Feld“ und im Querformat.
 
 Chromium über das globale Playwright-Modul (`chromium.launch()` ohne Optionen, nichts installiert), `isMobile`, `hasTouch`,
 Pixeldichte 2, de-DE. Viewports 360 x 640 und 390 x 844, dazu 320 x 568 sowie quer 640 x 360 und 568 x 320. Zustand: frisch
-angelegte Einsatz-Sammlung „Hochwasser Test“ mit 0, 3 oder 6 THW-Beispielbögen (`examples/thw`, über „Bögen einlesen…“),
+angelegte Einsatz-Sammlung „Hochwasser Test“ mit 0, 3 oder 6 THW-Übungsbögen (`examples/thw`, über „Bögen einlesen…“),
 Schnellerfassung bis „In Einsatz übernehmen“, eigener Bogen im Assistenten (Schritt 1 bis 6, auch „‹ Startseite“ und „Bogen
 schließen“), Scanner ohne Kamera, Papierkorb, Anzeigemodus „Feld“ (über den Speicherschlüssel `eeb.anzeigemodus.v1`).
 Tipps als Touch-Tipps (`touchscreen.tap()`), Zeitabstände gestuft (300, 1 000, 1 600, 2 500 ms). Maße aus

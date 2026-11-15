@@ -18,7 +18,7 @@ gemeldet.
 Playwright/Chromium (`chromium.launch()` ohne Optionen, globales Modul, da die
 Projektkopie keinen Browser fand), `isMobile`/`hasTouch`, Locale de-DE, Telefon
 390 × 844 und 360 × 640. Jeder Lauf mit frischem Kontext. Einsatzdaten aus den
-Beispielbögen unter `examples/thw/` (Kopien mit `uebung: false`, aktuellem
+Übungsbögen unter `examples/thw/` (Kopien mit `uebung: false`, aktuellem
 Stand und Zeitraum), über „Bögen einlesen…“ in eine frisch angelegte Sammlung
 eingespielt (3, 4, 6 und 12 Bögen).
 

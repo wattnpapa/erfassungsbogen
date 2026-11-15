@@ -17,7 +17,7 @@ Chromium über das globale `playwright`-Modul (`/opt/node22/lib/node_modules/pla
 `chromium.launch()` ohne Optionen, nichts installiert. `isMobile`/`hasTouch`, Locale de-DE,
 Viewports 360 × 640 und 390 × 844, Tipps über `touchscreen.tap`. Je Szenario ein frischer
 Browserkontext. Zustand über die Bedienung: Einsatz-Sammlung „Hochwasser Weser" anlegen,
-die THW-Beispielbögen `012-sinsheim`, `013-ulm`, `014-weinsberg` (Kopien außerhalb des
+die THW-Übungsbögen `012-sinsheim`, `013-ulm`, `014-weinsberg` (Kopien außerhalb des
 Repositorys, `uebung: false`, `stand` fünf Minuten vor der Geräteuhr) über „Bögen
 einlesen…" aufnehmen; für den Assistenten Bogen `013-ulm` über „Aus Datei laden…".
 Kein Kamera-Scan, keine Handschuhe, kein Zweitgerät, keine nativen Builds.

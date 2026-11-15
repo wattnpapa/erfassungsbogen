@@ -1,9 +1,9 @@
-# Audit „Führungssicht“, Schwerpunkt Beispielbögen, Runde 2 (Kräfteansatz für eine Übung zusammenstellen)
+# Audit „Führungssicht“, Schwerpunkt Übungsbögen, Runde 2 (Kräfteansatz für eine Übung zusammenstellen)
 
 Prüfer: Rollenaudit `thw-command-reviewer` · Datum: 2026-11-09 ·
 Prüfgegenstand: Live-Seite https://erfassungsbogen.app/ (Version
 `v2026.1109.833`), Code-Stand Commit `085a93b` (`main`). Nur der Bereich
-Beispielbögen: Dialog „Beispielbögen“ mit Suche, Register, Pfadleiste,
+Übungsbögen: Dialog „Übungsbögen“ mit Suche, Register, Pfadleiste,
 Tabelle bzw. Karten und dem neuen Knopf „Alle … in eine Übungs-Sammlung“,
 dazu die so angelegte Übungs-Sammlung mit Lageblatt und Sammel-PDF, weil sie
 zur Aufgabe der Rolle gehört. Code zur Einordnung: `src/app/beispiele-dialog.tsx`,
@@ -51,7 +51,7 @@ Geprüft:
 - Ordnergrenzen: Übungs-Sammlung OV Forchheim angelegt, danach drei Bögen
   aus OV Schweinfurt einzeln über „Anzeigen“ → „In Einsatz-Sammlung
   ablegen…“ dazugelegt (Klicks gezählt, Rückfragen mitgeschrieben).
-- „Anzeigen“ eines Beispielbogens (Hessen, 1. Löschgruppe): Zeitraum,
+- „Anzeigen“ eines Übungsbogens (Hessen, 1. Löschgruppe): Zeitraum,
   Stand, Warnungen.
 - Herkunftsspalte aller Ordner außerhalb der THW-Ortsverbände (484 Zeilen
   in 24 Ordnern) maschinell auf Aufbau, Doppelwörter und doppelte Träger
@@ -92,7 +92,7 @@ Gerade beim Kernbeispiel der Rolle, einem OV mit **zwei Technischen Zügen**,
 stimmt die Lage aber nicht: Aus OV Landshut (11 Bögen) werden 9 Einheiten mit
 76 statt 89 Helfern, weil der Zugtrupp und die Bergungsgruppe des 2. TZ den
 Bogen des 1. TZ als „neue Fassung“ überschreiben, während die Meldung „mit 11
-Beispielbögen angelegt“ sagt (BB2-K1). Wer das nicht nachrechnet, übt mit
+Übungsbögen angelegt“ sagt (BB2-K1). Wer das nicht nachrechnet, übt mit
 einem stillschweigend falschen Kräfteansatz. Der Zug, im Dialog sichtbar,
 kommt in der Sammlung weiter nicht an („10 ohne Zug“, BB-K7). Die neue Suche
 findet Orte und Ortsverbände, aber keine Einheitstypen in Klartext
@@ -107,7 +107,7 @@ Geprüft und in Ordnung (nicht gemeldet):
   (11/31/156//198, 73 Fzg), Mecklenburg-Vorpommern (9/26/90//125, 40 Fzg) und
   THW direkt (14/230/717//961, 301 Fzg). Fünf Zeilen „Zugtrupp (ZTr)“ in
   Hessen und vier in Mecklenburg-Vorpommern werden nicht zusammengeführt.
-- Datierung: Geöffneter Beispielbogen „Zeitraum 09.11.2026 – 10.11.2026“, in
+- Datierung: Geöffneter Übungsbogen „Zeitraum 09.11.2026 – 10.11.2026“, in
   der Sammlung „Stand der Angaben 09.11.2026, 08:44“, kein „Stand vor … Tagen“,
   kein „Einsatzzeitraum … ist vorbei“.
 - Einzelablage über Ordnergrenzen: drei Bögen aus OV Schweinfurt in die
@@ -128,17 +128,17 @@ Geprüft und in Ordnung (nicht gemeldet):
 | BB-K5 | teilweise | Behoben: „SAR-Leitstelle“ nicht mehr doppelt; THW, Niedersachsen, Sachsen, Thüringen, Saarland, Brandenburg mit Ort fett. Offen: In Hessen (37 von 37 Zeilen), Mecklenburg-Vorpommern (27/27), Rheinland-Pfalz (37/37, Modulkennung „BS-01 · Brandschutz“), Berlin (8/18), NRW (7/13) und Bundeswehr (3/8) steht fett der Zug, die Einheit oder das Modul statt eines Orts. Hessen: Träger in 18 Zeilen doppelt („Deutsches Rotes Kreuz — Kreisverband Hochtaunuskreis“ / „DRK-Kreisverband Hochtaunuskreis“). Neue Doppelwörter: „übergeordnetes Landeskommando Landeskommando (fiktiv)“ (Bundeswehr, 2 Zeilen), „Landkreis/kreisfreie Stadt Landkreis Moorwehde“ (BBK, 5 Zeilen). THW direkt (101 Bögen): weiter kein Zughinweis. |
 | BB-K6 | behoben | Zeitraum und Stand auf heute (siehe „Geprüft und in Ordnung“); keine Veraltet-Warnung in Sammlung, Lageblatt und Sammel-PDF. Warnungen aus den Daten selbst („alle als ‚männlich‘ (Vorbelegung)“, „Sitzplätze fehlen“) stehen weiter in Karten und Sammel-PDF; sie gehören nicht zu BB-K6. |
 | BB-K7 | teilweise | Art „Übung“: behoben (Sammelweg legt „Übung“ an, Lage zählt). Zug: offen. Forchheim „10 ohne Zug“, Landshut „9 ohne Zug“, Hessen „37 ohne Zug“, obwohl der Dialog „1. Technischer Zug“ bzw. in der Herkunft „Sanitätszug (SanZ)“ zeigt; Spalte „Zug“ in Lageblatt und Sammel-PDF leer. |
-| BB-K8 | behoben | Register „Katastrophenschutz“ zeigt „Baden-Württemberg“, „Mecklenburg-Vorpommern“, „Nordrhein-Westfalen“, „Rheinland-Pfalz“ usw. einheitlich; „Noch ohne Beispielbögen: Bremen, Hamburg, Sachsen-Anhalt, Schleswig-Holstein“. |
+| BB-K8 | behoben | Register „Katastrophenschutz“ zeigt „Baden-Württemberg“, „Mecklenburg-Vorpommern“, „Nordrhein-Westfalen“, „Rheinland-Pfalz“ usw. einheitlich; „Noch ohne Übungsbögen: Bremen, Hamburg, Sachsen-Anhalt, Schleswig-Holstein“. |
 
 ## Befunde
 
-### BB2-K1 [P1] Übungs-Sammlung aus einem OV mit zwei Technischen Zügen verliert still Einheiten: OV Landshut 11 Bögen → 9 Einheiten, 76 statt 89 Helfer; die Meldung sagt „mit 11 Beispielbögen“
+### BB2-K1 [P1] Übungs-Sammlung aus einem OV mit zwei Technischen Zügen verliert still Einheiten: OV Landshut 11 Bögen → 9 Einheiten, 76 statt 89 Helfer; die Meldung sagt „mit 11 Übungsbögen“
 
 - **Typ:** Statusklarheit/Datenverlust in der Lage.
 - **Neu oder alt (Verweis):** neu; Folge des Sammelwegs aus BB-K1. Gleiche
   Ursache wie Runde 1 BB-W2 (gleichnamige Bögen werden eine Einheit), dort
   nur für „Einlagen Kräfte Hannover“ behoben.
-- **Fundstelle:** Dialog „Beispielbögen“ › OV Landshut (Suche „Landshut“),
+- **Fundstelle:** Dialog „Übungsbögen“ › OV Landshut (Suche „Landshut“),
   „Alle 11 in eine Übungs-Sammlung“; danach die Übungs-Sammlung, Lageblatt.
   1280x900. Nachgestellt mit OV Augsburg.
 - **Beobachtung:**
@@ -146,7 +146,7 @@ Geprüft und in Ordnung (nicht gemeldet):
     „Bergungsgruppe“ je einmal mit „1. Technischer Zug“ und „2. Technischer
     Zug“; Summe der Zeilen 2/22/65//89.
   - Die Meldung lautet „Übungs-Sammlung ‚Übung: … › OV Landshut‘ mit 11
-    Beispielbögen angelegt.“ Die Sammlung zeigt aber **9 Einheiten,
+    Übungsbögen angelegt.“ Die Sammlung zeigt aber **9 Einheiten,
     1 / 19 / 56 // 76**, 22 Fahrzeuge, „9 gemeldet · 9 anwesend“.
   - Nr. 1 „THW Landshut Zugtrupp Technischer Zug“ und Nr. 2 „THW Landshut
     Bergungsgruppe“ tragen „neue Fassung“ und „Folgemeldung … 1 Fahrzeug dazu
@@ -172,7 +172,7 @@ Geprüft und in Ordnung (nicht gemeldet):
   „Folgemeldung“ suggeriert eine Lageänderung, die es nie gab. Das ist eine
   stille Fehlinformation in der Lage, die der Ausbilder ohne Nachrechnen nicht
   bemerkt.
-- **Empfehlung:** Beim Sammelweg jeden Beispielbogen als eigene Einheit
+- **Empfehlung:** Beim Sammelweg jeden Übungsbogen als eigene Einheit
   aufnehmen; gleichnamige Einheiten im Namen unterscheiden (Zug anhängen,
   wie beim 2. Einsatzzug Hannover) oder den Zug setzen (siehe BB-K7). Wenn die
   App doch zusammenführt, nennt die Meldung die Zahl der Einheiten und warum
@@ -185,7 +185,7 @@ Geprüft und in Ordnung (nicht gemeldet):
 
 - **Typ:** Navigation/Erwartung.
 - **Neu oder alt (Verweis):** neu; Teil der Nachprüfung von BB-K4.
-- **Fundstelle:** Dialog „Beispielbögen“, Feld „Suchen“ (Platzhalter „Ort, OV
+- **Fundstelle:** Dialog „Übungsbögen“, Feld „Suchen“ (Platzhalter „Ort, OV
   oder Einheit, z. B. Oldenburg“). Alle Ansichten.
 - **Beobachtung:**
   - „Bergungsgruppe“: „0 Ordner und 0 Bögen gefunden“; im Bestand liegen 870
@@ -254,21 +254,21 @@ Geprüft und in Ordnung (nicht gemeldet):
 - **Beobachtung:** Jede Karte: „kürzlich eingetroffen“, „eingetroffen
   09.11.2026, 08:44 … · am Meldekopf von Hand erfasst“; Kopf „10 gemeldet ·
   10 anwesend“; im Sammel-PDF „Eingetroffen 09.11.2026, 08:54“ für alle zehn
-  in derselben Minute. Dass die Einheiten aus den Beispielbögen übernommen
+  in derselben Minute. Dass die Einheiten aus den Übungsbögen übernommen
   wurden, steht nirgends an der Einheit (nur „ÜBUNG“).
 - **Erwartung der Rolle (Annahme zum Übungsablauf):** Eine vorbereitete
   Übungslage zeigt die Einheiten als „erwartet“ oder ohne Eintreffzeit, und
-  die Herkunft sagt „aus Beispielbögen übernommen“.
+  die Herkunft sagt „aus Übungsbögen übernommen“.
 - **Auswirkung im Einsatz:** Wer die Sammlung als Soll-Lage weitergibt oder
   übernimmt, liest „10 anwesend, von Hand am Meldekopf erfasst“ und hält das
   für tatsächliches Geschehen; die Eintreffzeiten ergeben keine sinnvolle
   Zeitleiste für die Nachbesprechung. Beides lässt sich je Einheit ändern
   („ändern“), bei zehn Einheiten aber zehnmal.
-- **Empfehlung:** Herkunft der Meldung „aus Beispielbögen“ angeben; beim
+- **Empfehlung:** Herkunft der Meldung „aus Übungsbögen“ angeben; beim
   Anlegen wählen lassen: „als eingetroffen“ oder „noch nicht eingetroffen“
   (Soll-Lage), oder die Eintreffzeit offen lassen.
 - **Verifikation:** Übungs-Sammlung aus OV Forchheim: Karten nennen
-  „aus Beispielbogen“ statt „am Meldekopf von Hand erfasst“; mit Wahl „noch
+  „aus Übungsbogen“ statt „am Meldekopf von Hand erfasst“; mit Wahl „noch
   nicht eingetroffen“ zeigt der Kopf 0 anwesend.
 
 ## Hinweise (ohne Priorität)
@@ -304,7 +304,7 @@ Aufgabe; nicht in der Zählung.
   KatS-Zug eines Landes geht nur als ganzes Land oder Bogen für Bogen.
 - **Fremde Hilfe nötig:** nein für den einfachen Fall; für das Erkennen des
   Fehlers bei zwei Zügen wäre Nachrechnen nötig, das die App nicht anbietet.
-- **Größtes Missverständnis:** „mit 11 Beispielbögen angelegt“ lässt glauben,
+- **Größtes Missverständnis:** „mit 11 Übungsbögen angelegt“ lässt glauben,
   die Lage enthalte elf Einheiten, tatsächlich sind es neun.
 - **Größtes Einsatzrisiko:** Eine Übungs-Soll-Lage, der still ein Zugtrupp und
   eine Bergungsgruppe fehlen und die eine nie gemeldete „Folgemeldung“ zeigt.

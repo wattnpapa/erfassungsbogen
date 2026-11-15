@@ -20,7 +20,7 @@ Playwright (Chromium, `chromium.launch()` ohne Optionen, globales Modul
 Telefon 390x844 und 360x640, dazu 320x568 und 320x480 (Dialoge), 640x360 und
 844x390 (quer). Zustand: Einsatz „Hochwasser Nord“ mit bis zu fünf Einheiten,
 aufgenommen über „Einheit schnell erfassen (nur Stärke)…“ und über „Bögen
-einlesen…“ (Beispielbögen). Geprüft:
+einlesen…“ (Übungsbögen). Geprüft:
 
 - Nachgeladene Teile: Verlauf von Seitenhöhe und Layoutverschiebungen beim
   Neuladen der Einsatzansicht (Service Worker aktiv, mit und ohne 4- und

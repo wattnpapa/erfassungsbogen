@@ -1,5 +1,5 @@
 /**
- * Reine Suchlogik des Beispielbögen-Dialogs (beispiele-dialog.tsx), getrennt,
+ * Reine Suchlogik des Übungsbögen-Dialogs (beispiele-dialog.tsx), getrennt,
  * damit sie ohne Oberfläche prüfbar ist (beispiele-suche.test.ts).
  */
 

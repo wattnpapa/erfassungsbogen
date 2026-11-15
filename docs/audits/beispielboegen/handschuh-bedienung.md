@@ -1,25 +1,25 @@
-# Audit „Handschuh-Bedienung“, Schwerpunkt Beispielbögen (Startseiten-Abschnitt, Dialog, Register, Pfadleiste, Karten)
+# Audit „Handschuh-Bedienung“, Schwerpunkt Übungsbögen (Startseiten-Abschnitt, Dialog, Register, Pfadleiste, Karten)
 
 Prüfer: Rollenaudit `thw-glove-touch-reviewer` · Datum: 2026-11-08 ·
-Prüfgegenstand: Live-Seite `https://erfassungsbogen.app/` (frisch deployt, Code-Stand `0dd56d4`, `main`), nur der Bereich Beispielbögen
+Prüfgegenstand: Live-Seite `https://erfassungsbogen.app/` (frisch deployt, Code-Stand `0dd56d4`, `main`), nur der Bereich Übungsbögen
 
 **Zählung:** P0: 0 · P1: 0 · P2: 3 (BB-G1 bis BB-G3) · P3: 3 (BB-G4 bis BB-G6) · Hinweise ohne Priorität: 4 (H1 bis H4)
 
 Reiner Prüfbericht, keine Codeänderung. Gelesen vor dem Prüfen: `docs/audits/README.md`, `runde-21/handschuh-bedienung.md`
-(Aufbau), zum Nachschlagen `src/app/fusszeile.tsx` (Dialog „Beispielbögen“) und die Regeln `beispiel-…` in `index.html`.
+(Aufbau), zum Nachschlagen `src/app/fusszeile.tsx` (Dialog „Übungsbögen“) und die Regeln `beispiel-…` in `index.html`.
 Je Sachverhalt ein Befund, mit Typ (Daten/Verlust, Bedienung, Layout/Abstand, Text, Kontrast) und Kennzeichnung
 „gemessen“, „im Bild“ oder „aus Messung abgeleitet“.
 
 ## Urteil aus Sicht der Rolle
 
-Im Hochformat ist der Bereich mit Handschuh gut zu bedienen: Der Startknopf „Beispielbögen ansehen“ ist 182 × 44 (Feld 218 × 54),
+Im Hochformat ist der Bereich mit Handschuh gut zu bedienen: Der Startknopf „Übungsbögen ansehen“ ist 182 × 44 (Feld 218 × 54),
 die Registerzeilen sind über die ganze Breite antippbar und 52 bis 112 px hoch (Feld 63 bis 233), „‹ Zurück“ ist ein echter Knopf
 (84 × 44, Feld 100 × 54), die Kartenknöpfe Anzeigen/PDF/Link sind 71 bis 104 px breit und 44 hoch (Feld 85 bis 125 × 54) mit 18 bis
 20 px Abstand. Das Rollen im Dialog bleibt im Dialog (die Seite dahinter bewegt sich nicht, auch nicht am Listenende), ein Wisch,
 der auf einem Knopf beginnt, löst nichts aus, ein Tipp auf den abgedunkelten Rand schließt nicht, und wer einen angefangenen Bogen hat,
-bekommt vor dem Ersetzen die Rückfrage „Beispielbogen öffnen?“ (302 × 44, 24 px Abstand). Reibung entsteht an drei Stellen: im
+bekommt vor dem Ersetzen die Rückfrage „Übungsbogen öffnen?“ (302 × 44, 24 px Abstand). Reibung entsteht an drei Stellen: im
 Querformat stehen die Aktionen außerhalb des Bildes, während des Nachladens rutschen die Knöpfe unter dem Finger, und jeder Weg in einen
-Bogen (gewollt oder versehentlich) wirft den Ordnerpfad weg. Die Aufgabe „Beispielbogen ansehen, als PDF holen oder Link weitergeben“
+Bogen (gewollt oder versehentlich) wirft den Ordnerpfad weg. Die Aufgabe „Übungsbogen ansehen, als PDF holen oder Link weitergeben“
 ist ohne fremde Hilfe zu schaffen, im Querformat nur mit einem nicht angezeigten Seitwärtswisch.
 
 ## Prüfaufbau
@@ -27,14 +27,14 @@ ist ohne fremde Hilfe zu schaffen, im Querformat nur mit einem nicht angezeigten
 Chromium über das globale Playwright-Modul (`chromium.launch()` ohne Optionen), `isMobile`, `hasTouch`, Pixeldichte 1, de-DE,
 Touch-Tipps (`tap()`) und Wischgesten über CDP-Touch-Ereignisse. Viewports 360 × 640, 390 × 844, 320 × 568, quer 640 × 360, zur
 Einordnung zusätzlich quer 568 × 320 und 844 × 390. Jeweils Anzeigemodus „Standard“ und „Feld“ (über `eeb.anzeigemodus.v1`, vor
-dem Laden gesetzt; Klasse `feld-modus`, Grundschrift 17,92 px). Weg: Startseite → „Beispielbögen ansehen“ → Erklärung auf/zu →
+dem Laden gesetzt; Klasse `feld-modus`, Grundschrift 17,92 px). Weg: Startseite → „Übungsbögen ansehen“ → Erklärung auf/zu →
 „THW“ (101 Bögen direkt, Unterordner „Alle Einheiten aller Ortsverbände (LV › RSt › OV)“ mit 3 533) → „Baden-Württemberg“ →
 „RSt Biberach“ → „OV Biberach/Riß“ (6 Karten). Gemessen: Knopfmaße und Abstände per `getBoundingClientRect`, Treffer per
 `elementFromPoint` (DOM nicht verändert), Nachladen ungedrosselt und gedrosselt (150 ms Latenz, 200 KiB/s). Skripte und
 Bildschirmfotos in `/tmp/claude-0/audit-handschuh/` (außerhalb des Repositorys).
 
 **Annahmen:** Ein Handschuhfinger trifft mit etwa 8 bis 14 px Abweichung um die gezielte Stelle; als Mindestmaß gelten 44 × 44 px,
-im Modus „Feld“ 48 px. Beispielbögen sind Übungs- und Ausbildungsmaterial, kein Einsatzweg; die Prioritäten sind daran gemessen.
+im Modus „Feld“ 48 px. Übungsbögen sind Übungs- und Ausbildungsmaterial, kein Einsatzweg; die Prioritäten sind daran gemessen.
 
 **Nicht prüfbar:** echte Handschuhe und echte Fingerauflage; das Share-Sheet hinter „Link“ (im Prüfbrowser ohne sichtbare Rückmeldung,
 „Kopiert“ erscheint nur beim Weg über die Zwischenablage); Zurück-Geste von Android als Schließen des Dialogs; Electron- und
@@ -45,9 +45,9 @@ App-Fassung; das Speichern der PDF auf einem echten Telefon (im Prüfbrowser kam
 
 | Ziel | 360 × 640 | 390 × 844 | 320 × 568 | 640 × 360 | Feld (360 × 640) |
 | --- | --- | --- | --- | --- | --- |
-| „Beispielbögen ansehen“ | 182 × 44 | 182 × 44 | 182 × 44 | 182 × 44 | 218 × 54 |
+| „Übungsbögen ansehen“ | 182 × 44 | 182 × 44 | 182 × 44 | 182 × 44 | 218 × 54 |
 | „Schließen“ (oben rechts, bleibt stehen) | 96 × 44, y 33 | 96 × 44, y 115 → 33 (H1) | 96 × 44, y 66 | 96 × 44, y 33 | 114 × 48 |
-| „Was sind Beispielbögen? …“ | 278 × 44 | 308 × 44 | 238 × 44 | 494 × 44 | 276 × 54 (320: 236 × 76) |
+| „Was sind Übungsbögen? …“ | 278 × 44 | 308 × 44 | 238 × 44 | 494 × 44 | 276 × 54 (320: 236 × 76) |
 | Registerzeile | 278 × 52 bis 112 | 308 × 52 bis 88 | 238 × 52 bis 160 | 494 × 52 | 276 × 63 bis 179 |
 | „‹ Zurück“ | 84 × 44 | 84 × 44 | 84 × 44 | 84 × 44 | 100 × 54 |
 | Pfad-Link „Alle“ / „THW“ | 24 × 44 / 32 × 44 | 24 × 44 / 32 × 44 | 24 × 44 / 32 × 44 | 24 × 44 / 32 × 44 | 28 × 54 / 38 × 54 |
@@ -61,7 +61,7 @@ App-Fassung; das Speichern der PDF auf einem echten Telefon (im Prüfbrowser kam
 
 **Typ:** Layout/Abstand · **Kennzeichnung:** gemessen und im Bild (640 × 360, Standard und Feld; zur Einordnung 568 × 320 und 844 × 390).
 
-**Fundstelle:** Dialog „Beispielbögen“ im Querformat, jede Ebene mit Bögen (z. B. „THW“, „OV Biberach/Riß“).
+**Fundstelle:** Dialog „Übungsbögen“ im Querformat, jede Ebene mit Bögen (z. B. „THW“, „OV Biberach/Riß“).
 
 **Beobachtung:** Bei 640 px Breite bleibt die Liste eine Tabelle (die Kartenform greift erst unter 34 rem). Der Tabellenbehälter ist
 494 px breit, die Tabelle 763 px (Feld: 556 gegen 908 px). „Anzeigen“ beginnt bei x 567, genau am rechten Rand des sichtbaren Bereichs,
@@ -69,7 +69,7 @@ App-Fassung; das Speichern der PDF auf einem echten Telefon (im Prüfbrowser kam
 (Bild `j-640x360-standard-tabelle.png`). Ein Seitwärtswisch auf einer Zeile schiebt die Tabelle um 269 px; dann sind die drei Knöpfe
 im Bild, Einheit und Ort aber abgeschnitten („adt“, „ach/Riß“, Bild `k-640x360-querwisch.png`). 568 × 320: Anzeigen bei x 535 von 527
 sichtbar. 844 × 390: Anzeigen sichtbar, PDF halb, Link außerhalb. Kein Hinweis, dass die Tabelle seitlich weitergeht. Der Kopf
-„Beispielbögen / Schließen“ bleibt stehen (68 von 328 px, Feld 73), sodass bei 360 px Höhe zwei Tabellenzeilen ins Bild passen.
+„Übungsbögen / Schließen“ bleibt stehen (68 von 328 px, Feld 73), sodass bei 360 px Höhe zwei Tabellenzeilen ins Bild passen.
 
 **Erwartung der Rolle:** Die Aktionen einer Zeile stehen neben dem, was sie betreffen, ohne Seitwärtswischen.
 
@@ -111,10 +111,10 @@ Ladezeile: jeder Punkt trifft durchgehend denselben Knopf (auch gedrosselt).
 
 **Typ:** Bedienung · **Kennzeichnung:** gemessen (360 × 640).
 
-**Fundstelle:** Karte → „Anzeigen“ → im Bogen „‹ Startseite“ → „Beispielbögen ansehen“.
+**Fundstelle:** Karte → „Anzeigen“ → im Bogen „‹ Startseite“ → „Übungsbögen ansehen“.
 
 **Beobachtung:** „Anzeigen“ schließt den Dialog und öffnet den Bogen. „‹ Startseite“ führt an den Seitenanfang (Bildlauf 0); der
-Knopf „Beispielbögen ansehen“ steht danach bei y 2 148 einer 3 503 px hohen Seite (vorher, ohne Bogen, bei y 1 843). Der Dialog öffnet
+Knopf „Übungsbögen ansehen“ steht danach bei y 2 148 einer 3 503 px hohen Seite (vorher, ohne Bogen, bei y 1 843). Der Dialog öffnet
 wieder auf der Wurzel („Alle“), der Pfad THW › Alle Einheiten › Baden-Württemberg › RSt Biberach › OV Biberach/Riß ist weg: fünf Tipps
 plus Rollen, um zum Nachbarbogen zu kommen.
 
@@ -124,8 +124,8 @@ oder um nach einem Fehltipp doch das PDF zu holen.
 **Auswirkung im Einsatz (Ausbildung):** Wer mehrere Bögen eines Ortsverbands zeigen will (Unterricht, Übungsvorbereitung) oder sich bei
 Anzeigen/PDF vertippt hat, wiederholt jedes Mal den ganzen Weg; mit Handschuh rund 7 Tipps und 2 bis 3 Wischer statt einem.
 
-**Empfehlung:** Den zuletzt offenen Ordner (für die Sitzung) beim Wiederöffnen beibehalten und aus dem geöffneten Beispielbogen einen
-direkten Rückweg „Zurück zu den Beispielbögen“ anbieten.
+**Empfehlung:** Den zuletzt offenen Ordner (für die Sitzung) beim Wiederöffnen beibehalten und aus dem geöffneten Übungsbogen einen
+direkten Rückweg „Zurück zu den Übungsbögen“ anbieten.
 
 **Nachprüfung:** OV Biberach/Riß → Anzeigen → zurück: Der Dialog steht wieder auf „OV Biberach/Riß“, erreichbar mit höchstens zwei Tipps.
 
@@ -199,7 +199,7 @@ Anzeigen über die ganze Breite, darunter immer PDF links und Link rechts).
 - **H2 Ordnername mit „›“ (Text):** „Alle Einheiten aller Ortsverbände (LV › RSt › OV)“ trägt im Namen dasselbe Zeichen, das die Pfadleiste als
   Trenner benutzt; im Pfad liest sich das wie fünf Stufen.
 - **H3 „Schließen“ im Feld-Modus (Layout):** wächst nur auf 48 px, die übrigen Ziele auf 54; erfüllt das Maß, wirkt neben „‹ Zurück“ aber kleiner.
-- **H4 Lage des Einstiegs (Layout):** Der Abschnitt „Beispielbögen“ beginnt bei 360 × 640 rund 2,9 Bildschirme unter dem Seitenanfang
+- **H4 Lage des Einstiegs (Layout):** Der Abschnitt „Übungsbögen“ beginnt bei 360 × 640 rund 2,9 Bildschirme unter dem Seitenanfang
   (Knopf bei y 1 843), mit geöffnetem Bogen bei y 2 148. Er ist der einzige Einstieg (laut Code), siehe BB-G3.
 
 ## Abschluss

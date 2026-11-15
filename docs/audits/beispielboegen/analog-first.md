@@ -1,9 +1,9 @@
-# Audit „Analog first“, Schwerpunkt Beispielbögen (Papier als Übungsunterlage)
+# Audit „Analog first“, Schwerpunkt Übungsbögen (Papier als Übungsunterlage)
 
-Prüfer: Rollenaudit `thw-analog-first-reviewer` · Datum: 2026-11-08 · Prüfgegenstand: Bereich „Beispielbögen“ der
+Prüfer: Rollenaudit `thw-analog-first-reviewer` · Datum: 2026-11-08 · Prüfgegenstand: Bereich „Übungsbögen“ der
 Live-Seite https://erfassungsbogen.app/ (Stand `main`, Commit `0dd56d4`, frisch deployt; Fußzeile „v2026.1108.2056“):
-Abschnitt „Beispielbögen“ auf der Startseite unter „So funktioniert’s“ mit dem Primärknopf „Beispielbögen ansehen“,
-Dialog „Beispielbögen“ (Register, Pfadleiste, Tabelle, Knöpfe Anzeigen/PDF/Link), die daraus erzeugten PDFs und ihr
+Abschnitt „Übungsbögen“ auf der Startseite unter „So funktioniert’s“ mit dem Primärknopf „Übungsbögen ansehen“,
+Dialog „Übungsbögen“ (Register, Pfadleiste, Tabelle, Knöpfe Anzeigen/PDF/Link), die daraus erzeugten PDFs und ihr
 Verhältnis zum Blanko-Vordruck.
 
 Zählung: **P0 0 · P1 0 · P2 2 · P3 6 · Hinweise 3** (8 Befunde BB-A1 bis BB-A8, alle neu in diesem Schwerpunkt).
@@ -13,7 +13,7 @@ Reiner Prüfbericht, keine Codeänderung. Vorher gelesen: `docs/audits/README.md
 `src/app/app.tsx` (`BeispielboegenStart`, `oeffneBeispiel`), `src/app/pdf-dokument.ts` (Wasserzeichen, Störer, QR-Maße).
 Je Sachverhalt ein Befund, mit Typ (Daten/Verlust, Bedienung, Layout/Abstand, Text, Kontrast). Geschmacksfragen stehen
 als „Hinweis“ ohne Priorität im eigenen Abschnitt. Die Warnhinweise an den Beispieldaten („Zeitraum vorbei“ u. a.), die
-in R21 als Artefakte ausgeklammert waren, sind hier gewertet (BB-A8), weil die Beispielbögen selbst der Prüfgegenstand
+in R21 als Artefakte ausgeklammert waren, sind hier gewertet (BB-A8), weil die Übungsbögen selbst der Prüfgegenstand
 sind.
 
 ## Prüfaufbau
@@ -22,11 +22,11 @@ Playwright (Chromium, `chromium.launch()` ohne Optionen), Locale de-DE, `deviceS
 (`isMobile`/`hasTouch`) und 1280 × 900. Keine Skripteinschleusung, kein DOM-Eingriff; je Szenario ein frischer Kontext.
 Skripte, Bildschirmfotos, PDFs und Seitenbilder unter `/tmp/claude-0/audit-analog/bb/`.
 
-- Startseite: Lage des Abschnitts „Beispielbögen“ (390: Überschrift y = 1 692, Knopf y = 1 823, 182 × 44 px;
+- Startseite: Lage des Abschnitts „Übungsbögen“ (390: Überschrift y = 1 692, Knopf y = 1 823, 182 × 44 px;
   1280: y = 1 438 bzw. 1 529) und des Knopfs „Leeren Vordruck drucken (PDF)“ (390: y = 551).
 - Dialog: Register der obersten Ebene (ASB 4, BBK 5, Bundeswehr 8, DLRG 7, DRK 16, Feuerwehr 12, Katastrophenschutz 290,
   Praktische Ausbildung 41, THW 3 634 Bögen), Unterordner, Pfadleiste, Tabelle; Knöpfe am Telefon 104/72/71 × 44 px.
-- **PDF-Download** (`page.waitForEvent('download')`) von neun Beispielbögen: THW Albstadt ZTr TZ, THW Ansbach FGr Log-MW,
+- **PDF-Download** (`page.waitForEvent('download')`) von neun Übungsbögen: THW Albstadt ZTr TZ, THW Ansbach FGr Log-MW,
   THW Weinsberg FGr Öl (C), JUH Hannover 2. Einsatzzug (nur Stärke), JUH Malter Verpflegungsgruppe und Zugtrupp, JUH
   Akkonia Zugtrupp, Feuerwehr Ammerland Aufklärungstrupp Luft, DRK BHP 25 Kat. GELB; dazu Blanko-Vordruck von der
   Startseite und aus der Fußzeile.
@@ -57,7 +57,7 @@ Das Papier taugt. Jede geprüfte Beispiel-PDF ist A4 hoch (595 × 842 pt) und tr
 Seite (gemessen: 8 bis 10 % der Seitenfläche im Grauwert 241, auch auf reinen QR-Seiten). Seite 1 hat zusätzlich die rote
 Störer-Zeile „ÜBUNG — Dieser Bogen beschreibt keinen echten Einsatz.“, die auch schwarzweiß dunkel genug ist. Die QR-Codes
 sind groß: ein Einzelcode misst 67 mm (Version 17, 0,72 mm je Modul), Teilcodes 81 mm (Version 12, 1,11 mm je Modul). Alle
-24 Codes ließen sich schon aus 100-dpi-Bildern lesen. Der Rückweg trägt: Ein eingescannter Beispielbogen kommt als Übung
+24 Codes ließen sich schon aus 100-dpi-Bildern lesen. Der Rückweg trägt: Ein eingescannter Übungsbogen kommt als Übung
 an, „Bögen einlesen…“ liest Fotos ganzer Seiten, und „Lage vom Papier abgleichen…“ fragt Nr., Eingangszeit, Status, Zug
 und Auftrag vom Blatt ab. Offline gehen Dialog und PDFs ebenfalls.
 
@@ -69,15 +69,15 @@ Aufgabe zu schaffen, aber mit Umwegen.
 
 ## Befunde
 
-### BB-A1 [P2, Bedienung] Kein Sammeldruck: mehrere Beispielbögen für eine Übung nur einzeln oder über den eigenen Bogen, der dabei verdrängt wird
+### BB-A1 [P2, Bedienung] Kein Sammeldruck: mehrere Übungsbögen für eine Übung nur einzeln oder über den eigenen Bogen, der dabei verdrängt wird
 
-- **Fundstelle / Aufgabe:** Dialog „Beispielbögen“, Aufgabe „drei bis zehn Bögen einer Übung gesammelt ausdrucken“
+- **Fundstelle / Aufgabe:** Dialog „Übungsbögen“, Aufgabe „drei bis zehn Bögen einer Übung gesammelt ausdrucken“
   (1280 × 900, Ordner „Praktische Ausbildung / JUH RV Malter“, 5 Bögen).
 - **Beobachtung (gemessen):** Die Tabelle hat je Zeile nur „Anzeigen“, „PDF“ und „Link“. Es gibt keine Mehrfachauswahl und
   keinen Knopf „alle Bögen dieses Ordners als PDF“, auch nicht in Ordnern, die eine Übung bilden (Malter 5, Akkonia 7,
   Johannesburg 6, Hannover 23 Bögen) oder in einem Ortsverband unter „Alle Einheiten aller Ortsverbände“. In der
-  Einsatzansicht gibt es keinen Weg zu den Beispielbögen (der Dialog öffnet nur von der Startseite). Gesammelt geht es nur
-  so: „Beispielbögen ansehen → Praktische Ausbildung → JUH RV Malter → Anzeigen → In Einsatz-Sammlung ablegen… → Sammlung
+  Einsatzansicht gibt es keinen Weg zu den Übungsbögen (der Dialog öffnet nur von der Startseite). Gesammelt geht es nur
+  so: „Übungsbögen ansehen → Praktische Ausbildung → JUH RV Malter → Anzeigen → In Einsatz-Sammlung ablegen… → Sammlung
   wählen → ‹ Startseite“, für **drei Bögen 23 Tipps**. Der Pfad springt bei jedem Öffnen auf „Alle“ zurück. Jedes
   „Anzeigen“ ersetzt den eigenen Bogen. Ab dem zweiten Bogen lautet die Rückfrage: „Der Bogen … auf dem Platz ‚Zuletzt
   geschlossener Bogen‘ wird dabei endgültig gelöscht“, mit den Wahlknöpfen „… vorher als Datei sichern“ und „… alten Bogen
@@ -108,7 +108,7 @@ Aufgabe zu schaffen, aber mit Umwegen.
   ____ Uhr · ins Gerät übertragen [ ] von ______ um ____ Uhr / **Blatt ____ von ____**“. Das Abgleich-Formular fragt je
   Einheit „Nr. laut Blatt“, „Eingetroffen am“, „Status: anwesend / abgerückt“, „Zug“, „Auftrag / Notiz“ und verweist auf
   „Seite 1 bzw. Kasten ‚Stand am Meldekopf‘“. Diesen Kasten gibt es nur in der Sammel-PDF, nicht auf der Einzel-PDF eines
-  Beispielbogens. Auf der Beispiel-PDF fehlen damit Platz für Zug, Abrücken und Auftrag. Folgeseiten tragen „Nr. ______ ·
+  Übungsbogens. Auf der Beispiel-PDF fehlen damit Platz für Zug, Abrücken und Auftrag. Folgeseiten tragen „Nr. ______ ·
   … · Blatt 2 von 4 dieses Bogens“.
 - **Erwartung der Rolle:** Ein Meldekopf-Kasten, den ich einmal lerne, auf dem leeren wie auf dem ausgefüllten Bogen, und
   das Abgleich-Formular fragt genau die Kästchen dieses Kastens ab.
@@ -153,7 +153,7 @@ Aufgabe zu schaffen, aber mit Umwegen.
 - **Verifikation:** PDF aus Malter und aus Akkonia laden: zwei verschiedene Namen, beide mit Übungskennung; `pdfinfo` zeigt
   „ÜBUNG“ im Titel.
 
-### BB-A5 [P3, Layout/Abstand] Einseitige Beispielbögen haben keine Leerzeile für Nachträge von Hand
+### BB-A5 [P3, Layout/Abstand] Einseitige Übungsbögen haben keine Leerzeile für Nachträge von Hand
 
 - **Fundstelle / Aufgabe:** Einseitige Beispiel-PDFs (Albstadt ZTr TZ, Hannover 2. Einsatzzug, Ammerland Aufklärungstrupp
   Luft), Übung „Einheit meldet am Meldekopf eine Änderung, Teilnehmer trägt sie von Hand nach“.
@@ -195,7 +195,7 @@ Aufgabe zu schaffen, aber mit Umwegen.
 
 ### BB-A8 [P3, Text] Übungsunterlagen voller Warnhinweise wegen alter Beispieldaten
 
-- **Fundstelle / Aufgabe:** Beispielbögen in einer Übungs-Sammlung und auf deren Sammel-PDF (Malter, Albstadt, Weinsberg).
+- **Fundstelle / Aufgabe:** Übungsbögen in einer Übungs-Sammlung und auf deren Sammel-PDF (Malter, Albstadt, Weinsberg).
 - **Beobachtung (gemessen):** Die Beispiele tragen Zeiträume wie „17.02.2024“ (Praktische Ausbildung) oder „17.07.2026 –
   18.07.2026“ (THW). Die Sammel-PDF druckt je Einheit „Hinweise (4)“ bzw. „(5)“: „Einsatzzeitraum 17.02.2024 ist vorbei …“,
   „liegt mehr als ein Jahr entfernt — Tippfehler im Jahr?“, „Keine telefonische Erreichbarkeit erfasst …“. Auf den Karten
@@ -206,15 +206,15 @@ Aufgabe zu schaffen, aber mit Umwegen.
 - **Erwartung der Rolle:** Ein Übungsstapel enthält die Fehler, die der Ausbilder einbaut, nicht zufällige.
 - **Auswirkung im Einsatz:** Die Teilnehmer üben, Warnungen zu übergehen; auf der ausgedruckten Übersicht verdrängen die
   Hinweise die Spalten, um die es geht. „Zählt trotzdem mit“ neben „zählt nicht“ ist auf Papier ein Widerspruch.
-- **Empfehlung:** Beispielbögen beim Laden auf einen aktuellen Zeitraum heben oder Zeitwarnungen für Übungsbögen
+- **Empfehlung:** Übungsbögen beim Laden auf einen aktuellen Zeitraum heben oder Zeitwarnungen für Übungsbögen
   unterdrücken. „Zählt trotzdem mit“ nur, wenn die Karte wirklich zählt. Für abgelegte Beispiele eine eigene Herkunft
-  („aus Beispielbogen“).
+  („aus Übungsbogen“).
 - **Verifikation:** Fünf Beispiele in eine Übungs-Sammlung, Sammel-PDF: keine Zeit- oder Jahreswarnung; keine Karte sagt
   zugleich „zählt nicht“ und „zählt trotzdem mit“.
 
 ## Hinweise (ohne Priorität)
 
-- **H1, Startseite trennt Papier-Reserve und Beispiele:** Der Text des Abschnitts „Beispielbögen“ nennt „Ansehen und
+- **H1, Startseite trennt Papier-Reserve und Beispiele:** Der Text des Abschnitts „Übungsbögen“ nennt „Ansehen und
   Ausprobieren“, nicht Übung oder Druck. Der Knopf „Leeren Vordruck drucken (PDF)“ steht 1 270 px darüber (390 × 844: y = 551
   gegen 1 823). Wer eine Übung vorbereitet, holt Blanko und Beispiele an zwei Stellen. Die Erklärung im Dialog („PDFs tragen
   das Wasserzeichen ‚ÜBUNG‘ …“) ist eingeklappt.
@@ -245,9 +245,9 @@ Blanko-Vordruck.
 - **Aufgabe geschafft:** mit Umwegen (einzelne Bögen drucken und zurückscannen ja; Übungsstapel nur einzeln oder über den
   eigenen Bogen)
 - **Fremde Hilfe nötig:** nein
-- **Größtes Missverständnis:** Wer eine Sammlung aus Beispielbögen anlegt, hält „Einsatz“ für richtig und druckt „0
+- **Größtes Missverständnis:** Wer eine Sammlung aus Übungsbögen anlegt, hält „Einsatz“ für richtig und druckt „0
   Einheiten zählend“.
 - **Größtes Einsatzrisiko:** Beim Sammeln über „Anzeigen“ wird ein echter eigener Bogen auf „Zuletzt geschlossener Bogen“
   verdrängt und nach Rückfrage endgültig gelöscht (BB-A1).
-- **Top-Priorität für die nächste Iteration:** „Ordner als eine PDF drucken“ im Beispielbögen-Dialog, ohne den eigenen Bogen
+- **Top-Priorität für die nächste Iteration:** „Ordner als eine PDF drucken“ im Übungsbögen-Dialog, ohne den eigenen Bogen
   zu berühren (BB-A1).

@@ -16,7 +16,7 @@ Chromium (Playwright, `/opt/pw-browsers/chromium`), Viewport 360 × 640 px,
 habe ich zuerst ohne Blick in frühere Berichte. Den Runde-1-Bericht, die
 Tabelle „Stand der Behebung" und den Runde-2-Bericht
 [neuer-nutzer.md](neuer-nutzer.md) habe ich erst danach gelesen. Für die
-Meldekopf-Szenarien habe ich fünf Beispielbögen aus `examples/thw/` über
+Meldekopf-Szenarien habe ich fünf Übungsbögen aus `examples/thw/` über
 „Bögen einlesen…" als Dateien geladen, also so, wie es ein Nutzer tun würde,
 und keine `localStorage`-Seeds verwendet.
 
@@ -456,7 +456,7 @@ nicht noch einmal als eigene Befunde gezählt:
 
 Nicht nachgestellt habe ich R2-N1 (Verdrängung durch zwei
 Schnellerfassungen), R2-N5 und R2-N6. R2-N4 („alt") ließ sich mit den
-Beispielbögen nicht prüfen: Deren Stand liegt im Juli, dort ist „alt"
+Übungsbögen nicht prüfen: Deren Stand liegt im Juli, dort ist „alt"
 richtig.
 
 ## Was gut funktioniert und erhalten bleiben sollte

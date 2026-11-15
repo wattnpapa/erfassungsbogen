@@ -223,7 +223,7 @@ von ____ · Reicht der Platz nicht …" (`src/app/pdf-dokument.ts` Zeile 1701 ff
 **Beobachtung:**
 - Der Blanko fasst 10 + 19 = 29 Personalzeilen. Der Hinweis nennt „mehr als 4
   Fahrzeuge oder 6 Qualifikationen", das Personal fehlt.
-- Von den 443 Beispielbögen haben 20 mehr als 29 Personen (THW: der Großbogen
+- Von den 443 Übungsbögen haben 20 mehr als 29 Personen (THW: der Großbogen
   mit 38; sonst Züge der Feuerwehr, des Katastrophenschutzes und der
   Bundeswehr mit 30 bis 73).
 - Die beiden Hinweiszeilen sind klein und berühren einander

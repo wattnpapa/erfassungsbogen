@@ -13,7 +13,7 @@ Meldungen überlebt das Neuladen nicht, Tabellenzeilenhöhe bei 180 × 320), Run
 (R11-S4, R11-H2, R11-K2, R11-A2, R11-A5, R11-M1, R11-M3), Runde 12 (R12-W3, R12-H3,
 R12-O2, R12-O4, R12-G3), Runde 13 (R13-W1, R13-W6, R13-H1) und Runde 14 (R14-E7,
 R14-S2, R14-H1 nur Mindestvariante, R14-W3 Regelsatz nicht im Lageblatt). Der
-Hinweis „Anderer Einsatz?" an Beispielbögen (Ortsname aus dem Auftrag kommt in der
+Hinweis „Anderer Einsatz?" an Übungsbögen (Ortsname aus dem Auftrag kommt in der
 Sammlung nicht vor) ist R14-W3 und wird nicht wiederholt.
 
 ## Prüfaufbau
@@ -23,7 +23,7 @@ nichts installiert), `isMobile`/`hasTouch`, Locale de-DE, Viewports 390 × 844
 (durchgehend) und 360 × 640 (Tabelle, Aufteilen, Details, Scanner, Überlauf auch
 bei 320 × 568). Geräteuhr 26.10.2026. Je „Gerät" ein eigener Browserkontext.
 
-Eingang der Bögen auf dem echten Weg: Beispielbogen öffnen, Zeitraum auf heute
+Eingang der Bögen auf dem echten Weg: Übungsbogen öffnen, Zeitraum auf heute
 setzen, „Dies ist eine Übung" abwählen (Rückfrage „Beispieldaten im Bogen" mit
 „Trotzdem als Einsatz" bestätigt), „Bogen übergeben… → Weitere Formate → Link
 teilen" (`navigator.share` gestubbt, Host auf `localhost:4173` umgeschrieben), dann
@@ -65,7 +65,7 @@ alle anderen Ausgaben.
 | R14-H1 Link ohne Sammlung | hält als Mindestvariante. Kaltstart mit Link: Übersicht mit Hinweis „Meldung einer fremden Einheit: Sie gehört in eine Einsatz-Sammlung", Hauptknopf „In Einsatz-Sammlung ablegen…" steht vor „Bogen übergeben…"; ohne Sammlung führt er über „Neue Sammlung anlegen…" in die Ablage, die Einheit liegt danach als Nr. 1 in der neuen Sammlung |
 | R14-H2/D3/G2 Zugzuordnung | hält. „Zug „1. Zug" gesetzt: 4 Einheiten" mit „Rückgängig"; „Zug 1", „ZUG1" und „1.Zug" landen im selben Zug, „TZ 2" bleibt eigener Zug |
 | R14-E1 Übung zählen | hält. Unter „Mehr…" der Karte „Als Einsatzmeldung zählen?" mit Zahl der Personen und Hinweis auf „Rückgängig" |
-| R14-E6 Übung abwählen | hält. Beim Abwählen am Beispielbogen kommt „Beispieldaten im Bogen" mit „Übung beibehalten" / „Trotzdem als Einsatz" |
+| R14-E6 Übung abwählen | hält. Beim Abwählen am Übungsbogen kommt „Beispieldaten im Bogen" mit „Übung beibehalten" / „Trotzdem als Einsatz" |
 | R14-W5 Zahlen in Dialog und Quittung | hält. Stärke 11 → 9 steht in Dialog („Gesamt: 9 (bisher 11)"), Quittung und Karte gleich; Verpflegung zieht mit (27 → 25) |
 | R14-A1 Eintreffzeit | hält. Lageblatt trägt „11:52 *" mit Fußnote „Zeit des Einlesens am Gerät, nicht vom Absender … bestätigt" |
 | R14-S1 Zurück-Geste | hält für Auftrag/Notiz. Ein getippter, nicht gespeicherter Auftrag steht nach Browser-Zurück und erneutem Öffnen der Sammlung auf der Karte |

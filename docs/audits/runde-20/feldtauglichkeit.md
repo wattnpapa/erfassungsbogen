@@ -16,7 +16,7 @@ Bedienung, Layout/Abstand, Text, Kontrast).
 Playwright/Chromium (globales Modul, `chromium.launch()` ohne Optionen), `isMobile`/`hasTouch`,
 Locale de-DE, Telefon 390 × 844, 360 × 640, 320 × 568 und Querformat 568 × 320 / 640 × 360,
 frischer Kontext je Lauf. Tipps als Touch-Tipps. Einsatzdaten: Sammlung „Übung Weser“ mit 2 bis
-7 Beispielbögen aus `examples/thw/` über „Bögen einlesen…“; Schnellerfassung (Husum,
+7 Übungsbögen aus `examples/thw/` über „Bögen einlesen…“; Schnellerfassung (Husum,
 „THW Oldenburg“); eigener Bogen im Assistenten (Schritt 1 bis 6); Anzeigemodi Standard, Feld,
 Dunkel, Nacht. Voller Speicher: `localStorage` mit Füllschlüsseln bis zum Quota-Fehler
 (`QuotaExceededError` schon bei 1 Zeichen) gefüllt, danach die Handlungen im Einsatz.
@@ -36,8 +36,8 @@ Display, Kamera-Scan, echte Bildschirmtastatur und Autokorrektur, WebKit/Safari,
 Drucken, Inhalt der erzeugten PDF-Seiten, echter Download der CSV-Datei (Quittung „Gespeichert“
 erscheint, ein Download-Ereignis wurde nicht ausgewertet), Datumsfeld im Lagemonitor-Block (der
 Headless-Browser zeigt „mm/dd/yyyy“, das sagt nichts über ein Gerät mit deutscher Region),
-„7 aufgenommen, 7 bereits vorhanden“ (R19-K10: mit sieben JSON-Beispielbögen in sechs Läufen
-nicht aufgetreten; der Fall betraf PDFs, die hier nicht vorlagen), Alter der Beispielbögen
+„7 aufgenommen, 7 bereits vorhanden“ (R19-K10: mit sieben JSON-Übungsbögen in sechs Läufen
+nicht aufgetreten; der Fall betraf PDFs, die hier nicht vorlagen), Alter der Übungsbögen
 („Stand vor 102 Tagen“, „Zeitraum vorbei“ stammt aus den Beispieldateien, nicht gewertet).
 
 ## Urteil
@@ -187,7 +187,7 @@ Namen nicht mehr ändern (R20-H1, P2). Alles andere sind Kleinigkeiten (P3), üb
 
 - **Typ:** Layout/Abstand
 - **Neu oder alt (Verweis):** alt, R19-W4 (Rest: war „mehr als drei Bildschirme“, jetzt etwa zweieinhalb).
-- **Evidence:** Observed (360 × 640, drei Beispielbögen).
+- **Evidence:** Observed (360 × 640, drei Übungsbögen).
 - **Ort:** Einsatzansicht nach „Bögen einlesen…“.
 - **Beobachtung:** Vor der Überschrift „Einheiten (…)“ (y = 1 317) und der ersten Karte (y = 1 542)
   stehen Kennzahlen, vier Aufnahmeknöpfe, Aufnahmequittung, „Neu seit der letzten Kenntnisnahme“
@@ -291,7 +291,7 @@ Namen nicht mehr ändern (R20-H1, P2). Alles andere sind Kleinigkeiten (P3), üb
 
 - **Typ:** Text
 - **Neu oder alt (Verweis):** alt, R19-M14 (Warnung in drei Zeilen; Spalte „Auftrag“ ist entfallen).
-- **Evidence:** Observed (360 × 640, vier Beispielbögen).
+- **Evidence:** Observed (360 × 640, vier Übungsbögen).
 - **Ort:** Einsatzansicht › „Tabelle“, Spalte „Eingetr.“.
 - **Beobachtung:** Zelle „06:40 * ⚠ Stand vor 102 Tagen“: Zeit, Stern und Warnung in einer Spalte, die
   Warnung bricht in drei Zeilen. „Eingetr.“ liest sich dadurch wie „eingetroffen vor 102 Tagen“,

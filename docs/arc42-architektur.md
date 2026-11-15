@@ -59,7 +59,7 @@
 > Sammlung, Bilderstapel, Einsatz-Import und -Abgleich, Schnellerfassung für den
 > Meldekopf, Lagemonitor (`?lagemonitor=`), Papier-Abgleich, Sammel-PDF, Lageblatt,
 > Einsatz-CSV und Alle-Daten-CSV der Sammlung, Export-Stände, Aufteilen und
-> Zusammenführen, „Alle … in eine Übungs-Sammlung“ der Beispielbögen. Ein
+> Zusammenführen, „Alle … in eine Übungs-Sammlung“ der Übungsbögen. Ein
 > empfangener Bogen öffnet sich wieder direkt. Neu: Die Startseite verweist auf die
 > Meldekopf-App (ein Link, keine Netzverbindung der App; `src/app/meldekopf-weg.tsx`,
 > `meldekopf-app.ts`) und nennt Sammlungen, die noch unter `eeb.einsaetze.v1` auf
@@ -172,7 +172,7 @@
 > je Person mit der Dienststelle aus Schritt 1 vor und schlägt beim THW die
 > Ortsverbände des Verzeichnisses vor (`OvVorschlagFeld`/`useOvDaten` aus Schritt 1,
 > in Karte und Kurz-Liste); das PDF nennt eine Abweichung als erste Zeile der
-> Kontaktspalte („OV: Bremen - Nord"; seit 2026-11-08 klein hinter dem Namen). Die THW-Beispielbögen (`npm run beispiele`)
+> Kontaktspalte („OV: Bremen - Nord"; seit 2026-11-08 klein hinter dem Namen). Die THW-Übungsbögen (`npm run beispiele`)
 > tragen seit 2026-10-27 in rund jeder dritten Einheit ein bis drei Helfer aus
 > Nachbar-Ortsverbänden (eigener Zufallsstrom, übrige Bögen unverändert). Kein
 > neuer Host, kein neuer Speicherort.
@@ -1164,7 +1164,7 @@ flowchart LR
 | Statische Seiten (`public/*.html`) | ~35 SEO-/Informationsseiten je Organisation (THW, Feuerwehr, DRK, …), Anleitung, Datenschutz, Impressum – teilen sich Kopfnavigation und Design-Token mit der App, laufen aber außerhalb des React-Bundles. Seit 2026-09-27 übernehmen sie den Anzeigemodus der App (Dunkel/Feld/Nacht, ohne gespeicherte Wahl die Systemeinstellung) über einen kleinen Inline-Block, den `scripts/content-stil.mts` schreibt; er liest nur `eeb.anzeigemodus.v1` und setzt eine Klasse auf `<html>`. |
 | Electron-Hülle (`electron/main.js`) | Desktop-Fenster, Auto-Update (`electron-updater`), eingeschränkte Berechtigungsvergabe, externe Links im Systembrowser öffnen. |
 | Capacitor-Hüllen (`android/`, `ios/`) | Native Projekte (Gradle/Xcode), binden Capacitor-Plugins (Kamera-Barcode-Scanner, Filesystem, Share, App) ein. |
-| Build-/Content-Skripte (`scripts/`) | Vite-Plugin-Hilfsfunktionen, Beispielbogen-Generatoren je Bundesland/Organisation, Icon-/Screenshot-Rendering, Sitemap, Kopfnavigation, Bundle-Budget-Prüfung, Kern-Kopien-Prüfung. |
+| Build-/Content-Skripte (`scripts/`) | Vite-Plugin-Hilfsfunktionen, Übungsbogen-Generatoren je Bundesland/Organisation, Icon-/Screenshot-Rendering, Sitemap, Kopfnavigation, Bundle-Budget-Prüfung, Kern-Kopien-Prüfung. |
 | E2E-Spezifikation (`features/`) | Gherkin-Szenarien auf Deutsch als ausführbare Anforderungsdokumentation und Regressionsschutz. |
 | App-lokale Vokabulare (`src/vokabulare/`) | Inhalte, die laut `docs/entwicklung.md` bewusst nicht in den Kern gewandert sind, z. B. Landesvorlagen (`import.meta.glob`, eine Vite-Eigenschaft) und die Großstadtregelung der Funkrufnamen (`thw-funkrufname-ort.ts`). |
 | `@bos/eeb-format` | Datenmodell (`model.ts`, 456 Zeilen), Binär-/QR-Codec (`codec.ts`, 1053 Zeilen — größtes Modul im Kern), Ed25519-Signatur (`signatur.ts`, 340 Zeilen), QR-Erzeugung außerhalb des Browsers (`qr-node.ts`). |
@@ -1242,7 +1242,7 @@ import { bogenZuQrSvg, nodeKompressor } from "@bos/eeb-format/node";     // nur 
 | `codec.ts` (1053 Zeilen) | Binärkodierung/-dekodierung, Base41-Transportkodierung, QR-Payload-Aufbau (`EEB2`/`EEB2C`), Segmentierung großer Bögen. Die Kompression wird als `Kompressor`-Funktion hineingereicht (Browser: pako, Node: `node:zlib`). |
 | `signatur.ts` (340 Zeilen) | Ed25519-Signatur/-Verifikation, Signaturkette („Gegenzeichnen", `gegengezeichnetePayloadBytes`), Container-Format `EEB2C`, Absenderkarten-Kodierung. |
 | `datenschutzfrist.ts` | Datenschutzfrist: Ende 90 Tage nach `stand`, Übungen ausgenommen (`datenschutzfristEnde`, `datenschutzfristAbgelaufen`, `tageBisAnonymisierung`), Anonymisierung eines Bogens (`bogenAnonymisiert`) und Plausibilitätsprüfung der Geräteuhr gegen Sprünge nach vorn (`uhrPruefen`). Baut nur auf `model` auf; kein Schemafeld. |
-| `qr-node.ts` (50 Zeilen) | QR-Erzeugung außerhalb des Browsers (SVG/PNG), z. B. für die Beispielbogen-Generatorskripte. Einziges Modul, das `node:zlib`, `qrcode` und `Buffer` benutzen darf. |
+| `qr-node.ts` (50 Zeilen) | QR-Erzeugung außerhalb des Browsers (SVG/PNG), z. B. für die Übungsbogen-Generatorskripte. Einziges Modul, das `node:zlib`, `qrcode` und `Buffer` benutzen darf. |
 | `index.ts` (89 Zeilen) | Öffentliche Fassade: reexportiert `model`/`codec`/`signatur` (nicht `qr-node`), definiert `kernVersion()` sowie eine handgeschriebene UTF-8-Kodierfunktion, die bewusst ohne `TextEncoder` auskommt. |
 
 Architektonische Besonderheiten, die die Trennung technisch erzwingen:
@@ -1327,7 +1327,7 @@ Nachschlagetabellen plus Zugriffsfunktionen, keine Geschäftslogik:
 | `ebenen.ts` (73) | Hierarchie-Ebenen je Organisation (THW OV→RB→LV, FW Gemeinde→LK→Bezirk→Land, …). |
 
 Bewusst **nicht** in diesem Baustein: `landesvorlagen.ts` (bleibt im
-Erfassungsbogen, weil es `import.meta.glob` nutzt und die Beispielbögen
+Erfassungsbogen, weil es `import.meta.glob` nutzt und die Übungsbögen
 Produktinhalt statt Vokabular sind), `src/vokabulare/thw-funkrufname-ort.ts`
 (die OV-Kennzahlen der Großstadtregelung; Kandidat für den Kern, sobald der
 Meldekopf sie eigenständig braucht) sowie die Zeichen-Symboldaten.
@@ -1524,7 +1524,7 @@ sequenceDiagram
   SW->>SW: precache Kern (App-Shell, alle JS-Bausteine, wasm/woff2, Bilder, Blanko-Vordruck, Anleitung/Vorlage/Datenschutz/Impressum)
   Browser->>SW: Fortschritt aus der Cache API („2,1 von 6,7 MB")
   SW-->>Browser: clientsClaim() – übernimmt sofort die laufende Seite
-  Browser->>SW: zweite Stufe nachladen (Beispielbögen, Themenseiten laut offline-zusatz.json)
+  Browser->>SW: zweite Stufe nachladen (Übungsbögen, Themenseiten laut offline-zusatz.json)
   SW->>SW: Laufzeit-Cache eeb-zusatz
   Note over Nutzer,Netz: Gerät verliert Netzverbindung
   Nutzer->>Browser: erneuter Aufruf / weiter benutzen
@@ -1565,12 +1565,12 @@ schwachem Mobilfunk über eine Minute ohne Fortschritt. Jetzt teilt
 **Kern** (78 Dateien, 6,7 MB: App-Shell, alle JS-Bausteine einschließlich PDF,
 QR-Decoder und Landesvorlagen, Schrift, Bilder, Blanko-Vordruck und die von der
 App verlinkten Seiten) bleibt im Workbox-Precache und ist Bedingung für
-„offline bereit". Die **Zusatzstufe** (474 Dateien, 4,0 MB: Beispielbögen,
+„offline bereit". Die **Zusatzstufe** (474 Dateien, 4,0 MB: Übungsbögen,
 Themen- und Länderseiten) schreibt der Build nach `offline-zusatz.json`; die
 Startseite lädt sie nach der Aktivierung nach (`src/app/offline-vorrat.ts`),
 der Service Worker legt sie über zwei Laufzeit-Routen in den Cache
-`eeb-zusatz` (Beispielbögen `CacheFirst`, Seiten `StaleWhileRevalidate` seit Runde 7, Liste `NetworkFirst`).
-*Hinweis 2026-10-24:* Mit `examples/praktische-ausbildung/` (41 Bögen, JSON) sind die Zusatzstufe um 41 Dateien und die Zahlen oben (474 Dateien, 4,0 MB) sowie die Bogenzählungen weiter unten (227/239/443 Beispielbögen) nicht mehr aktuell; beim nächsten Build neu messen.
+`eeb-zusatz` (Übungsbögen `CacheFirst`, Seiten `StaleWhileRevalidate` seit Runde 7, Liste `NetworkFirst`).
+*Hinweis 2026-10-24:* Mit `examples/praktische-ausbildung/` (41 Bögen, JSON) sind die Zusatzstufe um 41 Dateien und die Zahlen oben (474 Dateien, 4,0 MB) sowie die Bogenzählungen weiter unten (227/239/443 Übungsbögen) nicht mehr aktuell; beim nächsten Build neu messen.
 *Hinweis 2026-11-09 (Kreiseinheiten der Kreisfeuerwehren Niedersachsen):* `examples/feuerwehr/niedersachsen/kreisfeuerwehren/` (106 Bögen aus zehn Landkreisen und der Region Hannover, zusammen rund 1,4 MB JSON, erzeugt von `scripts/kreisfeuerwehr-nds-beispielboegen.mts`) liegt in der Zusatzstufe; ihre Datei- und Größenzahlen oben sind entsprechend höher, beim nächsten Build neu messen.
 *Nachgezogen 2026-11-08 (alle THW-Ortsverbände):* `examples/thw/ortsverbaende/` trägt 3.533 Übungsbögen
 (jede Einheit von 667 OVs, Landesverband › Regionalstelle › Ortsverband, immer StAN-Stärke, erzeugt von
@@ -1581,11 +1581,11 @@ Zusatzstufe heraus; ein Bogen kommt beim ersten Öffnen aus dem Netz und bleibt 
 `CacheFirst`-Route im eigenen Laufzeit-Cache `eeb-ov-beispiele` (höchstens 4000 Einträge; seit 2026-11-08,
 Prüfrunde Beispielbögen BB-O2: im gemeinsamen `eeb-zusatz` mit 1500 Einträgen verdrängten ab rund 950 geöffneten
 OV-Bögen alle übrigen Beispiele und Fotos). Die Offline-Zeile der Startseite nennt die Ausnahme („außer den
-Beispielbögen der THW-Ortsverbände"). Ihre Adressliste steht nicht im Glob der Fußzeile, sondern im eigenen
-Baustein `src/app/beispiele-thw-ov.ts` (rund 0,74 MB, gezippt 84 KB), den der Beispielbögen-Dialog beim
+Übungsbögen der THW-Ortsverbände"). Ihre Adressliste steht nicht im Glob der Fußzeile, sondern im eigenen
+Baustein `src/app/beispiele-thw-ov.ts` (rund 0,74 MB, gezippt 84 KB), den der Übungsbögen-Dialog beim
 Öffnen nachlädt; Startbündel unverändert, JS-Gesamtumfang 6,45 MB (`scripts/bundle-budget.json` angehoben).
 Kein neuer Host zur Laufzeit; thw.blafusel.de ruft nur das Generatorskript mit `--abrufen` auf.
-*Nachgezogen 2026-11-09:* Der Beispielbögen-Dialog samt Glob der übrigen Beispiel-Dateien, Suche und
+*Nachgezogen 2026-11-09:* Der Übungsbögen-Dialog samt Glob der übrigen Beispiel-Dateien, Suche und
 Ordnernavigation liegt in eigenem Baustein `src/app/beispiele-dialog.tsx`, den `fusszeile.tsx` beim ersten
 Öffnen per `lazy()` lädt (vorher Teil des Startbündels, das nach den Prüfrunden-Korrekturen über dem Budget lag).
 Beispiele werden beim Weitergeben auf heute gestellt (`src/app/beispiel-heute.ts`).
@@ -2108,7 +2108,7 @@ erreichbar (zuvor gleichlautend mit dem der Vorlagen, R5-D5).
 - **Pipeline:** Binärstrom → DeflateRaw (pako) → Base41 → alphanumerischer
   QR-Modus. Base41 (41-Zeichen-Alphabet, angelehnt an Base45/RFC 9285, aber
   URL-sicher) nutzt den alphanumerischen QR-Modus (5,5 Bit/Zeichen) statt des
-  Byte-Modus (8 Bit/Zeichen) – gemessen über 227 Beispielbögen sinkt die mittlere
+  Byte-Modus (8 Bit/Zeichen) – gemessen über 227 Übungsbögen sinkt die mittlere
   QR-Version von 20,50 auf 17,66.
 - **Zwei Formate je nach Zweck:** Der QR-Code nutzt Base41 (`B.`-Marker); der
   teilbare Textlink bleibt bewusst Base64url, weil Base41-Sonderzeichen
@@ -2303,7 +2303,7 @@ Projekt-Dokumenten rekonstruiert — einschließlich der vier Kern-Submodule, de
   Base41-Sonderzeichen (`$ * / :`) in Chat-Programmen die Link-Erkennung
   zerhacken würden.
 - **Konsequenzen:** Abwärtskompatibel beim Lesen; mittlere QR-Version sinkt über
-  227 Beispielbögen von 20,50 auf 17,66.
+  227 Übungsbögen von 20,50 auf 17,66.
 
 ### ADR-005: Ed25519-Signatur mit Signaturkette statt zentraler PKI
 
@@ -2395,7 +2395,7 @@ flowchart LR
 
 | # | Qualitätsziel | Szenario | Bewertungsmaßstab / Nachweis im Repository |
 | --- | --- | --- | --- |
-| 1 | Offlinefähigkeit | Eine Einheit ruft die Web-App einmal online auf, verliert danach die Netzverbindung im Einsatzgebiet und füllt einen Bogen komplett aus, druckt PDF und erzeugt QR-Code. | Service Worker precacht App-Shell inkl. wasm/woff2 (`vite.config.ts`, VitePWA), Beispielbögen und Themenseiten als zweite Stufe danach (seit 2026-10-05, 6.4); Szenario „Die PDF entsteht auch ohne Netz und ohne Neuladen" in `features/uebergabe.feature`. |
+| 1 | Offlinefähigkeit | Eine Einheit ruft die Web-App einmal online auf, verliert danach die Netzverbindung im Einsatzgebiet und füllt einen Bogen komplett aus, druckt PDF und erzeugt QR-Code. | Service Worker precacht App-Shell inkl. wasm/woff2 (`vite.config.ts`, VitePWA), Übungsbögen und Themenseiten als zweite Stufe danach (seit 2026-10-05, 6.4); Szenario „Die PDF entsteht auch ohne Netz und ohne Neuladen" in `features/uebergabe.feature`. |
 | 2 | Benutzbarkeit im Feld | Ein Nutzer schaltet bei grellem Sonnenlicht in den Feld-Modus und kann alle Bedienelemente weiterhin klar erkennen. | `anzeige-modus.ts`, `features/daten-und-anzeige.feature` (Anzeigemodus Dunkel/Feld/Nacht, auch bei dunklem Systemdesign). |
 | 3 | Schnellerfassung am Meldekopf | Eine fremde Einheit trifft ohne eigenen Bogen ein; der Meldekopf erfasst sie in wenigen Minuten (nur Stärke, Führungskraft, Fahrzeuge) und druckt einen Bogen. | `personalErfassung = NUR_STAERKE`, Minimalfelder laut `docs/datenmodell.md` („Meldekopf-Workflow"), gemessene Payload-Größe 191 Bytes → QR-Version 10. |
 | 4 | Rückwärtskompatibilität | Ein vor Jahren gedruckter QR-Code (Schema-Version 2) wird mit der aktuellen App-Version gescannt und korrekt angezeigt. | Eingefrorene v2-Fixture in `codec.migration.test.ts` und `features/fixtures.ts`; `migriereBogen` deckt `2..SCHEMA_VERSION` ab. |
@@ -2496,6 +2496,7 @@ Repository-Analyse, keine offiziellen Angaben des Projekts.
 | DRK / JUH / MHD / ASB | Deutsches Rotes Kreuz / Johanniter-Unfall-Hilfe / Malteser Hilfsdienst / Arbeiter-Samariter-Bund – Hilfsorganisationen. |
 | DLRG | Deutsche Lebens-Rettungs-Gesellschaft. |
 | Erfassungsbogen | Das (ursprünglich papierene) Formular, mit dem eine Einheit Stärke, Personal, Fahrzeuge und Sofortbedarf für einen Einsatz oder eine Übung dokumentiert. |
+| Übungsbogen | Mitgelieferter, ausgefüllter Bogen einer fiktiven Einheit mit erfundenen Personen, zum Üben am Meldekopf und zum Ausprobieren der App (Dialog „Übungsbögen“, bis 2026-11-15 „Beispielbögen“). Alle sind als Übung gekennzeichnet; dieselbe Kennzeichnung kann jeder eigene Bogen in Schritt 2 tragen. Dieselben Dateien speisen die Landesvorlagen in Schritt 1. |
 | Einheit | Die organisatorische Grundeinheit, die einen Erfassungsbogen führt (z. B. eine Fachgruppe, ein Löschzug, eine SEG). |
 | Einsatz | Der konkrete Einsatz- bzw. Übungskontext (Zeitraum, Ort, Auftrag), unter dem Einheiten gemeldet werden. |
 | Übung | Kennzeichnung eines Bogens als Übungs- statt echten Einsatzbogen (ab Schema-Version 6); wird in PDF/Anzeige deutlich markiert. |

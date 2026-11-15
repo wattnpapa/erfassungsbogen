@@ -161,7 +161,7 @@ App muss die Nähe erkennen.
 | Schichtübergabe | Sammel-PDF mit eingebetteter Sammlung → „Einsatz importieren" auf dem nächsten Gerät, Historie inklusive | Ausgedruckte Übergabe-Übersicht — unvollständig (A1); bei allen abgerückt kein Druck (W2) | Import der Sammel-PDF (funktioniert, Status und Historie bleiben) |
 | Einsatzende / Archiv | Datei mit allem; nach 90 Tagen Namen anonymisiert (App sagt es in Schritt 2) | Vollständiger Ausdruck vor Tag 90 — derzeit nicht erzeugbar, wenn alle abgerückt sind (W2) | Datensicherung (JSON) einspielen; Papier nicht rücklesbar außer über QR |
 
-Nicht gelistet: Themenwahl, Vorlagenpflege, Beispielbögen — keine
+Nicht gelistet: Themenwahl, Vorlagenpflege, Übungsbögen — keine
 Rückfallebene nötig.
 
 ## Würde ich dafür das Papier weglegen?

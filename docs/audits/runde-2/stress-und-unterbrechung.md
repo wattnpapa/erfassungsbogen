@@ -87,7 +87,7 @@ Umwegen, wer zugleich den eigenen Bogen führt, verliert ihn.
 
 **Priorität:** P1
 
-**Nachweis:** beobachtet (Seed eines echten Beispielbogens mit
+**Nachweis:** beobachtet (Seed eines echten Übungsbogens mit
 `uebung: false`, Speicherzeitpunkt 60 Tage zurück).
 
 **Fundstelle / Aufgabe:** Startseite → Entwurfskarte „THW Ulm

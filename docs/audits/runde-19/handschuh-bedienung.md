@@ -14,7 +14,7 @@ Behebungen, die im Browser nicht mehr zu beobachten sind, stehen nur in der Nach
 
 Chromium über das globale Playwright-Modul (`chromium.launch()` ohne Optionen, nichts installiert; die Projektkopie fand
 keinen Browser), `isMobile`, `hasTouch`, Pixeldichte 2, de-DE. Viewports 360 x 640 und 390 x 844, dazu 320 x 568 sowie quer
-640 x 360 und 568 x 320. Zustand: frisch angelegte Einsatz-Sammlung „Hochwasser Test“ mit 2, 3, 4, 6 oder 11 THW-Beispielbögen
+640 x 360 und 568 x 320. Zustand: frisch angelegte Einsatz-Sammlung „Hochwasser Test“ mit 2, 3, 4, 6 oder 11 THW-Übungsbögen
 (`examples/thw`, über „Bögen einlesen…“), eigener Bogen im Assistenten (Schritt 1 bis 6, Personen, Übergabe, „Bogen
 schließen“), Schnellerfassung, Scanner (ohne Kamera), Papierkorb, Exporte, Anzeigemodus „Feld“. Tipps als Touch-Tipps
 (`touchscreen.tap()`) an festen Koordinaten, Zeitabstände gestuft (100 bis 1 300 ms). Maße aus `getBoundingClientRect()`

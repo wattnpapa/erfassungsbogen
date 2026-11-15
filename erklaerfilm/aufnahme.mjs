@@ -24,7 +24,7 @@ const BREITE = 1280;
 const HOEHE = 800;
 const SKALA = 1.5; // 1920×1200 Bildpunkte: scharf genug für Zoom im 1080p-Film
 
-/** Namen der Bergungsgruppe — erfunden, wie in den Beispielbögen. */
+/** Namen der Bergungsgruppe — erfunden, wie in den Übungsbögen. */
 const NAMEN = [
   "Lehmann, Karsten 0731 5550123",
   "Herrmann, Moritz",
@@ -53,7 +53,7 @@ function jetztEeb() {
   return Math.round((Date.UTC(teile.year, teile.month - 1, teile.day, teile.hour, teile.minute) - Date.UTC(2020, 0, 1)) / 60_000);
 }
 
-/** Beispielbogen aus examples/, auf heute gestellt (wie scripts/screenshots.mjs). */
+/** Übungsbogen aus examples/, auf heute gestellt (wie scripts/screenshots.mjs). */
 async function beispielBogen(pfad) {
   const bogen = JSON.parse(await readFile(new URL(`../examples/${pfad}`, import.meta.url), "utf8"));
   bogen.uebung = false;
@@ -283,7 +283,7 @@ try {
 
   // ── Meldekopf: Einsatz-Sammlung ───────────────────────────────────────
   // Ein zweites Gerät: das Tablet am Meldekopf. Vier THW-Einheiten aus den
-  // Beispielbögen sind schon eingetroffen, die Bergungsgruppe Ulm kommt dazu.
+  // Übungsbögen sind schon eingetroffen, die Bergungsgruppe Ulm kommt dazu.
   const vorher = await Promise.all(
     ["thw/001-albstadt-ztr-tz.json", "thw/004-freiburg-fgr-wp-a.json", "thw/012-sinsheim-fgr-w-b.json", "thw/007-laufenburg-ztr-fz-log.json"].map(beispielBogen),
   );

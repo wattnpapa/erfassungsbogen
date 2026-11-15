@@ -67,7 +67,7 @@ function einzelDokument(b: Erfassungsbogen, qr: Awaited<ReturnType<typeof qrErze
 
 /**
  * Bogen als PDF ausgeben. `name` überschreibt den aus der Einheit abgeleiteten
- * Dateinamen (die Beispielbögen behalten so ihren Dateinamen aus examples/).
+ * Dateinamen (die Übungsbögen behalten so ihren Dateinamen aus examples/).
  * `herkunft` = empfangener Payload: unverändert weitergereicht behält der
  * QR-Code auf der letzten Seite die Original-Signatur (siehe qrErzeugen).
  */
@@ -75,7 +75,7 @@ export async function pdfErzeugen(
   b: Erfassungsbogen,
   name?: string,
   herkunft?: Uint8Array | null,
-  /** Vor dem Ausgeben gefragt: true = der Aufrufer will die Datei nicht mehr (Beispielbögen, BB-E1). */
+  /** Vor dem Ausgeben gefragt: true = der Aufrufer will die Datei nicht mehr (Übungsbögen, BB-E1). */
   abgebrochen?: () => boolean,
 ): Promise<{ nichtDarstellbar: number; betroffen: string[]; umschrift: string[]; vereinfacht: string[] }> {
   const qr = await qrErzeugen(b, herkunft);

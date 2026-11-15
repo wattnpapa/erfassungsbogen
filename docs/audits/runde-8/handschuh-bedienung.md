@@ -25,7 +25,7 @@ am Finger rund 90 px, die Beschriftung muss trotzdem in den Knopf passen.
 
 Zustände per `localStorage`-Seed, jeweils mit `uebung: false` und aktuellem
 `stand`: `eeb.entwurf.v1` (Großbogen mit 38 Personen), `eeb.einsaetze.v1`
-(Sammlung „Hochwasser Musterstadt“ aus sechs Beispielbögen, einmal mit
+(Sammlung „Hochwasser Musterstadt“ aus sechs Übungsbögen, einmal mit
 `vomPapier` je Eintrag), `eeb.vorlagen.v1` (über „Als Vorlage speichern“ erzeugt),
 `eeb.uhr.v1` (365 Tage alt, Sammlung 200 Tage alt). Der Zweitfenster-Fall entstand
 durch einen zweiten Tab im selben Kontext, der den Entwurf im `localStorage`

@@ -311,7 +311,7 @@ und legt ein Byte-Segment für den Präfix neben ein Alphanumerik-Segment für d
 Daten. Eine Großschreibung der URL würde nur ~0,12 QR-Versionsstufen bringen und
 dafür Universal Links und Kamera-Apps riskieren.
 
-**Wirkung** (227 Beispielbögen, unsigniert, Fehlerkorrektur M): QR-Version im
+**Wirkung** (227 Übungsbögen, unsigniert, Fehlerkorrektur M): QR-Version im
 Mittel 20,50 → 17,66, Modulkante 99 → 88; 222 statt 216 Bögen passen in einen
 einzelnen Code. Binärformat und Deflate-Kompression bleiben unberührt.
 
@@ -501,7 +501,7 @@ Duplikate, meldet den Fortschritt („Teil 1 von 2"), und dekodiert erst, wenn a
 Prüfsumme nach dem Zusammensetzen falsch, wird abgelehnt. Ein zwischendurch
 gescannter fremder oder unsegmentierter Code wird sofort separat behandelt.
 
-**Abwärtskompatibel:** Passt der Bogen in einen QR (über die 443 Beispielbögen
+**Abwärtskompatibel:** Passt der Bogen in einen QR (über die 443 Übungsbögen
 gemessen 73 — der Regelfall ist die Aufteilung), wird **kein** Kopf erzeugt; der
 Single-QR-Roundtrip ist Byte-für-Byte identisch zu vorher. Ein bereits gedruckter
 QR-Code bleibt unabhängig vom Budget lesbar — die Schwellen betreffen nur das

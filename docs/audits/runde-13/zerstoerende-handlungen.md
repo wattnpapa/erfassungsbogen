@@ -19,7 +19,7 @@ R12-O4, R12-G3) sind nicht erneut gemeldet.
 Chromium über das globale `playwright`-Modul, `chromium.launch()` ohne Optionen,
 `isMobile`/`hasTouch`, Locale de-DE, Tipps als Touch-Tipp. Viewports 390 × 844 und
 360 × 640. Zustände über die Bedienung der App: Einsatz-Sammlung „Hochwasser Weser"
-anlegen, vier THW-Beispielbögen (mit `uebung: false`, außerhalb des Repositorys
+anlegen, vier THW-Übungsbögen (mit `uebung: false`, außerhalb des Repositorys
 kopiert) über „Bögen einlesen…" aufnehmen, Sammel-PDF und Datensicherung als echte
 Dateien erzeugen und wieder einspielen. Kein Kamera-Scan, keine Handschuhe, keine
 nativen Builds, kein Zweitgerät.
@@ -33,7 +33,7 @@ einspielen über abweichende Daten, Sammel-PDF erneut importieren (gleichnamige
 Sammlung), neuere und ältere Folgemeldung derselben Einheit, Absenderkarte setzen,
 ändern, entfernen, „Jetzt" und „Beginn entfernen" beim Einsatzbeginn, Vorlage
 speichern und ersetzen, „In Einsatz-Sammlung ablegen…", angefangene Erfassung mit
-„Einheit manuell erfassen…", Beispielbogen öffnen bei vorhandenem Entwurf, „Namen
+„Einheit manuell erfassen…", Übungsbogen öffnen bei vorhandenem Entwurf, „Namen
 einfügen…", Person entfernen (Abstand zu ▲ und ⇑).
 
 ## Urteil

@@ -16,7 +16,7 @@ Neuladen nicht, Tabellenzeilenhöhe bei 180 × 320) wurden nicht neu gemeldet.
 Playwright/Chromium (`chromium.launch()` ohne Optionen), `isMobile`/`hasTouch`,
 Locale de-DE, Telefon 390 × 844 und 360 × 640, dazu 640 × 360, 320 × 480 und
 360 × 340 (Stand-in für eine eingeblendete Tastatur). Jeder Lauf mit frischem
-Browser-Kontext. Einsatzdaten kamen aus den Beispielbögen unter `examples/thw/`
+Browser-Kontext. Einsatzdaten kamen aus den Übungsbögen unter `examples/thw/`
 (Kopien mit `uebung: false`, aktuellem Zeitraum und aktuellem Stand, über
 „Bögen einlesen…“ bzw. „Aus Datei laden…“ eingespielt), nicht aus
 `localStorage`-Seeds. Durchgespielt, jeweils vom natürlichen Einstieg aus:

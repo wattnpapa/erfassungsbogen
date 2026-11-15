@@ -19,7 +19,7 @@ Playwright (globales Modul `/opt/node22/lib/node_modules/playwright`,
 `chromium.launch()` ohne Optionen, nichts installiert), `isMobile`/`hasTouch`,
 Locale de-DE, Viewports 390 × 844 und 360 × 640, je Gerät ein eigener Kontext.
 Geräteuhr 26.10.2026. Zustände über `localStorage`-Seed des Entwurfs
-(`eeb.entwurf.v1`) aus den Beispielbögen unter `examples/thw/` (Sinsheim FGr W (B),
+(`eeb.entwurf.v1`) aus den Übungsbögen unter `examples/thw/` (Sinsheim FGr W (B),
 Albstadt Zugtrupp) mit `uebung: false`, Zeitraum und `stand` auf heute. Der Link-Weg
 ersetzt den QR-Transport (`navigator.share` gestubbt, Host auf `localhost:4173`
 umgeschrieben); Folgemeldung durch einen zweiten Link mit einer Person weniger und

@@ -193,7 +193,7 @@ P0: keine. P1: keine. P2: eine. P3: sechs.
   Laden geht weiter, sobald es wieder da ist. Bitte geöffnet lassen.“ Netz zurück: nach 0,5 s „✓ Jetzt offline bereit“,
   nach 9 s „Funktioniert komplett offline“. Kein „Laden abgebrochen“.
 - **Zweite Stufe (R6-O6, R6-O7):** Pause höchstens 20 s; nach 80 s Funkloch lief der Zähler 8 s nach der Rückkehr
-  wieder. Nach Neuladen ohne Netz nennt die Zeile die Lücke: „Beispielbögen und Themenseiten fehlen noch (140 von 508),
+  wieder. Nach Neuladen ohne Netz nennt die Zeile die Lücke: „Übungsbögen und Themenseiten fehlen noch (140 von 508),
   sie folgen beim nächsten Netz“ (`eeb.offline-zusatz.v1`).
 - **Speicher voll (R6-O1, R6-O5):** Echt gefüllt, „Löschen…“ → „In den Papierkorb“: „Nicht gelöscht — Der Speicher
   dieses Geräts nimmt nichts mehr an … Platz schafft nur Löschen …“, die Warnzeile nennt den Weg, der wirkt, und „die

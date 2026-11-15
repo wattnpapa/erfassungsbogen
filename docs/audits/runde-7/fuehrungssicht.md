@@ -45,7 +45,7 @@ mit `pdftotext` gelesen), Übersicht-CSV, Exportstand-Zeilen, Lagemonitor
 **Nicht prüfbar:** echter Fernseher und Sitzabstand, Fenstersuche auf dem
 zweiten Bildschirm, Vollbild und Wachhalten im Headless-Chromium, echtes
 Drucken, Kamera, WebKit. Das Datum „Einsatzbeginn" habe ich nur über „Jetzt"
-gesetzt. Die „Zeitraum vorbei"-Hinweise stammen aus den Seeds (Beispielbögen
+gesetzt. Die „Zeitraum vorbei"-Hinweise stammen aus den Seeds (Übungsbögen
 tragen Einsatzzeiträume im Juli 2026) und zählen nicht als Befund.
 
 ## Urteil

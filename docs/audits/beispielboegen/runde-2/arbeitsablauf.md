@@ -1,8 +1,8 @@
-# Prüfbericht Schwerpunkt Beispielbögen, Runde 2: Arbeitsablauf
+# Prüfbericht Schwerpunkt Übungsbögen, Runde 2: Arbeitsablauf
 
 - **Prüfer:** Rolle „Arbeitsablauf“ (thw-workflow-reviewer). Wie in Runde 1 spiele ich drei Personen nacheinander: den Ausbilder, der eine Übung vorbereitet, den Teilnehmer, der eine Einheit spielt, und den Meldekopf, der die Bögen aufnimmt.
 - **Datum:** 2026-11-09
-- **Prüfgegenstand:** Nur der Bereich Beispielbögen auf der Live-Seite `https://erfassungsbogen.app/`, Stand `main` Commit `085a93b` (Fußzeile `v2026.1109.833`). Geprüft sind der Dialog „Beispielbögen“ (jetzt mit Suche, gemerktem Ordner und „Alle … in eine Übungs-Sammlung“) und alles, was danach kommt: „Anzeigen“, „PDF“, „Link“, die Übungs-Sammlung mit Sammel-PDF und Lageblatt, der Empfang beim Teilnehmer, die Aufnahme am Meldekopf, Vorlage und Rückweg.
+- **Prüfgegenstand:** Nur der Bereich Übungsbögen auf der Live-Seite `https://erfassungsbogen.app/`, Stand `main` Commit `085a93b` (Fußzeile `v2026.1109.833`). Geprüft sind der Dialog „Übungsbögen“ (jetzt mit Suche, gemerktem Ordner und „Alle … in eine Übungs-Sammlung“) und alles, was danach kommt: „Anzeigen“, „PDF“, „Link“, die Übungs-Sammlung mit Sammel-PDF und Lageblatt, der Empfang beim Teilnehmer, die Aufnahme am Meldekopf, Vorlage und Rückweg.
 - **Code zum Nachschlagen (nicht geändert):** `src/app/beispiele-dialog.tsx` (`beispielKopie`, `alleAlsUebung`, `suchTreffer`, `beispieleOeffnen`), `src/app/app.tsx` (`oeffneBeispiel`, `beispielUnveraendert`, `beispieleAlsUebung`, `bogenInSammlung`), `src/app/schritte/uebersicht.tsx` (`uebungEmpfangen`), `src/app/beispiel-heute.ts`.
 - **Grundlage:** Bericht aus Runde 1 (`../arbeitsablauf.md`, BB-W1 bis BB-W10, H1 bis H6) und „Stand der Behebung“ Nr. 1 bis 21 in `../README.md`.
 - **Maßstab:** Der ganze Ablauf zählt mehr als der einzelne Bildschirm. Je Ursache gibt es einen Befund.
@@ -19,7 +19,7 @@
   2. **Teilnehmer (Telefon).** Der Ausbilder kopiert mit „Link“ die Bergungsgruppe Bad Aibling (683 Zeichen, Zwischenablage). Der Teilnehmer öffnet den Link in einem leeren Profil, dann „Bogen übergeben…“. Danach Neuladen und „Fortsetzen“.
   3. **Meldekopf (Tablet).** (a) Neue Sammlung der Art „Übung“, darin „Bögen einlesen…“ mit den vier Einzel-PDFs. (b) Dieselben PDFs in die vom Sammelweg schon gefüllte Sammlung. (c) Beides am „Übungstag“ fünf Tage später, dazu der Link beim Teilnehmer an diesem Tag.
   4. **Durchblättern mit eigenem Entwurf (Telefon).** Bogen „THW Musterstadt“ angefangen, dann drei DRK-Beispiele nacheinander mit „Anzeigen“. Zweiter Lauf: ein Beispiel öffnen, Seite neu laden, nächstes Beispiel.
-  5. **Rückweg.** Nach „Anzeigen“ und nach dem Sammelweg über „‹ Startseite“ › „Beispielbögen ansehen“. Außerdem die Zurück-Taste des Browsers.
+  5. **Rückweg.** Nach „Anzeigen“ und nach dem Sammelweg über „‹ Startseite“ › „Übungsbögen ansehen“. Außerdem die Zurück-Taste des Browsers.
   6. **Ablage in eine echte Sammlung.** Sammlung der Art „Einsatz“ anlegen, Beispiel › „In Einsatz-Sammlung ablegen…“ › diese Sammlung.
   7. **Vorlage.** Beispiel › „Als Vorlage speichern“ › Startseite.
 - Die Seite wurde nicht verändert: kein `addScriptTag`, keine DOM-Eingriffe. Gelesen wurde über `innerText` und `boundingBox`, die Zwischenablage über `navigator.clipboard.readText()` mit erteilter Berechtigung.
@@ -51,8 +51,8 @@ Reibung entsteht an drei Stellen:
 
 ### BB-W1 [P1 → Rest P2] Beispiel verdrängt eigenen Entwurf: **teilweise**
 
-- **Behoben im normalen Ablauf:** Mit dem Entwurf „THW Musterstadt“ fragt das erste „Anzeigen“ wie vorgesehen: „Der angefangene Bogen „THW Musterstadt“ wird durch den Beispielbogen ersetzt …“. Danach ersetzen das zweite und dritte Beispiel einander ohne Rückfrage. „THW Musterstadt“ bleibt dabei unter „Zuletzt geschlossenen Bogen zurückholen“. Die Meldung sagt das ausdrücklich: „Solange du nichts änderst, ersetzt das nächste Beispiel ihn ohne Rückfrage. Dein eigener Bogen „THW Musterstadt“ liegt auf der Startseite …“. Die Startkarte trägt „BEISPIEL“.
-- **Noch zu beobachten:** Beispiel öffnen, Seite neu laden (auf dem Telefon reicht dafür, dass der Browser den Tab verwirft, während man telefoniert), dann ein zweites Beispiel öffnen. Es erscheint wieder wörtlich die alte Rückfrage: „Der angefangene Bogen „DRK-Kreisverband Buchenrode e. V. Behandlung Kat. GELB (BHP 25)“ wird … ersetzt. Der Bogen „THW Musterstadt“ … auf dem Platz „Zuletzt geschlossener Bogen“ wird dabei endgültig gelöscht“, mit „Beispielbogen öffnen — alten Bogen endgültig löschen“. Die Startkarte zeigt nach dem Neuladen „ÜBUNG“ statt „BEISPIEL“ und „Entwurf … wiederhergestellt“. Die zuvor gegebene Zusage „ersetzt das nächste Beispiel ihn ohne Rückfrage“ stimmt dann nicht mehr (Bild `33-nach-reload-rueckfrage.png`). Das ist im README als „nur im Arbeitsspeicher“ vermerkt. Aus Nutzersicht ist es aber derselbe Fehler wie in Runde 1, nur seltener.
+- **Behoben im normalen Ablauf:** Mit dem Entwurf „THW Musterstadt“ fragt das erste „Anzeigen“ wie vorgesehen: „Der angefangene Bogen „THW Musterstadt“ wird durch den Übungsbogen ersetzt …“. Danach ersetzen das zweite und dritte Beispiel einander ohne Rückfrage. „THW Musterstadt“ bleibt dabei unter „Zuletzt geschlossenen Bogen zurückholen“. Die Meldung sagt das ausdrücklich: „Solange du nichts änderst, ersetzt das nächste Beispiel ihn ohne Rückfrage. Dein eigener Bogen „THW Musterstadt“ liegt auf der Startseite …“. Die Startkarte trägt „BEISPIEL“.
+- **Noch zu beobachten:** Beispiel öffnen, Seite neu laden (auf dem Telefon reicht dafür, dass der Browser den Tab verwirft, während man telefoniert), dann ein zweites Beispiel öffnen. Es erscheint wieder wörtlich die alte Rückfrage: „Der angefangene Bogen „DRK-Kreisverband Buchenrode e. V. Behandlung Kat. GELB (BHP 25)“ wird … ersetzt. Der Bogen „THW Musterstadt“ … auf dem Platz „Zuletzt geschlossener Bogen“ wird dabei endgültig gelöscht“, mit „Übungsbogen öffnen — alten Bogen endgültig löschen“. Die Startkarte zeigt nach dem Neuladen „ÜBUNG“ statt „BEISPIEL“ und „Entwurf … wiederhergestellt“. Die zuvor gegebene Zusage „ersetzt das nächste Beispiel ihn ohne Rückfrage“ stimmt dann nicht mehr (Bild `33-nach-reload-rueckfrage.png`). Das ist im README als „nur im Arbeitsspeicher“ vermerkt. Aus Nutzersicht ist es aber derselbe Fehler wie in Runde 1, nur seltener.
 - **Empfehlung:** Das Merkmal „unverändertes Beispiel“ mit dem Entwurf speichern, so dass es ein Neuladen übersteht. Gelingt das nicht, darf ein Beispiel wenigstens nie den Rückholplatz eines echten Bogens überschreiben.
 
 ### BB-W2 [P1] Hannover-Einlage fasst vier Bögen zu einer Einheit zusammen: **behoben**
@@ -65,14 +65,14 @@ Reibung entsteht an drei Stellen:
 
 - **Behoben:** Der Dialog öffnet nach „Anzeigen“, nach dem Sammelweg und nach dem Neuladen im zuletzt offenen Ordner (z. B. „Alle › THW › … › RSt Bad Tölz › OV Bad Aibling“). Das zeitraubende Durchklicken der fünf Ebenen entfällt.
 - **Noch zu beobachten:**
-  - Im geöffneten Beispiel gibt es weiter keinen Knopf „Zurück zu den Beispielbögen“. Der Weg führt über „‹ Startseite“ und Scrollen zu „Beispielbögen ansehen“. Der Knopf liegt bei 360 × 640 mit offenem Bogen bei y = 2 328 bis 2 352, also im vierten Bildschirm.
+  - Im geöffneten Beispiel gibt es weiter keinen Knopf „Zurück zu den Übungsbögen“. Der Weg führt über „‹ Startseite“ und Scrollen zu „Übungsbögen ansehen“. Der Knopf liegt bei 360 × 640 mit offenem Bogen bei y = 2 328 bis 2 352, also im vierten Bildschirm.
   - Die Zurück-Taste des Browsers führt nach „Anzeigen“ auf die Startseite, nicht in den Dialog.
   - Das README nennt den fehlenden Knopf selbst als offen.
 
 ### BB-W4 [P2] Kein Sammelweg: **behoben** (neue Folgefragen siehe BB2-W1, BB2-W3)
 
 - „Alle 4 in eine Übungs-Sammlung“ steht im Ordner direkt über der Liste (bei 360 × 640 auf y = 470, ohne Scrollen). Ein Tipp legt die Sammlung „Übung: …“ an und öffnet sie. Noch ein Tipp („Einsatz weitergeben / sichern“) liefert in 4,6 s das Sammel-PDF (9 Seiten), ein weiterer in 1,2 s das Lageblatt. Damit ist die Nachprüfung aus Runde 1 erfüllt: höchstens drei Tipps.
-- Nicht umgesetzt ist der Teil der Empfehlung, der in einer leeren Sammlung der Art „Übung“ auf Beispielbögen verweist (siehe H5).
+- Nicht umgesetzt ist der Teil der Empfehlung, der in einer leeren Sammlung der Art „Übung“ auf Übungsbögen verweist (siehe H5).
 
 ### BB-W5 [P2] Vergangene Zeiträume: **teilweise**
 
@@ -130,7 +130,7 @@ Reibung entsteht an drei Stellen:
   - Liest der Meldekopf die Teilnehmer-PDFs dann in die schon gefüllte Sammlung ein, entstehen vier „Folgemeldung … inhaltlich unverändert“. Das ist richtig gelöst, aber kein Übungseffekt.
   - Der Hinweis am Knopf sagt nur „mit Sammel-PDF, Lageblatt und Weitergabe“, nicht, wofür der Weg gedacht ist (Lage zum Vorzeigen oder Material zum Verteilen).
 - **Folge:** Für eine Meldekopf-Übung nach A1 hilft der Sammelweg kaum. Er erzeugt das Ergebnis, das der Meldekopf erst erarbeiten soll. Das Austeilen an die Teilnehmer kostet weiter einen Download je Bogen. Wer die Sammlung samt Sammel-PDF an den Meldekopf weitergibt, nimmt ihm die Übung vorweg. Und der Eintrag „am Meldekopf von Hand erfasst“ ist in der Auswertung falsch.
-- **Empfehlung:** Zwei Ausgänge je Ordner anbieten. (1) „Alle n als PDF zum Austeilen“: ein PDF mit den Bögen nacheinander, ohne Meldekopf-Kasten und ohne Eingangszeit, ein Bogen je Blatt mit QR-Code. (2) Der bestehende Weg „in eine Übungs-Sammlung“ für eine vorgefertigte Lage, dann mit Herkunft „aus Beispielbögen übernommen“ statt „am Meldekopf von Hand erfasst“. Am Knopf in einem Satz sagen, welcher Weg wofür ist.
+- **Empfehlung:** Zwei Ausgänge je Ordner anbieten. (1) „Alle n als PDF zum Austeilen“: ein PDF mit den Bögen nacheinander, ohne Meldekopf-Kasten und ohne Eingangszeit, ein Bogen je Blatt mit QR-Code. (2) Der bestehende Weg „in eine Übungs-Sammlung“ für eine vorgefertigte Lage, dann mit Herkunft „aus Übungsbögen übernommen“ statt „am Meldekopf von Hand erfasst“. Am Knopf in einem Satz sagen, welcher Weg wofür ist.
 - **Nachprüfung:** Ordner „OV Bad Aibling“: Mit höchstens zwei Tipps liegt ein PDF vor, das vier verteilbare Bögen ohne „Eingetroffen“ und ohne Lage enthält. Karten aus dem Sammelweg nennen nicht mehr „von Hand erfasst“.
 
 ### BB2-W2 [P2] Typ Ablauf/Übergabe: Ein per Link empfangener Übungsbogen zeigt dem Teilnehmer drei QR-Teile statt einem
@@ -141,7 +141,7 @@ Reibung entsteht an drei Stellen:
   - Beim Ausbilder („Anzeigen“) ist derselbe Bogen ein einzelner Code.
   - Nach Neuladen und „Fortsetzen“ zeigt der Teilnehmer plötzlich nur einen Code („Signiert mit dem Echtheits-Siegel dieses Geräts“). Auch der Satz „Empfangener Übungsbogen …“ und „Empfangen als: ✓ signiert …“ sind dann verschwunden.
 - **Folge:** Gerade der Schritt, der am Meldekopf geübt werden soll, wird künstlich dreimal so lang. Jeder Teilnehmer zeigt drei Codes nacheinander, der Meldekopf scannt drei, und der erklärende Text ist Signaturtechnik statt Einsatzsprache. Ob es ein oder drei Codes sind, hängt zudem davon ab, ob die Seite zwischendurch neu geladen wurde. Die Kamerazeit selbst ist nicht gemessen (siehe „Nicht prüfbar“).
-- **Empfehlung:** Für einen unveränderten Übungsbogen aus den Beispielbögen beim Empfänger keinen Gegenzeichnungs-Zuschlag in den Code legen, so dass derselbe eine Code wie beim Ausbilder entsteht. Wenigstens den Teilnehmer nicht mit „fremder Stelle“ und „gegengezeichnet“ ansprechen. Das Verhalten vor und nach dem Neuladen angleichen.
+- **Empfehlung:** Für einen unveränderten Übungsbogen aus den Übungsbögen beim Empfänger keinen Gegenzeichnungs-Zuschlag in den Code legen, so dass derselbe eine Code wie beim Ausbilder entsteht. Wenigstens den Teilnehmer nicht mit „fremder Stelle“ und „gegengezeichnet“ ansprechen. Das Verhalten vor und nach dem Neuladen angleichen.
 - **Nachprüfung:** Link im leeren Profil öffnen. Ergebnis: ein QR-Code, gleich viele Teile wie beim Ausbilder, vor und nach dem Neuladen.
 
 ### BB2-W3 [P3] Typ Ablauf: Der Sammelweg gilt nur für genau einen Ordner. Wiederholen erzeugt stille Doppel, und der Name ist der ganze Pfad
@@ -154,7 +154,7 @@ Reibung entsteht an drei Stellen:
   - Der Name ist der volle Pfad: „Übung: THW › Alle Einheiten aller Ortsverbände (nach Landesverband, Regionalstelle, OV) › Bayern › RSt Bad Tölz › OV Bad Aibling“ (138 Zeichen). Bei 360 × 640 belegt er sieben Zeilen im Kopf der Sammlung (Bild `91-sammlung-360.png`). Zwei Sammlungen unterscheiden sich erst im letzten Wort. Auch Sammel-PDF und Lageblatt tragen den Pfad im Dateinamen (rund 150 Zeichen) und in jeder Fußzeile.
   - Der Ort bleibt leer („Ort eintragen…“), obwohl alle Bögen „Bruckmühl“ nennen.
 - **Folge:** Eine Übung über zwei OV oder eine RSt führt zurück zu Einzel-PDFs und „Bögen einlesen…“. Wer versehentlich zweimal tippt, hat doppelte Sammlungen und muss die richtige an langen, gleich anfangenden Namen erkennen.
-- **Empfehlung:** Sammelweg auch auf höheren Ebenen und für Suchergebnisse, mit Bogenzahl im Knopf. Gibt es schon eine Übungs-Sammlung aus Beispielbögen, die Wahl „neu anlegen / in „…“ hinzufügen“ anbieten. Bei gleichem Ordner auf die vorhandene Sammlung hinweisen. Als Namen den letzten Ordner verwenden („Übung: OV Bad Aibling“).
+- **Empfehlung:** Sammelweg auch auf höheren Ebenen und für Suchergebnisse, mit Bogenzahl im Knopf. Gibt es schon eine Übungs-Sammlung aus Übungsbögen, die Wahl „neu anlegen / in „…“ hinzufügen“ anbieten. Bei gleichem Ordner auf die vorhandene Sammlung hinweisen. Als Namen den letzten Ordner verwenden („Übung: OV Bad Aibling“).
 - **Nachprüfung:** In „RSt Bad Tölz“ steht ein Sammelknopf. Ein zweiter Tipp auf denselben Ordner fragt nach. Der Sammlungsname passt bei 360 px in höchstens zwei Zeilen.
 
 ### BB2-W4 [P3] Typ Inhalt: Platzhalter-Kennzeichen erzeugen in der Hannover-Übungslage „Kennzeichen doppelt“ auf fast jeder Karte
@@ -179,7 +179,7 @@ Reibung entsteht an drei Stellen:
 - **H2 Dateinamen jetzt lang und doppelt:** `uebung-beispiel-thw-ortsverbaende-lv-bayern-rst-bad-toelz-ov-bad-aibling-ov-bad-aibling-01-1-tz-ztr-tz.pdf` (103 Zeichen, „ov-bad-aibling“ zweimal). Im Download-Ordner des Telefons ist davon nur der Anfang sichtbar, der bei allen Bögen gleich ist.
 - **H3 Echte Dienststellen-Adressen** (aus Runde 1, offen): Jetzt stehen „Poststelle.LVBY@thw.de“ und „Poststelle.RSt_Bad-Toelz@thw.de“ auch im Sammel-PDF jeder Übungslage.
 - **H4 „Dein Bogen“** im Ablage-Dialog eines Beispiels (aus Runde 1, offen): „Dein Bogen wird als Meldung abgelegt … dein Bogen bleibt unter „Fortsetzen““.
-- **H5 Leere Übungs-Sammlung ohne Verweis:** Eine neue Sammlung der Art „Übung“ zeigt nur „Noch keine Meldung. Bogen scannen oder manuell erfassen.“ Der Satz „Mit Beispielbögen füllen…“ aus der Empfehlung zu BB-W4 fehlt. Der Meldekopf, der selbst üben will, erfährt hier nicht, dass es Beispielbögen gibt.
+- **H5 Leere Übungs-Sammlung ohne Verweis:** Eine neue Sammlung der Art „Übung“ zeigt nur „Noch keine Meldung. Bogen scannen oder manuell erfassen.“ Der Satz „Mit Übungsbögen füllen…“ aus der Empfehlung zu BB-W4 fehlt. Der Meldekopf, der selbst üben will, erfährt hier nicht, dass es Übungsbögen gibt.
 - **H6 Korrektur zu Runde 1:** „OV Bad Aibling“ enthält 4 Bögen, nicht 6 wie in BB-W4 aus Runde 1 angegeben. Die Daten im Repository enthalten ebenfalls vier.
 - **H7 Teilnehmer nach Neuladen:** Ein empfangener Übungslink überlebt das Neuladen als „Entwurf … wiederhergestellt“. Nach „Fortsetzen“ ist der Bogen aber ein eigener Bogen des Teilnehmers: Hinweis für Teilnehmer und Meldekopf weg, Signatur jetzt „dieses Geräts“. Für die Übung schadet das nicht („Bogen übergeben…“ bleibt vorn), es erklärt aber das wechselnde Verhalten in BB2-W2.
 

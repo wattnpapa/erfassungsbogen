@@ -17,7 +17,7 @@ Chromium über das globale Playwright-Modul (die Projektkopie findet keinen Brow
 und 360 x 640 (zusätzlich 568 x 320 nur für den Scanner ohne Kamera). Frischer Browserzustand je
 Durchlauf. Durchlaufen: Startseite; „Neuen Bogen erstellen" (Schritt 1 bis 6); „Neue
 Einsatz-Sammlung…"; „Einheit schnell erfassen" (mit und ohne Ort, drei Einheiten); „Bögen
-einlesen…" (drei und vier Beispielbögen, zweimal derselbe Satz); Karte aufklappen, „Mehr…",
+einlesen…" (drei und vier Übungsbögen, zweimal derselbe Satz); Karte aufklappen, „Mehr…",
 „Entfernen" mit Rückfrage und Quittung, „Abrücken", Tabelle, Scanner ohne Kamera, Lageblatt,
 Sammel-PDF, CSV (Übersicht, alle Daten), Excel, „Übergabe vermerken…", „Einsatz als beendet
 markieren", „Einsatz löschen…". Der Gerätespeicher wurde mit einem bis zum Quota-Fehler
@@ -160,7 +160,7 @@ Tabellenspalte. Nichts davon verhindert eine Aufgabe.
 
 - **Neu oder alt (Verweis):** neu.
 - **Ort:** Startseite, grüner Kasten unter „Bögen sammeln (Meldekopf)", beim ersten Besuch.
-- **Beobachtung:** „✓ Jetzt offline bereit für Bogen, PDF, QR-Code und Empfang. Beispielbögen und
+- **Beobachtung:** „✓ Jetzt offline bereit für Bogen, PDF, QR-Code und Empfang. Übungsbögen und
   Themenseiten werden nachgeladen (212 von 549) — alle Daten bleiben auf diesem Gerät." Der Haken
   steht, obwohl erst 212 von 549 Dateien geladen sind. Der Kasten ist bei 360 px 243 px hoch.
 - **Erwartung der Rolle:** Entweder „bereit" oder „lädt noch"; wer vor der Anfahrt prüft, ob er im

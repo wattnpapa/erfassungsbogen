@@ -25,7 +25,7 @@ Durchlaufen: Startseite (leer, mit Entwurf), Ansicht-Menü, Assistent Schritt 1 
 Schnellerfassung bis zur Rückfrage „Ort der Einheit fehlt" und „Stärke fehlt",
 Ortsvorschläge bei verkleinertem Viewport, Einsatzansicht (Kacheln, Karten, „Mehr…",
 „Details", „Zug zuordnen", „Auftrag/Notiz", Abrücken mit Quittung, Filter, Tabelle),
-Einsatz weitergeben, Scanner ohne Kamera, Datensicherung, Beispielbögen, Impressum,
+Einsatz weitergeben, Scanner ohne Kamera, Datensicherung, Übungsbögen, Impressum,
 Datenschutz, „Alle Daten löschen", „Neue Einsatz-Sammlung", Begleitseiten
 `anleitung.html` und `themen.html`. Gemessen: `scrollWidth` gegen `innerWidth`, Ziele
 unter 40 px, Schriften unter 12 px, Eingabefelder unter 16 px, Lage der klebenden

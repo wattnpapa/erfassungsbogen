@@ -1,8 +1,8 @@
-# Prüfbericht Beispielbögen: Stress und Unterbrechung
+# Prüfbericht Übungsbögen: Stress und Unterbrechung
 
 - **Prüfer:** Rolle „Stress und Unterbrechung“ (thw-stress-test-user), erfahrener Helfer unter Zeitdruck, mit Unterbrechungen und wenig Aufmerksamkeit
 - **Datum:** 2026-11-08
-- **Prüfgegenstand:** nur der Bereich Beispielbögen: Abschnitt „Beispielbögen“ auf der Startseite unter „So funktioniert’s“ (Primärknopf „Beispielbögen ansehen“, Fußzeilen-Link entfallen) und Dialog „Beispielbögen“ (zugeklappte Erklärung, Register mit Bogenzahl, Pfadleiste „‹ Zurück“ / „Alle › …“, tiefe Ordner THW › Alle Einheiten aller Ortsverbände › LV › RSt › OV, Karten mit Anzeigen/PDF/Link, Ladezustand)
+- **Prüfgegenstand:** nur der Bereich Übungsbögen: Abschnitt „Übungsbögen“ auf der Startseite unter „So funktioniert’s“ (Primärknopf „Übungsbögen ansehen“, Fußzeilen-Link entfallen) und Dialog „Übungsbögen“ (zugeklappte Erklärung, Register mit Bogenzahl, Pfadleiste „‹ Zurück“ / „Alle › …“, tiefe Ordner THW › Alle Einheiten aller Ortsverbände › LV › RSt › OV, Karten mit Anzeigen/PDF/Link, Ladezustand)
 - **Code-Stand:** `main`, Commit `0dd56d4`, live auf `https://erfassungsbogen.app/` (Version `2026.1108.2056`); lokal nicht gebaut (privates Submodul fehlt)
 - **Zählung:** P0: 0 · P1: 1 · P2: 4 · P3: 4 · Hinweise: 6
 - **Kennzeichnung:** *gemessen* = im Testbrowser reproduziert, *Risiko* = abgeleitet.
@@ -38,8 +38,8 @@ Weg im Szenario (360x640, gemessen):
 
 | Schritt | Aktion | Bemerkung |
 | --- | --- | --- |
-| 0 | Startseite rund 1.840 px nach unten wischen (390x844: 1.823 px) | Knopf „Beispielbögen ansehen“ liegt knapp drei Bildschirme tief |
-| 1 | „Beispielbögen ansehen“ | Dialog „Alle“ |
+| 0 | Startseite rund 1.840 px nach unten wischen (390x844: 1.823 px) | Knopf „Übungsbögen ansehen“ liegt knapp drei Bildschirme tief |
+| 1 | „Übungsbögen ansehen“ | Dialog „Alle“ |
 | 2 | „THW 3.634 Bögen“ | letzte Zeile, bei 360x640 am unteren Dialogrand angeschnitten (y 594 bis 646, Dialog endet bei 624) |
 | 3 | „Alle Einheiten aller Ortsverbände (LV › RSt › OV)“ | darunter 101 weitere Bögen direkt auf der THW-Ebene |
 | 4 | „Bremen, Niedersachsen 404 Bögen“ | 8 Landesverbände |
@@ -54,7 +54,7 @@ Weg im Szenario (360x640, gemessen):
 
 - **Kennzeichnung:** gemessen (`b8.js`, `b9.js`, 360x640)
 - **Fundstelle / Aufgabe:** THW › Alle Einheiten aller Ortsverbände › Bremen, Niedersachsen › RSt Oldenburg › OV Oldenburg (NI) → „PDF“, ohne Netz.
-- **Beobachtung:** Nach vollständigem Vorrat meldet die Startseite „✓ Jetzt offline bereit. Funktioniert komplett offline“. Offline zeigt der OV-Ordner 9 Karten mit Dateinamen statt Einheiten („ov-oldenburg-ni-05-1-tz-b“, „nicht geladen“, Stärke „—“), am Listenende „Einige Beispielbögen liegen noch nicht auf dem Gerät — sie werden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).“ „PDF“ ergibt „PDF konnte nicht erzeugt werden: Dieser Beispielbogen liegt noch nicht auf dem Gerät — Beispielbögen werden nach dem ersten Laden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).“ Die Ordner-Bögen sind laut `scripts/precache-aufteilung.ts` bewusst „nur auf Abruf“ und gehören nie zum Vorrat; die Offline-Zeile sagt dazu nichts. Die 101 Bögen direkt unter THW und die übrigen Organisationen gehen offline.
+- **Beobachtung:** Nach vollständigem Vorrat meldet die Startseite „✓ Jetzt offline bereit. Funktioniert komplett offline“. Offline zeigt der OV-Ordner 9 Karten mit Dateinamen statt Einheiten („ov-oldenburg-ni-05-1-tz-b“, „nicht geladen“, Stärke „—“), am Listenende „Einige Übungsbögen liegen noch nicht auf dem Gerät — sie werden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).“ „PDF“ ergibt „PDF konnte nicht erzeugt werden: Dieser Übungsbogen liegt noch nicht auf dem Gerät — Übungsbögen werden nach dem ersten Laden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).“ Die Ordner-Bögen sind laut `scripts/precache-aufteilung.ts` bewusst „nur auf Abruf“ und gehören nie zum Vorrat; die Offline-Zeile sagt dazu nichts. Die 101 Bögen direkt unter THW und die übrigen Organisationen gehen offline.
 - **Erwartung der Rolle:** Was „komplett offline“ heißt, geht offline, oder die App sagt vorher klar: „Bögen der Ortsverbände nur mit Netz; einmal geöffnete bleiben auf dem Gerät.“
 - **Auswirkung im Einsatz:** Auf dem Übungsgelände ohne Netz bekommt der Zugführer den Bogen seiner Einheit nicht. Der Text lässt ihn warten oder die Offline-Zeile suchen, die „fertig“ sagt. Dateinamen wie „…-05-1-tz-b“ machen nicht einmal erkennbar, welche Karte die Bergungsgruppe wäre.
 - **Empfehlung:** Für OV-Ordner eine eigene, ehrliche Meldung („Nur mit Netz. Bereits geöffnete Bögen bleiben auf dem Gerät.“), schon beim Betreten des Ordners. Die Offline-Zeile der Startseite um diese Ausnahme ergänzen. Ohne Netz Einheit und Zug aus dem Dateinamen lesbar zeigen („Bergungsgruppe · 1. TZ“) statt der Kennung. Optional: „Diesen OV für offline merken“.
@@ -63,7 +63,7 @@ Weg im Szenario (360x640, gemessen):
 ### BB-S2 [P2, Bedienung] Keine Suche: sechs Ebenen, Vorwissen über LV und Regionalstelle nötig
 
 - **Kennzeichnung:** gemessen (Wegtabelle oben; `b4.js` zählt je LV 4 bis 12 Regionalstellen: NRW 12, Bayern 11, Hessen/RLP/Saarland 11)
-- **Fundstelle / Aufgabe:** Dialog „Beispielbögen“, konkreten OV finden.
+- **Fundstelle / Aufgabe:** Dialog „Übungsbögen“, konkreten OV finden.
 - **Beobachtung:** Es gibt kein Suchfeld, nur die Ordnerkette. Für 3.533 OV-Bögen aus 667 OVs führt der Weg über LV und Regionalstelle. Wer die Regionalstelle seines OV nicht kennt, tippt Regionalstellen der Reihe nach an und geht jeweils zurück. Ab Startseite: 7 Tipps und rund 5 Wischbewegungen, bei 360x640 liegen „THW“, die passende RSt und der OV jeweils am oder unter dem unteren Rand.
 - **Erwartung der Rolle:** „Oldenburg“ eintippen, Treffer „OV Oldenburg (NI) · Bergungsgruppe“, PDF.
 - **Auswirkung im Einsatz:** Unter Zeitdruck kostet das eine halbe bis ganze Minute volle Aufmerksamkeit; mit unbekannter RSt mehrere Fehlversuche. Der Name der Regionalstelle muss nicht zum OV passen; dann hilft nur Wissen über die Verwaltungsstruktur (Risiko).
@@ -74,11 +74,11 @@ Weg im Szenario (360x640, gemessen):
 
 - **Kennzeichnung:** gemessen (`b4.js`, `b5.js`)
 - **Fundstelle / Aufgabe:** Dialog bis OV Oldenburg navigiert, dann unterbrochen.
-- **Beobachtung:** Escape (Zurück-Geste) schließt den Dialog; erneutes „Beispielbögen ansehen“ beginnt bei „Alle“. Ebenso nach „Anzeigen“ (Bogen öffnet, Dialog schließt; zurück über „‹ Startseite“, wieder wischen, wieder 6 Ebenen) und nach Neuladen (Seite steht oben, Knopf wieder rund 1.840 px tief). Nur der Tab-Wechsel hält Ordner und Bildlauf. Der Rücksprung ist im Code gewollt („beim Öffnen wieder ganz oben starten“).
+- **Beobachtung:** Escape (Zurück-Geste) schließt den Dialog; erneutes „Übungsbögen ansehen“ beginnt bei „Alle“. Ebenso nach „Anzeigen“ (Bogen öffnet, Dialog schließt; zurück über „‹ Startseite“, wieder wischen, wieder 6 Ebenen) und nach Neuladen (Seite steht oben, Knopf wieder rund 1.840 px tief). Nur der Tab-Wechsel hält Ordner und Bildlauf. Der Rücksprung ist im Code gewollt („beim Öffnen wieder ganz oben starten“).
 - **Erwartung der Rolle:** Nach dem Wiederöffnen dort stehen, wo man war, oder mindestens ein „Zuletzt: OV Oldenburg (NI)“.
 - **Auswirkung im Einsatz:** Wer zwei Bögen vergleicht (Anzeigen, zurück, nächster) oder kurz angesprochen wird und den Dialog wegwischt, macht den ganzen Weg erneut. Die Zurück-Geste ist unter Stress die häufigste Fehlbedienung.
-- **Empfehlung:** Letzten Ordner für die Sitzung merken und beim Öffnen wieder anzeigen (mit „Alle“ in der Pfadleiste als Ausweg); nach „Anzeigen“ auf der Startseite einen Rückweg „Zurück zu den Beispielbögen (OV Oldenburg)“.
-- **Nachprüfung:** OV Oldenburg öffnen, Escape, „Beispielbögen ansehen“: Ordner OV Oldenburg erscheint. Ebenso nach „Anzeigen“ und Rückkehr.
+- **Empfehlung:** Letzten Ordner für die Sitzung merken und beim Öffnen wieder anzeigen (mit „Alle“ in der Pfadleiste als Ausweg); nach „Anzeigen“ auf der Startseite einen Rückweg „Zurück zu den Übungsbögen (OV Oldenburg)“.
+- **Nachprüfung:** OV Oldenburg öffnen, Escape, „Übungsbögen ansehen“: Ordner OV Oldenburg erscheint. Ebenso nach „Anzeigen“ und Rückkehr.
 
 ### BB-S4 [P2, Orientierung] Neue Ebene öffnet mitten in der Liste; Pfadleiste und „‹ Zurück“ scrollen weg
 

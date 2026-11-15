@@ -17,7 +17,7 @@ R13-H1, R14-E7, R14-S2, R14-H1, R14-W3) wurden nicht neu gemeldet.
 Playwright (globales Modul unter `/opt/node22/lib/node_modules/playwright`, `chromium.launch()` ohne
 Optionen; die Projektkopie fand keinen Browser), `isMobile`/`hasTouch`, Locale de-DE, Dichte 2, Telefon
 390 × 844 und 360 × 640 (Dialogmaße zusätzlich 320 × 568). Neue Browser-Kontexte je Lauf, Zustände durch
-Bedienung; Beispielbögen aus `examples/thw/` als Dateien eingelesen. Nichts installiert, kein Prozess
+Bedienung; Übungsbögen aus `examples/thw/` als Dateien eingelesen. Nichts installiert, kein Prozess
 beendet. Handscanner und Link-Weg durch Tastatureingabe mit Enter nachgestellt; die Links stammen aus
 „Bogen übergeben… → Weitere Formate → Link teilen" (`navigator.share` gestubbt), die Teil-Codes aus den
 QR-Bildern der App, mit `jsqr` zurückgelesen. Das Lageblatt wurde mit `pdftotext` gelesen.
@@ -29,7 +29,7 @@ entfernen, „Namen einfügen…", Fahrzeuge, Sofortbedarf, Zeiträume), Schnell
 (anlegen, Dateien einlesen, Zeiten ändern, Abrücken mit Doppeltipp, Zug zuordnen, Stärke ändern, Aufteilen,
 Verschieben, als Einsatzmeldung zählen, Filter, Tabelle, Exporte bei leerem Einsatz, Löschen und
 Papierkorb), Import von Sammel-PDF, falschen, beschädigten und manipulierten Dateien (vierzehn
-Abwandlungen eines Beispielbogens), Handscanner mit Fremdcodes, beschädigten Links und mehrteiligen Codes,
+Abwandlungen eines Übungsbogens), Handscanner mit Fremdcodes, beschädigten Links und mehrteiligen Codes,
 Absenderkarte, Vorlagen, Dialoge bei 360 × 640.
 
 ## Urteil
@@ -89,7 +89,7 @@ Hinweis auf die Signatur). Die Liste zeigt „Einheiten (1 gemeldet · 1 zählen
 „⚠ Signatur ungültig", die Quittung „Neu seit der letzten Kenntnisnahme (1) … neu gemeldet" erwähnt sie nicht.
 Das Lageblatt (PDF, `pdftotext`) führt die Einheit in „Lage: 1 Einheit zählend · Stärke … 0/0/1/1" mit
 „Hinweisen: Einheitstyp fehlt prüfen; keine Rufnummer", aber ohne den Vermerk ungültiger Signatur. Dasselbe
-mit dem Beispielbogen 001 (Albstadt): Handscanner meldet „✓ … aufgenommen", der Link über die Adresszeile
+mit dem Übungsbogen 001 (Albstadt): Handscanner meldet „✓ … aufgenommen", der Link über die Adresszeile
 öffnet den Bogen mit der einen Zeile „Empfangen als: ⚠ Signatur ungültig — die Daten passen nicht zur
 Signatur." und zerstörten Inhalten („PostseWn tzSt_Tuebingen@thw.de" als E-Mail), die als „Hinweise an die
 Einheit (3) — hier nichts zu beheben" erscheinen. An anderen Stellen (Position 150 bis 200 im Link) wird

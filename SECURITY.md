@@ -45,7 +45,7 @@ Diskussionen melden. Zwei Wege stehen offen:
 
 Hilfreich für die Meldung sind: betroffenes Repository und Version bzw. Commit,
 eine Beschreibung der Auswirkung, die Schritte zum Nachstellen (gern mit einem
-Beispielbogen oder QR-Inhalt) sowie die Umgebung, in der der Fehler auftritt
+Übungsbogen oder QR-Inhalt) sowie die Umgebung, in der der Fehler auftritt
 (Browser, Desktop-App, iOS/Android). Ein Vorschlag zur Behebung ist willkommen,
 aber nicht nötig.
 

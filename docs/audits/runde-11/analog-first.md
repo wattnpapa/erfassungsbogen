@@ -12,7 +12,7 @@ und die Befundüberschriften aller früheren Analog-first-Berichte (R2 bis R10),
 ## Prüfaufbau
 
 Playwright (Chromium, `chromium.launch()` ohne Optionen, `isMobile`/`hasTouch`, Locale de-DE), Telefon 390 × 844
-und 360 × 640. Jeder Durchgang in einem frischen Browser-Kontext. Die Sammlungen wurden mit den Beispielbögen aus
+und 360 × 640. Jeder Durchgang in einem frischen Browser-Kontext. Die Sammlungen wurden mit den Übungsbögen aus
 `examples/thw/` (auf `uebung: false` gesetzt, 6 und 40 Stück) über „Bögen einlesen…" gefüllt, für die
 Datenschutzfrist mit Kopien, deren `stand` 30, 85 und 95 Tage zurückliegt. Papier-Ausgaben wurden heruntergeladen
 und mit `pdftotext -layout`, `pdfinfo` und `pdftoppm` gelesen: Lageblatt (6 und 40 Einheiten), Sammel-PDF (6 und 40
@@ -32,7 +32,7 @@ Einheit führt ihren Bogen als „Papier-Reserve" in der Fahrzeugmappe (so empfi
 
 **Nicht prüfbar:** echtes Drucken (Druckrand, Graustufen), Kamera- und Handscanner, QR-Weg vom Papier
 (ersetzt durch den inhaltsgleichen Dateiweg), native Builds, Safari, echte Geräte- und Akkuausfälle (ersetzt durch frische
-Kontexte). Die Beispielbögen tragen Einsatzzeiträume im Juli; „Zeitraum vorbei", „Anderer Einsatz?" und die Hinweise „keine
+Kontexte). Die Übungsbögen tragen Einsatzzeiträume im Juli; „Zeitraum vorbei", „Anderer Einsatz?" und die Hinweise „keine
 Rufnummer / kein Kraftfahrer" sind Artefakte der Seeds und nicht gewertet.
 
 **Bekannte Grenzen, nicht neu gemeldet:** R6-O9, R7-G4/M8, R7-G8/H9, R7-N1, R7-N9, R8-A1, R8-M6, R9-M3, R9-G5,
@@ -90,7 +90,7 @@ Erreichbarkeiten: Datenschutzfrist, Stand vor 95 Tagen — Angaben vom Papier na
 steht sichtbar auf der aufgeklappten Karte. Auf dem Ausdruck steht neben dem Code, bis wann er Namen liefert („Namen im Code
 gültig bis …"), damit die Einheit rechtzeitig neu bearbeitet.
 
-**Verifikation:** Beispielbogen mit `stand` 95 Tage zurück einlesen: die Quittung nennt den Bogen, die Karte erklärt die
+**Verifikation:** Übungsbogen mit `stand` 95 Tage zurück einlesen: die Quittung nennt den Bogen, die Karte erklärt die
 Marke ohne Antippen des Tooltips. Einzel-PDF eines 80 Tage alten Bogens drucken: der Gültigkeitsvermerk steht neben dem
 Code.
 

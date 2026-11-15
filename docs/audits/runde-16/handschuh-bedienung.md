@@ -20,7 +20,7 @@ Chromium über das globale `playwright`-Modul (`chromium.launch()` ohne Optionen
 fand keinen Browser), `isMobile`, `hasTouch`, Pixeldichte 2, de-DE. Viewports 390 x 844, 360 x 640,
 dazu 320 x 568, 375 x 667, 385 x 800, 412 x 915, 430 x 932 sowie quer 640 x 360, 568 x 320, 844 x 390.
 Tipps über `tap()` und `touchscreen.tap()` an festen Koordinaten. Zustand: frisch angelegte
-Einsatz-Sammlung „Hochwasser Test“ mit elf Beispielbögen THW (`examples/thw`, über „Bögen einlesen…“),
+Einsatz-Sammlung „Hochwasser Test“ mit elf Übungsbögen THW (`examples/thw`, über „Bögen einlesen…“),
 eigener Bogen im Assistenten, Aufnahme von Hand und Schnellerfassung. Nicht prüfbar: echte Handschuhe,
 echte Bildschirmtastatur, Kamera-Scan, native Datums- und Zeitwähler.
 

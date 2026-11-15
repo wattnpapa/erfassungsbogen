@@ -75,7 +75,7 @@ Reine Prüfberichte ohne Codeänderung.
 Die Mehrzahl ist bestätigt: Scanner-Ausgang, Weitergabe der Sammlung mit
 Abrückzeiten, Rückfragen vor Tabellen-Löschen und Organisationswechsel,
 Zielgrößen im Formular, Themenwahl nach Systemeinstellung, Offline-Cache der
-Beispielbögen, Stapel-Scan ohne Rückfrage. Nur teilweise wirken F2 (gilt nicht
+Übungsbögen, Stapel-Scan ohne Rückfrage. Nur teilweise wirken F2 (gilt nicht
 für die Schnellerfassung auf der Startseite), D4 (Quittung außerhalb des
 Bildes), E3 (Zurück aus Schritt 1), K1 bis K3 und K5 (Folgemeldung,
 Exporte), A2/A5 (Eintreffzeit beim Einlesen, Kennungsabgleich) und O4

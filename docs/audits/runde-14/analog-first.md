@@ -15,7 +15,7 @@ nicht erneut gemeldet.
 
 Playwright (Chromium, `chromium.launch()` ohne Optionen; die Projektkopie fand keinen Browser, das globale
 Playwright-Modul schon), `isMobile`/`hasTouch`, Locale de-DE, Telefon 390 × 844 und 360 × 640, jeweils frischer
-Kontext. Einsatz-Sammlung mit 2, 3, 4, 6 und 40 THW-Beispielbögen aus `examples/thw/` (auf `uebung: false`, Stand auf
+Kontext. Einsatz-Sammlung mit 2, 3, 4, 6 und 40 THW-Übungsbögen aus `examples/thw/` (auf `uebung: false`, Stand auf
 „vor 60 bis 180 Minuten" gesetzt; zusätzlich zwei unveränderte Bögen mit Stand Juli und eine Mischung mit einem
 Übungsbogen), eingelesen über „Bögen einlesen…". Durchgespielt:
 
@@ -36,7 +36,7 @@ Lageblatt hängt nach einem Geräteausfall weiter an der Wand und wird von Zugf�
 Sammel-PDF geht an die Ablösung.
 
 **Nicht prüfbar:** echtes Drucken (Druckrand, Graustufen, Heften), Kamera- und Handscanner, Safari, native Builds,
-echte Akku- oder Geräteausfälle, echte Uhrabweichungen eines Tablets ohne Netz. Bei Beispielbögen entstehen „Zeitraum
+echte Akku- oder Geräteausfälle, echte Uhrabweichungen eines Tablets ohne Netz. Bei Übungsbögen entstehen „Zeitraum
 vorbei" und „Anderer Einsatz?" aus den Daten (Zeitraum Juli, Auftragstext anderer Lagen); das ist Seed-Artefakt und
 nicht gewertet.
 

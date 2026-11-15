@@ -17,7 +17,7 @@ Chromium über Playwright (`chromium.launch()` ohne Optionen), `isMobile`,
 `hasTouch`, Locale de-DE, je Lauf ein eigener Kontext. Viewports 390 × 844,
 360 × 640, 320 × 568, quer 640 × 360 und 568 × 320, dazu `html { font-size }`
 auf 130 und 150 %. Zustände über `localStorage`-Seeds (Entwurf `eeb.entwurf.v1`
-aus einem Beispielbogen, Sammlung „Hochwasser Musterstadt" mit sechs Meldungen
+aus einem Übungsbogen, Sammlung „Hochwasser Musterstadt" mit sechs Meldungen
 aus `examples/thw/`, `uebung: false`); der Hinweis „Zeitraum vorbei" und die
 Datenschutzfrist stammen aus den Beispieldaten und sind nicht gewertet.
 

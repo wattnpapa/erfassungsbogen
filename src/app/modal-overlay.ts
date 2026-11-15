@@ -232,7 +232,7 @@ export function ersteEbeneVerlassen(): void {
 
 /**
  * Dieselbe Behandlung für alle Fenster der Startseite (Datensicherung, „Alle Daten löschen",
- * Impressum, Datenschutz, Beispielbögen …), nicht nur für Rückfragen: Auf dem ersten
+ * Impressum, Datenschutz, Übungsbögen …), nicht nur für Rückfragen: Auf dem ersten
  * Verlaufseintrag der App führte Zurück bei offenem Fenster aus der App heraus (Audit Runde 6,
  * R6-S3). Ein Beobachter legt für jedes geöffnete `<dialog>` den Eintrag an und verbraucht ihn
  * beim Schließen; die Zurück-Geste schließt das Fenster über `offenesFensterAbbrechen` (app.tsx).

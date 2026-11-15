@@ -15,7 +15,7 @@ R15-E1, R15-E2, R15-D4, R15-S4, R15-M2) wurden nicht neu gemeldet.
 Playwright (globales Modul unter `/opt/node22/lib/node_modules/playwright`, `chromium.launch()` ohne
 Optionen), `isMobile`/`hasTouch`, Locale de-DE, Dichte 2. Telefon 390 × 844 und 360 × 640, einzelne
 Messungen bei 640 × 360 (Querformat im geöffneten Dialog). Je Lauf ein neuer Browser-Kontext, Zustände durch
-Bedienung; Beispielbögen aus `examples/thw/` als Dateien eingelesen, zusätzlich selbst abgewandelte Dateien
+Bedienung; Übungsbögen aus `examples/thw/` als Dateien eingelesen, zusätzlich selbst abgewandelte Dateien
 (zu neue und zu alte Schemaversion, fehlende Einheit, abgeschnittenes JSON, falsche Dateiendung, 30-MB-Datei).
 Das Lageblatt wurde mit `pdftotext` gelesen. Nichts installiert, kein Prozess beendet.
 

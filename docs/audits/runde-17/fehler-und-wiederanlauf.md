@@ -8,7 +8,7 @@
 
 ## Prüfaufbau
 
-Playwright (globales Modul `/opt/node22/lib/node_modules/playwright`, `chromium.launch()` ohne Optionen), `isMobile`/`hasTouch`, Locale de-DE, Dichte 2. Viewports 390 x 844 (Hauptlauf) und 360 x 640 (Sammlung mit acht Bögen, Quittungsleiste, seitlicher Überlauf: keiner). Beispielbögen aus `examples/thw/` als Kopien mit `uebung: false` und aktuellem Stand, über „Bögen einlesen…" aufgenommen; zusätzlich selbst abgewandelte Dateien (älterer und neuerer Stand derselben Einheit, abgeschnittenes JSON, Textdatei, CSV, Excel, Lageblatt-PDF). Lageblatt, Sammel-PDF, CSV und Excel wurden heruntergeladen und gelesen (`pdftotext`, `pdfinfo`, Zip-Inhalt). Nichts installiert, kein Prozess beendet.
+Playwright (globales Modul `/opt/node22/lib/node_modules/playwright`, `chromium.launch()` ohne Optionen), `isMobile`/`hasTouch`, Locale de-DE, Dichte 2. Viewports 390 x 844 (Hauptlauf) und 360 x 640 (Sammlung mit acht Bögen, Quittungsleiste, seitlicher Überlauf: keiner). Übungsbögen aus `examples/thw/` als Kopien mit `uebung: false` und aktuellem Stand, über „Bögen einlesen…" aufgenommen; zusätzlich selbst abgewandelte Dateien (älterer und neuerer Stand derselben Einheit, abgeschnittenes JSON, Textdatei, CSV, Excel, Lageblatt-PDF). Lageblatt, Sammel-PDF, CSV und Excel wurden heruntergeladen und gelesen (`pdftotext`, `pdfinfo`, Zip-Inhalt). Nichts installiert, kein Prozess beendet.
 
 Nicht geprüft: echte Kamera, Nahbereich, native Builds, echte Bildschirmtastatur, große Systemschrift (R15-M2 am Telefon mit 200 %), PDF-Dateiname im Tab-Betrachter (R16-A3), HEIC-Fotos. Der Weg „QR aus Bild einlesen…" mit einer Textdatei `fake.png` ließ sich im Lauf nicht auslösen (kein Ergebnis, nicht belegt).
 
@@ -59,7 +59,7 @@ Die Fehlerabsicherung ist weiter sehr dicht, und die Behebungen der Runde 16 hal
 
 - **Neu oder alt (Verweis):** alt, wie R14-W3 („Anderer Einsatz?" teilweise), weiter teilweise.
 - **Ort:** Einsatz-Sammlung, Einheitenliste, Lageblatt, 390 x 844 und 360 x 640.
-- **Beobachtung:** Nach dem Einlesen von vier Beispielbögen trägt jede Karte außer einer „⚠ Anderer Einsatz?"; die aufgeklappte Karte sagt „Kein Ortsname daraus kommt beim Ort der Sammlung oder bei den übrigen Einheiten vor. Zählt trotzdem mit." Auch nach „Zur Kenntnis genommen" bleibt die Marke; es gibt keinen Knopf „Passt so" an der Karte. Das Lageblatt druckt die Marke mit dem vollen Satz je Einheit („Anderer Einsatz? Bogen nennt: …"), bei sechs Einheiten viermal.
+- **Beobachtung:** Nach dem Einlesen von vier Übungsbögen trägt jede Karte außer einer „⚠ Anderer Einsatz?"; die aufgeklappte Karte sagt „Kein Ortsname daraus kommt beim Ort der Sammlung oder bei den übrigen Einheiten vor. Zählt trotzdem mit." Auch nach „Zur Kenntnis genommen" bleibt die Marke; es gibt keinen Knopf „Passt so" an der Karte. Das Lageblatt druckt die Marke mit dem vollen Satz je Einheit („Anderer Einsatz? Bogen nennt: …"), bei sechs Einheiten viermal.
 - **Folge:** Eine Warnung, die für jede Einheit mit eigenem Auftragstext gilt und nicht wegzubekommen ist, wird nach dem dritten Mal nicht mehr gelesen; der eine echte Fehlgriff (Bogen aus einem anderen Einsatz) geht darin unter. Auf Papier steht der Zweifel dauerhaft über den Einheiten.
 - **Empfehlung:** Eine Entscheidung je Karte zulassen („Gehört zu dieser Lage"), die die Marke auf Karte und Lageblatt entfernt und in der Historie vermerkt wird; im Lageblatt Marke kurz halten.
 

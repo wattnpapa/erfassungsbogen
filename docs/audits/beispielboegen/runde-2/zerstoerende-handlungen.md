@@ -1,8 +1,8 @@
-# Audit „Zerstörende Handlungen“, Beispielbögen Runde 2 (unverändertes Beispiel ohne Rückfrage, Übungsschutz, Sammelweg)
+# Audit „Zerstörende Handlungen“, Übungsbögen Runde 2 (unverändertes Beispiel ohne Rückfrage, Übungsschutz, Sammelweg)
 
 Prüfer: Rollenaudit `thw-destructive-action-reviewer` · Datum: 2026-11-09 ·
 Prüfgegenstand: Live-Seite `https://erfassungsbogen.app/` (Version `v2026.1109.833`), Code-Stand
-Commit `085a93b` (`main`). Nur der Bereich Beispielbögen, Schwerpunkt der Umbau aus „Stand der
+Commit `085a93b` (`main`). Nur der Bereich Übungsbögen, Schwerpunkt der Umbau aus „Stand der
 Behebung“ in `../README.md`: Ein unverändertes Beispiel (`offenesBeispiel` in `src/app/app.tsx`)
 wird ohne Rückfrage ersetzt oder geschlossen und belegt den Rückholplatz nicht; Rückfrage vor der
 Ablage eines Übungsbogens in eine Sammlung, die keine Übung ist; neue Sammlung aus Übungsbogen mit
@@ -93,8 +93,8 @@ gelingt ohne fremde Hilfe.
   Biberach/Riß → Crailsheim ohne Rückfrage; Rückholplatz nach jedem Schritt „Musterstadt-EIGEN“.
   Meldung nach „Anzeigen“: „Solange du nichts änderst, ersetzt das nächste Beispiel ihn ohne
   Rückfrage. Dein eigener Bogen „THW Musterstadt-EIGEN“ liegt auf der Startseite …“.
-  Startkarte „Bogen schließen“ am Beispiel: keine Rückfrage, Quittung „Beispielbogen geschlossen —
-  er liegt weiter unter „Beispielbögen“ bereit. Dein eigener Bogen … liegt …“, Rückholplatz
+  Startkarte „Bogen schließen“ am Beispiel: keine Rückfrage, Quittung „Übungsbogen geschlossen —
+  er liegt weiter unter „Übungsbögen“ bereit. Dein eigener Bogen … liegt …“, Rückholplatz
   unverändert. „Neuen Bogen erstellen“ bei offenem Beispiel: keine Rückfrage, eigener Entwurf
   bleibt. „Zurückholen“ bei offenem Beispiel: ohne Rückfrage, eigener Entwurf offen.
 - Grenzfälle „minimal geändert“ (Durchblättern, Feld antippen, Zeichen tippen und löschen, Übung
@@ -114,7 +114,7 @@ gelingt ohne fremde Hilfe.
 - Rest ohne Priorität: Musterung ohne Übungs-/Beispielmarke, „Als Vorlage speichern“ ohne Hinweis
   auf Beispieldaten (H5). Eine neue Lücke auf dem Empfangsweg: BB2-D3.
 
-### BB-D3 [P3] Beispielbogen landet mit einem Tipp in einer echten Einsatz-Sammlung: **behoben**
+### BB-D3 [P3] Übungsbogen landet mit einem Tipp in einer echten Einsatz-Sammlung: **behoben**
 
 - Gemessen: „In Einsatz-Sammlung ablegen…“ → „Hochwasser Echt“: Rückfrage „Übungsbogen in diese
   Sammlung? — „THW Albstadt …“ ist als ÜBUNG gekennzeichnet. In „Hochwasser Echt“ zählt er nicht in
@@ -162,7 +162,7 @@ Bogen“ wird dabei endgültig gelöscht: Er fasst nur einen Bogen. Nur der jetz
 bleibt auf der Startseite unter „Zuletzt geschlossenen Bogen zurückholen“ erreichbar.“ Knopf
 „Schließen, zur Startseite“ rot, Fokus „Abbrechen“. Nach Bestätigung liegt der eigene Entwurf
 **unverändert** auf dem Rückholplatz, das Beispiel ist nicht dort; beide Sätze stimmen also nicht.
-Danach keine Quittung (auf dem Startseitenweg: „Beispielbogen geschlossen — …“). Derselbe Knopf
+Danach keine Quittung (auf dem Startseitenweg: „Übungsbogen geschlossen — …“). Derselbe Knopf
 auf der Startkarte schließt ohne Rückfrage.
 
 **Erwartung der Rolle:** Derselbe Knopf „Bogen schließen“ sagt überall dasselbe, und eine rote
@@ -175,8 +175,8 @@ wiegt die Gewöhnung: Wer einmal erlebt, dass „endgültig gelöscht“ nicht s
 nächste, echte Warnung (BB2-D2) eher weg.
 
 **Empfehlung:** Am unveränderten Beispiel aus der Gesamtübersicht genauso wie von der Startkarte
-schließen: ohne Rückfrage oder mit dem Satz „Beispielbogen schließen — er liegt weiter unter
-„Beispielbögen“ bereit; dein Bogen „…“ bleibt zurückholbar“, nicht rot, mit derselben Quittung.
+schließen: ohne Rückfrage oder mit dem Satz „Übungsbogen schließen — er liegt weiter unter
+„Übungsbögen“ bereit; dein Bogen „…“ bleibt zurückholbar“, nicht rot, mit derselben Quittung.
 
 **Nachprüfung:** Eigener Entwurf, Beispiel anzeigen, in der Gesamtübersicht „Bogen schließen“:
 keine Rückfrage mit „endgültig gelöscht“, Quittung nennt den wartenden eigenen Bogen.
@@ -193,7 +193,7 @@ wirklich ändern → nächstes Beispiel. `offenesBeispiel` ist nur ein `useRef`.
 **Beobachtung:**
 1. (a) Nach Neuladen: Startkarte „THW Albstadt Zugtrupp Technischer Zug ÜBUNG — Entwurf vom
    09.11.26, 08:52 Uhr wiederhergestellt“ (vorher „BEISPIEL“, nichts geändert). Nächstes Beispiel:
-   „Beispielbogen öffnen? — Der angefangene Bogen „THW Albstadt …“ wird durch den Beispielbogen
+   „Übungsbogen öffnen? — Der angefangene Bogen „THW Albstadt …“ wird durch den Übungsbogen
    ersetzt. Der Bogen „THW Musterstadt-EIGEN“ … wird dabei endgültig gelöscht …“, Knöpfe
    „… den alten Bogen vorher als Datei sichern“ (primär), „… alten Bogen endgültig löschen“
    (rot), „Abbrechen“ (Fokus). Nach „endgültig löschen“ liegt das unveränderte Beispiel auf dem
@@ -222,7 +222,7 @@ sichern“ ist der Primärknopf, der Fokus liegt auf „Abbrechen“. Deshalb P2
 **Empfehlung:** Die Herkunft „unverändertes Beispiel“ mit dem Entwurf speichern (etwa als
 Prüfsumme oder Marke neben dem Entwurf), damit Neuladen und neuer Tab sie nicht verlieren. In der
 Rückfrage den Verlust-Knopf mit dem Namen beschriften („„THW Musterstadt-EIGEN“ endgültig
-löschen“) und das Beispiel „Beispielbogen „…“ (geändert)“ nennen statt „angefangener Bogen“.
+löschen“) und das Beispiel „Übungsbogen „…“ (geändert)“ nennen statt „angefangener Bogen“.
 „Dein eigener Bogen“ nur für einen Bogen sagen, der nicht aus einem Beispiel stammt; nach
 „sichern“ den Dateinamen nennen.
 
@@ -236,7 +236,7 @@ Rückfrage nennt im Verlust-Knopf den Namen des eigenen Bogens.
 **Kennzeichnung:** gemessen (Link-Weg, `s13.js`); QR-Scan nach Code gleich (derselbe Empfangsweg,
 kein `beispielMerken`), nicht gemessen.
 
-**Fundstelle:** „Link“ im Dialog „Beispielbögen“ → Link auf anderem Gerät öffnen → „Empfangenen
+**Fundstelle:** „Link“ im Dialog „Übungsbögen“ → Link auf anderem Gerät öffnen → „Empfangenen
 Bogen öffnen?“ → „Meldung öffnen“ → Schritt 2 „Dies ist eine Übung“ abwählen. Code: Der
 Empfangsweg in `app.tsx` setzt den Bogen ohne `beispielMerken`, anders als Datei, Vorlage,
 Musterung und Zurückholen.
@@ -266,7 +266,7 @@ Rückfrage „Beispieldaten im Bogen“ erscheint. Ebenso nach Scan des QR-Codes
 **Typ:** Bedienung (Doppelung, Speicherverbrauch). **Kennzeichnung:** gemessen (360 × 640,
 `s6.js`, Screenshot `s6-start-zwei-uebungen.png`).
 
-**Fundstelle:** Dialog „Beispielbögen“ → Ordner THW → „Alle 101 in eine Übungs-Sammlung“, zweimal.
+**Fundstelle:** Dialog „Übungsbögen“ → Ordner THW → „Alle 101 in eine Übungs-Sammlung“, zweimal.
 
 **Beobachtung:** Jeder Tipp legt ohne Rückfrage eine neue Sammlung an und öffnet sie (rund 5 s
 beim ersten, beim zweiten Mal sofort). Danach stehen auf der Startseite zwei Sammlungen mit

@@ -11,7 +11,7 @@
  * Dazu kommen keyword-benannte Aufnahmen für die Landingpages (thw.html,
  * meldekopf.html …): Statt der leeren Startseite zeigen sie die App bei der
  * Arbeit — ausgefüllter Bogen, Einsatz-Sammlung mit Stärke-Summen, QR-Übergabe.
- * Der App-Zustand entsteht über localStorage-Seeds aus den Beispielbögen in
+ * Der App-Zustand entsteht über localStorage-Seeds aus den Übungsbögen in
  * examples/ plus wenige UI-Klicks. Diese Bilder gehören NICHT ins Manifest.
  *
  * Startet selbst einen Vite-Dev-Server, sofern nicht EEB_BASE_URL auf einen
@@ -45,7 +45,7 @@ function heuteEebDatum() {
 }
 
 /**
- * Beispielbogen aus examples/ lesen (dieselben Daten wie im Beispiele-Dialog).
+ * Übungsbogen aus examples/ lesen (dieselben Daten wie im Beispiele-Dialog).
  * Der Einsatzzeitraum wird auf heute verschoben (gleiche Dauer): Die Beispiele
  * stammen vom Juli 2026, und die App meldet einen abgelaufenen Zeitraum als
  * offenen Punkt — auf jeder Aufnahme stünde sonst „Einsatzzeitraum … ist

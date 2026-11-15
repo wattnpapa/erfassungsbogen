@@ -35,7 +35,7 @@ Lagemonitor (`?lagemonitor=<id>`, auch über „Lagemonitor öffnen"),
 Zwei-Fenster-Konflikt (zweite Seite im selben Kontext ändert den Entwurf; Leiste,
 „Entscheiden", Rückfrage „Meine Fassung behalten?"), Musterung der Vorlage,
 Browser-Zurück und -Vorwärts über Startseite, Assistent und Einsatz, Dialoge der
-Startseite (Einheit schnell erfassen, Datensicherung, Beispielbögen, Alle Daten
+Startseite (Einheit schnell erfassen, Datensicherung, Übungsbögen, Alle Daten
 löschen, Neue Einsatz-Sammlung, Verwerfen, QR-Code scannen).
 
 Gemessen habe ich `scrollWidth` gegen `innerWidth`, Lage und Höhe fester und
@@ -261,21 +261,21 @@ Tabelle auf Orga, Ort und F/U/M kürzen; sonst Rollschatten am Rand.
 **Nachprüfung:** `?lagemonitor=<id>` bei 360 × 640: `scrollWidth` der Tabelle
 gleich ihrem Rahmen, oder „M" liegt im Bild.
 
-### R8-M5 [P3] „Beispielbögen" und „Datensicherung": „Schließen" liegt nur oben im Dialog und rollt aus dem Bild; Links 33 px hoch
+### R8-M5 [P3] „Übungsbögen" und „Datensicherung": „Schließen" liegt nur oben im Dialog und rollt aus dem Bild; Links 33 px hoch
 
 **Priorität:** P3
 
 **Kennzeichnung:** gemessen, im Screenshot beobachtet (`dlgend-Beis.png`,
 `dlgend-Date.png`).
 
-**Fundstelle:** Dialoge der Startseite „Beispielbögen" (Liste „Organisation oder
+**Fundstelle:** Dialoge der Startseite „Übungsbögen" (Liste „Organisation oder
 Thema wählen") und „Datensicherung" (`dialog`, rollt als Ganzes; kein fester
 Fuß wie bei den Rückfragen).
 
 **Beobachtung:** Bei 360 × 640 ist der Dialog 606 px hoch bei 812 px
-(„Beispielbögen") und 883 px („Datensicherung") Inhalt. Am Ende der Liste liegt
+(„Übungsbögen") und 883 px („Datensicherung") Inhalt. Am Ende der Liste liegt
 „Schließen" bei −173 bis −129 px, also außerhalb; im Screenshot steht am Fuß
-des Dialogs kein Schließen-Weg. In „Beispielbögen" gehen 15 Zeilen Erklärtext
+des Dialogs kein Schließen-Weg. In „Übungsbögen" gehen 15 Zeilen Erklärtext
 (Anzeigen, PDF, Link) der Liste voran; die Liste beginnt erst auf dem zweiten
 Bild. Die Listeneinträge („ASB (4 Bögen)", „THW (101 Bögen)" …) sind
 unterstrichene Verweise von 33 px Höhe in 33-px-Abstand (kein Zwischenraum). In
@@ -536,5 +536,5 @@ Befunde: 0 × P0, 0 × P1, 2 × P2, 8 × P3.
    Knöpfen und schmalerem Rand.
 3. R8-M3: Fußleiste und Schrittleiste im Zoom-Fenster einzeilig, Konfliktlage
    entlasten.
-4. R8-M5: „Schließen" der Dialoge „Beispielbögen" und „Datensicherung" als festen
+4. R8-M5: „Schließen" der Dialoge „Übungsbögen" und „Datensicherung" als festen
    Fuß.

@@ -3,7 +3,7 @@
 - **Prüfer:** Rolle „Arbeitsablauf“ (thw-workflow-reviewer), Meldekopf-Bediener und Helfer mit eigenem Bogen in einer Person
 - **Datum:** 2026-10-27
 - **Code-Stand:** Commit `be6b396` (`main`), Produktionsbuild, `http://localhost:4173`
-- **Methode:** Playwright (globales Modul, Chromium ohne Optionen), `isMobile`/`hasTouch`, Locale de-DE, Viewports 360 x 640 und 390 x 844. Als Bögen dienten die Beispielbögen aus `examples/thw/` mit `uebung: false` und aktuellem Stand. Kein Code geändert. Nicht geprüft: Kamera-Scan, Nahbereich, Bildschirmtastatur, native Builds, der Dialog „Namen einfügen…“ (R16-E1) und „Link teilen“ (nur in Runde 16 gesehen).
+- **Methode:** Playwright (globales Modul, Chromium ohne Optionen), `isMobile`/`hasTouch`, Locale de-DE, Viewports 360 x 640 und 390 x 844. Als Bögen dienten die Übungsbögen aus `examples/thw/` mit `uebung: false` und aktuellem Stand. Kein Code geändert. Nicht geprüft: Kamera-Scan, Nahbereich, Bildschirmtastatur, native Builds, der Dialog „Namen einfügen…“ (R16-E1) und „Link teilen“ (nur in Runde 16 gesehen).
 - **Zählung:** P0: 0 · P1: 0 · P2: 0 · P3: 5
 
 ## Urteil aus Sicht der Rolle
@@ -12,7 +12,7 @@ Erwartete Arbeitsfolge (Annahme, kein bekannter THW-Vorschrifttext): Der Meldeko
 
 Der Ablauf trägt auch in dieser Runde. Alle Strecken ließen sich ohne fremde Hilfe, ohne doppelte Eingabe und ohne Datenverlust durchlaufen. Die verbleibende Reibung liegt in Kleinigkeiten, vor allem in den Rückgängig-Quittungen und in den Dateitexten.
 
-Durchlaufen im echten Browser: Einsatz anlegen; 2, 4 und 8 Bögen aufnehmen (bei 8 die Kurzfassung mit „Alle 8 einzeln anzeigen“ und den Ortswarnungen, die für die Beispielbögen zutreffen); Sammelzuordnung Zug; Abrücken; Auftrag/Notiz mit Neuladen bei offenem Feld (Text bleibt erhalten); Sammel-PDF (2,4 s bei 4 Bögen) und Import auf einem zweiten Gerät (4 Einheiten, 3 anwesend, Abgerückte als „ABGERÜCKT“); Sammel-PDF versehentlich über „Aus Datei laden…“ (App erklärt „Die PDF enthält 4 Bögen … Alle auf einmal: Einsatz importieren…“); CSV, Nachtrags-CSV, Lageblatt; Sammel-PDF nach Abrücken einer Einheit; „Einheit schnell erfassen“ aus der Einsatzansicht (Schritt 2 übersprungen, Zug im Ergebnis abfragbar); eigener Bogen aus Datei bis „Bogen übergeben…“; Entwurf auf der Startseite mit „Fortsetzen / Verwerfen“ (fragt beim Verwerfen nach).
+Durchlaufen im echten Browser: Einsatz anlegen; 2, 4 und 8 Bögen aufnehmen (bei 8 die Kurzfassung mit „Alle 8 einzeln anzeigen“ und den Ortswarnungen, die für die Übungsbögen zutreffen); Sammelzuordnung Zug; Abrücken; Auftrag/Notiz mit Neuladen bei offenem Feld (Text bleibt erhalten); Sammel-PDF (2,4 s bei 4 Bögen) und Import auf einem zweiten Gerät (4 Einheiten, 3 anwesend, Abgerückte als „ABGERÜCKT“); Sammel-PDF versehentlich über „Aus Datei laden…“ (App erklärt „Die PDF enthält 4 Bögen … Alle auf einmal: Einsatz importieren…“); CSV, Nachtrags-CSV, Lageblatt; Sammel-PDF nach Abrücken einer Einheit; „Einheit schnell erfassen“ aus der Einsatzansicht (Schritt 2 übersprungen, Zug im Ergebnis abfragbar); eigener Bogen aus Datei bis „Bogen übergeben…“; Entwurf auf der Startseite mit „Fortsetzen / Verwerfen“ (fragt beim Verwerfen nach).
 
 ## Haltbarkeit der Behebungen aus Runde 16
 

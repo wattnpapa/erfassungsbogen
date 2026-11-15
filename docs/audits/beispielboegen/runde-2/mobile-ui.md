@@ -1,8 +1,8 @@
-# Audit „Mobile UI", Schwerpunkt Beispielbögen, Runde 2 (Nachprüfung und neue Befunde)
+# Audit „Mobile UI", Schwerpunkt Übungsbögen, Runde 2 (Nachprüfung und neue Befunde)
 
 Prüfer: Rollenaudit `mobile-ui-reviewer` · Datum: 2026-11-09 · Prüfgegenstand: Live-Seite
-`https://erfassungsbogen.app/` (Stand `main`, Commit `085a93b`), nur der Bereich Beispielbögen:
-Abschnitt „Beispielbögen" auf der Startseite und Dialog „Beispielbögen"
+`https://erfassungsbogen.app/` (Stand `main`, Commit `085a93b`), nur der Bereich Übungsbögen:
+Abschnitt „Übungsbögen" auf der Startseite und Dialog „Übungsbögen"
 (`src/app/beispiele-dialog.tsx`, nachgeladen über `src/app/fusszeile.tsx`) ·
 Zählung: **P0 0 · P1 1 · P2 3 · P3 2 · Hinweise 3**
 
@@ -24,7 +24,7 @@ Schalter „Schrift groß"; die Grundschrift des Browsers wurde wie in Runde 1 p
 `html.schrift-gross`. Langsames Netz per CDP `Network.emulateNetworkConditions` (600 ms Latenz,
 40 kB/s), ohne Netz per `context.setOffline`. Kein Eingriff ins DOM; Skripte lesen Maße, Fokus,
 Live-Region und Rollstand, setzen höchstens `scrollTop` des Dialogs und lösen Klicks aus.
-Wege: Startseite → „Beispielbögen ansehen" → Wurzel, ASB, DRK, Katastrophenschutz, THW (101 Bögen),
+Wege: Startseite → „Übungsbögen ansehen" → Wurzel, ASB, DRK, Katastrophenschutz, THW (101 Bögen),
 THW → „Alle Einheiten aller Ortsverbände (nach Landesverband, Regionalstelle, OV)" →
 Baden-Württemberg → RSt Villingen-Schwenningen → OV Bad Säckingen (fünf Ebenen); „Bremen,
 Niedersachsen" und zurück; Suche „Oldenburg", „OV Bad", „xyzqq"; „‹ Zurück", Pfad „Alle", Escape,
@@ -68,9 +68,9 @@ Pfadleiste, `--beispiel-kopf`, Container-Karten, feste Dialoghöhe sind vorhande
 | BB-M4 | **teilweise** | „›" aus dem Ordnernamen entfernt („… (nach Landesverband, Regionalstelle, OV)"), „Alle" 44 px breit, unter 40 rem „Alle › … ›" plus zwei Ebenen. Nachprüfkriterien nicht erreicht: OV Bad Säckingen bei 360 x 640 Pfadleiste 4 Zeilen, 165 px („‹ Zurück" / „Alle › …" / „› RSt Villingen-Schwenningen" / „› OV Bad Säckingen", „›" weiter freistehend am Zeilenanfang); erste Karte bei 663 px, Dialogunterkante 624 px; quer keine Zeile im ersten Bild (erste Karte 549 px, Unterkante 374 px). Ursachen siehe BB2-M2 und BB2-M3. |
 | BB-M5 | **teilweise** | „‹ Zurück" klebt jetzt und ist aus der Mitte des THW-Ordners ohne Wischen erreichbar. Karte bei 390 px 225 px, drei Knöpfe in einer Zeile. Offen: bei 320 und 360 px „Link" weiter allein in der zweiten Zeile, Karte 281 px (Ziel etwa 220 px); in „Feld" bei 360 px und iPhone 13 Karte 360 px, „Link" ebenfalls allein. |
 | BB-M6 | **behoben** | Kopfzeile auf allen Ebenen bei 17 px, Dialoghöhe konstant (536/608/812/358/1148 px je Viewport). |
-| BB-M7 | bewusst so entschieden, nur nachgeprüft | Unverändert: „Neuen Bogen erstellen", „Neue Einsatz-Sammlung…" und „Beispielbögen ansehen" (Klasse `primaer`, `rgb(18, 39, 94)`, bei 360 px auf 1.843 px) tragen dieselbe Fläche. Nicht neu gemeldet. |
+| BB-M7 | bewusst so entschieden, nur nachgeprüft | Unverändert: „Neuen Bogen erstellen", „Neue Einsatz-Sammlung…" und „Übungsbögen ansehen" (Klasse `primaer`, `rgb(18, 39, 94)`, bei 360 px auf 1.843 px) tragen dieselbe Fläche. Nicht neu gemeldet. |
 | BB-M8 | **behoben** | Register Katastrophenschutz: „Baden-Württemberg", „Mecklenburg-Vorpommern", „Nordrhein-Westfalen", „Rheinland-Pfalz" usw. in derselben Schreibweise wie unter THW. |
-| BB-M9 | **teilweise** | Titel und „Schließen" stehen in einer Zeile (`flex-wrap: nowrap`), auch bei 320 px und 200 %. Offen: Zusammenfassung „Was sind Beispielbögen? …" bei 200 % weiter 28 px fett in Kennfarbe, 4 Zeilen, 168 px hoch, größer als der auf 22 px gedeckelte Titel; ASB bei 200 %: erste Karte bei 1.354 px (Unterkante 624 px). Der Titel selbst trennt bei 320 px normal und bei 150/200 % auf zwei Zeilen („Beispiel-/bögen", Kopfzeile 77 bzw. 93 px). |
+| BB-M9 | **teilweise** | Titel und „Schließen" stehen in einer Zeile (`flex-wrap: nowrap`), auch bei 320 px und 200 %. Offen: Zusammenfassung „Was sind Übungsbögen? …" bei 200 % weiter 28 px fett in Kennfarbe, 4 Zeilen, 168 px hoch, größer als der auf 22 px gedeckelte Titel; ASB bei 200 %: erste Karte bei 1.354 px (Unterkante 624 px). Der Titel selbst trennt bei 320 px normal und bei 150/200 % auf zwei Zeilen („Beispiel-/bögen", Kopfzeile 77 bzw. 93 px). |
 | H1 | **offen** | 820 x 1180 und 844 x 390: Register weiter einspaltig, Name 461 bis 514 px breit, Zahl rund 450 px weiter rechts. |
 | H2 | **behoben** | Über den Karten „101 Bögen direkt in „THW", außerhalb der Ordner oben". |
 | H3 | **offen** | `border-left-color: var(--akzent)` bei `:hover` (nur `hover: hover`) und `:focus-visible` unverändert. |
@@ -83,7 +83,7 @@ Pfadleiste, `--beispiel-kopf`, Container-Karten, feste Dialoghöhe sind vorhande
 **Typ:** Layout/Abstand
 **Neu oder alt (Verweis):** neu (Folge der klebenden Pfadleiste aus der Behebung zu BB-M5/BB-G5)
 
-**Ort:** Dialog „Beispielbögen", jeder Ordner, besonders THW → „Alle Einheiten aller
+**Ort:** Dialog „Übungsbögen", jeder Ordner, besonders THW → „Alle Einheiten aller
 Ortsverbände (…)" und tiefer; 360 x 640 und 390 x 844 bei 150 % und 200 % Schrift.
 
 **Beobachtung (gemessen):** Die Pfadleiste ist `position: sticky` unter der Kopfzeile, ihre Schrift
@@ -120,7 +120,7 @@ erreichbar; bei 150 % passen Name und Knöpfe einer Karte gleichzeitig in den fr
 **Typ:** Layout/Abstand
 **Neu oder alt (Verweis):** neu (Rest von BB-M4 im Querformat)
 
-**Ort:** Dialog „Beispielbögen", Ordner unterhalb von THW → Ortsverbände; 844 x 390.
+**Ort:** Dialog „Übungsbögen", Ordner unterhalb von THW → Ortsverbände; 844 x 390.
 
 **Beobachtung (gemessen):** Die Verkürzung „Alle › … ›" hängt an `@media (max-width: 40rem)` und
 greift bei 844 px Fensterbreite nicht. OV Bad Säckingen: voller Pfad über drei Zeilen („‹ Zurück" /
@@ -150,11 +150,11 @@ ersten Bild.
 **Typ:** Layout/Abstand
 **Neu oder alt (Verweis):** neu (Ursache des offenen Teils von BB-M4; verstärkt durch die neue Suche)
 
-**Ort:** Dialog „Beispielbögen", jeder Ordner mit Bögen; 320 x 568, 360 x 640, 390 x 844, quer,
+**Ort:** Dialog „Übungsbögen", jeder Ordner mit Bögen; 320 x 568, 360 x 640, 390 x 844, quer,
 „Feld".
 
 **Beobachtung (gemessen):** Der Dialog rollt nach jedem Wechsel auf 0. Über der Pfadleiste stehen
-auf jeder Ebene die Zusammenfassung „Was sind Beispielbögen? …" und das Suchfeld mit Beschriftung:
+auf jeder Ebene die Zusammenfassung „Was sind Übungsbögen? …" und das Suchfeld mit Beschriftung:
 Pfadleiste beginnt bei 230 px (320 px: 239 px), also 145 bis 154 px unter der Kopfzeile; bei
 150 % bei 344 px, bei 200 % bei 480 px (Dialogunterkante 624 px). Zwischen Pfad und erster Karte
 liegen im OV-Ordner zusätzlich der Hinweis „Die Bögen der THW-Ortsverbände lädt die App nicht
@@ -180,7 +180,7 @@ Knopfzeile im ersten Bild; bei 320 x 568 mindestens Titel der ersten Karte.
 **Typ:** Layout/Text
 **Neu oder alt (Verweis):** neu (Suche neu seit Runde 1)
 
-**Ort:** Dialog „Beispielbögen", Suchfeld; 320 x 568, 360 x 640, 200 % Schrift.
+**Ort:** Dialog „Übungsbögen", Suchfeld; 320 x 568, 360 x 640, 200 % Schrift.
 
 **Beobachtung (gemessen):** Jeder gefundene Ordner trägt den vollen Pfad als Namen, mit „›" als
 Trenner, z. B. „THW › Alle Einheiten aller Ortsverbände (nach Landesverband, Regionalstelle, OV) ›
@@ -206,12 +206,12 @@ Teilwort-Treffer; bei vielen Ordnern die Bögen nicht ganz ans Ende schieben.
 **Nachprüfung:** 360 x 640, „Oldenburg": jeder Ordner-Treffer höchstens zwei Zeilen Name plus eine
 Zeile Pfad; „OV Bad": OV-Ordner vor „Baden-Württemberg".
 
-### BB2-M5 [P3] Erster Tipp auf „Beispielbögen ansehen": keine Rückmeldung während des Nachladens, ohne Netz ersetzt eine Fehlerseite die ganze App
+### BB2-M5 [P3] Erster Tipp auf „Übungsbögen ansehen": keine Rückmeldung während des Nachladens, ohne Netz ersetzt eine Fehlerseite die ganze App
 
 **Typ:** Bedienung/Rückmeldung
 **Neu oder alt (Verweis):** neu (Dialog seit Runde 1 nachgeladen)
 
-**Ort:** Startseite, Knopf „Beispielbögen ansehen", erster Tipp; 360 x 640.
+**Ort:** Startseite, Knopf „Übungsbögen ansehen", erster Tipp; 360 x 640.
 
 **Beobachtung (gemessen):** Der Dialog liegt in einem eigenen Baustein
 (`beispiele-dialog-*.js`, 101 kB, 26 kB komprimiert), `<Suspense fallback={null}>`. Zeit vom Tipp
@@ -227,8 +227,8 @@ Dialog auch ohne Netz (0,7 s).
 passiert. Im Funkloch kurz nach dem ersten Aufruf verschwindet die ganze Startseite für einen
 Nebenweg; die Meldung beruhigt zwar, aber der Zusammenhang ist weg.
 
-**Empfehlung:** Während des Nachladens am Knopf eine Rückmeldung geben (z. B. „Beispielbögen werden
-geladen …", Knopf solange gesperrt) und einen Ladefehler des Bausteins im Abschnitt „Beispielbögen"
+**Empfehlung:** Während des Nachladens am Knopf eine Rückmeldung geben (z. B. „Übungsbögen werden
+geladen …", Knopf solange gesperrt) und einen Ladefehler des Bausteins im Abschnitt „Übungsbögen"
 abfangen („Ohne Netz noch nicht verfügbar, erneut versuchen") statt in der Fehlergrenze der App.
 
 **Nachprüfung:** Erster Tipp bei 600 ms Latenz und 40 kB/s: innerhalb von 100 ms sichtbare
@@ -239,7 +239,7 @@ Rückmeldung; ohne Netz vor Abschluss des Vorrats: Startseite bleibt, Hinweis im
 **Typ:** Layout/Abstand
 **Neu oder alt (Verweis):** neu (Folge der Behebung zu BB-M1)
 
-**Ort:** Dialog „Beispielbögen", oberste Ebene; 360 x 640, normale Schrift.
+**Ort:** Dialog „Übungsbögen", oberste Ebene; 360 x 640, normale Schrift.
 
 **Beobachtung (gemessen):** Name `flex: 1 1 9em`, Zahl rechts; „3.634 Bögen ›" ist breiter als die
 übrigen Zahlen. Bei „ASB" bis „Praktische Ausbildung" steht die Zahl in der Zeile (Zeile 52 px,

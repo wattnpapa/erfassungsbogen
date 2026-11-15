@@ -23,7 +23,7 @@ gesperrt, also kalter Start) und mit 6-fach gedrosselter CPU bei warmem Service 
 Durchlaufen: Startseite; „Neuen Bogen erstellen" (Schritt 1 bis 6); „Neue Einsatz-Sammlung…";
 „Einheit schnell erfassen" (Schritt 1 bis 4, mehrere Einheiten); Karte, „Mehr…", „Ort der Einheit
 ändern…", „Stärke ändern…", „Verschieben…", „Als Übung kennzeichnen…"; Tabelle; „Bögen
-einlesen…"; Scanner ohne Kamera; Exporte (Sammel-PDF, Lageblatt, beide CSV, Excel); Beispielbögen;
+einlesen…"; Scanner ohne Kamera; Exporte (Sammel-PDF, Lageblatt, beide CSV, Excel); Übungsbögen;
 „Übergabe vermerken…", „Einsatz beenden", „Einsatz löschen…".
 Nicht prüfbar: Kamera, echte Bildschirmtastatur, Handschuhe, Licht, WebKit, Safe-Area.
 
@@ -34,7 +34,7 @@ aufnehmen, Ort ändern, exportieren, bei vollem Speicher sauber scheitern. Die B
 halten fast vollständig. **Offline bricht dagegen die gesamte Einsatz-Sammlung weg:** Die Einsatzansicht
 lässt sich ohne Netz nicht mehr öffnen und die Startseite behauptet trotzdem „Funktioniert komplett
 offline". Das ist die Folge des Nachladens der Einsatzansicht (R21-N1) und der einzige
-einsatzkritische Befund dieser Runde. Bogen, Assistent, Zeichensammlung, Beispielbögen und PDF
+einsatzkritische Befund dieser Runde. Bogen, Assistent, Zeichensammlung, Übungsbögen und PDF
 laufen offline einwandfrei.
 
 ## Bestätigte Behebungen aus Runde 20 (im echten Browser)
@@ -65,10 +65,10 @@ laufen offline einwandfrei.
   kein seitlicher Überlauf (`scrollWidth` gleich Breite), Knöpfe 44 bis 58 px hoch, nichts abgeschnitten.
 - **Tabelle am Telefon** (360 und 390): kein seitlicher Überlauf, Köpfe „Einheit · Stärke ·
   Eingetroffen" ausgeschrieben, Namen vollständig, Legende darunter.
-- **Startseite**: Hinweis „Rest lädt noch (Beispielbögen, Themenseiten): 325 von 549" statt falschem
+- **Startseite**: Hinweis „Rest lädt noch (Übungsbögen, Themenseiten): 325 von 549" statt falschem
   „Jetzt offline bereit" beim Nachladen (R20-N7 gehalten).
 - **Nachgeladene Zeichensammlung**: Beim Wählen des Einheitstyps erscheint das taktische Zeichen ohne
-  sichtbare Verzögerung, auch bei 400 kbit/s kalt; offline im Assistenten und in den Beispielbögen
+  sichtbare Verzögerung, auch bei 400 kbit/s kalt; offline im Assistenten und in den Übungsbögen
   vorhanden. Kein Befund.
 - **Warmer Start der Einsatzansicht**: mit Service Worker und 6-fach gedrosselter CPU 0,76 s von „Einsatz
   anlegen" bis zur Ansicht, kein Platzhalter sichtbar, Layout-Sprung 0.

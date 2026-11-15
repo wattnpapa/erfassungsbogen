@@ -480,7 +480,7 @@ Stand 17.10.2026, Paket 4 „Papier, PDF, Begriffe, Rest".
 Geprüft mit Typprüfung, Unit-Tests (2 875 grün), Verhaltenstests (137 Szenarien, 1 749 Schritte grün)
 und Nachmessung (PDFs mit `pdfinfo`, `pdftotext` und gerenderten Seiten; Browser
 360 × 640, `isMobile`/`hasTouch`, de-DE, Dev-Server Port 5180). Probemenge: alle
-443 Beispielbögen unter `examples/`; die Seitenzahlen blieben unverändert (Einzel
+443 Übungsbögen unter `examples/`; die Seitenzahlen blieben unverändert (Einzel
 772, mit zwei Codeteilen 998). Aufgeführt sind nur die Befunde dieses Pakets.
 
 | Befund | Stand | Umsetzung |

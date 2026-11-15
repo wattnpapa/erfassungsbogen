@@ -25,7 +25,7 @@ doppelt so groß wie am Gerät ohne Zoom.
 Zustände per `localStorage`-Seed, jeweils mit `uebung: false` und `stand` auf
 heute: `eeb.entwurf.v1` (Großbogen Verstärkter Bergungszug, 38 Personen, 10
 Fahrzeuge), `eeb.einsaetze.v1` (Sammlung „Hochwasser Musterstadt“ aus sechs
-Beispielbögen, einmal mit `vomPapier`), `eeb.vorlagen.v1` (über „Als Vorlage
+Übungsbögen, einmal mit `vomPapier`), `eeb.vorlagen.v1` (über „Als Vorlage
 speichern“ erzeugt). Den Zwei-Fenster-Fall erzeugte ein zweiter Tab im selben
 Kontext, der „Diesel“ im Entwurf änderte.
 

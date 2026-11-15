@@ -1,8 +1,8 @@
-# Audit „Helfer im Feld“, Schwerpunkt Beispielbögen (Feldtauglichkeit)
+# Audit „Helfer im Feld“, Schwerpunkt Übungsbögen (Feldtauglichkeit)
 
 Prüfer: Rollenaudit `thw-field-user-reviewer` · Datum: 2026-11-08 ·
 Prüfgegenstand: Live-Seite `https://erfassungsbogen.app/` (frisch deployt, Code-Stand Commit `0dd56d4`, `main`), nur der Bereich
-Beispielbögen: Startseiten-Abschnitt „Beispielbögen“ mit „Beispielbögen ansehen“, Dialog „Beispielbögen“ (Erklärung, Register,
+Übungsbögen: Startseiten-Abschnitt „Übungsbögen“ mit „Übungsbögen ansehen“, Dialog „Übungsbögen“ (Erklärung, Register,
 Pfadleiste, tiefe Ordner, Tabelle/Karten, Ladezustand) und die Folgen von „Anzeigen“, „PDF“ und „Link“.
 
 Zählung: **P0 0 · P1 0 · P2 4 · P3 7 · Hinweise 6** (Hinweise ohne Priorität, nicht in der Zählung)
@@ -20,7 +20,7 @@ frischer Kontext je Lauf, Tipps als Touch-Tipps; Skripte und Bildschirmfotos unt
 Schalter „Ansicht“ im Kopf umgestellt). DOM nicht verändert, kein Skript eingeschleust; gelesen wurden nur Lage, Größe, Bildlauf
 und berechnete Stile.
 
-Wege: (1) Startseite ohne Bogen → „Beispielbögen ansehen“ → alle neun Register → THW › Alle Einheiten aller Ortsverbände › LV ›
+Wege: (1) Startseite ohne Bogen → „Übungsbögen ansehen“ → alle neun Register → THW › Alle Einheiten aller Ortsverbände › LV ›
 RSt › OV (Baden-Württemberg/Biberach, Niedersachsen/Oldenburg, Bayern/Bad Tölz, NRW/Aachen), Katastrophenschutz › Bundesland,
 DRK, Feuerwehr, Praktische Ausbildung; (2) „Anzeigen“ ohne eigenen Bogen, mit angefangenem eigenem Bogen („THW Oldenburg“,
 nur Ort eingetragen) und ein zweites Mal danach; „Abbrechen“ in der Rückfrage; (3) „PDF“ (Download gespeichert, Text und Seite 1
@@ -28,14 +28,14 @@ gerendert), „Link“ (Zwischenablage-Berechtigung erteilt, Inhalt ausgelesen);
 (5) Doppeltipp auf eine Registerzeile; (6) Ladezustand mit Drosselung über das Chrome-DevTools-Protokoll („langsames 3G“
 400 kBit/s, 400 ms; Service Worker blockiert) und ungedrosselt, Zeitverlauf alle 100 ms bis 1 s gemessen; (7) Offline: online
 geladen bis „✓ Jetzt offline bereit“ (nach 70 s), weitere 120 s gewartet, Netz getrennt (`setOffline`), neu geladen, Dialog,
-„Anzeigen“ und „PDF“ in THW, OV-Ordnern und Katastrophenschutz; (8) Stichprobe von sechs Beispielbögen nach „Anzeigen“ auf
+„Anzeigen“ und „PDF“ in THW, OV-Ordnern und Katastrophenschutz; (8) Stichprobe von sechs Übungsbögen nach „Anzeigen“ auf
 offene Punkte.
 
 ## Annahmen
 
-- Beispielbögen dienen Ausbildung, Übung und dem Kennenlernen der App; sie werden typischerweise in der Unterkunft, beim
+- Übungsbögen dienen Ausbildung, Übung und dem Kennenlernen der App; sie werden typischerweise in der Unterkunft, beim
   Dienstabend oder vor der Übung angesehen, seltener unter Zeitdruck am Einsatzort. Die Prioritäten sind darauf bezogen.
-- Ein Helfer schaut sich meist mehr als einen Beispielbogen an (z. B. „seinen“ Gruppentyp und den Zugtrupp).
+- Ein Helfer schaut sich meist mehr als einen Übungsbogen an (z. B. „seinen“ Gruppentyp und den Zugtrupp).
 - Wer bereits einen eigenen Bogen angefangen hat, will ihn behalten.
 
 ## Nicht prüfbar (Not verified)
@@ -46,7 +46,7 @@ echtes Mobilnetz (Drosselung nur angenähert); Telefon-Zurück-Taste (angenäher
 
 ## Urteil
 
-Aufgabe „Einen Beispielbogen meiner Einheit finden, ansehen, als PDF holen, Link weitergeben“: **abgeschlossen, mit Mühe an
+Aufgabe „Einen Übungsbogen meiner Einheit finden, ansehen, als PDF holen, Link weitergeben“: **abgeschlossen, mit Mühe an
 einzelnen Stellen**. Online im Hochformat geht der Weg ohne Hilfe: Register mit Bogenzahl, ein echter „‹ Zurück“-Knopf, Karten
 mit drei 44 px hohen Knöpfen, Rückfrage vor dem Ersetzen des eigenen Bogens, Störer „ÜBUNG“ in der App und Wasserzeichen
 „ÜBUNG“ in der PDF. Reibung entsteht, (a) wenn man mehr als ein Beispiel ansieht, während ein eigener Bogen angefangen ist:
@@ -55,12 +55,12 @@ Pfad schließt (BB-H2); (c) offline, wo 3 533 der 3 634 THW-Bögen fehlen, obwoh
 (d) im Querformat, wo die Knöpfe neben dem Bild liegen (BB-H4).
 
 Erwartetes Bild des Helfers: „Das ist ein Ordner mit Musterbögen wie im Schrank vom OV. Ich blättere zu meinem OV, schaue mir
-den Bogen an, lege ihn zurück, nehme den nächsten.“ Das Zurücklegen passt nicht dazu: ein angesehener Beispielbogen wird zum
+den Bogen an, lege ihn zurück, nehme den nächsten.“ Das Zurücklegen passt nicht dazu: ein angesehener Übungsbogen wird zum
 „angefangenen Bogen“ und belegt dieselben Plätze wie die eigene Arbeit.
 
 ## Bestätigt (funktioniert und sollte bei Umbauten erhalten bleiben)
 
-- **Einstieg:** Abschnitt „Beispielbögen“ steht direkt unter „So funktioniert’s“ (360 × 640: y = 1 712, Knopf 182 × 44; Feld
+- **Einstieg:** Abschnitt „Übungsbögen“ steht direkt unter „So funktioniert’s“ (360 × 640: y = 1 712, Knopf 182 × 44; Feld
   218 × 54), kurzer Erklärsatz, ein Primärknopf. Der Fußzeilen-Link ist weg; der Abschnitt ist der einzige Einstieg und reicht.
 - **Dialog-Start:** öffnet in 11 ms; die Erklärung ist eingeklappt (44 px), die neun Register stehen sofort da, jede Zeile ganz
   antippbar (278 × 52 bis 64 px), Bogenzahl rechts. Bei 390 × 844 alle neun ohne Rollen im Bild.
@@ -75,34 +75,34 @@ den Bogen an, lege ihn zurück, nehme den nächsten.“ Das Zurücklegen passt n
 - **Während „PDF“/„Link“/„Anzeigen“:** „wird vorbereitet …“ in der Zeile, alle Knöpfe gesperrt; ein Doppeltipp löst nichts
   doppelt aus. Doppeltipp auf eine Registerzeile („Alle Einheiten …“, 120 ms Abstand) öffnete nur eine Ebene.
 - **„Anzeigen“ ohne eigenen Bogen:** sofort Übersicht, Störer „ÜBUNG — Dieser Bogen ist als Übung gekennzeichnet …“, Meldung
-  „Beispielbogen geöffnet — fiktive Daten zum Ansehen und Ausprobieren.“
-- **„Anzeigen“ mit eigenem Bogen:** Rückfrage „Beispielbogen öffnen? Der angefangene Bogen „THW Oldenburg“ wird durch den
-  Beispielbogen ersetzt. Der Stand bleibt auf der Startseite unter „Zuletzt geschlossenen Bogen zurückholen“ erreichbar.“ mit
-  „Beispielbogen öffnen“ / „Abbrechen“ (je 302 × 44, 24 px Abstand); „Abbrechen“ lässt den Dialog „Beispielbögen“ offen. Nach
+  „Übungsbogen geöffnet — fiktive Daten zum Ansehen und Ausprobieren.“
+- **„Anzeigen“ mit eigenem Bogen:** Rückfrage „Übungsbogen öffnen? Der angefangene Bogen „THW Oldenburg“ wird durch den
+  Übungsbogen ersetzt. Der Stand bleibt auf der Startseite unter „Zuletzt geschlossenen Bogen zurückholen“ erreichbar.“ mit
+  „Übungsbogen öffnen“ / „Abbrechen“ (je 302 × 44, 24 px Abstand); „Abbrechen“ lässt den Dialog „Übungsbögen“ offen. Nach
   dem Öffnen steht „THW Oldenburg“ tatsächlich auf dem Rückholplatz.
 - **PDF:** Download „bhp25-behandlung-gelb.pdf“ nach 2,5 s (ungedrosselt), drei Seiten; Kopfzeile „ÜBUNG — Dieser Bogen beschreibt
   keinen echten Einsatz.“ und diagonales Wasserzeichen „ÜBUNG“ über der Seite.
 - **Link:** Knopf wechselt für 3 s auf „Kopiert“; Zwischenablage enthält `https://erfassungsbogen.app/#…` (915 Zeichen).
-- **Schließen:** Fokus geht zurück auf „Beispielbögen ansehen“, die Startseite bleibt an derselben Stelle (scrollY 1 593 vor
+- **Schließen:** Fokus geht zurück auf „Übungsbögen ansehen“, die Startseite bleibt an derselben Stelle (scrollY 1 593 vor
   und nach).
 - **Offline, kleiner Bestand:** Register und Zahlen erscheinen offline vollständig; Bögen der Ordner THW (101), DRK, Katastrophenschutz
   usw. öffnen und erzeugen offline die PDF („001-albstadt-ztr-tz.pdf“, „1-loeschgruppe-gelnhausen.pdf“).
 
 ## Befunde
 
-### BB-H1 [P2] Zweiter Beispielbogen verdrängt den eigenen Entwurf vom Rückholplatz: Rückfrage verlangt „sichern“ oder „endgültig löschen“
+### BB-H1 [P2] Zweiter Übungsbogen verdrängt den eigenen Entwurf vom Rückholplatz: Rückfrage verlangt „sichern“ oder „endgültig löschen“
 
 - **Typ:** Daten/Verlust
 - **Gleicher Sachverhalt:** BB-E2, BB-D1, BB-K1 (andere Berichte dieser Runde).
 - **Evidence:** Observed (360 × 640).
-- **Ort:** Startseite mit angefangenem Bogen → „Beispielbögen ansehen“ → ASB › „Anzeigen“ → „Beispielbogen öffnen“ → Startseite →
-  „Beispielbögen ansehen“ → DLRG › „Anzeigen“.
-- **Beobachtung:** Der erste Beispielbogen wird zum „angefangenen Bogen“ (Karte „ASB-Kreisverband Rheindorf e. V.
+- **Ort:** Startseite mit angefangenem Bogen → „Übungsbögen ansehen“ → ASB › „Anzeigen“ → „Übungsbogen öffnen“ → Startseite →
+  „Übungsbögen ansehen“ → DLRG › „Anzeigen“.
+- **Beobachtung:** Der erste Übungsbogen wird zum „angefangenen Bogen“ (Karte „ASB-Kreisverband Rheindorf e. V.
   Betreuungskomponente (Einsatzeinheit)“ mit „Fortsetzen“), der eigene „THW Oldenburg“ rückt auf „Zuletzt geschlossener Bogen“.
-  Beim zweiten Beispiel erscheint: „Der angefangene Bogen „ASB-Kreisverband Rheindorf …“ wird durch den Beispielbogen ersetzt. Der
+  Beim zweiten Beispiel erscheint: „Der angefangene Bogen „ASB-Kreisverband Rheindorf …“ wird durch den Übungsbogen ersetzt. Der
   Bogen „THW Oldenburg“ (Stand 08.11.26, 21:10 Uhr) auf dem Platz „Zuletzt geschlossener Bogen“ wird dabei endgültig gelöscht: Er
-  fasst nur einen Bogen. …“ mit drei Knöpfen: „Beispielbogen öffnen — den alten Bogen vorher als Datei sichern“ (rot, gefüllt),
-  „Beispielbogen öffnen — alten Bogen endgültig löschen“ (rot umrandet), „Abbrechen“. Der Text ist neun Zeilen lang (Dialog
+  fasst nur einen Bogen. …“ mit drei Knöpfen: „Übungsbogen öffnen — den alten Bogen vorher als Datei sichern“ (rot, gefüllt),
+  „Übungsbogen öffnen — alten Bogen endgültig löschen“ (rot umrandet), „Abbrechen“. Der Text ist neun Zeilen lang (Dialog
   488 px), „alter Bogen“ meint hier den eigenen, nicht den gerade angesehenen ASB-Bogen.
 - **Erwartung des Helfers:** „Ich habe mir nur ein Muster angesehen; das lege ich zurück. Mein eigener Bogen ist davon nicht
   betroffen.“
@@ -110,7 +110,7 @@ den Bogen an, lege ihn zurück, nehme den nächsten.“ Das Zurücklegen passt n
   fiktives Muster anzusehen, das jederzeit wieder aus dem Dialog zu holen wäre. Der Schutz greift (keine stille Löschung), aber
   der Helfer muss einen langen Text lesen und zwischen zwei ähnlich roten Knöpfen wählen; „alten Bogen endgültig löschen“ ist bei
   flüchtigem Lesen als „das alte Beispiel weg“ zu verstehen.
-- **Empfehlung:** Ein geöffneter Beispielbogen sollte weder den Rückholplatz belegen noch den eigenen Bogen dorthin verschieben,
+- **Empfehlung:** Ein geöffneter Übungsbogen sollte weder den Rückholplatz belegen noch den eigenen Bogen dorthin verschieben,
   solange er unverändert ist (er ist ja wieder zu holen); erst eine Änderung macht ihn zu „eigener Arbeit“. Mindestens: ein
   unverändertes Beispiel beim nächsten Beispiel ohne Rückfrage ersetzen und den eigenen Bogen auf dem Rückholplatz lassen.
 - **Nachprüfung:** Eigenen Bogen anfangen, zwei Beispiele nacheinander öffnen: Keine Frage nach „endgültig löschen“; der eigene
@@ -121,9 +121,9 @@ den Bogen an, lege ihn zurück, nehme den nächsten.“ Das Zurücklegen passt n
 - **Typ:** Bedienung
 - **Gleicher Sachverhalt:** BB-E4, BB-S3, BB-G3.
 - **Evidence:** Observed (360 × 640, Zurück über `goBack`, entspricht Zurück-Taste/-Wisch; auf echtem Android Likely gleich).
-- **Ort:** Dialog „Beispielbögen“ in Tiefe 5 (Alle › THW › Alle Einheiten aller Ortsverbände › Bayern › RSt Bad Tölz).
+- **Ort:** Dialog „Übungsbögen“ in Tiefe 5 (Alle › THW › Alle Einheiten aller Ortsverbände › Bayern › RSt Bad Tölz).
 - **Beobachtung:** Zurück-Geste: Dialog zu, Adresse bleibt `https://erfassungsbogen.app/` (gut: die App wird nicht verlassen). Erneut
-  „Beispielbögen ansehen“: keine Pfadleiste, wieder die neun Register ganz oben. Der Code setzt beim Öffnen den Pfad bewusst auf
+  „Übungsbögen ansehen“: keine Pfadleiste, wieder die neun Register ganz oben. Der Code setzt beim Öffnen den Pfad bewusst auf
   leer. Dasselbe nach „Anzeigen“ und Rückkehr zur Startseite.
 - **Erwartung des Helfers:** Zurück heißt „eine Ebene hoch“, wie im Dateimanager des Telefons. Und: „Ich mach den Ordner wieder
   auf, wo ich war.“
@@ -139,13 +139,13 @@ den Bogen an, lege ihn zurück, nehme den nächsten.“ Das Zurücklegen passt n
 - **Typ:** Bedienung (Funktion offline nicht nutzbar)
 - **Gleicher Sachverhalt:** BB-S1 (dort P1), BB-E3, BB-E5.
 - **Evidence:** Observed (360 × 640, zweimal).
-- **Ort:** Dialog „Beispielbögen“ offline › THW › Alle Einheiten aller Ortsverbände › beliebiger OV › „Anzeigen“ / „PDF“.
+- **Ort:** Dialog „Übungsbögen“ offline › THW › Alle Einheiten aller Ortsverbände › beliebiger OV › „Anzeigen“ / „PDF“.
 - **Beobachtung:** Online geladen bis „✓ Jetzt offline bereit. Funktioniert komplett offline — alle Daten bleiben auf diesem
   Gerät.“ (70 s), weitere 120 s gewartet, Netz getrennt, neu geladen. Das Register zeigt „THW 3.634 Bögen“, der OV-Ordner öffnet,
   die Karten aber zeigen Dateinamen („ov-bad-aibling-01-1-tz-ztr-tz“), „nicht geladen“, „Stärke —“, und die Knöpfe „Anzeigen“,
-  „PDF“, „Link“ sind aktiv. Darunter: „Einige Beispielbögen liegen noch nicht auf dem Gerät — sie werden mit Netz nachgeladen (siehe
-  Offline-Zeile der Startseite).“ Nach „Anzeigen“: „Bogen konnte nicht geladen werden: Dieser Beispielbogen liegt noch nicht auf
-  dem Gerät — Beispielbögen werden nach dem ersten Laden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).“ Die
+  „PDF“, „Link“ sind aktiv. Darunter: „Einige Übungsbögen liegen noch nicht auf dem Gerät — sie werden mit Netz nachgeladen (siehe
+  Offline-Zeile der Startseite).“ Nach „Anzeigen“: „Bogen konnte nicht geladen werden: Dieser Übungsbogen liegt noch nicht auf
+  dem Gerät — Übungsbögen werden nach dem ersten Laden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).“ Die
   Offline-Zeile sagt aber nur „✓ Funktioniert komplett offline …“. Im Zusatzvorrat lagen 12 OV-Einträge (nur der vorher online
   geöffnete OV Aachen); die 101 Bögen direkt unter THW und Katastrophenschutz gingen offline.
 - **Erwartung des Helfers:** „Offline bereit“ heißt auch die Muster sind da — für den Ausbildungsabend in der Halle ohne Netz.
@@ -153,7 +153,7 @@ den Bogen an, lege ihn zurück, nehme den nächsten.“ Das Zurücklegen passt n
   schickt den Helfer zu einer Zeile, die das Gegenteil behauptet; er weiß nicht, ob Warten, Neuladen oder WLAN hilft. Für den
   Einsatz selbst ohne Folgen (fiktive Daten), daher P2.
 - **Empfehlung:** Entweder die OV-Bögen in den Offline-Vorrat nehmen (und die Startseite erst „komplett offline“ melden, wenn sie
-  da sind) oder ehrlich sagen: „Beispielbögen der Ortsverbände brauchen Netz; offline verfügbar: THW (101), DRK, …“. Nicht
+  da sind) oder ehrlich sagen: „Übungsbögen der Ortsverbände brauchen Netz; offline verfügbar: THW (101), DRK, …“. Nicht
   verfügbare Karten als solche kennzeichnen und ihre Knöpfe sperren, statt einen Fehler nach dem Tipp zu zeigen.
 - **Nachprüfung:** Wie oben offline: OV-Ordner zeigt entweder geladene Karten oder einen klaren Hinweis „nur mit Netz“; der Text der
   Startseite passt dazu.
@@ -163,7 +163,7 @@ den Bogen an, lege ihn zurück, nehme den nächsten.“ Das Zurücklegen passt n
 - **Typ:** Layout/Abstand
 - **Gleicher Sachverhalt:** BB-G1, BB-K2 (Tablet).
 - **Evidence:** Observed (640 × 360, Standard).
-- **Ort:** Dialog „Beispielbögen“ › THW › … › OV Oldenburg (NI).
+- **Ort:** Dialog „Übungsbögen“ › THW › … › OV Oldenburg (NI).
 - **Beobachtung:** Ab dieser Breite steht eine Tabelle (Köpfe Einheit/Herkunft/Stärke/Bogen). Innenbreite des Rollbereichs 494 px,
   Inhalt 684 px; „Anzeigen“ bei x = 488 im Bild, „PDF“ bei x = 598 halb hinter dem Dialogrand (Dialog endet bei x = 592), „Link“ bei
   x = 677 ganz außerhalb. Kein sichtbarer Hinweis auf seitliches Rollen. Auf der obersten Ebene stehen bei 328 px Dialoghöhe nur
@@ -193,7 +193,7 @@ den Bogen an, lege ihn zurück, nehme den nächsten.“ Das Zurücklegen passt n
 - **Nachprüfung:** Aus gerollter Registerliste einen OV öffnen: Pfad und „‹ Zurück“ oben im Bild; im Ordner THW ans Ende rollen:
   „‹ Zurück“ weiter sichtbar.
 
-### BB-H6 [P3] Jeder Beispielbogen öffnet mit „⚠ offene Punkte“; THW-OV-Bögen zeigen im Kopf „3 Personal fehlt“
+### BB-H6 [P3] Jeder Übungsbogen öffnet mit „⚠ offene Punkte“; THW-OV-Bögen zeigen im Kopf „3 Personal fehlt“
 
 - **Typ:** Text (Inhalt der Beispiele)
 - **Gleicher Sachverhalt:** BB-E9, BB-K6.
@@ -208,7 +208,7 @@ den Bogen an, lege ihn zurück, nehme den nächsten.“ Das Zurücklegen passt n
 - **Folge:** Der Helfer hält das Muster für fehlerhaft oder denkt, er habe beim Öffnen etwas falsch gemacht; die Warnungen, die im
   Ernstfall schützen, nutzen sich ab.
 - **Empfehlung:** Beispiele so pflegen, dass sie ohne Warnung durchgehen (Personen mit gesetztem Geschlecht, eindeutige Kennzeichen),
-  und bei Übungs-/Beispielbögen die Zeitraum-Warnung als Hinweis „Beispiel: Zeitraum fiktiv“ führen oder auslassen.
+  und bei Übungs-/Übungsbögen die Zeitraum-Warnung als Hinweis „Beispiel: Zeitraum fiktiv“ führen oder auslassen.
 - **Nachprüfung:** Stichprobe aus jedem Register: Übersicht ohne „⚠“, kein Reiter „fehlt“.
 
 ### BB-H7 [P3] Katastrophenschutz: Ländernamen in Großbuchstaben ohne Umlaut und Bindestrich, uneinheitlich, vier Länder fehlen
@@ -279,7 +279,7 @@ den Bogen an, lege ihn zurück, nehme den nächsten.“ Das Zurücklegen passt n
 - **Typ:** Layout/Abstand
 - **Gleicher Sachverhalt:** BB-S8 (Pfadleiste).
 - **Evidence:** Observed (360 × 640, Feld).
-- **Ort:** Dialog „Beispielbögen“ oberste Ebene und OV-Ebene.
+- **Ort:** Dialog „Übungsbögen“ oberste Ebene und OV-Ebene.
 - **Beobachtung:** Register „BBK (Bundeseinheiten“ mit der schließenden Klammer allein in der dritten Zeile. „Schließen“ (Feld) bricht
   unter den Titel, Kopf 128 px. Auf der obersten Ebene stehen sechs von neun Registern im Bild; „THW“ (die größte Gruppe, alphabetisch
   zuletzt) erst nach dem Rollen. In Tiefe 5 ist die Pfadleiste 314 px hoch, 52 % der Dialoghöhe 604 px; der Zähler „9 Bögen“ beginnt bei
@@ -292,10 +292,10 @@ den Bogen an, lege ihn zurück, nehme den nächsten.“ Das Zurücklegen passt n
 
 ## Hinweise (ohne Priorität, keine Beeinträchtigung der Aufgabe)
 
-1. **Erklärung ohne Aufklapp-Zeichen:** „Was sind Beispielbögen? Was heißen Anzeigen, PDF und Link?“ ist 14 px blau, ohne Dreieck
+1. **Erklärung ohne Aufklapp-Zeichen:** „Was sind Übungsbögen? Was heißen Anzeigen, PDF und Link?“ ist 14 px blau, ohne Dreieck
    (Zusammenfassung als Flexbox, Marker fehlt); wirkt wie ein Verweis auf eine andere Seite. Aufgeklappt 363 px.
 2. **Schmale Pfadziele:** „Alle“ 23,5 × 44 px, „THW“ 31,7 × 44 px; mit Handschuh knapp. „‹ Zurück“ (84 × 44) ist der sichere Weg.
-3. **Lage des Abschnitts:** „Beispielbögen ansehen“ liegt bei 360 × 640 bei y = 1 843 (2,9 Bildschirme), mit angefangenem Bogen
+3. **Lage des Abschnitts:** „Übungsbögen ansehen“ liegt bei 360 × 640 bei y = 1 843 (2,9 Bildschirme), mit angefangenem Bogen
    tiefer (Abschnitt y = 1 972), bei 390 × 844 2,2, im Feld-Modus 3,4 Bildschirme. Für den Übungszweck ausreichend, nach jedem
    „Anzeigen“ aber erneut zu rollen (BB-H2).
 4. **PDF-Dateiname ohne „Beispiel“:** „bhp25-behandlung-gelb.pdf“, „001-albstadt-ztr-tz.pdf“; im Download-Ordner neben echten Bögen

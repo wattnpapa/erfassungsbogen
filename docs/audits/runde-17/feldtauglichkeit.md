@@ -16,7 +16,7 @@ Playwright/Chromium (globales Modul, `chromium.launch()` ohne Optionen),
 `isMobile`/`hasTouch`, Locale de-DE, Telefon 360 × 640 und 390 × 844, einzelne
 Läufe 320 × 568 (Ansichten „Feld“ und „Nacht“). Frischer Kontext je Lauf. Einsatzdaten:
 (a) Sammlung „Hochwasser Musterstadt“ aus 8 vorbereiteten Einträgen, (b) frisch
-angelegte Sammlung, in die 7 bzw. 30 Beispielbögen aus `examples/thw/` mit
+angelegte Sammlung, in die 7 bzw. 30 Übungsbögen aus `examples/thw/` mit
 aktuellem Stand über „Bögen einlesen…“ eingespielt wurden; eigener Bogen im
 Assistenten (Husum, Bergungsgruppe), einmal als Schnellerfassung.
 
@@ -32,7 +32,7 @@ Neuladen ohne Netz, Anzeigemodi „Feld“ und „Nacht“.
 Dunkelheit am Display, Kamera-Scan, echte Bildschirmtastatur und Autokorrektur,
 WebKit/Safari, echtes Drucken, voller Speicher, Inhalt der erzeugten PDF-Seiten.
 Die Hinweise „Anderer Einsatz?“ und „Zeitraum vorbei“ stammen aus der
-Herkunft der Beispielbögen (andere Orte, andere Daten) und wurden nicht gewertet.
+Herkunft der Übungsbögen (andere Orte, andere Daten) und wurden nicht gewertet.
 
 ## Urteil
 
@@ -77,7 +77,7 @@ Rest-Befunde aus früheren Runden, die im Browser weiterhin zu sehen sind.
 **Neu oder alt (Verweis):** alt — wie R16-H3, weiter offen.
 **Evidence:** Observed (frischer Kontext, 360 × 640 und 390 × 844, Lage alle 100 bis
 200 ms gemessen).
-**Ort:** Startseite, grüner Kasten „Jetzt offline bereit … Beispielbögen und
+**Ort:** Startseite, grüner Kasten „Jetzt offline bereit … Übungsbögen und
 Themenseiten werden nachgeladen (n von 549)“ und darunter „Neue Einsatz-Sammlung…“,
 „Einheit schnell erfassen (nur Stärke)…“.
 **Beobachtung:** Der Kasten wechselt in den ersten rund vier Sekunden mehrfach seine

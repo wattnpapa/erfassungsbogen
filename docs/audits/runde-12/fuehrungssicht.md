@@ -18,7 +18,7 @@ Playwright-Modul, weil die Projektkopie keinen Browser fand), Locale de-DE,
 `isMobile`/`hasTouch`, Telefon 390x844 und 360x640. Zustand aus
 `localStorage`-Seed (`eeb.einsaetze.v1`) mit acht Bögen aus `examples/thw/`,
 `uebung: false`, Meldealter 2 bis 400 Minuten, zwei Abgerückte (Seed-Artefakt:
-alle Karten „ANONYMISIERT" und „Zeitraum vorbei", weil die Beispielbögen alt
+alle Karten „ANONYMISIERT" und „Zeitraum vorbei", weil die Übungsbögen alt
 sind). Bedient: Startseite, Einsatzansicht, Karte aufklappen, Abrücken mit
 Quittung, Zug zuordnen (neuer Zug), Zwischensummen, Karten/Tabelle bei 360x640,
 Filterfeld, „Neue Einsatz-Sammlung…" mit gleichem Namen, Lageblatt (PDF

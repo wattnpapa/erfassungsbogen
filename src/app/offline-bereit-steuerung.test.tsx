@@ -3,7 +3,7 @@
  * „ready" übernimmt.
  *
  * Beide Ereignisse kommen in derselben Millisekunde; in neuen Chrome-Versionen
- * steht „ready" oft vorn. Die Startseite lud die Beispielbögen und Themenseiten
+ * steht „ready" oft vorn. Die Startseite lud die Übungsbögen und Themenseiten
  * dann nie nach, und ohne Netz stand „fehlen noch (0 von 474)" da — das
  * E2E-Szenario „Ohne Netz startet die App weiter" scheiterte daran.
  */

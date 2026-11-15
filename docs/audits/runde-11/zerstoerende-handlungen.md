@@ -15,7 +15,7 @@ R9-M3, R9-G5, R8-H5/S4, leere Karten bei „Nur Stärke", Rückgängig für Meld
 
 Chromium über `require('playwright')` ohne Startoptionen, `isMobile`/`hasTouch`,
 Locale de-DE, Tipps als Touch-Tipp. Viewports 390 × 844 und 360 × 640. Zustände über
-die Bedienung der App: Einsatz-Sammlung anlegen, vier THW-Beispielbögen aus
+die Bedienung der App: Einsatz-Sammlung anlegen, vier THW-Übungsbögen aus
 `examples/thw/` (mit `uebung: false`) über „Bögen einlesen…" aufnehmen, zweiter
 Browser-Tab im selben Profil, zweite Sammlung, Sammel-PDF als Datei. Kein Kamera-Scan,
 keine Handschuhe, keine nativen Builds, kein echtes Zweitgerät.
@@ -116,7 +116,7 @@ Kernsatz („„Trupp A" abgeteilt — Rückgängig") gekürzt.
 **Beobachtung:** Der Schritt sagt selbst: „Die erste Person der Liste steht im PDF und in
 der Meldung als Ansprechperson — bei ihr fragt der Meldekopf nach." Die Rückfrage „Lang,
 Sabine entfernen?" lautet bei der ersten Person aber wie bei jeder anderen („… Name,
-Funktionen, Qualifikationen und Erreichbarkeiten …"). Im Beispielbogen hatte nur die erste
+Funktionen, Qualifikationen und Erreichbarkeiten …"). Im Übungsbogen hatte nur die erste
 Person eine Nummer. Nach zweimaligem Entfernen war Person 1 „Lehmann" ohne Kontakt;
 erst in der Übersicht steht „Keine telefonische Erreichbarkeit erfasst …" (3 offene Punkte).
 
@@ -187,7 +187,7 @@ Alles im Browser nachgespielt (390 × 844, soweit nicht anders vermerkt):
 - **Bogen aus Datei laden mit Entwurf:** Rückfrage „Bogen aus Datei öffnen?" mit Name des
   angefangenen Bogens und Hinweis auf „Zuletzt geschlossenen Bogen zurückholen"; Entwurf
   bleibt bis zur Bestätigung unverändert (2019 Zeichen vorher und nachher).
-- **Beispielbögen „Anzeigen"** mit vorhandenem Entwurf: Entwurf unverändert.
+- **Übungsbögen „Anzeigen"** mit vorhandenem Entwurf: Entwurf unverändert.
 - **Sammel-PDF zurück einlesen** (Stand von vor dem Abrücken, Einheit 2 inzwischen
   abgerückt): „keine neue Einheit. Jetzt 4 Einheiten, davon 3 anwesend"; Abrückung bleibt,
   Meldungszeile „Stand des anderen Geräts übernommen".

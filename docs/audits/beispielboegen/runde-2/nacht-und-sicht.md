@@ -1,9 +1,9 @@
-# Audit „Nacht und Sicht", Schwerpunkt Beispielbögen, Runde 2
+# Audit „Nacht und Sicht", Schwerpunkt Übungsbögen, Runde 2
 
 Prüfer: Rollenaudit `thw-night-visibility-reviewer` · Datum: 2026-11-09 ·
 Prüfgegenstand: Live-Seite `https://erfassungsbogen.app/` (Fassung `v2026.1109.833`, Code-Stand
-Commit `085a93b` = `main`), nur der Bereich Beispielbögen: Abschnitt „Beispielbögen" der Startseite,
-Dialog „Beispielbögen" (Aufklapper, Suche, Pfadleiste, Register, Tabelle bzw. Karten, Sammelweg,
+Commit `085a93b` = `main`), nur der Bereich Übungsbögen: Abschnitt „Übungsbögen" der Startseite,
+Dialog „Übungsbögen" (Aufklapper, Suche, Pfadleiste, Register, Tabelle bzw. Karten, Sammelweg,
 Hinweis- und Fehlerzeilen, Quittung) und die Marken „BEISPIEL"/„ÜBUNG" auf Startseitenkarte und
 Vorlage · Zählung: **P0 0 · P1 0 · P2 0 · P3 4 · Hinweise 2** (dazu vier Hinweise aus Runde 1, die
 weiter offen sind)
@@ -30,7 +30,7 @@ Gemessen (WCAG-Formel, Vorder- gegen die zusammengesetzte Hintergrundfläche aus
 Pseudo-Elemente `::after`/`::before`/`::placeholder` eingeschlossen): Aufklapper (zu, offen, Fokus),
 Suchfeld (Beschriftung, Eingabe, Platzhalter, Rahmen, Fokusring), Register, Pfadleiste (Hintergrund,
 Unterkante, „Alle", „…", Trenner, aktueller Ordner), Pfadleiste beim Rollen (Element unter der
-Unterkante), Hinweiszeilen, „Noch ohne Beispielbögen", Sammelknopf „Alle … in eine Übungs-Sammlung"
+Unterkante), Hinweiszeilen, „Noch ohne Übungsbögen", Sammelknopf „Alle … in eine Übungs-Sammlung"
 (ruhend, Hover, Fokus, gesperrt während „PDF"), Quittung nach „PDF" (Farbe und Lage im Bild),
 Ladefehler mit „Erneut laden", Marken „BEISPIEL"/„ÜBUNG", Fokus per Tab, Hover (1280 px). Taktische
 Zeichen: Klasse, `filter`, Unterlage, dazu ein Bildschirmfoto jedes Zeichens (DRK, BBK) auf Pixel
@@ -49,7 +49,7 @@ Skripte und Bildschirmfotos: `/tmp/claude-0/r2-nacht/` (u. a. `messen.js`, `mark
 `390-nacht-thw-waehrend-laden.png`, `390-nacht-thw-nach-laden.png`, `zoom-fokus.png`,
 `zoom-marken.png`).
 
-**Annahmen:** wie in Runde 1. Die Beispielbögen dienen dem Üben und Zeigen (Dienstabend, Fahrzeug,
+**Annahmen:** wie in Runde 1. Die Übungsbögen dienen dem Üben und Zeigen (Dienstabend, Fahrzeug,
 Zelt), nicht dem laufenden Einsatz; Maßstab ist der Anspruch der App selbst („Nacht: gedimmt, blendet
 nicht"; DESIGN.md: „Tastaturfokus überall gleich"). Ein verzögertes OV-Bündel von 6 bis 8 s ist ein
 plausibler Fall bei schwachem Netz: Das Bündel ist 738 kB groß (85 kB komprimiert) und wird beim
@@ -94,15 +94,15 @@ Ansichten ohne fremde Hilfe.
 
 | Prüfpunkt | Ergebnis |
 | --- | --- |
-| Startseite, Abschnitt „Beispielbögen" | unverändert: Überschrift Nacht 12,45 : 1, Hinweis 6,77, Primärknopf Schrift 5,00 / Fläche 5,05; Standard 16,88 / 5,42 / 14,21; Dunkel 15,68 / 8,86 / 9,22; Feld 17,45 / 11,78 / 14,21 |
+| Startseite, Abschnitt „Übungsbögen" | unverändert: Überschrift Nacht 12,45 : 1, Hinweis 6,77, Primärknopf Schrift 5,00 / Fläche 5,05; Standard 16,88 / 5,42 / 14,21; Dunkel 15,68 / 8,86 / 9,22; Feld 17,45 / 11,78 / 14,21 |
 | Suchfeld „Suchen" | Beschriftung Nacht 6,31 : 1 (Dunkel 8,17, Standard 5,92, Feld 14,18); Eingabe 11,61 (14,46 / 18,43 / 21); Platzhalter „Ort, OV oder Einheit, z. B. Oldenburg" Nacht 4,75, Dunkel 5,22, Standard 4,69, Feld 14,18 — überall über 4,5 : 1; Feldrahmen 3,41 / 3,45 / 3,37 / 18,58 (Feld 2 px); Höhe 44 px (Feld 54 px); Schrift 16 px, also kein Zoom beim Antippen. Fokus per Tab: 3 px Kennfarbe, Nacht 4,71 : 1, Dunkel 9,31, Standard 14,21, Feld 4 px 14,21. Suche „Oldenburg" zeigt „2 Ordner, 57 Bögen" in Schriftfarbe. |
 | Pfadleiste | „‹ Zurück" Nacht 11,61, „Alle" 6,69 (unterstrichen), aktueller Ordner 11,61 fett, Trenner 4,75; „…" (aria-hidden, kein Ziel) 11,61 : 1 in normaler Stärke, nicht unterstrichen — vom Link „Alle" klar zu unterscheiden |
-| Hinweis- und Erklärzeilen | jede sichtbare `.hinweis` im Dialog Nacht 6,31 : 1, Dunkel 8,17, Standard 5,92, Feld 14,18 (13 bis 14 px, Feld 15,7 bis 16,8 px); darunter „Noch ohne Beispielbögen: Bremen, Hamburg, Sachsen-Anhalt, Schleswig-Holstein.", die OV-Offline-Zeile, „Angaben werden geladen … n von 101", „wird vorbereitet …" |
+| Hinweis- und Erklärzeilen | jede sichtbare `.hinweis` im Dialog Nacht 6,31 : 1, Dunkel 8,17, Standard 5,92, Feld 14,18 (13 bis 14 px, Feld 15,7 bis 16,8 px); darunter „Noch ohne Übungsbögen: Bremen, Hamburg, Sachsen-Anhalt, Schleswig-Holstein.", die OV-Offline-Zeile, „Angaben werden geladen … n von 101", „wird vorbereitet …" |
 | Sammelknopf „Alle … in eine Übungs-Sammlung" | Schrift Nacht 11,61, Rahmen 3,41 (Dunkel 14,46 / 3,45, Standard 18,43 / 3,37, Feld 21 / 18,58), 44 px hoch (Feld 54); Hover (1280 px) Text und Rahmen in Kennfarbe Nacht 4,71, Dunkel 9,31; Fokus 3 px Kennfarbe. Gesperrt während „PDF": gestrichelter Rahmen und Fläche `--flaeche-2`, Schrift 5,69 : 1 (Nacht), keine Deckkraft-Absenkung — gesperrt ist an der Form erkennbar, nicht nur an der Farbe |
 | Fokus per Tab im Ordner | Register, Sammelknopf, „Anzeigen", „PDF", „Link", „Erneut laden": 3 px Kennfarbe (Feld 4 px), Nacht 4,71 : 1. Nach dem Ordnerwechsel liegt der Fokus auf dem Ordnernamen (programmatisch, ohne Ring) |
 | Quittung nach „PDF" (Farbe) | `--gut`, fett 600, 13 px: Nacht #8fae63 7,30 : 1, Dunkel #6cd18a 9,22, Standard und Feld #146b3a 6,57; Dateiname `uebung-beispiel-drk-bhp25-behandlung-gelb.pdf` |
 | Marken „BEISPIEL" (Startseitenkarte) und „ÜBUNG" (gespeicherte Vorlage) | Text Nacht #d9b96a 8,15 : 1, Dunkel 10,27, Standard und Feld 7,51; 13 px (Feld 15,7 px) fett, Versalien; Rahmen Nacht 2,42, Dunkel 2,59, Standard 1,79, Feld 4,02. Die Kennzeichnung trägt über das Wort, nicht über die Farbe; auf der Karte liegt das Zeichen (`einheit-avatar gross`) nachts gedämpft |
-| Meldung nach „Anzeigen" („Beispielbogen geöffnet — fiktive Daten …") | Text Nacht 11,61 : 1, 4-px-Oberkante in Schriftfarbe (nicht heller als die Schrift) |
+| Meldung nach „Anzeigen" („Übungsbogen geöffnet — fiktive Daten …") | Text Nacht 11,61 : 1, 4-px-Oberkante in Schriftfarbe (nicht heller als die Schrift) |
 | Helligkeit Nacht | DRK offen: Luma-Mittel 28,5 (390 px) bzw. 23,5 (1280 px), Höchstwert 206, kein Pixel darüber; Dunkel Höchstwert 234 (= Schrift) |
 | Schriftgröße | kein gemessener Text unter 13 px (Feld 15,7 px); Marken 13 px |
 
@@ -111,7 +111,7 @@ Ansichten ohne fremde Hilfe.
 ### BB2-L1 (P3, Kontrast) Ladefehler mit „Erneut laden" sieht aus wie eine Erklärung — die Warnfarbe greift nicht
 
 - **Ort:** Dialog → Ordner, dessen Bögen nicht geladen werden konnten (nachgestellt: ASB mit abgebrochenen Anfragen `/assets/*.json`), Zeile über der Liste, alle Modi. Code: `beispiele-dialog.tsx` Zeile 867 (`<p className="hinweis warnung-text beispiel-ladefehler">`); in `index.html` steht `.warnung-text { color: var(--warn-text) }` (Zeile 1917) vor `.hinweis { color: var(--text-2) }` (Zeile 1929), gleiche Spezifität, die spätere Regel gewinnt.
-- **Beobachtung (gemessen):** Die Zeile „Einige Beispielbögen liegen noch nicht auf dem Gerät — sie werden mit Netz nachgeladen (siehe Offline-Zeile der Startseite). Erneut laden" hat die Farbe der gewöhnlichen Hinweise: Nacht #a2977e (6,31 : 1) statt `--warn-text` #d9b96a, Dunkel #aab2c2 statt #f0cf88, Standard #5c6478 statt #6d4700. Unterschied zur Erklärzeile des Sammelknopfs zwei Zeilen darunter: nur Schriftstärke 600 statt 400; kein Zeichen, kein Rahmen, keine Fläche (`::before` leer). „Erneut laden" ist ein unterstrichener Link in Kennfarbe (Nacht 6,69 : 1, 47 px hoch, 76 px breit). Darunter stehen die Karten mit „nicht geladen" und „—" (`390-nacht-ladefehler.png`).
+- **Beobachtung (gemessen):** Die Zeile „Einige Übungsbögen liegen noch nicht auf dem Gerät — sie werden mit Netz nachgeladen (siehe Offline-Zeile der Startseite). Erneut laden" hat die Farbe der gewöhnlichen Hinweise: Nacht #a2977e (6,31 : 1) statt `--warn-text` #d9b96a, Dunkel #aab2c2 statt #f0cf88, Standard #5c6478 statt #6d4700. Unterschied zur Erklärzeile des Sammelknopfs zwei Zeilen darunter: nur Schriftstärke 600 statt 400; kein Zeichen, kein Rahmen, keine Fläche (`::before` leer). „Erneut laden" ist ein unterstrichener Link in Kennfarbe (Nacht 6,69 : 1, 47 px hoch, 76 px breit). Darunter stehen die Karten mit „nicht geladen" und „—" (`390-nacht-ladefehler.png`).
 - **Erwartung der Rolle:** Was nicht geklappt hat, hebt sich von Erklärtexten ab — in derselben Warn-Handschrift wie anderswo in der App, und nicht nur über die Farbe.
 - **Folge:** Nachts und bei gedimmtem Display liest sich die Zeile als eine weitere Erklärung im Grau des Dialogs; man sieht leere Karten und weiß nicht, dass es einen Knopf „Erneut laden" gibt und dass die App selbst einen Fehler meldet. Die Aufgabe bleibt lösbar (Text und Link sind lesbar), kostet aber einen Fehlversuch, wenn man auf „Anzeigen" einer leeren Karte tippt.
 - **Empfehlung:** Die Fehlerzeile sichtbar als Warnung kennzeichnen, wie die übrigen Warnungen der App (Warnfarbe und ein Merkmal, das ohne Farbe trägt, etwa Zeichen oder Rahmen).
@@ -121,7 +121,7 @@ Ansichten ohne fremde Hilfe.
 ### BB2-L2 (P3, Bedienung) Quittung nach „PDF" am Telefon außer Sicht und bleibt im nächsten Ordner stehen
 
 - **Ort:** Dialog → Ordner mit Bögen → „PDF" einer Karte, 390 x 844, alle Modi. Code: `beispiele-dialog.tsx` Zeile 873 (Quittung als `<p role="status">` über Bogenzahl und Liste).
-- **Beobachtung (gemessen):** Die Quittung „PDF „uebung-beispiel-drk-…pdf" erzeugt — liegt im Download-Ordner." erscheint über der Liste. Bei „PDF" in Zeile 1 (DRK, Knopf auf 750 px) steht sie sichtbar auf 377 px. Bei „PDF" in Zeile 5 (Knopf auf 400 px) steht sie auf −973 px, also gut einen Bildschirm über dem sichtbaren Bereich, und darüber liegt die angeheftete Pfadleiste; im Bild ändert sich nur, dass „wird vorbereitet …" verschwindet und die Knöpfe wieder durchgezogene Rahmen haben. Nach „Alle" → „Katastrophenschutz" steht dieselbe Quittung weiter im neuen Ordner (über „Noch ohne Beispielbögen: …"). Bei 1280 px steht sie bei kurzen Ordnern im Bild (152 bis 169 px). Unterschied zum Hinweistext: Grün `--gut` und Schriftstärke 600, kein Haken oder Zeichen.
+- **Beobachtung (gemessen):** Die Quittung „PDF „uebung-beispiel-drk-…pdf" erzeugt — liegt im Download-Ordner." erscheint über der Liste. Bei „PDF" in Zeile 1 (DRK, Knopf auf 750 px) steht sie sichtbar auf 377 px. Bei „PDF" in Zeile 5 (Knopf auf 400 px) steht sie auf −973 px, also gut einen Bildschirm über dem sichtbaren Bereich, und darüber liegt die angeheftete Pfadleiste; im Bild ändert sich nur, dass „wird vorbereitet …" verschwindet und die Knöpfe wieder durchgezogene Rahmen haben. Nach „Alle" → „Katastrophenschutz" steht dieselbe Quittung weiter im neuen Ordner (über „Noch ohne Übungsbögen: …"). Bei 1280 px steht sie bei kurzen Ordnern im Bild (152 bis 169 px). Unterschied zum Hinweistext: Grün `--gut` und Schriftstärke 600, kein Haken oder Zeichen.
 - **Erwartung der Rolle:** Nach dem Tippen auf „PDF" an der Stelle, wo man hinsieht, eine Bestätigung, dass die Datei da ist — und im nächsten Ordner keine Meldung zu einem Bogen von vorher.
 - **Folge:** Wer nachts ein Beispiel weiter unten als PDF holt (Übungsvorbereitung, Ausdruck für Teilnehmer), sieht keine Rückmeldung und tippt erneut — es entsteht eine zweite gleichnamige Datei. Die stehengebliebene Quittung im neuen Ordner nennt einen Bogen, der dort nicht liegt. Bei Rot-Grün-Schwäche unterscheidet sich die Quittung von den grauen Hinweisen nur über die Schriftstärke.
 - **Empfehlung:** Die Bestätigung dort zeigen, wo getippt wurde (an der Karte oder in einer Leiste, die im Bild bleibt), mit einem Merkmal ohne Farbe, und beim Ordnerwechsel entfernen.
@@ -150,7 +150,7 @@ Ansichten ohne fremde Hilfe.
 
 ## Hinweise (ohne Priorität)
 
-- **H1 Fokusring am Aufklapper ist der Browser-Ring.** „Was sind Beispielbögen? …" (`summary`) bekommt per Tab `outline: auto` statt des App-Rings (die Regel `button:focus-visible, a:focus-visible` in `index.html` Zeile 619 erfasst `summary` nicht). Nachts ist dieser Ring weiß-grau: 2 108 Pixel heller als Luma 206, Höchstwert 238, also heller als jede Schrift im Dialog; in Standard ein schwarz-weißer Doppelring (`zoom-fokus.png`). Alle anderen Ziele im Dialog haben 3 px Kennfarbe (DESIGN.md: „Tastaturfokus überall gleich"). Betrifft nur die Bedienung mit Tastatur.
+- **H1 Fokusring am Aufklapper ist der Browser-Ring.** „Was sind Übungsbögen? …" (`summary`) bekommt per Tab `outline: auto` statt des App-Rings (die Regel `button:focus-visible, a:focus-visible` in `index.html` Zeile 619 erfasst `summary` nicht). Nachts ist dieser Ring weiß-grau: 2 108 Pixel heller als Luma 206, Höchstwert 238, also heller als jede Schrift im Dialog; in Standard ein schwarz-weißer Doppelring (`zoom-fokus.png`). Alle anderen Ziele im Dialog haben 3 px Kennfarbe (DESIGN.md: „Tastaturfokus überall gleich"). Betrifft nur die Bedienung mit Tastatur.
 - **H2 Größenzeichen sehr klein.** Das Zeichen ist in der Tabelle 30 px hoch (Feld 34 px). Die Punkte und Striche der Größe sind darin 2 bis 3 px groß, in allen vier Modi. Seit BB-L1 sind sie auch nachts sichtbar (8 : 1), bei kleinster Displayhelligkeit, mit Armlänge Abstand oder bei Sehschwäche sind Trupp, Gruppe und Zug am Zeichen allein aber kaum auseinanderzuhalten; der Name sagt es. Nicht messbar ohne echtes Gerät.
 
 ## Schluss

@@ -9,7 +9,7 @@ import {
 } from "./landesvorlagen";
 import { Ernaehrung, Fahrerlaubnis, OrganisationsTyp, StaerkeRolle } from "@bos/eeb-format/model";
 
-// Die Vorlagen entstehen zur Bauzeit aus den Beispielbögen unter
+// Die Vorlagen entstehen zur Bauzeit aus den Übungsbögen unter
 // examples/<bereich>/<bundesland>/. Geprüft wird deshalb nicht der Inhalt
 // einzelner Einheiten (der wandert mit den Generatorskripten), sondern die
 // Ableitung: richtige Zuordnung von Bereich und Bundesland, Gruppierung der
@@ -89,7 +89,7 @@ describe("Landesvorlagen", () => {
     }
   });
 
-  it("bietet der Feuerwehr Niedersachsen an, kennt aber keine Vorlagen ohne Beispielbögen", () => {
+  it("bietet der Feuerwehr Niedersachsen an, kennt aber keine Vorlagen ohne Übungsbögen", () => {
     expect(hatLandesvorlagen(OrganisationsTyp.FEUERWEHR)).toBe(true);
     expect(landesvorlagenBundeslaender(OrganisationsTyp.FEUERWEHR)).toContain("niedersachsen");
     expect(landesvorlage(OrganisationsTyp.FEUERWEHR, "niedersachsen", "gibt es nicht")).toBeUndefined();

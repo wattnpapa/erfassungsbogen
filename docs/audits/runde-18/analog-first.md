@@ -13,7 +13,7 @@ beobachten sind, sind nicht gemeldet.
 ## Prüfaufbau
 
 Playwright (Chromium, `chromium.launch()` ohne Optionen, globales Playwright-Modul), `isMobile`/`hasTouch`, Locale de-DE,
-Telefon 390 × 844 und 360 × 640, jeweils frischer Kontext. Einsatz-Sammlung „Hochwasser Test" mit 2 bis 24 THW-Beispielbögen
+Telefon 390 × 844 und 360 × 640, jeweils frischer Kontext. Einsatz-Sammlung „Hochwasser Test" mit 2 bis 24 THW-Übungsbögen
 aus `examples/thw/` (auf `uebung: false`, Stand 30 bis 240 Minuten alt, Zeitraum heute), eingelesen als JSON-Dateien und als
 PNG-Fotos (150 dpi) der Sammel-PDF. Durchgespielt:
 
@@ -35,7 +35,7 @@ ohne die App weiterverarbeitet.
 
 **Nicht prüfbar:** echtes Drucken, Kamera- und Handscanner, Safari, native Builds, echte Akku- oder Geräteausfälle,
 Zeitverhalten auf einem echten Telefon. Die Hinweise „Anderer Einsatz?", „Kennzeichen doppelt", „Sitzplätze fehlen", „alle als
-männlich" und „Stand vor …" bei den Beispielbögen sind Seed-Artefakte und nicht gewertet; sie verlängern aber Zeilen im
+männlich" und „Stand vor …" bei den Übungsbögen sind Seed-Artefakte und nicht gewertet; sie verlängern aber Zeilen im
 Lageblatt (siehe R18-A9).
 
 **Kennzeichnung:** *gemessen* = im Testbrowser reproduziert (Seitentext, Dateiinhalt, Messwert); *beobachtet* = gesehen.
@@ -189,7 +189,7 @@ trägt, die App läuft offline weiter. Reibung bleibt an neun Stellen, überwieg
 
 ### R18-A9 [P3] Lageblatt: Nachtragstafel läuft bei fünf Einheiten über zwei Seiten
 
-- **Neu oder alt (Verweis):** neu (Hinweis: Zeilenlänge durch Seed-Hinweise der Beispielbögen mitbedingt).
+- **Neu oder alt (Verweis):** neu (Hinweis: Zeilenlänge durch Seed-Hinweise der Übungsbögen mitbedingt).
 - **Ort:** Einsatzansicht → „Lageblatt (A4 quer)" mit 5 Einheiten.
 - **Beobachtung (gemessen):** `pdfinfo`: 2 Seiten. Seite 1 endet nach der Tafelüberschrift „Nachtrag von Hand" mit zwei Zeilen, Seite 2 trägt den Rest
   und „Summe einschl. Nachträge (von Hand)". Mit 3 Einheiten: 1 Seite; mit 24 Einheiten: 4 Seiten.

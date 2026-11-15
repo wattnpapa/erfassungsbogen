@@ -76,7 +76,7 @@ so von 843 kB auf 1.258 kB; mit modulgenauen Importen sind es 839 kB.
   der Einsatz-Sammlung verbindet. Der Kern bekommt die Ablage hineingereicht.
 - `src/app/taktische-zeichen-bogen.ts` — löst Organisation, Kurzzeichen und
   Namen aus dem Bogen auf; die Zeichensammlung selbst kennt den Bogen nicht.
-- `src/vokabulare/landesvorlagen.ts` — liest die Beispielbögen über
+- `src/vokabulare/landesvorlagen.ts` — liest die Übungsbögen über
   `import.meta.glob`, eine Vite-Eigenschaft, und die Bögen sind Produktinhalt.
 - `src/vokabulare/thw-funkrufname-ort.ts` — Großstadtregelung der
   Funkrufnamen: Berlin, Hamburg und Köln sprechen auf den Stadtnamen und
@@ -381,7 +381,7 @@ Zusammenspiel:
 | [einsatz-sammlung.feature](../features/einsatz-sammlung.feature) | Einsatz anlegen (Dialog, Pflichtfeld, Enter, Esc, Abbruch), Bogen aufnehmen |
 | [einsatz-detail.feature](../features/einsatz-detail.feature) | Summen, Vollansicht, Abrücken, Zug-Etikett, Aufteilen/Zusammenführen, Folgemeldung/Historie/Diff, Sammel-PDF, CSV (Übersicht und alle Daten), Papierkorb |
 | [einheiten-liste.feature](../features/einheiten-liste.feature) | Einheitenliste einer Großlage: Suche, Sortierung, Qualifikationsfilter, Tabellensicht mit Spaltensortierung und Summenzeile — und dass die Summen des Einsatzes davon unberührt bleiben |
-| [daten-und-anzeige.feature](../features/daten-und-anzeige.feature) | Anzeigemodus Dunkel/Feld/Nacht (auch bei dunklem Systemdesign und mit Android-Anmutung), Datensicherung, „Alle Daten löschen", Pflichtangaben, Beispielbögen, kaputter Link |
+| [daten-und-anzeige.feature](../features/daten-und-anzeige.feature) | Anzeigemodus Dunkel/Feld/Nacht (auch bei dunklem Systemdesign und mit Android-Anmutung), Datensicherung, „Alle Daten löschen", Pflichtangaben, Übungsbögen, kaputter Link |
 
 Der Prüfstand steht in [features/support/haken.ts](../features/support/haken.ts):
 
@@ -624,7 +624,7 @@ liest und schreibt nur NFC-Tags, Peer-to-Peer ist nicht Teil der Spezifikation,
 und Android Beam (das einzige Verfahren, das das je konnte) ist seit Android 14
 entfernt. Dazu läuft Web NFC nur in Chromium auf Android; WebKit hat es nie
 bekommen, iOS fällt also komplett aus. Ein NFC-**Tag** als Datenträger ginge,
-wäre aber ein Rückschritt: gemessen über die 239 Beispielbögen liegt die
+wäre aber ein Rückschritt: gemessen über die 239 Übungsbögen liegt die
 signierte Nutzlast im Median bei 562 Bytes (p90 708, max 1837) — auf einen
 NTAG215 (~492 B nutzbar) passen 23 %, auf einen NTAG216 (~872 B) 93 %, während
 ein einzelner QR-Code heute schon mehr trägt.
@@ -666,7 +666,7 @@ vorbelegen. Es gibt zwei Quellen:
 - **THW (code-basiert, StAN-konform):** an den Einheitstyp gekoppelt, gepflegt in
   [vendor/bos-vokabulare/src/thw-stan-personal.ts](../vendor/bos-vokabulare/src/thw-stan-personal.ts)
   und [thw-stan-fahrzeuge.ts](../vendor/bos-vokabulare/src/thw-stan-fahrzeuge.ts).
-- **Landesvorlagen (freitext-basiert, aus den Beispielbögen abgeleitet):** für
+- **Landesvorlagen (freitext-basiert, aus den Übungsbögen abgeleitet):** für
   alle übrigen Organisationen außer Polizei, Bundespolizei und Bundeswehr.
   Logik in [src/vokabulare/landesvorlagen.ts](../src/vokabulare/landesvorlagen.ts),
   UI in `SchrittEinheit` ([src/app/schritte/einheit.tsx](../src/app/schritte/einheit.tsx)):
@@ -677,13 +677,13 @@ vorbelegen. Es gibt zwei Quellen:
   KatS-StAN, die Nds. Feuerwehrverordnung und (für das DRK) die Gliederung der
   Bereitschaft.
 
-**Konvention – Landesvorlagen pflegen sich selbst:** Jeder Beispielbogen unter
+**Konvention – Landesvorlagen pflegen sich selbst:** Jeder Übungsbogen unter
 `examples/<bereich>/<bundesland>/*.json` wird beim Build per `import.meta.glob`
 eingelesen und steht automatisch als Landesvorlage der darin angegebenen
 Organisation und des Bundeslands zur Verfügung. Ein **neues Bundesland** ist nur
 ein neuer Unterordner, eine **neue Einheit** nur eine weitere JSON-Datei – beide
 erscheinen ohne Codeänderung. Kommen also künftig weitere StAN-Unterlagen oder
-Landesverordnungen als Beispielbögen hinzu (erzeugt von
+Landesverordnungen als Übungsbögen hinzu (erzeugt von
 `scripts/kats-*-beispielboegen.mts` bzw. `scripts/fw-*-beispielboegen.mts`), sind
 sie damit auch als Vorlage verfügbar. Anzeigenamen werden bei Bedarf in
 `BUNDESLAND_LABEL` bzw. `BEREICH_LABEL` (in `landesvorlagen.ts`) ergänzt;

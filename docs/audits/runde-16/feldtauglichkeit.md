@@ -15,7 +15,7 @@ R15-M2, R15-O1).
 Playwright/Chromium (globales Modul, `chromium.launch()` ohne Optionen, da die
 Projektkopie keinen passenden Browser fand), `isMobile`/`hasTouch`, Locale de-DE,
 Telefon 360 × 640 und 390 × 844, einzelne Läufe 320 × 568 und quer (640 × 360).
-Frischer Kontext je Lauf, keine Kamera. Einsatzdaten: Kopien der Beispielbögen
+Frischer Kontext je Lauf, keine Kamera. Einsatzdaten: Kopien der Übungsbögen
 unter `examples/thw/` mit `uebung: false` und aktuellem Stand (3 bis 6 Dateien),
 über „Bögen einlesen…“ in eine frisch angelegte Sammlung „Hochwasser Test“
 eingespielt; eigener Bogen einmal im Assistenten ausgefüllt (BGr, Husum und
@@ -34,7 +34,7 @@ Kontrastmessung in allen vier Ansichten, Erstbesuch mit Service-Worker-Installat
 Dunkelheit am Display, Kamera-Scan, native Datums- und Zeitauswahl (der
 Prüfbrowser zeigt Datumsfelder im US-Format, das ist kein Befund der App),
 echte Bildschirmtastatur und Autokorrektur, WebKit/Safari, echtes Drucken,
-voller Speicher. Die Beispielbögen tragen Zeiträume aus dem Juli; die dadurch
+voller Speicher. Die Übungsbögen tragen Zeiträume aus dem Juli; die dadurch
 erscheinenden Hinweise („Zeitraum vorbei“, „Anderer Einsatz?“) sind ein Artefakt
 des Prüfaufbaus und wurden nicht gewertet.
 
@@ -115,7 +115,7 @@ geblieben.
 den Namen so, wie er ihn eingetippt hat, nicht ein „korrigiertes“ Wort.
 **Folge:** Gering. Eine Autokorrektur würde den Namen der Dienststelle im Bogen und
 im QR-Code verfälschen; der Fehler fiele erst beim Meldekopf oder im PDF auf.
-Die Felder sind bei Vorlagen und Beispielbögen meist schon gefüllt.
+Die Felder sind bei Vorlagen und Übungsbögen meist schon gefüllt.
 **Empfehlung:** Autokorrektur, Rechtschreibprüfung und Autovervollständigung auch an
 den Namensfeldern der höheren Ebenen und am Organisationsnamen abschalten, wie
 am Ortsfeld.
@@ -126,7 +126,7 @@ und `spellcheck=false`; auf einem Telefon einen unüblichen Ortsnamen eintippen.
 
 **Evidence:** Observed (frischer Kontext, Startseite, 360 × 640 und 390 × 844,
 Lage der Knöpfe alle 200 ms gemessen).
-**Ort:** Startseite, grüner Kasten „Jetzt offline bereit … Beispielbögen und
+**Ort:** Startseite, grüner Kasten „Jetzt offline bereit … Übungsbögen und
 Themenseiten werden nachgeladen (n von 549)“ und die darunterliegenden Knöpfe
 „Neue Einsatz-Sammlung…“, „Einheit schnell erfassen (nur Stärke)…“.
 **Beobachtung:** Der Kasten ändert in den ersten rund fünf Sekunden viermal seinen

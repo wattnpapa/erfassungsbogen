@@ -35,7 +35,7 @@ war vorher geschlossen); `eeb.uhr.v1` stand im Format des Geräts
 Szenarien:
 
 1. Startseite: „Verwerfen", „Neuen Bogen erstellen", „Zuletzt geschlossenen
-   Bogen zurückholen", Beispielbogen „Anzeigen", „Aus Datei laden…" (zwei
+   Bogen zurückholen", Übungsbogen „Anzeigen", „Aus Datei laden…" (zwei
    Dateien nacheinander), „Geräteschlüssel neu erzeugen", „Alle Daten
    löschen", „Datensicherung" mit „Sicherung einspielen…", „Einsatz löschen…"
    mit Papierkorb.
@@ -91,7 +91,7 @@ Alles beobachtet bzw. im Speicher gemessen.
 | „Neuen Bogen erstellen" mit Entwurf | Rückfrage „Neuen Bogen anfangen?" | wie oben |
 | „Aus Datei laden…" mit Entwurf | Rückfrage; beim zweiten Mal mit „… wird dabei endgültig gelöscht" | wie oben |
 | „Zuletzt geschlossenen Bogen zurückholen" mit Entwurf | Rückfrage nennt den ersetzten Bogen | tauscht |
-| Beispielbogen „Anzeigen" mit Entwurf | Rückfrage „Beispielbogen öffnen?" | Rückholplatz |
+| Übungsbogen „Anzeigen" mit Entwurf | Rückfrage „Übungsbogen öffnen?" | Rückholplatz |
 | „Bogen schließen" | Rückfrage, „nicht gelöscht" | Rückholplatz |
 | „Person entfernen" | Rückfrage mit Name | Quittung „Rückgängig" |
 | „Fahrzeug entfernen" | Rückfrage mit Kennzeichen; Text „gehen verloren", kein Wort zu „Rückgängig" | nicht geprüft |

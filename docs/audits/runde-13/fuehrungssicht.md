@@ -19,7 +19,7 @@ Playwright-Modul, weil die Projektkopie keinen Browser fand), Locale de-DE,
 `localStorage`-Seed (`eeb.einsaetze.v1`) mit acht Bögen aus `examples/thw/`
 (`uebung: false`), Meldealter 2 bis 400 Minuten, zwei Züge, eine abgerückte
 Einheit. Seed-Artefakte: Das „Stand" der Bögen liegt teils in der Zukunft, und
-mehrere Karten tragen „Anderer Einsatz?", weil die Beispielbögen nicht zum
+mehrere Karten tragen „Anderer Einsatz?", weil die Übungsbögen nicht zum
 Einsatznamen passen. Beides wurde nicht bewertet.
 
 Bedient: Startseite, Einsatzansicht, Aufklapper „Bedarf" und „Zwischensummen

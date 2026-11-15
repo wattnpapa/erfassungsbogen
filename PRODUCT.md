@@ -35,7 +35,7 @@ Der komplette Bogeninhalt steckt in einem einzigen QR-Code auf der letzten PDF-S
 
 - Assistent (Einheit, Einsatz, Personal, Fahrzeuge, Sofortbedarf) mit nachbearbeitbarer Gesamtübersicht; Personal wahlweise nur als Stärke.
 - Einsatz-Sammlung: seit 2026-11-09 nicht mehr hier, sondern in der eigenen Meldekopf-App (meldekopf.erfassungsbogen.app); die Startseite verweist dorthin.
-- Vorlagen: Landes-/Organisations-Beispielbögen (KatS der Länder, FwVO NDS, DRK, DLRG, THW-StAN) als anwendbare Vorbelegung; eigene Vorlagen mit Musterung.
+- Vorlagen: Landes-/Organisations-Übungsbögen (KatS der Länder, FwVO NDS, DRK, DLRG, THW-StAN) als anwendbare Vorbelegung; eigene Vorlagen mit Musterung.
 - Personalstamm: Helferliste der Dienststelle einmal aus Excel (.xlsx) oder CSV einlesen (Spaltenzuordnung, Mustervorlage), bei jedem neuen Bogen „Wer ist dabei?“ mit Suche und Filter; bleibt auf dem Gerät, nicht in Bogen, QR oder Datensicherung.
 - Optionale Ed25519-Signatur im QR-Code.
 - **Schema-Abwärtskompatibilität ist Pflicht:** alte QR-Codes und Dateien müssen per Migration lesbar bleiben.
@@ -49,7 +49,7 @@ Bisher keine formell bindenden Zusagen erklärt (Stand 2026-08-06). Faktisch vor
 
 ## Evidence on Hand
 
-- Beispielbögen als JSON unter `examples/` (KatS Niedersachsen/Sachsen/Brandenburg/Thüringen, Feuerwehr NDS mit Kreisfeuerwehrbereitschaften und Kreiseinheiten aus zehn Landkreisen und der Region Hannover, DRK, DLRG, THW, praktische Ausbildung Johanniter/Hannover).
+- Übungsbögen als JSON unter `examples/` (KatS Niedersachsen/Sachsen/Brandenburg/Thüringen, Feuerwehr NDS mit Kreisfeuerwehrbereitschaften und Kreiseinheiten aus zehn Landkreisen und der Region Hannover, DRK, DLRG, THW, praktische Ausbildung Johanniter/Hannover).
 - Eigene Landingpages je Organisation (thw/feuerwehr/drk/johanniter/malteser/asb/dlrg/katastrophenschutz/meldekopf) plus Anleitung und „Papier oder digital?".
 - Keine Testimonials, Fallstudien oder Nutzerzahlen vorhanden — nicht erfinden.
 

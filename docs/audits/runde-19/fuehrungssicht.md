@@ -17,9 +17,9 @@ Playwright (Chromium, `chromium.launch()` ohne Optionen, globales
 Playwright-Modul unter `/opt/node-tools`, da die Projektkopie keinen Browser
 findet), Locale de-DE, Zeitzone Europe/Berlin, `isMobile`/`hasTouch`; Telefon
 390x844 und 360x640, der Lagemonitor zusätzlich bei 1280x720. Zustand:
-Einsatz „Hochwasser Neckar · BR Sporthalle Rottenburg"; sieben Beispielbögen
+Einsatz „Hochwasser Neckar · BR Sporthalle Rottenburg"; sieben Übungsbögen
 THW (Albstadt, Biberach/Riß, Crailsheim, Freiburg, Haßmersheim, Karlsruhe,
-Laufenburg) aus „Beispielbögen › PDF" über „Bögen einlesen…" aufgenommen, je
+Laufenburg) aus „Übungsbögen › PDF" über „Bögen einlesen…" aufgenommen, je
 Karte „Mehr… › Als Einsatzmeldung zählen…". Danach: Zug je Karte (1. bis
 3. Zug), Auftrag (Nr. 3), Abrücken (Nr. 6), „Stärke ändern…" (Nr. 2: 11 auf 8),
 „Entfernen" (Nr. 6) mit Neuladen, Papierkorb „Zurückholen", Lageblatt (PDF,

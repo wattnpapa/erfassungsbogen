@@ -1,5 +1,5 @@
 /**
- * Der Dialog „Beispielbögen" als eigener Baustein: Ordner, Suche, Tabelle und
+ * Der Dialog „Übungsbögen" als eigener Baustein: Ordner, Suche, Tabelle und
  * die Adressliste aller Beispiel-Dateien (examples/**). Die Fußzeile lädt ihn
  * erst beim ersten Öffnen (lazy), damit er nicht in jedem App-Start liegt
  * (ADR-003, Bundle-Budget; vorher Teil von fusszeile.tsx).
@@ -98,7 +98,7 @@ const LAENDER: Record<string, string> = {
   thueringen: "Thüringen",
 };
 
-// Beispielbögen aus examples/ — beliebig tief verschachtelt (z. B.
+// Übungsbögen aus examples/ — beliebig tief verschachtelt (z. B.
 // examples/thw/*.json oder examples/katastrophenschutz/niedersachsen/*.json).
 // Abgelegt ist nur das Bogen-JSON; die PDF entsteht erst beim Klick aus dem
 // aktuellen Layout (siehe beispielPdf), damit Layout-Änderungen nicht jedes
@@ -198,7 +198,7 @@ function boegenHier(pfad: string[]): BeispielEintrag[] {
   return unterPfad(pfad).filter((b) => b.ordner.length === pfad.length);
 }
 
-// Einmal geladene Beispielbögen bleiben für die Sitzung liegen: die Tabelle
+// Einmal geladene Übungsbögen bleiben für die Sitzung liegen: die Tabelle
 // zeigt Einheit, Herkunft und Stärke aus dem Bogen selbst, und beim Blättern
 // zwischen den Ordnern (oder für PDF/Ansehen) wird nicht erneut geladen.
 const BOGEN_CACHE = new Map<string, Erfassungsbogen>();
@@ -207,7 +207,7 @@ const BOGEN_CACHE = new Map<string, Erfassungsbogen>();
  * Bögen der THW-Ortsverbände (examples/thw/ortsverbaende/, Dateinamen „ov-…"):
  * Die App lädt sie nie vorab (scripts/precache-aufteilung.ts, istNurAufAbruf).
  * Ohne Netz darf die Meldung deshalb kein Nachladen versprechen (Prüfrunde
- * Beispielbögen, BB-S1, BB-O1, BB-H3).
+ * Übungsbögen, BB-S1, BB-O1, BB-H3).
  */
 const istOvBogen = (url: string): boolean => /\/ov-[^/]+\.json$/.test(url);
 const OV_OFFLINE_TEXT =
@@ -317,7 +317,7 @@ function ordnerHerkunft(pfad: string[]): string {
     .join(" › ");
 }
 
-/** Beispielbogen-JSON laden (gecacht) und auf das aktuelle Schema heben. */
+/** Übungsbogen-JSON laden (gecacht) und auf das aktuelle Schema heben. */
 async function beispielBogen(url: string): Promise<Erfassungsbogen> {
   const bekannt = BOGEN_CACHE.get(url);
   if (bekannt) return bekannt;
@@ -325,12 +325,12 @@ async function beispielBogen(url: string): Promise<Erfassungsbogen> {
   try {
     antwort = await fetch(url);
   } catch {
-    // Beispielbögen sind die zweite Stufe des Offline-Vorrats (R3-O3): ohne
+    // Übungsbögen sind die zweite Stufe des Offline-Vorrats (R3-O3): ohne
     // Netz fehlen sie, bis die Startseite sie nachgeladen hat.
     throw new Error(
       istOvBogen(url)
         ? `Dieser Bogen liegt noch nicht auf dem Gerät. ${OV_OFFLINE_TEXT}`
-        : "Dieser Beispielbogen liegt noch nicht auf dem Gerät — Beispielbögen werden nach dem ersten Laden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).",
+        : "Dieser Übungsbogen liegt noch nicht auf dem Gerät — Übungsbögen werden nach dem ersten Laden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).",
     );
   }
   if (antwort.ok && istOvBogen(url)) ovBogenAblegen(url, antwort.clone());
@@ -371,7 +371,7 @@ async function beispielKopie(url: string): Promise<Erfassungsbogen> {
 }
 
 /**
- * Beispielbogen laden und daraus die PDF im aktuellen Layout erzeugen —
+ * Übungsbogen laden und daraus die PDF im aktuellen Layout erzeugen —
  * Download (Web) bzw. Share-Sheet (App) übernimmt pdfErzeugen.
  */
 async function beispielPdf(datei: string, url: string, abgebrochen: () => boolean = () => false): Promise<void> {
@@ -384,7 +384,7 @@ async function beispielPdf(datei: string, url: string, abgebrochen: () => boolea
 }
 
 /**
- * Beispielbogen laden und daraus den Bogen-Link erzeugen — dieselbe Voll-URL,
+ * Übungsbogen laden und daraus den Bogen-Link erzeugen — dieselbe Voll-URL,
  * die auch im Bogen selbst unter „Link teilen" steht: Sie trägt den kompletten
  * signierten Bogen im Fragment und öffnet ihn beim Antippen in der App.
  */
@@ -476,14 +476,14 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
   /** Zählt mit jeder Anfrage zum Öffnen hoch (beispielboegenOeffnen in fusszeile.tsx). */
   anfrage: number;
   /**
-   * Beispielbogen in der App öffnen — wie ein frisch gescannter Bogen.
+   * Übungsbogen in der App öffnen — wie ein frisch gescannter Bogen.
    * Rückgabe false = die Übernahme wurde abgelehnt (Rückfrage abgebrochen);
    * dann bleibt der Dialog stehen.
    */
   onBogenOeffnen: (bogen: Erfassungsbogen) => Promise<boolean>;
 }) {
   const beispiele = useRef<HTMLDialogElement>(null);
-  // Ordner-Navigation im Beispielbögen-Dialog: erst Organisation/Thema, ggf.
+  // Ordner-Navigation im Übungsbögen-Dialog: erst Organisation/Thema, ggf.
   // weitere Ebenen (z. B. Bundesland), dann der Bogen.
   const [beispielPfad, setBeispielPfad] = useState<string[]>([]);
   const [beispielSuche, setBeispielSuche] = useState("");
@@ -535,7 +535,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
   // Zeit des letzten Ordnerwechsels: Ein Doppeltipp auf ein Register öffnete
   // sonst mit dem zweiten Tipp einen Unterordner (BB-E6).
   const letzterWechsel = useRef(0);
-  // Wann der Dialog aufging: Der Sammelknopf nimmt kurz danach keinen Tipp an (Doppeltipp auf „Beispielbögen ansehen").
+  // Wann der Dialog aufging: Der Sammelknopf nimmt kurz danach keinen Tipp an (Doppeltipp auf „Übungsbögen ansehen").
   const geoeffnetUm = useRef(0);
   // Der Dialog lädt die Bögen des offenen Ordners nach, um Einheit, Herkunft
   // und Stärke in der Tabelle zu zeigen. Die Tabelle rendert ausschließlich aus
@@ -643,7 +643,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
         setLadeFehlt(
           fehlend.some(istOvBogen)
             ? `Einige Bögen liegen noch nicht auf dem Gerät. ${OV_OFFLINE_TEXT}`
-            : "Einige Beispielbögen liegen noch nicht auf dem Gerät — sie werden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).",
+            : "Einige Übungsbögen liegen noch nicht auf dem Gerät — sie werden mit Netz nachgeladen (siehe Offline-Zeile der Startseite).",
         );
       }
     });
@@ -728,7 +728,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
 
   const beispielGeladen = beispielBoegen.filter((b) => b.url in beispielDaten).length;
 
-  /** PDF eines Beispielbogens anfordern; Fehler im Dialog zeigen. */
+  /** PDF eines Übungsbogens anfordern; Fehler im Dialog zeigen. */
   async function beispielHolen(datei: string, url: string, ordner: string[]) {
     setBeispielFehler("");
     setBeispielQuittung("");
@@ -750,7 +750,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
   }
 
   /**
-   * Link zum Beispielbogen weitergeben: Share-Sheet, wo es eins gibt (App,
+   * Link zum Übungsbogen weitergeben: Share-Sheet, wo es eins gibt (App,
    * mobiler Browser), sonst in die Zwischenablage. Fehlt beides, steht der Link
    * zum Markieren im Hinweis. Derselbe Weg wie „Link teilen" im Bogen selbst.
    */
@@ -779,7 +779,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
     }
   }
 
-  /** Beispielbogen in der App öffnen — wie ein gescannter Bogen. */
+  /** Übungsbogen in der App öffnen — wie ein gescannter Bogen. */
   async function beispielAnsehen(datei: string, url: string) {
     setBeispielFehler("");
     setBeispielLaeuft(datei);
@@ -820,7 +820,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
   return (
     <>
       <Dialog
-        titel="Beispielbögen"
+        titel="Übungsbögen"
         dialogRef={beispiele}
         klasse="breit beispiele-dialog"
         onSchliessen={() => {
@@ -831,10 +831,10 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
         {/* Die Liste steht vorn, die Erklärung klappt auf (R8-M5): vorher gingen 15 Zeilen Text der Liste voran, die
             erst auf dem zweiten Bild begann. */}
         <details className="beispiele-erklaerung">
-          <summary>Was sind Beispielbögen? Was heißen Anzeigen, PDF und Link?</summary>
+          <summary>Was sind Übungsbögen? Was heißen Anzeigen, PDF und Link?</summary>
           <p>
-            Ausgefüllte Beispiel-Erfassungsbögen (fiktive Einheiten und Personen) –
-            zum Ansehen, für Übungen oder zum Testen des QR-Imports. Alle sind als
+            Ausgefüllte Erfassungsbögen fiktiver Einheiten und Personen –
+            zum Üben am Meldekopf, zum Ausprobieren der App und zum Testen des QR-Imports. Alle sind als
             Übung gekennzeichnet: In der App erscheint ein Störer, PDFs tragen das
             Wasserzeichen „ÜBUNG". <strong>Anzeigen</strong>{" "}
             öffnet den Bogen in der App, als wäre er gerade gescannt worden;{" "}
@@ -993,7 +993,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
           const fehlen = Object.entries(LAENDER)
             .filter(([k]) => !beispielOrdner.some((o) => o.ordner === k))
             .map(([, n]) => n);
-          return fehlen.length > 0 ? <p className="hinweis">Noch ohne Beispielbögen: {fehlen.join(", ")}.</p> : null;
+          return fehlen.length > 0 ? <p className="hinweis">Noch ohne Übungsbögen: {fehlen.join(", ")}.</p> : null;
         })()}
         {ladeFehlt && (
           <p className="hinweis warnung-text beispiel-ladefehler" role="status">

@@ -28,7 +28,7 @@ aufgeklappte Karte, Abrücken-Quittung („Wieder anwesend" mit „Rückgängig"
 „Suchen, sortieren, filtern", „Bogen scannen…", „Einheit manuell erfassen…", „Einheit schnell
 erfassen…", „Bögen einlesen…", „Ort eintragen…", „Einsatz weitergeben / sichern", Lagemonitor-Knopf,
 Ansichtswahl, „Einsatz löschen?", „Neue Einsatz-Sammlung…", „Alle Daten löschen", Bogen Schritt 1
-bis 6, Anleitung, Datenschutz, Impressum, Aufbau des Bogens, Datensicherung, Beispielbögen.
+bis 6, Anleitung, Datenschutz, Impressum, Aufbau des Bogens, Datensicherung, Übungsbögen.
 Bildschirmfotos für Nacht und Feld bei 360 px habe ich angesehen.
 
 **Nicht prüfbar:** echtes Licht (Sonne, Scheinwerfer, Rotlicht), Displayhelligkeit, Kamerabild im

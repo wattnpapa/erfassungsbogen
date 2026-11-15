@@ -3,7 +3,7 @@
 - Prüfer: Rolle „Helfer ohne Einweisung“ (thw-new-user-reviewer)
 - Datum: 2026-10-26
 - Zählung: P0 0 · P1 0 · P2 0 · P3 7
-- Prüfaufbau: Produktionsbuild auf http://localhost:4173 (Code-Stand Commit 2c96abe, `main` nach Runde 11), Playwright/Chromium (globales Modul, weil die Projektkopie keinen Browser fand), Telefon 390×844 und 360×640, Touch, de-DE. Zustände über die Bedienung aufgebaut; Beispielbögen aus `examples/thw/` mit `uebung: false` und heutigem Zeitraum über „Bögen einlesen…“ eingespielt. Kamera, Handschuhe, Bildschirmtastatur, native Builds nicht prüfbar. Die bekannten Grenzen aus `docs/audits/README.md` und Runde 10/11 wurden nicht neu gemeldet.
+- Prüfaufbau: Produktionsbuild auf http://localhost:4173 (Code-Stand Commit 2c96abe, `main` nach Runde 11), Playwright/Chromium (globales Modul, weil die Projektkopie keinen Browser fand), Telefon 390×844 und 360×640, Touch, de-DE. Zustände über die Bedienung aufgebaut; Übungsbögen aus `examples/thw/` mit `uebung: false` und heutigem Zeitraum über „Bögen einlesen…“ eingespielt. Kamera, Handschuhe, Bildschirmtastatur, native Builds nicht prüfbar. Die bekannten Grenzen aus `docs/audits/README.md` und Runde 10/11 wurden nicht neu gemeldet.
 
 ## Urteil
 

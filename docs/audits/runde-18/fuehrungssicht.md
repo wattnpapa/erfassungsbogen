@@ -18,8 +18,8 @@ Playwright-Modul unter `/opt/node-tools`, da die Projektkopie keinen Browser
 findet), Locale de-DE, Zeitzone Europe/Berlin, `isMobile`/`hasTouch`, Telefon
 390x844 und 360x640; der Lagemonitor zusätzlich bei 1280x720 und 1280x420.
 Zustand: Einsatz „Hochwasser Neckar · BR Sporthalle Rottenburg"; sieben
-Beispielbögen THW (Albstadt, Biberach/Riß, Crailsheim, Freiburg, Haßmersheim,
-Karlsruhe, Laufenburg) aus „Beispielbögen › PDF" über „Bögen einlesen…"
+Übungsbögen THW (Albstadt, Biberach/Riß, Crailsheim, Freiburg, Haßmersheim,
+Karlsruhe, Laufenburg) aus „Übungsbögen › PDF" über „Bögen einlesen…"
 aufgenommen und je Karte über „Mehr… › Als Einsatzmeldung zählen…" in die Lage
 gehoben. Danach: Zug je Karte (1. bis 3. Zug), Auftrag (Nr. 3), Abrücken
 (Nr. 6), „Stärke ändern…" (Nr. 2: 11 auf 8, Nr. 3: 12 auf 10), „Meldung
@@ -192,7 +192,7 @@ Geprüft und in Ordnung (Behebungen aus Runde 17):
 - **Ort:** Startseite, erster Besuch auf einem Gerät ohne gespeicherten Einsatz,
   390x844.
 - **Beobachtung:** Bei 0,75 s erscheint die lange Zeile „✓ Jetzt offline bereit
-  für Bogen, PDF, QR-Code und Empfang. Beispielbögen und Themenseiten werden
+  für Bogen, PDF, QR-Code und Empfang. Übungsbögen und Themenseiten werden
   nachgeladen (n von 549) — alle Daten bleiben auf diesem Gerät."; bei etwa 2,5 s
   wird sie zu „✓ Jetzt offline bereit. Funktioniert komplett offline — …". Die
   Seitenhöhe sinkt von 7272 auf 7182 px, „Einsatz-Sammlung (Meldekopf)" rutscht

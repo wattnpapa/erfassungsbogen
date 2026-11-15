@@ -1,8 +1,8 @@
-# Audit „Mobile UI", Schwerpunkt Beispielbögen (Darstellung und Bedienung auf dem Telefon)
+# Audit „Mobile UI", Schwerpunkt Übungsbögen (Darstellung und Bedienung auf dem Telefon)
 
 Prüfer: Rollenaudit `mobile-ui-reviewer` · Datum: 2026-11-08 · Prüfgegenstand: Live-Seite
 `https://erfassungsbogen.app/` (Stand `main`, Commit `0dd56d4`, frisch deployt), nur der Bereich
-Beispielbögen: Abschnitt „Beispielbögen" auf der Startseite und Dialog „Beispielbögen" ·
+Übungsbögen: Abschnitt „Übungsbögen" auf der Startseite und Dialog „Übungsbögen" ·
 Zählung: **P0 0 · P1 1 · P2 2 · P3 6 · Hinweise 4**
 
 Reiner Prüfbericht, keine Codeänderung. Vorab gelesen: `docs/audits/README.md`,
@@ -20,14 +20,14 @@ zusätzlich 480, 544, 560, 600, 700, 768, 1024 und 1280 px Breite. Ansichten „
 (über „Ansicht: Standard ▾"). Große Schrift: Grundschrift des Browsers per CDP
 `Page.setFontSizes` auf 24 px (150 %) und 32 px (200 %); die App setzt dann selbst
 `html.schrift-gross`. Kein Eingriff ins DOM; Skripte lesen nur Maße, Fokus und Scrollstand.
-Wege: Startseite → „Beispielbögen ansehen" → Ordner ASB (4 Bögen), Katastrophenschutz,
+Wege: Startseite → „Übungsbögen ansehen" → Ordner ASB (4 Bögen), Katastrophenschutz,
 Praktische Ausbildung, THW (101 Bögen direkt), THW → „Alle Einheiten aller Ortsverbände" →
 Baden-Württemberg → RSt Villingen-Schwenningen → OV Bad Säckingen (fünf Ebenen); „‹ Zurück",
 Pfad „Alle", Esc und „Schließen"; Tastatur (Enter/Tab/Umschalt+Tab) bei 390 x 844. Skripte und
 Bildschirmfotos unter `/tmp/claude-0/audit-mobile/`.
 
 Annahmen: Zustand frischer Browser (Erststart) und einmal mit angelegter Sammlung „Testlage".
-Die Beispielbögen kommen vom Live-Server; Ladezeiten entsprechen der Prüfumgebung, nicht einem
+Die Übungsbögen kommen vom Live-Server; Ladezeiten entsprechen der Prüfumgebung, nicht einem
 schwachen Mobilnetz. „Anzeigen", „PDF" und „Link" wurden nicht ausgelöst (außerhalb des
 Schwerpunkts Layout/Bedienung des Dialogs).
 
@@ -47,7 +47,7 @@ Bildschirmleser-Ansagen (nur Fokus und `role=status` gemessen), Feld-Ansicht im 
   Rollen weiter bei 17 px oben).
 - Ordnerwechsel setzt die Dialog-Rollposition auf 0 (vorher 23 px gerollt, danach 0): Pfadleiste
   und Register stehen nach dem Tipp oben im Bild.
-- Esc und „Schließen" schließen den Dialog, der Fokus kehrt auf „Beispielbögen ansehen" zurück,
+- Esc und „Schließen" schließen den Dialog, der Fokus kehrt auf „Übungsbögen ansehen" zurück,
   die Startseite steht an derselben Stelle (Rollposition 1.593 px vor und nach dem Dialog).
 - Seite hinter dem Dialog rollt nicht mit (`overflow: hidden` auf `html`).
 - Nachladen der 101 THW-Bögen (Zählung „Angaben werden geladen … 2 von 101" bis „90 von 101"):
@@ -63,7 +63,7 @@ Bildschirmleser-Ansagen (nur Fokus und `role=status` gemessen), Feld-Ansicht im 
 **Typ:** Layout/Abstand
 **Neu oder alt (Verweis):** neu (neu gestaltetes Register)
 
-**Ort:** Dialog „Beispielbögen", oberste Ebene und jede Ordnerebene; 360 x 640 und 320 x 568
+**Ort:** Dialog „Übungsbögen", oberste Ebene und jede Ordnerebene; 360 x 640 und 320 x 568
 mit 200 % und 150 % Schrift, abgeschwächt auch 320 x 568 bei normaler Schrift.
 
 **Beobachtung (gemessen):** Bei 200 % (Grundschrift 32 px, `html.schrift-gross`) bleibt die
@@ -78,7 +78,7 @@ Schrift: „(Bundeseinheite / n)" und „Katastrophens / chutz".
 
 **Folge:** Wer die Systemschrift groß gestellt hat, kann die Ordner nicht lesen; ausgerechnet
 „THW" ist nur als Buchstabensäule neben der Zahl zu erkennen. Die Liste wird mehrere Bildschirme
-lang (oberste Ebene 3.286 px statt 670 px). Die Navigation zu den Beispielbögen ist für diese
+lang (oberste Ebene 3.286 px statt 670 px). Die Navigation zu den Übungsbögen ist für diese
 Nutzer praktisch nur noch durch Raten bedienbar.
 
 **Empfehlung:** Bogenzahl unter den Namen umbrechen lassen, sobald der Platz nicht reicht (oder
@@ -94,7 +94,7 @@ längstes Wort; bei 320 px normaler Schrift „Katastrophenschutz" ungebrochen.
 **Typ:** Layout/Abstand
 **Neu oder alt (Verweis):** neu
 
-**Ort:** Dialog „Beispielbögen", jeder Ordner mit Bögen (geprüft ASB, OV Bad Säckingen);
+**Ort:** Dialog „Übungsbögen", jeder Ordner mit Bögen (geprüft ASB, OV Bad Säckingen);
 Fensterbreite 545 bis etwa 900 px, also 820 x 1180, 768 px und quer 844 x 390.
 
 **Beobachtung (gemessen):** Die Umschaltung Karten/Tabelle hängt an `@media (max-width: 34rem)`
@@ -122,7 +122,7 @@ so setzen, dass Einheit, Herkunft, Stärke und drei Knöpfe ohne Rollen passen; 
 **Typ:** Bedienung
 **Neu oder alt (Verweis):** neu
 
-**Ort:** Dialog „Beispielbögen", Tipp oder Enter auf eine Register-Zeile, auf „Alle" in der
+**Ort:** Dialog „Übungsbögen", Tipp oder Enter auf eine Register-Zeile, auf „Alle" in der
 Pfadleiste und „‹ Zurück" von der ersten Ebene; alle Viewports (gemessen 360 x 640, 390 x 844).
 
 **Beobachtung (gemessen):** Beim Öffnen steht der Fokus auf „Schließen" (sinnvoll). Nach dem
@@ -204,7 +204,7 @@ loser Bögen, oder „nach oben" bzw. eine klebende Pfadleiste).
 **Typ:** Layout/Abstand
 **Neu oder alt (Verweis):** neu
 
-**Ort:** Dialog „Beispielbögen", 820 x 1180 (Wurzel → ASB → THW), 360 x 640 (Wurzel →
+**Ort:** Dialog „Übungsbögen", 820 x 1180 (Wurzel → ASB → THW), 360 x 640 (Wurzel →
 „Praktische Ausbildung").
 
 **Beobachtung (gemessen):** Der Dialog ist senkrecht mittig und so hoch wie sein Inhalt. Bei
@@ -221,7 +221,7 @@ ohnehin erreicht) öffnen, sodass Kopf, Pfad und Register an derselben Stelle bl
 **Nachprüfung:** Wurzel → ASB → THW → Zurück bei 820 x 1180 und 360 x 640: Oberkante der
 Kopfzeile ändert sich um höchstens 2 px.
 
-### BB-M7 [P3] Startseite: drei gleich gefärbte Primärknöpfe, „Beispielbögen ansehen" klebt an der nächsten Überschrift
+### BB-M7 [P3] Startseite: drei gleich gefärbte Primärknöpfe, „Übungsbögen ansehen" klebt an der nächsten Überschrift
 
 **Typ:** Layout/Abstand
 **Neu oder alt (Verweis):** neu (Einstieg von der Fußzeile auf die Startseite verlegt)
@@ -229,21 +229,21 @@ Kopfzeile ändert sich um höchstens 2 px.
 **Ort:** Startseite, Erststart und mit Daten; 320 x 568 bis 820 x 1180.
 
 **Beobachtung (gemessen):** Erststart: „Neuen Bogen erstellen", „Neue Einsatz-Sammlung…" (beide
-oben in der Weiche, 55 px hoch) und „Beispielbögen ansehen" (44 px, bei 360 px auf 1.843 px)
+oben in der Weiche, 55 px hoch) und „Übungsbögen ansehen" (44 px, bei 360 px auf 1.843 px)
 tragen dieselbe Fläche `rgb(18, 39, 94)`. Mit einer Sammlung: „Öffnen", „Neuen Bogen erstellen"
-und „Beispielbögen ansehen" (bei 2.054 px von 3.539). `DESIGN.md`: „Eine primäre Aktion je
-Ansicht". Zwischen „Beispielbögen ansehen" (Unterkante 1.887) und der Überschrift „Absender für
-übergebene Bögen" (1.899) liegen 12 px; über „Beispielbögen" selbst deutlich mehr.
+und „Übungsbögen ansehen" (bei 2.054 px von 3.539). `DESIGN.md`: „Eine primäre Aktion je
+Ansicht". Zwischen „Übungsbögen ansehen" (Unterkante 1.887) und der Überschrift „Absender für
+übergebene Bögen" (1.899) liegen 12 px; über „Übungsbögen" selbst deutlich mehr.
 
 **Folge:** Das Beiwerk „Beispiele ansehen" ist im Bild genauso laut wie die Arbeitsaktionen;
 wer weiter unten auf der Seite steht, sieht eine dominante Aktion, die nicht die Hauptaufgabe
 ist. Der Knopf wirkt wie der Anfang des Absender-Abschnitts.
 
-**Empfehlung:** „Beispielbögen ansehen" als normalen (umrandeten) Knopf führen und vor der
+**Empfehlung:** „Übungsbögen ansehen" als normalen (umrandeten) Knopf führen und vor der
 nächsten Überschrift den üblichen Abschnittsabstand setzen.
 
 **Nachprüfung:** Auf der Startseite genau eine Fläche in Kennfarbe je Bereich der Weiche, keine
-im Beispielbögen-Abschnitt; Abstand Knopf → nächste Überschrift wie zwischen den übrigen
+im Übungsbögen-Abschnitt; Abstand Knopf → nächste Überschrift wie zwischen den übrigen
 Abschnitten.
 
 ### BB-M8 [P3] Ordnernamen uneinheitlich: „BADENWUERTTEMBERG", „NORDRHEIN WESTFALEN" neben „Brandenburg"
@@ -251,7 +251,7 @@ Abschnitten.
 **Typ:** Text
 **Neu oder alt (Verweis):** neu
 
-**Ort:** Dialog „Beispielbögen" → Katastrophenschutz; 360 x 640 (gilt für alle Viewports).
+**Ort:** Dialog „Übungsbögen" → Katastrophenschutz; 360 x 640 (gilt für alle Viewports).
 
 **Beobachtung:** Register: „BADENWUERTTEMBERG", „BAYERN", „BERLIN", „Brandenburg", „HESSEN",
 „MECKLENBURG VORPOMMERN", „Niedersachsen", „NORDRHEIN WESTFALEN", „RHEINLAND PFALZ", „SAARLAND",
@@ -271,11 +271,11 @@ Groß-/Kleinschreibung), etwa über die Anzeigenamen der Ordner.
 **Typ:** Layout/Abstand
 **Neu oder alt (Verweis):** neu
 
-**Ort:** Dialog „Beispielbögen", 360 x 640 mit 32 px Grundschrift; ASB.
+**Ort:** Dialog „Übungsbögen", 360 x 640 mit 32 px Grundschrift; ASB.
 
-**Beobachtung (gemessen):** Der Titel „Beispielbögen" ist auf 22 px gedeckelt, „Schließen"
+**Beobachtung (gemessen):** Der Titel „Übungsbögen" ist auf 22 px gedeckelt, „Schließen"
 bricht in eine zweite Zeile, die klebende Kopfzeile ist 132 px hoch (22 % der Dialoghöhe). Die
-Zusammenfassung „Was sind Beispielbögen? Was heißen Anzeigen, PDF und Link?" ist nicht gedeckelt
+Zusammenfassung „Was sind Übungsbögen? Was heißen Anzeigen, PDF und Link?" ist nicht gedeckelt
 (etwa 32 px, fett, Kennfarbe) und läuft über vier Zeilen. In ASB: Pfadleiste 192 px, Bogenzahl
 bei 573 px, erste Karte bei 637 px, also vollständig unter dem ersten Bild (Dialogunterkante
 622 px). Bei 320 x 568 und normaler Schrift steht „Schließen" ebenfalls unter dem Titel

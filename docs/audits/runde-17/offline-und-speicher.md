@@ -5,7 +5,7 @@ Prüfer: Rollenaudit `thw-offline-resilience-reviewer` · Datum: 2026-10-27 · Z
 Reiner Prüfbericht, keine Codeänderung. Gegen die laufende App auf Port 4173 (Produktionsbuild, Code-Stand Commit `be6b396`, `main`),
 Playwright mit Chromium (globales Modul), Telefon 390 × 844 und 360 × 640, `isMobile`/`hasTouch`, Locale de-DE, je Lauf ein eigener
 Browser-Kontext. Netz weg über `context.setOffline`, CPU-Last über `Emulation.setCPUThrottlingRate`, Zeitsprünge über `page.clock`,
-zwei Tabs im selben Kontext für Parallelzugriff. Einsätze und Bögen über die Oberfläche (Beispielbögen aus `examples/thw` über
+zwei Tabs im selben Kontext für Parallelzugriff. Einsätze und Bögen über die Oberfläche (Übungsbögen aus `examples/thw` über
 „Bögen einlesen…“); nur der Speicher wurde für den Vollast-Test gezielt aufgefüllt.
 
 Nach dem Auftrag dieser Runde gelten keine „bekannten Grenzen“ mehr als ausgenommen. Gemeldet ist alles, was im Browser noch zu

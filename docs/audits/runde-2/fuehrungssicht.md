@@ -21,7 +21,7 @@ Neuladen.
 
 **Lage „Übung Hochwasser Neckar · BR Heilbronn Nord"** (Art „Übung"),
 aufgebaut über „Bögen einlesen… → Dateien wählen…" aus Kopien der
-Beispielbögen. In den Kopien habe ich nur Stand und Einsatzzeitraum auf den
+Übungsbögen. In den Kopien habe ich nur Stand und Einsatzzeitraum auf den
 Prüftag gesetzt, beim Großbogen blieb der Stand vom Juli stehen:
 
 | Einheit | Quelle | Stärke | Lage-Zustand |
@@ -38,7 +38,7 @@ Prüftag gesetzt, beim Großbogen blieb der Stand vom Juli stehen:
 | Feuerwehr FF Lauffen am Neckar Gruppe | Startseite → Schnellerfassung (nur Stärke) → „In Einsatz aufnehmen…" | 0/1/8/9 | kein Sofortbedarf, 2 Lücken |
 
 Stand der Lage: 11 gemeldet · 10 zählend, 4 / 24 / 84 / 112, 30 Fahrzeuge.
-Vorab habe ich dieselben Beispielbögen unverändert in eine Sammlung der Art
+Vorab habe ich dieselben Übungsbögen unverändert in eine Sammlung der Art
 „Einsatz" eingelesen, um die Übungs-Trennung zu prüfen. Die Folgemeldung habe
 ich zusätzlich in einer eigenen Sammlung „Test Folge" auf zwei Wegen
 nachgestellt.

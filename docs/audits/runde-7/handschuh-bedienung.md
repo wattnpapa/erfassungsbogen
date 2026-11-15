@@ -22,7 +22,7 @@ nachgestellt (halbierter CSS-Viewport, doppelte Pixeldichte: 180 × 320,
 
 Zustände per `localStorage`-Seed, jeweils mit `uebung: false` und aktuellem
 `stand`: `eeb.entwurf.v1` (Großbogen mit 38 Personen, Bogen 013),
-`eeb.einsaetze.v1` (Sammlung „Hochwasser Musterstadt“ aus sechs Beispielbögen,
+`eeb.einsaetze.v1` (Sammlung „Hochwasser Musterstadt“ aus sechs Übungsbögen,
 einmal mit `vomPapier` je Eintrag, einmal mit alter Änderungszeit),
 `eeb.vorlagen.v1` (über die Übersicht erzeugt), `eeb.uhr.v1` (365 Tage alt).
 

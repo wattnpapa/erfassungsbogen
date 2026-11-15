@@ -270,9 +270,9 @@ anschließt), R9-G5, R8-H5/S4. Das Zugrundeliegende zu R10-K3 (Breite der
 klebenden Spalte) bleibt dort geführt.
 
 Beobachtung, kein Befund: Auf allen Karten des Seeds steht „⚠ Anderer
-Einsatz?" (die Beispielbögen nennen einen anderen Ort) sowie weitere Hinweise
+Einsatz?" (die Übungsbögen nennen einen anderen Ort) sowie weitere Hinweise
 („Kennzeichen doppelt"); im Lageblatt steht der Text fett in der Spalte
-„Einheit". Das ist Seed-Artefakt (Beispielbögen aus verschiedenen Einsätzen).
+„Einheit". Das ist Seed-Artefakt (Übungsbögen aus verschiedenen Einsätzen).
 
 ## Bestätigtes
 

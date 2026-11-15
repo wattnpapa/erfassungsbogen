@@ -19,7 +19,7 @@ R13-H1 keine Knöpfe mit nächsten Typen) wurden nicht neu gemeldet.
 Playwright/Chromium (`chromium.launch()` ohne Optionen, globales Modul, da die
 Projektkopie keinen passenden Browser fand), `isMobile`/`hasTouch`, Locale
 de-DE, Telefon 390 × 844 und 360 × 640, einzelne Läufe quer (640 × 360). Jeder
-Lauf mit frischem Kontext, keine Kamera. Einsatzdaten: Kopien der Beispielbögen
+Lauf mit frischem Kontext, keine Kamera. Einsatzdaten: Kopien der Übungsbögen
 unter `examples/thw/` (`uebung: false`), über „Bögen einlesen…“ in eine frisch
 angelegte Sammlung eingespielt (3, 5 und 22 Dateien); der Bogen zum Übergeben
 wurde im Assistenten selbst ausgefüllt (Link über gestubbtes `navigator.share`).
@@ -34,7 +34,7 @@ Sammlung anlegen, Dateien einlesen, „Zur Kenntnis genommen“, Aufklappen,
 „Abrücken“ mit Quittung, „Stärke ändern…“ (Plausibilitätsfrage bei 250 und 900),
 „Zug für alle“, manuelle Erfassung und „In Einsatz übernehmen“, Lageblatt,
 „Einsatz weitergeben / sichern“, CSV, Excel; (5) Dialoge „Datensicherung“,
-„Beispielbögen“, „Geräteschlüssel“, „Alle Daten löschen“, Scanner ohne Kamera;
+„Übungsbögen“, „Geräteschlüssel“, „Alle Daten löschen“, Scanner ohne Kamera;
 (6) Eingabe-Attribute aller Felder der Schritte 1 bis 5, Zielgrößen und seitliches
 Überlaufen in allen vier Ansichten, statische Begleitseiten bei 360 px.
 
@@ -43,7 +43,7 @@ Finger, Sonnenlicht und Dunkelheit am Display, Kamera-Scan, native Datums- und
 Zeitauswahl, echte Bildschirmtastatur samt Autokorrektur, WebKit/Safari, echtes
 Drucken, Verhalten bei vollem oder gesperrtem Speicher.
 
-Hinweis zu den Daten: Die Beispielbögen tragen einen Stand ab dem Folgetag; die
+Hinweis zu den Daten: Die Übungsbögen tragen einen Stand ab dem Folgetag; die
 dadurch erscheinenden Hinweise („Stand liegt nach dem Eintreffen“, „Zeitraum
 vorbei“) sind ein Artefakt des Prüfaufbaus und wurden nicht gewertet.
 

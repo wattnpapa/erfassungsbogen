@@ -15,7 +15,7 @@ Beobachtungen ohne Aufgabenbeeinträchtigung stehen als „Hinweis" ohne Priorit
 
 Playwright (Chromium, `chromium.launch()` ohne Optionen, globales Playwright-Modul, weil die Projektkopie keinen Browser
 findet), `isMobile`/`hasTouch`, Locale de-DE, Telefon 390 × 844 und 360 × 640, jeweils frischer Kontext. Einsatz-Sammlung
-„Hochwasser Test" mit 5 THW-Beispielbögen aus `examples/thw/` (Kopien mit `uebung: false`, „Stand" 30 bis 62 Minuten alt,
+„Hochwasser Test" mit 5 THW-Übungsbögen aus `examples/thw/` (Kopien mit `uebung: false`, „Stand" 30 bis 62 Minuten alt,
 Zeitraum heute), über „Bögen einlesen…" als JSON-Dateien eingelesen. Durchgespielt:
 
 - Einsatzansicht: „Entfernen" (Rückfrage, Doppeltipp auf „Meldung entfernen", Quittung, Papierkorb nach Neuladen,
@@ -36,7 +36,7 @@ zwischen Papier, Funk und Gerät; das Lageblatt hängt an der Wand; CSV und Exce
 **Nicht prüfbar:** echtes Drucken, Kamera- und Handscanner, Safari, native Builds, echte Akku- oder Geräteausfälle,
 Zeitverhalten auf einem echten Telefon, das Aussehen der nativen Zeit- und Datumsfelder auf einem echten Telefon (im
 Testbrowser erscheint „mm/dd/yyyy, --:-- --"). Die Hinweise „Anderer Einsatz?", „Kennzeichen doppelt", „Sitzplätze fehlen"
-bei den Beispielbögen sind Seed-Artefakte und nicht gewertet.
+bei den Übungsbögen sind Seed-Artefakte und nicht gewertet.
 
 ## Urteil
 

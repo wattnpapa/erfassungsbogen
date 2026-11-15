@@ -53,7 +53,7 @@ der Download der Sammel-PDF.
 Die Runde-6-Behebungen halten. „Stand aus dem anderen Fenster laden“ fragt
 jetzt vorher und legt die eigene Fassung auf den Rückholplatz; die Warnung
 nennt beide Stände mit Zeit und Personenzahl. Alle Fenster der Startseite
-(„Datensicherung“, „Beispielbögen“, „Impressum“, „Datenschutz“, „Alle Daten
+(„Datensicherung“, „Übungsbögen“, „Impressum“, „Datenschutz“, „Alle Daten
 löschen“ und die Rückfragen) schließen mit Zurück, ohne die App zu verlassen.
 Die entfernte Person kommt nach Schrittwechsel und Neuladen mit „Rückgängig“
 zurück. „Abrücken“ nimmt einen zweiten Tipp im Abstand von 100 bis 1 700 ms
@@ -277,7 +277,7 @@ nennt die Richtung ohne „danach“.
   Einsatzansicht, dann auf die Startseite („Angefangene Erfassung für
   „Hochwasser Musterstadt““ steht dort); Neuladen in der Einsatzansicht bleibt
   in der Einsatzansicht.
-- **Fenster der Startseite (R6-S3):** „Datensicherung“, „Beispielbögen“,
+- **Fenster der Startseite (R6-S3):** „Datensicherung“, „Übungsbögen“,
   „Impressum“, „Datenschutz“, „Alle Daten löschen“, „Verwerfen“, „Geräteschlüssel
   neu erzeugen“, „Neue Einsatz-Sammlung…“, „Einheit schnell erfassen…“: je
   offen, Zurück schließt, die Startseite bleibt. Nach „Schließen“ mit dem Knopf

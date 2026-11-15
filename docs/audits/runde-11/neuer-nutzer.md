@@ -7,7 +7,7 @@
 
 ## Urteil
 
-Ein Helfer ohne Einweisung kommt ohne fremde Hilfe zum Ziel. Geprüft wurden: Startseite, Assistent Schritt 1–6, Übersicht mit Offene-Punkte-Liste, Einsatz-Sammlung anlegen, manuelle Aufnahme, Schnellerfassung, Scanner-Dialog ohne Kamera, Datensicherung, Beispielbögen, Geräteschlüssel, „Alle Daten löschen“, Datenschutz, Impressum. Die Rückfragen sind verständlich (zum Beispiel „Ort der Einheit fehlt“ mit Sprungknopf). Die Verzeichnis-Ergänzung nach Eingabe des Ortes wird im Text angekündigt und lässt sich rückgängig machen. In keiner Ansicht gab es horizontalen Seitenüberlauf (390, 360, 320 px), keine Konsolenfehler. Es entstand kein neuer Befund oberhalb von P3.
+Ein Helfer ohne Einweisung kommt ohne fremde Hilfe zum Ziel. Geprüft wurden: Startseite, Assistent Schritt 1–6, Übersicht mit Offene-Punkte-Liste, Einsatz-Sammlung anlegen, manuelle Aufnahme, Schnellerfassung, Scanner-Dialog ohne Kamera, Datensicherung, Übungsbögen, Geräteschlüssel, „Alle Daten löschen“, Datenschutz, Impressum. Die Rückfragen sind verständlich (zum Beispiel „Ort der Einheit fehlt“ mit Sprungknopf). Die Verzeichnis-Ergänzung nach Eingabe des Ortes wird im Text angekündigt und lässt sich rückgängig machen. In keiner Ansicht gab es horizontalen Seitenüberlauf (390, 360, 320 px), keine Konsolenfehler. Es entstand kein neuer Befund oberhalb von P3.
 
 ## Befunde
 

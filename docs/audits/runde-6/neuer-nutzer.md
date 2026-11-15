@@ -24,7 +24,7 @@ erstellen“, „Neue Einsatz-Sammlung…“, Dateien in „Bögen einlesen…�
 laden…“, „Einsatz importieren…“), zum Teil durch `localStorage`-Seeds
 (`eeb.entwurf.v1`, `eeb.einsaetze.v1`, `eeb.uhr.v1`) aus `examples/`, jeweils
 mit `uebung: false`. Bei den Seeds setzte ich `stand` und Einsatzzeitraum der
-Beispielbögen auf heute, sonst fiel die Datenschutzfrist sofort an („DATENSCHUTZ-
+Übungsbögen auf heute, sonst fiel die Datenschutzfrist sofort an („DATENSCHUTZ-
 FRIST ABGELAUFEN“ beim ersten Öffnen von `001-albstadt-ztr-tz`, dessen Stand 92
 Tage alt ist; das ist Seed-Wirkung, kein Befund).
 

@@ -16,7 +16,7 @@ sind, stehen nur unter „Bestätigt“.
 Playwright/Chromium (globales Modul, `chromium.launch()` ohne Optionen),
 `isMobile`/`hasTouch`, Locale de-DE, Telefon 390 × 844, 360 × 640, 320 × 568 und
 Querformat 640 × 360, frischer Kontext je Lauf. Tipps als Touch-Tipps mit Koordinaten.
-Einsatzdaten: Sammlung „Übung Weser“ (Art „Übung“) mit 2, 3 oder 4 Beispielbögen aus
+Einsatzdaten: Sammlung „Übung Weser“ (Art „Übung“) mit 2, 3 oder 4 Übungsbögen aus
 `examples/thw/` über „Bögen einlesen…“; Schnellerfassung (Husum); eigener Bogen im
 Assistenten (Husum, FGr N, Schritt 1 bis 6).
 
@@ -37,7 +37,7 @@ am Display, Kamera-Scan, echte Bildschirmtastatur und Autokorrektur (die Befunde
 zu Eingabefeldern beruhen auf den Attributen), WebKit/Safari, echtes Drucken, voller
 Speicher, Inhalt der erzeugten PDF-Seiten, Lageblatt-Download im Headless-Browser
 (kein Download-Ereignis, aber Quittung „Lageblatt erzeugt“), Tastatur, die Dialoge
-verdeckt. Das Alter der Beispielbögen („Stand vor 103 Tagen“, „Zeitraum vorbei“) stammt
+verdeckt. Das Alter der Übungsbögen („Stand vor 103 Tagen“, „Zeitraum vorbei“) stammt
 aus den Beispieldateien und wurde nicht gewertet.
 
 ## Urteil

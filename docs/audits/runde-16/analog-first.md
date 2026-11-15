@@ -13,7 +13,7 @@ bekannte Grenze steht (u. a. R15-E1, R15-E2, R15-D4, R15-S4, R15-M2, R15-O1), is
 
 Playwright (Chromium, `chromium.launch()` ohne Optionen, globales Playwright-Modul), `isMobile`/`hasTouch`, Locale
 de-DE, Telefon 390 × 844 (Hauptlauf) und 360 × 640 (Dateiimport-Fehlertexte), jeweils frischer Kontext. Einsatz-Sammlung
-mit 3, 4 und 12 THW-Beispielbögen aus `examples/thw/` (auf `uebung: false`, Stand 30 bis 210 Minuten alt, Zeitraum
+mit 3, 4 und 12 THW-Übungsbögen aus `examples/thw/` (auf `uebung: false`, Stand 30 bis 210 Minuten alt, Zeitraum
 heute), eingelesen als JSON-Dateien und als PNG-Fotos der gedruckten Sammel-PDF (150 dpi). Durchgespielt:
 
 - „Stärke ändern…" (11 → 8), „Abrücken", „Zug für alle", Lageblatt (3, 4 und 12 Einheiten, zwei Seiten), Sammel-PDF,
@@ -29,7 +29,7 @@ heute), eingelesen als JSON-Dateien und als PNG-Fotos der gedruckten Sammel-PDF 
 gehen an den Stab und werden dort ohne die App weiterverarbeitet.
 
 **Nicht prüfbar:** echtes Drucken, Kamera- und Handscanner, Safari, native Builds, echte Akku- oder Geräteausfälle,
-PDF-Anzeige in Android-Chrome. Hinweise „Anderer Einsatz?", „Kennzeichen doppelt", „Stand vor …" bei den Beispielbögen
+PDF-Anzeige in Android-Chrome. Hinweise „Anderer Einsatz?", „Kennzeichen doppelt", „Stand vor …" bei den Übungsbögen
 sind Seed-Artefakte und nicht gewertet.
 
 **Kennzeichnung:** *gemessen* = im Testbrowser reproduziert (Seitentext, Dateiinhalt); *beobachtet* = gesehen.

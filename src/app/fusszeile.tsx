@@ -230,8 +230,8 @@ async function blankoHerunterladen(): Promise<void> {
 }
 
 /**
- * Den Beispielbögen-Dialog öffnen. Der einzige Einstieg ist der Abschnitt
- * „Beispielbögen“ auf der Startseite unter „So funktioniert's"; einen Link in
+ * Den Übungsbögen-Dialog öffnen. Der einzige Einstieg ist der Abschnitt
+ * „Übungsbögen“ auf der Startseite unter „So funktioniert's"; einen Link in
  * der Fußzeile gibt es nicht mehr. Der Dialog selbst bleibt hier (Zustand,
  * Nachladen, Ordner-Navigation); die Startseite schickt nur dieses Ereignis.
  */
@@ -258,7 +258,7 @@ export function beispielboegenOeffnen(): Promise<boolean> {
 
 export function Fusszeile({ onBogenOeffnen, kompakt = false, offlineHinweis }: {
   /**
-   * Beispielbogen in der App öffnen — wie ein frisch gescannter Bogen.
+   * Übungsbogen in der App öffnen — wie ein frisch gescannter Bogen.
    * Rückgabe false = die Übernahme wurde abgelehnt (Rückfrage abgebrochen);
    * dann bleibt der Dialog stehen.
    */
@@ -266,7 +266,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false, offlineHinweis }: {
   /**
    * Schmale Linkzeile statt voller Fußzeile — für den Assistenten. Beim
    * Ausfüllen gehören Datensicherung, „Alle Daten löschen" und 227
-   * Beispielbögen nicht unter das Formular: sie sind Startseiten-Angelegenheiten
+   * Übungsbögen nicht unter das Formular: sie sind Startseiten-Angelegenheiten
    * und stehen am Meldekopf-Tablet nur zwischen Feld und Weiter-Knopf.
    * Impressum und Datenschutz bleiben, sie müssen von jeder Seite erreichbar
    * sein; die Darstellung sitzt im Assistenten ohnehin schon im Seitenkopf.
@@ -535,9 +535,9 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false, offlineHinweis }: {
         async () => {
           fertig?.(false);
           await zeigeHinweis({
-            titel: "Beispielbögen noch nicht auf dem Gerät",
+            titel: "Übungsbögen noch nicht auf dem Gerät",
             text:
-              "Die Beispielbögen lassen sich ohne Netz gerade nicht öffnen: Dieses Gerät hat den Offline-Vorrat noch nicht ganz geladen (siehe Offline-Zeile der Startseite). Dein Bogen und alle Daten bleiben, wie sie sind. Mit Netz die Seite einmal neu laden, danach gehen die Beispielbögen auch offline.",
+              "Die Übungsbögen lassen sich ohne Netz gerade nicht öffnen: Dieses Gerät hat den Offline-Vorrat noch nicht ganz geladen (siehe Offline-Zeile der Startseite). Dein Bogen und alle Daten bleiben, wie sie sind. Mit Netz die Seite einmal neu laden, danach gehen die Übungsbögen auch offline.",
           });
         },
       );
@@ -547,7 +547,7 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false, offlineHinweis }: {
   }, [kompakt]);
 
   // Im Assistenten bleibt von der Fußzeile eine Zeile übrig: Pflichtangaben und
-  // die Anleitung. Alles Übrige — samt der schweren Beispielbögen-Liste — wird
+  // die Anleitung. Alles Übrige — samt der schweren Übungsbögen-Liste — wird
   // gar nicht erst gerendert, statt nur ausgeblendet zu werden.
   if (kompakt) {
     return (
