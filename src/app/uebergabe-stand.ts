@@ -53,7 +53,7 @@ export function uebergabeFesthalten(
     ...(weg ? { weg } : {}),
     ...(bestaetigt ? { bestaetigt: true } : {}),
     id: bogenInhaltsId(b),
-    einheit: einheitSchluessel(b.einheit),
+    einheit: einheitSchluessel(b.einheit, b.personal),
     staerke: staerkeText(b),
   };
 }
@@ -80,7 +80,7 @@ export function uebergabeNachWeg(
  * Gegenstelle nicht hat. Zeitpunkt bleibt der der Übergabe.
  */
 export function uebergabeBestaetigen(b: Erfassungsbogen, stand: UebergabeStand | null | undefined): UebergabeStand | null {
-  if (!stand || stand.einheit !== einheitSchluessel(b.einheit) || stand.id !== bogenInhaltsId(b)) return null;
+  if (!stand || stand.einheit !== einheitSchluessel(b.einheit, b.personal) || stand.id !== bogenInhaltsId(b)) return null;
   return { ...stand, bestaetigt: true };
 }
 
@@ -114,7 +114,7 @@ export function uebergabeText(
   b: Erfassungsbogen,
   stand: UebergabeStand | null | undefined,
 ): { text: string; geaendert: boolean; offen: boolean } | null {
-  if (!stand || stand.einheit !== einheitSchluessel(b.einheit)) return null;
+  if (!stand || stand.einheit !== einheitSchluessel(b.einheit, b.personal)) return null;
   const ereignis = stand.bestaetigt
     ? `Übergeben ${wann(stand.um)}`
     : stand.weg

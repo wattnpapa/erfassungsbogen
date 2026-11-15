@@ -66,3 +66,16 @@ describe("einheitSymbolSvg()", () => {
     expect(s).toBe(TZ_SYMBOLE["Feuerwehr_Einheiten/Löschzug"]);
   });
 });
+
+describe("Einzelperson", () => {
+  it("zeichnet die Raute der Person mit der Aufschrift ihrer Funktion", () => {
+    const s = einheitSymbolSvg({
+      organisation: OrganisationsTyp.THW,
+      einzelperson: true,
+      einheitsTyp: { freitext: "Baufachberater/in" },
+      hierarchie: [],
+    });
+    expect(s).toContain("M64,128 L128,64 L192,128 L128,192 Z");
+    expect(s).toContain(">BFB</text>");
+  });
+});

@@ -2081,6 +2081,9 @@
     /* Personal-Schnelleingabe: kompakte Tabellenzeilen, Felder füllen die Zelle. */
     .ansicht-wahl { display: flex; align-items: center; gap: 0.2rem 0.8rem; flex-wrap: wrap; }
     .ansicht-wahl button { margin-top: 0.4rem; }
+    /* Schritt 1: Einheit oder Einzelperson — eine Zeile mit zwei Auswahlpunkten, ohne den Rahmen des fieldset. */
+    .einheit-art { border: 0; padding: 0; margin: 0.8rem 0 0; min-width: 0; display: flex; align-items: center; gap: 0 0.8rem; flex-wrap: wrap; }
+    .einheit-art legend { padding: 0; font-size: var(--t-s); font-weight: 600; }
     .schnell-tabelle td { padding: 0.15rem 0.25rem; }
     .schnell-tabelle td input, .schnell-tabelle td select { width: 100%; min-width: 5.5rem; }
     .schnell-tabelle td:last-child button { border: var(--strich-stark) solid currentColor; border-radius: var(--radius); background: none; font-weight: bold; } /* R6-G8: das Ziel sieht aus wie ein Knopf */

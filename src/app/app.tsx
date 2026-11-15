@@ -36,6 +36,7 @@ import {
   einheitAnzeigename,
   einheitOrt,
   bogenSpeichern,
+  einzelpersonAbgleich,
   neuerBogen,
   schrittStatus,
 } from "./hilfen";
@@ -2645,7 +2646,8 @@ function AppInhalt() {
   const aendern = (patch: Partial<Erfassungsbogen>) => {
     // Jede Bearbeitung datiert den Stand neu — die Zeitgruppe im PDF und die
     // Revisionsreihenfolge der Einsatz-Sammlung zeigen die letzte Änderung.
-    setBogen({ ...bogen, ...patch, stand: stempelZeitpunkt() });
+    // Einzelperson: Einheitstyp folgt der Funktion der Person (einzelpersonAbgleich).
+    setBogen(einzelpersonAbgleich({ ...bogen, ...patch, stand: stempelZeitpunkt() }));
     setzeEmpfang(null);
   };
 

@@ -17,14 +17,14 @@ let stand: { schluessel: string; personen: Person[] } | null = null;
 
 /** Nach der Musterung: die abgewählten Personen merken (leer = nichts anzubieten). */
 export function nachzueglerMerken(bogen: Erfassungsbogen, abgewaehlt: Person[]): void {
-  stand = abgewaehlt.length > 0 ? { schluessel: einheitSchluessel(bogen.einheit), personen: structuredClone(abgewaehlt) } : null;
+  stand = abgewaehlt.length > 0 ? { schluessel: einheitSchluessel(bogen.einheit, bogen.personal), personen: structuredClone(abgewaehlt) } : null;
 }
 
 const name = (p: Person) => `${p.vorname.trim().toLowerCase()}|${p.nachname.trim().toLowerCase()}`;
 
 /** Abgewählte Personen der Vorlage dieses Bogens, die noch nicht im Bogen stehen. */
 export function nachzueglerFuer(bogen: Erfassungsbogen): Person[] {
-  if (!stand || stand.schluessel !== einheitSchluessel(bogen.einheit)) return [];
+  if (!stand || stand.schluessel !== einheitSchluessel(bogen.einheit, bogen.personal)) return [];
   const da = new Set(bogen.personal.map(name));
   return stand.personen.filter((p) => !da.has(name(p)));
 }

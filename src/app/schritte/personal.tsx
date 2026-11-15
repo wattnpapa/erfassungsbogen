@@ -1457,6 +1457,7 @@ export function SchrittPersonal({
     }
   }, [nachEntfernen]);
   const nurStaerke = bogen.personalErfassung === PersonalErfassung.NUR_STAERKE;
+  const einzel = bogen.einheit.einzelperson === true;
   /** Neue Person ans Ende — in der Kartenansicht samt Sprung dorthin, in der Tabelle mit Fokus in der neuen Zeile. */
   function personObenHinzufuegen() {
     const neu = neuePerson();
@@ -1811,10 +1812,15 @@ export function SchrittPersonal({
 
   return (
     <section className="karte">
-      <h2>3. Personal</h2>
+      <h2>{einzel ? "3. Person" : "3. Personal"}</h2>
+      {einzel && (
+        <p className="hinweis">
+          Einzelperson: Der Bogen meldet genau eine Person. Kommen mehrere, in Schritt 1 auf „Einheit“ umstellen.
+        </p>
+      )}
       {/* Der Assistent fragt Personal vor Fahrzeugen, das Papier hat sie in
           umgekehrter Reihenfolge — wer abtippt, blättert sonst (R4-A8). */}
-      {!nurStaerke && (
+      {!nurStaerke && !einzel && (
         <>
           <p className="hinweis">
             Vom Papier abtippen? Auf dem Blatt stehen die Fahrzeuge oben, das
@@ -1825,7 +1831,7 @@ export function SchrittPersonal({
       )}
       {/* „Meldekopf-Schnellerfassung“ nennt eine Funktion des anderen Geräts; wer seinen
           eigenen Bogen ausfüllt, braucht sie nicht (R5-N7). */}
-      {!nurStaerke && (
+      {!nurStaerke && !einzel && (
         <p className="hinweis">
           „Nur Stärke“ meldet nur die Zahlen, ohne Namen; die Fahrzeuge folgen
           in Schritt 4 — gedacht für den Meldekopf, der eine Einheit im Stehen
@@ -2046,7 +2052,7 @@ export function SchrittPersonal({
       )}
       {/* Der Weg zur Behebung steht an der Warnung (R8-W4): Der Knopf unter der Liste lag fünf
           Bildschirme tiefer. Gleiche Handlung, mit Rückweg. */}
-      {!nurStaerke && unbenannte > 0 && bogen.personal.some(personLeer) && (
+      {!nurStaerke && !einzel && unbenannte > 0 && bogen.personal.some(personLeer) && (
         <p>
           <button type="button" onClick={vorbelegungWegnehmen}>
             Vorbelegung entfernen (
@@ -2060,7 +2066,7 @@ export function SchrittPersonal({
 
       {/* Ansichtswahl: Detail-Karten (alle Felder) oder Schnelleingabe-Tabelle
           (viele Personen zügig erfassen); dazu Mehrzeilen-Import fertiger Listen. */}
-      {!nurStaerke && (
+      {!nurStaerke && !einzel && (
         <p className="ansicht-wahl">
           <label className="inline">
             <input
@@ -2228,6 +2234,8 @@ export function SchrittPersonal({
           {zurueckgeholt.text}
         </DaumenQuittung>
       )}
+{/* Einzelperson: genau eine Person — der Knopf bleibt nur, solange noch keine Karte da ist. */}
+      {!(einzel && bogen.personal.length >= 1) && (
       <button
         type="button"
         className="primaer"
@@ -2239,6 +2247,7 @@ export function SchrittPersonal({
       >
         + Person hinzufügen
       </button>
+      )}
 
       {/* Vorbelegungs-Knöpfe unter der Liste: oben schoben sie das erste
           Namensfeld rund 900 px tief (R2-N8). */}
@@ -2246,7 +2255,7 @@ export function SchrittPersonal({
           Namen und Erreichbarkeit — deshalb ohne Rückfrage (Rückfrage-Regel:
           verloren geht nichts Erfasstes). Was jemand ausgefüllt hat, bleibt. */}
       {/* Nur ein Weg (R13-N2): Steht der Knopf schon an der Warnung oben oder im „Nur Stärke"-Hinweis, entfällt er hier. */}
-      {!nurStaerke && unbenannte > 0 && !bogen.personal.some(personLeer) && (
+      {!nurStaerke && !einzel && unbenannte > 0 && !bogen.personal.some(personLeer) && (
         <p>
           <button type="button" onClick={vorbelegungWegnehmen}>
             Vorbelegung entfernen (
