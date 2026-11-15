@@ -63,6 +63,32 @@ Typische Auslöser (nicht abschließend):
 - **Software-Lieferkette** (SBOM, `npm audit`, Dependabot, neue Abhängigkeiten)
   → ISK 6.4, Arc42 Kap. 2.1/8.3/8.6/8.7.
 
+## Schemaänderung = Meldekopf und S1-Control im selben Arbeitsschritt nachziehen
+
+Den Erfassungsbogen lesen zwei weitere Apps: die **Meldekopf-App**
+(<https://github.com/wattnpapa/meldekopf>) und **S1-Control**. Beide nehmen
+Bögen als QR-Code, Link und Datei entgegen. Bleiben sie hinter dem Schema
+zurück, lehnen sie neue Bögen ab oder zeigen sie falsch an, und zwar am
+Meldekopf, also dort, wo der Bogen gebraucht wird.
+
+Deshalb gilt bei **jeder Anpassung des Schemas** (`SCHEMA_VERSION`, neues oder
+entfallenes Feld, Flag-Bit, Enumeration, neue Freitext-Konvention in
+`vendor/eeb-format`, auch ohne höhere Schema-Version wie bei
+`einheit.einzelperson`):
+
+- Die Änderung ist erst fertig, wenn **Meldekopf und S1-Control** den neuen
+  Kern-Stand übernommen haben und weiter funktionieren: Submodul- bzw.
+  Paketstand heben, dort Typprüfung, Tests und Verhaltensszenarien laufen
+  lassen, und alles anpassen, was das neue Feld lesen, anzeigen, exportieren
+  oder weiterreichen muss.
+- Das geschieht im selben Arbeitsschritt, nicht als Folgeaufgabe. Reihenfolge:
+  Kern-Repos, dann Erfassungsbogen, dann Meldekopf und S1-Control.
+- Fehlt der Zugriff auf eines der Repos, das **vor** der Schemaänderung sagen
+  und den Zugriff anfordern. Geht es trotzdem nicht, am Ende ausdrücklich
+  melden, welche App noch auf dem alten Stand ist. Nie stillschweigend nur den
+  Erfassungsbogen ändern.
+- Alte Bögen bleiben in allen drei Apps lesbar (Aufnahmeregel 4, ab Schema 2).
+
 ## Portierungen des Formats in `vendor/eeb-format/ports/` mitziehen
 
 Im Format-Repo liegen unter `ports/` handgepflegte Leser des EEB-Formats in
