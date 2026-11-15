@@ -56,7 +56,7 @@ describe("Lageblatt-Erreichbarkeit (R11-W2, R11-W4)", () => {
 describe("Anonymisierte Bögen (R11-A1)", () => {
   it("Gültigkeitsvermerk für den Ausdruck", () => {
     const b = { uebung: false, stand: 0 };
-    expect(codeGueltigBisText(b, (z) => `T${z}`)).toBe(`Namen im Code gültig bis T${90 * MINUTEN_JE_TAG}`);
+    expect(codeGueltigBisText(b, (z) => `T${z}`)).toBe(`Namen im Code lesbar bis T${90 * MINUTEN_JE_TAG} (Datenschutzfrist)`);
     expect(codeGueltigBisText({ uebung: true, stand: 0 }, String)).toBe("");
   });
 });
