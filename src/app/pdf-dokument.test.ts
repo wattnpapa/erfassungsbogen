@@ -521,6 +521,25 @@ describe("einsatzLageblattDokument()", () => {
     expect(JSON.stringify(frei.content).match(/"text":" ","margin":\[0,2,0,2\]/g)).toHaveLength(6);
     expect(texte(frei.content)).toContain("Kennzeichen:");
   });
+
+  it("druckt ohne gemeldetes Fahrzeug keinen leeren Fahrzeugblock und für eine Einzelperson keine freien Personalzeilen", () => {
+    const platz = { freiePersonalZeilen: 2, freiesFahrzeug: true };
+    const ohne = pdfDokument({ ...basisBogen(), fahrzeuge: [] }, QR, undefined, undefined, platz);
+    expect(texte(ohne.content)).not.toContain("Kennzeichen:");
+    // Die Einheit behält ihre freien Personalzeilen …
+    expect(JSON.stringify(ohne.content)).toContain('"text":" ","margin":[0,2,0,2]');
+    // … die Einzelperson nicht: Der Bogen meldet genau eine Person.
+    const b = basisBogen();
+    const einzel = pdfDokument(
+      { ...b, einheit: { ...b.einheit, einzelperson: true }, personal: b.personal.slice(0, 1), fahrzeuge: [] },
+      QR,
+      undefined,
+      undefined,
+      platz,
+    );
+    expect(texte(einzel.content)).not.toContain("Kennzeichen:");
+    expect(JSON.stringify(einzel.content)).not.toContain('"text":" ","margin":[0,2,0,2]');
+  });
 });
 
 // Audit Runde 6, R6-A3: Vorbelegung aus dem Einheitstyp steht nicht als gemeldet auf Papier.

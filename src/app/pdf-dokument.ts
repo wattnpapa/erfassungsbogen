@@ -1449,6 +1449,16 @@ export function pdfDokument(
   zusatz?: NachtragsPlatz,
 ): TDocumentDefinitions {
   b = ohneVorbelegung(b);
+  // Platz für Stiftnachträge nur, wo etwas nachzutragen wäre: Ohne gemeldetes Fahrzeug stand ein leerer
+  // Fahrzeugblock samt Zeichen auf dem Blatt, als gäbe es eins (Fachberater mit Mitfahrt). Eine Einzelperson
+  // bekommt auch keine freien Personalzeilen — der Bogen meldet genau eine Person.
+  if (zusatz) {
+    zusatz = {
+      ...zusatz,
+      freiesFahrzeug: zusatz.freiesFahrzeug && b.fahrzeuge.length > 0,
+      freiePersonalZeilen: b.einheit.einzelperson ? 0 : zusatz.freiePersonalZeilen,
+    };
+  }
   const org = b.einheit.organisation;
   const farbe = orgFarbePapier(org);
   const typName =
