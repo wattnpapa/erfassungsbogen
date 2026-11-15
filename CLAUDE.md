@@ -66,7 +66,8 @@ Typische Auslöser (nicht abschließend):
 ## Schemaänderung = Meldekopf und S1-Control im selben Arbeitsschritt nachziehen
 
 Den Erfassungsbogen lesen zwei weitere Apps: die **Meldekopf-App**
-(<https://github.com/wattnpapa/meldekopf>) und **S1-Control**. Beide nehmen
+(<https://github.com/wattnpapa/meldekopf>) und **S1-Control**
+(<https://github.com/wattnpapa/S1-Control>). Beide nehmen
 Bögen als QR-Code, Link und Datei entgegen. Bleiben sie hinter dem Schema
 zurück, lehnen sie neue Bögen ab oder zeigen sie falsch an, und zwar am
 Meldekopf, also dort, wo der Bogen gebraucht wird.
