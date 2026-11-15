@@ -12,6 +12,16 @@
 > umsetzen: SBOM, CSP ohne unsafe-inline, Entpack-Grenze") betrifft die Kapitel
 > 2.1, 8.3, 8.6, 8.7 und 11.2 — dort jeweils vermerkt.
 >
+> **Nachgezogen 2026-11-15 (Schema 13, Farbe des taktischen Zeichens):** Kap. 4.5, 5, 8.4, 12:
+> `Fahrzeug.zeichenfarbe` (`Zeichenfarbe.KOMMUNAL` = 1, `GRAU` = 2) für Gerät von Partnern, das eine Einheit
+> führt (Anhänger der Gemeinde, Abrollbehälter des Havariekommandos). Im QR Flag 64 des Fahrzeug-Bytes und ein
+> Byte am Ende des Fahrzeug-Blocks; Submodul `eeb-format`, `SCHEMA_VERSION` 13, `transportSchemaVersion` fordert
+> 13 nur für Bögen mit diesem Feld, eingefrorene v12-Fixture, VBA-Port auf Schema 13. `bos-taktische-zeichen`
+> zeichnet mit `farbe: "kommunal" | "grau"` (`#E26E0E`, `#A6A6A6`): das Kommunalzeichen der Sammlung, wo es
+> eines gibt, sonst das umgefärbte Zeichen der Organisation. `bos-meldekopf` liefert `zeichenfarbeText` und
+> meldet die Änderung im Abgleich. Schritt 4 hat die Auswahl „Farbe des Zeichens"; Übersicht, PDF
+> („Zeichen: …" unter den Sitzplätzen) und CSV (Spalte „Zeichenfarbe", hinten angefügt) nennen sie.
+>
 > **Nachgezogen 2026-11-12 („Geschlecht geprüft"):** Kap. 8. Neuer Speicherschlüssel `eeb.geschlecht-geprueft.v1`
 > (localStorage, `src/app/geschlecht-geprueft.ts`): Prüfsummen bestätigter Besetzungen, damit der Hinweis auf die
 > Geschlechts-Vorbelegung bei „alle männlich" abgeschaltet werden kann, ohne das Transportformat zu ändern.
@@ -1065,8 +1075,8 @@ Deflate-Kompression und eine alphanumerisch-optimierte Base41-Transportkodierung
 
 ### 4.5 Schema-Evolution statt Breaking Changes
 
-Das Datenformat hat Schema-Version 12 erreicht (v1 THW-spezifisch bis v12
-Funkrufname als Erreichbarkeit einer Person). Jede App-Version kann Schema `2..SCHEMA_VERSION`
+Das Datenformat hat Schema-Version 13 erreicht (v1 THW-spezifisch bis v13
+abweichende Farbe des taktischen Zeichens je Fahrzeug). Jede App-Version kann Schema `2..SCHEMA_VERSION`
 lesen und migriert beim Laden automatisch; beim Schreiben wird stets die
 kleinste tragende Version gewählt (`transportSchemaVersion`).
 
@@ -2020,13 +2030,14 @@ erreichbar (zuvor gleichlautend mit dem der Vorlagen, R5-D5).
 
 ### 8.4 Kompatibilitätskonzept (Schema-Evolution)
 
-- **Schema-Version aktuell 12** (`vendor/eeb-format/src/model.ts`); Historie: v1
+- **Schema-Version aktuell 13** (`vendor/eeb-format/src/model.ts`); Historie: v1
   (THW-spezifisch) → v2 (organisationsübergreifend) → v3 (Ernährungsform je
   Person) → v4 (ein Kennzeichen-Feld) → v5 (Einheitsname in der Hierarchie) → v6
   (Übungs-Kennzeichnung) → v7 (stand minutengenau) → v8 (mehrere
   Fahrerlaubnisklassen je Person) → v9 (abweichende Sitzplatzzahl je Fahrzeug)
   → v10 (abweichende Dienststelle je Person) → v11 (Einsatzzeitraum mit Uhrzeit
-  als ISO 8601) → v12 (Funkrufname als Erreichbarkeit einer Person, `KontaktArt.FUNK`).
+  als ISO 8601) → v12 (Funkrufname als Erreichbarkeit einer Person, `KontaktArt.FUNK`)
+  → v13 (abweichende Farbe des taktischen Zeichens je Fahrzeug, `Fahrzeug.zeichenfarbe`).
 - **Freitext-Konventionen statt Schema-Sprung:** Wo eine Angabe nur Text ist und
   jeder Leser sie auch ohne Vokabular verstehen soll, bleibt das Format
   unberührt — die DLRG-Ausbildungskennzahl steht als Freitext
@@ -2063,6 +2074,8 @@ erreichbar (zuvor gleichlautend mit dem der Vorlagen, R5-D5).
 - **Optionale Felder kosten ein Flag-Bit, nicht ein Byte:** die Sitzplatzzahl je
   Fahrzeug (ab v9) belegt Bit 32 des Fahrzeug-Flag-Bytes und schreibt nur dann
   ein zusätzliches Byte, wenn die Einheit vom Richtwert des Typs abweicht.
+  Ebenso die Farbe des taktischen Zeichens (ab v13): Bit 64 und ein Byte nur
+  bei Gerät von Partnern.
 - **Bitweise Kodierung häufiger Enums** (Geschlecht, Ernährung, Stärkerolle je 2
   Bit; Fahrerlaubnisklasse 4 Bit), BCD-gepackte Telefonnummern, Datum/Zeit als
   kompakte Ganzzahl seit einem festen Referenzdatum.
@@ -2479,7 +2492,7 @@ Repository-Analyse, keine offiziellen Angaben des Projekts.
 | `EEB2` / `EEB2C` | Magic-Bytes/Format-Kennung des QR-Payloads: `EEB2` = unsignierter Bogen, `EEB2C` = signierter Container mit einer oder mehreren Signaturstufen. |
 | Base41 | Eigenes, an Base45/RFC 9285 angelehntes, aber URL-sicheres 41-Zeichen-Alphabet zur Transportkodierung des QR-Dateninhalts (alphanumerischer QR-Modus). |
 | THW-Word-Bogen | Ausgefüllter Erfassungsbogen aus einer THW-Word-Vorlage `06-*_Erfassungsbogen.dotx`, gespeichert als `.docx`; die App liest seine Formularfelder (`word-bogen.ts`, `docs/thw-word-vorlagen.md`). |
-| Schema-Version | Versionsnummer des Datenmodells (aktuell 12); steuert, welche Felder ein Bogen enthalten kann und wie er migriert wird. |
+| Schema-Version | Versionsnummer des Datenmodells (aktuell 13); steuert, welche Felder ein Bogen enthalten kann und wie er migriert wird. |
 | `transportSchemaVersion` | Funktion, die beim Kodieren die kleinste Schema-Version wählt, die den tatsächlichen Bogeninhalt noch verlustfrei trägt. |
 | Segmentierung (`EEBS.`) | Aufteilung eines zu großen Bogens auf mehrere QR-Codes; jeder Teil trägt Teilnummer, Gesamtzahl und eine Prüfsumme. |
 | Absenderkarte | Freiwillig hinterlegte Kontaktangabe (Name/E-Mail/Telefon) eines Geräts, die signiert mit jedem übergebenen Bogen mitreist. |

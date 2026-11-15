@@ -1,7 +1,10 @@
 # Datenmodell Einheiten-Erfassungsbogen (EEB)
 
-**Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-10-26, **Schema-Version 10**
-(v10 = abweichende Dienststelle je Person `Person.dienststelle`;
+**Stufe 1** — Datenmodell und QR-Code-Kodierung. Stand: 2026-11-15, **Schema-Version 13**
+(v13 = abweichende Farbe des taktischen Zeichens je Fahrzeug `Fahrzeug.zeichenfarbe`;
+v12 = Funkrufname als Erreichbarkeit einer Person `KontaktArt.FUNK`;
+v11 = Einsatzzeitraum mit Uhrzeit `zeitraumVonIso`/`zeitraumBisIso`;
+v10 = abweichende Dienststelle je Person `Person.dienststelle`;
 v9 = abweichende Sitzplatzzahl je Fahrzeug `Fahrzeug.sitzplaetze`;
 v8 = mehrere Fahrerlaubnisklassen je Person `weitereFahrerlaubnisse`; v7 = `stand`
 minutengenau als Zeitpunkt statt Kalendertag; v6 = Übungs-Kennzeichnung
@@ -76,6 +79,15 @@ bei der kleineren Version. Ein Funkrufname ist nie privat: die App setzt das
 D/P-Flag auf dienstlich und zeigt den Schalter nicht, Anzeige, PDF, CSV und
 die VBA-Portierung schreiben `Funk: …` ohne (D)/(P). Eine eingefrorene
 v11-Fixture belegt, dass v11-Bögen unverschoben gelesen werden.
+
+Eine abweichende Farbe des taktischen Zeichens an einem Fahrzeug fordert
+Schema 13. `Fahrzeug.zeichenfarbe` (1 = kommunal/orange, 2 = grau) belegt
+Flag 64 des Fahrzeug-Bytes und ein Byte am Ende des Fahrzeug-Blocks, hinter
+der Sitzplatzzahl. Gedacht ist es für Gerät von Partnern, das eine Einheit
+führt: der Anhänger der Gemeinde, der Abrollbehälter des Havariekommandos.
+Fehlt das Feld, gilt die Farbe der Organisation, und der Bogen bleibt bei der
+kleineren Version. Eine eingefrorene v12-Fixture belegt, dass v12-Bögen
+unverschoben gelesen werden.
 
 **Bewusste Ausnahme (v4):** Bis v3 stand das THW-Kennzeichen als Zahl im QR-Code
 (Flag 16 im Fahrzeug-Byte). Dieses Sonderformat ist entfallen; es gibt nur noch ein
@@ -255,6 +267,7 @@ ausgeschriebene Hierarchie der Normalfall.
 | stanKonform | bool? | „Ausstattung nach StAN/Norm" — `undefined` = Frage nicht anwendbar (z. B. Fremdorganisation) |
 | aenderungen | string | Freitext, meist leer |
 | sitzplaetze | number? | ab Schema 9: Sitzplätze inkl. Fahrer/in, wenn sie vom Richtwert des Typs abweichen (FüKomKw mit Doppelkabine: 7 statt 3). Fehlt = Richtwert aus `vendor/bos-vokabulare/src/sitzplaetze.ts`; die Transportbilanz rechnet mit der erfassten Zahl zuerst |
+| zeichenfarbe | `Zeichenfarbe`? | ab Schema 13: abweichende Grundfarbe des taktischen Zeichens für Gerät von Partnern (1 = kommunal/orange, 2 = grau). Fehlt = Farbe der Organisation |
 
 ### Sofortbedarf
 

@@ -67,6 +67,7 @@ import {
   Vollstaendigkeit,
   staerkeVorlesen,
 } from "./bausteine";
+import { zeichenfarbeText } from "@bos/meldekopf/darstellung";
 
 /** Stufenzahl im QR-Hinweis — nur nennen, wenn es tatsächlich ein Meldeweg ist. */
 function stufenText(qr: QrSatz): string {
@@ -796,7 +797,11 @@ export function Uebersicht(props: {
           <tbody>
             {bogen.fahrzeuge.map((f, i) => (
               <tr key={i}>
-                <td data-label="Typ">{vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "—"}</td>
+                <td data-label="Typ">
+                  {vokabText(f.typ, vokabularFuer(org, "fahrzeug")) || "—"}
+                  {/* Gerät von Partnern: die Farbe des Zeichens steht als Wort beim Typ. */}
+                  {zeichenfarbeText(f) && <small className="hinweis"> · Zeichen {zeichenfarbeText(f)}</small>}
+                </td>
                 <td data-label="Kennzeichen">{kennzeichenText(f)}</td>
                 {zeigeFunkruf && <td data-label="Funkrufname">{funkrufText(f, bogen.einheit)}</td>}
                 <td data-label="Sitzplätze">{fahrzeugSitzplaetze(f, org) ?? "—"}</td>

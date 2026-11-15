@@ -6,7 +6,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { OrganisationsTyp, PersonalErfassung } from "@bos/eeb-format/model";
+import { OrganisationsTyp, PersonalErfassung, Zeichenfarbe } from "@bos/eeb-format/model";
 import { SchrittBuehne } from "../../test/schritt-buehne";
 import { neuerBogen, neuesFahrzeug, vokabularFuer } from "../hilfen";
 import { stanFahrzeugVorbelegung } from "@bos/vokabulare/thw-stan-fahrzeuge";
@@ -176,6 +176,24 @@ describe("Schritt Fahrzeuge", () => {
     await nutzer.clear(feld);
     await nutzer.type(feld, "12");
     expect(screen.queryByText(/Höchstens 99/)).toBeNull();
+  });
+
+  it("lässt die Farbe des taktischen Zeichens je Fahrzeug wählen und wieder zurücknehmen", async () => {
+    const nutzer = userEvent.setup();
+    const start = neuerBogen();
+    start.fahrzeuge = [{ typ: { freitext: "Anh Ölwehr" } }];
+    let stand = start;
+    render(<SchrittBuehne komponente={SchrittFahrzeuge} bogen={start} beobachten={(b) => (stand = b)} />);
+    const wahl = screen.getByLabelText("Farbe des Zeichens") as HTMLSelectElement;
+    expect(wahl.value).toBe(""); // Vorgabe: Farbe der Einheit
+
+    await nutzer.selectOptions(wahl, "orange (kommunal)");
+    expect(stand.fahrzeuge[0]!.zeichenfarbe).toBe(Zeichenfarbe.KOMMUNAL);
+    await nutzer.selectOptions(wahl, "grau (sonstige)");
+    expect(stand.fahrzeuge[0]!.zeichenfarbe).toBe(Zeichenfarbe.GRAU);
+    // „wie Einheit" entfernt das Feld wieder — der Bogen fordert dann kein Schema 13.
+    await nutzer.selectOptions(wahl, "wie Einheit");
+    expect(stand.fahrzeuge[0]!.zeichenfarbe).toBeUndefined();
   });
 
   it("übernimmt eine abweichende Sitzplatzzahl und rechnet die Bilanz damit", async () => {

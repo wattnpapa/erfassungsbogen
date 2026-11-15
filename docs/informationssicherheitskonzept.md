@@ -16,6 +16,12 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Abhängigkeiten (6.4/R8/M8). Die betroffenen Abschnitte sind entsprechend
 > gekennzeichnet.
 >
+> **Nachgezogen 2026-11-15 — Schema 13:** Transportformat (5.2): abweichende Farbe des taktischen Zeichens je
+> Fahrzeug (`Fahrzeug.zeichenfarbe`, Flag 64 im Fahrzeug-Byte, ein Byte). Nur Bögen mit diesem Feld sind
+> Schema 13; ältere App-Stände lehnen sie als „nicht unterstützte Schema-Version" ab. Exporte (5.4): PDF nennt
+> „Zeichen: kommunal (orange)" bzw. „grau", die CSV führt die Spalte „Zeichenfarbe". Keine neuen Speicherorte,
+> keine neuen Netzverbindungen. VBA-Portierung auf Schema 13.
+>
 > **Nachgezogen 2026-11-12 — „Geschlecht geprüft":** Neuer Speicherort `eeb.geschlecht-geprueft.v1` (3.3, Zeile D2p):
 > nur Prüfsummen über Namen und Geschlecht, keine Namen im Klartext; Transportformat und Schema unverändert.
 >

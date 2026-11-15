@@ -11,6 +11,11 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > **Wichtig:** Der Commit „Sicherheitsbericht umsetzen" (`c7604e9`, 2026-09-12)
 > hat das in R5/M6 genannte Dekomprimierungs-Risiko bereits behoben.
 >
+> **Nachgezogen 2026-11-15 — Schema 13:** Datenkategorie Fahrzeug erweitert (5.4): die Farbe des taktischen
+> Zeichens (`Fahrzeug.zeichenfarbe`: kommunal oder grau) für Gerät von Partnern. Sachangabe zum Gerät ohne
+> Personenbezug; sie reist mit dem Bogen durch QR, Datei, PDF und CSV. Kein neuer Speicherort, keine neue
+> Verbindung, keine Änderung der Risikobewertung.
+>
 > **Nachgezogen 2026-11-12 — „Geschlecht geprüft":** Neuer Speicherort `eeb.geschlecht-geprueft.v1` im
 > `localStorage` (`src/app/geschlecht-geprueft.ts`). Er hält Prüfsummen (FNV-1a) über Namen und Geschlecht einer
 > Besetzung, die jemand in Schritt 3 als „alle männlich" bestätigt hat, höchstens 50 Stück; Namen stehen dort nicht im
@@ -751,7 +756,7 @@ definieren.
 | Funktion/Qualifikation | Funktionen, Zusatzqualifikationen (inkl. Beruf — als Freitext mit Präfix „Beruf: " im selben Feld, eigenes Eingabefeld in der App), Fahrerlaubnis(se), Stärke-Rolle | Teils Pflicht, teils optional | `Person`, `src/app/beruf.ts` |
 | Unterbringungs-/verpflegungsrelevante Angaben | Geschlecht (M/W/D), Ernährungsform (inkl. vegetarisch/vegan) | Pflicht je Personaleintrag | `Person` — kein Gesundheitsdatum im Sinne Art. 9 DSGVO, dient der Logistikplanung |
 | Kontaktdaten | Telefon, E-Mail, Funkrufname der Person (ab Schema 12, stets dienstlich) | Optional, laut Code-Kommentar „i. d. R. nur Führungskräfte" | `Kontakt` |
-| Fahrzeugbezogen (potenziell personenbeziehbar) | Kennzeichen, Funkrufname | Optional | `Fahrzeug` |
+| Fahrzeugbezogen (potenziell personenbeziehbar) | Kennzeichen, Funkrufname; ohne Personenbezug: Farbe des taktischen Zeichens (ab Schema 13) | Optional | `Fahrzeug` |
 | Freiwillige Absenderangabe | Name, E-Mail, Telefon | Vollständig freiwillig (Opt-in) | Absenderkarte, `docs/datenmodell.md` |
 | Geräteschlüssel | Öffentlicher Ed25519-Schlüssel (kein Personenbezug für sich allein) | Automatisch, lokal erzeugt | `signatur.ts` |
 | Einsatzkontext | Einsatzort/-auftrag, Zeitraum | Pflicht | `Einsatz` — kann in Verbindung mit Personaldaten mittelbar Rückschlüsse auf Aufenthaltsorte erlauben |

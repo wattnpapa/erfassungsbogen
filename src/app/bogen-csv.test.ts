@@ -186,6 +186,12 @@ describe("bogenCsvInhalt()", () => {
     expect(spalte(csv, 4, "StAN-konform")).toBe("");
   });
 
+  it("nennt die abweichende Farbe des taktischen Zeichens; sonst bleibt die Spalte leer", () => {
+    expect(spalte(bogenCsvInhalt(bogen()), 4, "Zeichenfarbe")).toBe("");
+    const csv = bogenCsvInhalt(bogen("Oldenburg", { fahrzeuge: [{ typ: { freitext: "Anh Ölwehr" }, zeichenfarbe: 1 }] }));
+    expect(spalte(csv, 4, "Zeichenfarbe")).toBe("kommunal (orange)");
+  });
+
   it("unterscheidet „nicht gefragt“ von „nein“ beim StAN-Kennzeichen", () => {
     const csv = bogenCsvInhalt(bogen("Oldenburg", { fahrzeuge: [{ typ: { code: 2 }, stanKonform: false }] }));
     expect(spalte(csv, 4, "StAN-konform")).toBe("nein"); // Kopf + Einheit + 2 Personen

@@ -7,11 +7,12 @@
  * Produkt.
  */
 
-import { OrganisationsTyp, type Einheit, type Fahrzeug } from "@bos/eeb-format/model";
+import { OrganisationsTyp, Zeichenfarbe, type Einheit, type Fahrzeug } from "@bos/eeb-format/model";
 import { vokabText, vokabularFuer } from "@bos/meldekopf/darstellung";
 import {
   einheitZeichenSvg,
   fahrzeugZeichenSvg,
+  type Zeichenfarbe as Zeichenfarbvariante,
   type Zeichenorganisation,
 } from "@bos/taktische-zeichen/zeichen";
 
@@ -35,6 +36,12 @@ const ZEICHENBEREICH: Record<OrganisationsTyp, Zeichenorganisation> = {
   [OrganisationsTyp.SONSTIGE]: "sonstige",
 };
 
+/** Zeichenfarbe des Bogens → Farbvariante der Sammlung; ein unbekannter Wert zeichnet in Organisationsfarbe. */
+const ZEICHENFARBE: Partial<Record<Zeichenfarbe, Zeichenfarbvariante>> = {
+  [Zeichenfarbe.KOMMUNAL]: "kommunal",
+  [Zeichenfarbe.GRAU]: "grau",
+};
+
 /**
  * Taktisches Zeichen eines Fahrzeugs als (pdfmake-taugliches) SVG.
  * Kurzzeichen/Name stammen aus dem organisationsspezifischen Vokabular bzw.
@@ -47,6 +54,7 @@ export function fahrzeugSymbolSvg(f: Fahrzeug, org: OrganisationsTyp): string {
     kurz: vokabText(f.typ, tabelle, "kurz"),
     name: vokabText(f.typ, tabelle, "name"),
     thwCode: org === OrganisationsTyp.THW ? f.typ?.code : undefined,
+    farbe: f.zeichenfarbe != null ? ZEICHENFARBE[f.zeichenfarbe] : undefined,
   });
 }
 

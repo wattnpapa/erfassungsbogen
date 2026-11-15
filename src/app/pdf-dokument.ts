@@ -63,6 +63,7 @@ import {
   UEBUNG_HOEHE,
   UEBUNG_PFAD,
 } from "./uebung-wasserzeichen";
+import { zeichenfarbeText } from "@bos/meldekopf/darstellung";
 
 // Grau der Kopfzeilen/Hinweiszeile exakt aus der THWin-Papiervorlage
 // (06-BrB_Erfassungsbogen.dotx): w:fill="D9D9D9".
@@ -785,6 +786,7 @@ export function erreichbarkeitZeilen(
     fzg != null &&
     !fzg.kennzeichen?.trim() &&
     fzg.sitzplaetze == null &&
+    fzg.zeichenfarbe == null &&
     !fzg.aenderungen?.trim();
   if (furn) zeilen.push(soll || unberuehrt ? `${furn} (Vorbelegung)` : furn);
   // Rückruf der Einheit selbst: Name und Nummer, die der Absender hinterlegt hat (R11-W2).
@@ -1661,6 +1663,11 @@ export function pdfDokument(
                       : []),
                     ...(sitzplatzZeile(f, org)
                       ? [{ text: sitzplatzZeile(f, org), fontSize: schrift - 2 }]
+                      : []),
+                    // Die Farbe des Zeichens auch als Wort: ein Schwarz-Weiß-Druck
+                    // hält Orange, Grau und die Farbe der Einheit nicht auseinander.
+                    ...(zeichenfarbeText(f)
+                      ? [{ text: `Zeichen: ${zeichenfarbeText(f)}`, fontSize: schrift - 2 }]
                       : []),
                     { text: "" },
                   ],

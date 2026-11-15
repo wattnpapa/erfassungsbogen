@@ -8,9 +8,9 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { OrganisationsTyp, type Einheit } from "@bos/eeb-format";
+import { OrganisationsTyp, Zeichenfarbe, type Einheit } from "@bos/eeb-format";
 import { THW_EINHEITSTYPEN, THW_FAHRZEUGTYPEN } from "@bos/vokabulare";
-import { THW_EINHEIT_ZEICHEN, THW_FAHRZEUG_ZEICHEN, TZ_SYMBOLE } from "@bos/taktische-zeichen";
+import { THW_EINHEIT_ZEICHEN, THW_FAHRZEUG_ZEICHEN, TZ_SYMBOLE, ZEICHENFARBEN } from "@bos/taktische-zeichen";
 import { einheitSymbolSvg, fahrzeugSymbolSvg } from "./taktische-zeichen-bogen";
 
 describe("Zuordnung Vokabular → Zeichen", () => {
@@ -46,6 +46,28 @@ describe("fahrzeugSymbolSvg()", () => {
     for (const org of [OrganisationsTyp.JUH, OrganisationsTyp.MHD, OrganisationsTyp.ASB, OrganisationsTyp.RETTUNGSDIENST]) {
       expect(fahrzeugSymbolSvg({ typ: { freitext: "Rätselfahrzeug" } }, org)).toBe(drk);
     }
+  });
+});
+
+describe("fahrzeugSymbolSvg() mit abweichender Zeichenfarbe", () => {
+  it("zeichnet Gerät von Partnern orange oder grau statt in der Farbe der Einheit", () => {
+    const anh = { typ: { code: 51 } }; // Anh SwPu 15000
+    expect(fahrzeugSymbolSvg(anh, OrganisationsTyp.THW)).toContain("#003399");
+    const orange = fahrzeugSymbolSvg({ ...anh, zeichenfarbe: Zeichenfarbe.KOMMUNAL }, OrganisationsTyp.THW);
+    expect(orange).toContain(ZEICHENFARBEN.kommunal);
+    expect(orange).not.toContain("#003399");
+    expect(fahrzeugSymbolSvg({ ...anh, zeichenfarbe: Zeichenfarbe.GRAU }, OrganisationsTyp.THW)).toContain(ZEICHENFARBEN.grau);
+  });
+
+  it("nimmt das Kommunalzeichen der Sammlung, wo es eines gibt", () => {
+    expect(fahrzeugSymbolSvg({ typ: { freitext: "MTW" }, zeichenfarbe: Zeichenfarbe.KOMMUNAL }, OrganisationsTyp.FEUERWEHR)).toBe(
+      TZ_SYMBOLE["Kommunal_Fahrzeuge/MTW"],
+    );
+  });
+
+  it("fällt bei einem unbekannten Wert auf die Farbe der Organisation zurück", () => {
+    const f = { typ: { code: 1 }, zeichenfarbe: 9 as Zeichenfarbe };
+    expect(fahrzeugSymbolSvg(f, OrganisationsTyp.THW)).toBe(TZ_SYMBOLE["THW_Fahrzeuge/FmKW"]);
   });
 });
 

@@ -3,7 +3,7 @@
  */
 
 import { useRef, useState } from "react";
-import { Fahrzeug, OrganisationsTyp } from "@bos/eeb-format/model";
+import { Fahrzeug, OrganisationsTyp, Zeichenfarbe } from "@bos/eeb-format/model";
 import { sitzplaetzeRichtwert } from "@bos/vokabulare/sitzplaetze";
 import { fahrzeugVorbelegung, funkrufOrtsverband } from "../../vokabulare/thw-funkrufname-ort";
 import {
@@ -158,7 +158,7 @@ function FahrzeugKarte(props: {
                verschwindet ohne Dialog. */
             if (!fahrzeugLeer(f) && !(await frageJaNein({
               titel: `${bezeichnung} entfernen?`,
-              text: "Die erfassten Angaben dieses Fahrzeugs werden entfernt — Typ, Kennzeichen, Funkrufname, Sitzplätze und Änderungen. „Rückgängig“ in der Leiste unten holt es zurück — auch nach „Weiter“ oder Neuladen, 15 Minuten lang.",
+              text: "Die erfassten Angaben dieses Fahrzeugs werden entfernt — Typ, Kennzeichen, Funkrufname, Sitzplätze, Zeichenfarbe und Änderungen. „Rückgängig“ in der Leiste unten holt es zurück — auch nach „Weiter“ oder Neuladen, 15 Minuten lang.",
               ok: "Fahrzeug entfernen",
               gefahr: true,
             }))) {
@@ -233,6 +233,21 @@ function FahrzeugKarte(props: {
             </Feld>
           </>
         )}
+        {/* Gerät von Partnern (Anhänger der Gemeinde, Abrollbehälter des
+            Havariekommandos) steht nicht in der Farbe der Einheit. Die Wahl
+            färbt das Zeichen oben in der Karte, in der Übersicht und im PDF. */}
+        <Feld titel="Farbe des Zeichens" klasse="mittel">
+          <Auswahl
+            id={`feld-zeichenfarbe-${index}`}
+            title="Für Gerät, das der Einheit nicht gehört: Das taktische Zeichen wird orange oder grau statt in der Farbe der Einheit gezeichnet."
+            value={f.zeichenfarbe ?? ""}
+            onChange={(e) => set({ zeichenfarbe: e.target.value === "" ? undefined : (Number(e.target.value) as Zeichenfarbe) })}
+          >
+            <option value="">wie Einheit</option>
+            <option value={Zeichenfarbe.KOMMUNAL}>orange (kommunal)</option>
+            <option value={Zeichenfarbe.GRAU}>grau (sonstige)</option>
+          </Auswahl>
+        </Feld>
         <Feld titel="Änderungen bzw. Sondergerät">
           <input value={f.aenderungen ?? ""} onChange={(e) => set({ aenderungen: e.target.value || undefined })} {...NAMEN_EINGABE} />
         </Feld>

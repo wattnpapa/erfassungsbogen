@@ -747,6 +747,13 @@ Zuordnungstabellen, prüfen für jede Organisation den Rückfallweg und schlagen
 an, wenn ein Zeichen wieder einen Font mitschleppt. Benennt die Sammlung etwas
 um, scheitert der Lauf — statt still aufs Grundzeichen zurückzufallen.
 
+Gerät von Partnern steht nicht in der Farbe der Einheit: Trägt ein Fahrzeug
+`zeichenfarbe` (Schema 13), reicht die Brücke `farbe: "kommunal"` oder `"grau"`
+weiter. Die Sammlung führt eigene orange Kommunalzeichen (MTW, Anhänger,
+Mehrzweckarbeitsboot …); wo sie den Typ nicht kennt, wird das Zeichen der
+Organisation umgefärbt, mit schwarzem Rand, schwarzer Schrift und ohne den
+Schriftzug „THW".
+
 Die Zuordnung liegt in [vendor/bos-taktische-zeichen/src/zeichen.ts](../vendor/bos-taktische-zeichen/src/zeichen.ts)
 und arbeitet in drei Stufen: fester THW-Vokabular-Code → benanntes Zeichen;
 sonst Namenssuche über Dateiname und Titel im Bereich der Organisation; sonst
