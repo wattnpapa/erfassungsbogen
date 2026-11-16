@@ -16,6 +16,7 @@ import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { ausgabeDateiname, dateinameTeil, einheitAnzeigename, qrErzeugen } from "./hilfen";
 import { istNativ, binaerTeilen } from "./nativ";
 import {
+  boegenSammelDokument,
   einzelPdfDokument,
   nichtDarstellbareBetroffene,
   nichtDarstellbareNamen,
@@ -148,4 +149,34 @@ async function dokumentAusgeben(dd: Parameters<typeof pdfMake.createPdf>[0], dat
 export async function blankoPdfErzeugen(): Promise<boolean> {
   const dd = pdfDokument(leererBogen(), null, BLANKO_ZEILEN);
   return dokumentAusgeben({ ...dd, info: BLANKO_INFO }, BLANKO_DATEINAME);
+}
+
+/**
+ * Mehrere Bögen als eine Sammel-PDF (Übungsbögen: die markierten Bögen eines
+ * Ordners). Jeder Bogen bekommt seinen eigenen QR-Code und sieht aus wie sein
+ * Einzel-PDF; siehe boegenSammelDokument. `fortschritt` meldet jeden
+ * vorbereiteten Bogen, `abgebrochen` wird zwischen den Bögen gefragt.
+ * false = abgebrochen oder Share-Sheet verworfen.
+ */
+export async function sammelPdfErzeugen(
+  boegen: readonly Erfassungsbogen[],
+  dateiname: string,
+  titel: string,
+  fortschritt?: (n: number, von: number) => void,
+  abgebrochen: () => boolean = () => false,
+): Promise<boolean> {
+  const mitQr = [];
+  for (const b of boegen) {
+    if (abgebrochen()) return false;
+    mitQr.push({ bogen: b, qr: await qrErzeugen(b, null) });
+  }
+  const dd = await boegenSammelDokument(
+    mitQr,
+    (probe) => pdfMake.createPdf(kaestchenZeichnen(probe)).getBuffer(),
+    titel,
+    fortschritt,
+    abgebrochen,
+  );
+  if (!dd || abgebrochen()) return false;
+  return dokumentAusgeben(dd, dateiname);
 }

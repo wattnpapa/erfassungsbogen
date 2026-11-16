@@ -1124,6 +1124,19 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   Leser als ganzen Satz (`WordBogenFehler`), nie als Parser-Text. Ein
   Word-Bogen trägt keine Signatur; er kommt wie eine Bogen-Datei als
   „unsigniert" in die Sammlung (5.2 gilt unverändert).
+- **Sammel-PDF der Übungsbögen** (`src/app/pdf.ts: sammelPdfErzeugen`,
+  `pdf-dokument.ts: boegenSammelDokument`, seit 2026-11-16): Im
+  Übungsbögen-Dialog markierte Bögen werden als eine PDF-Datei ausgegeben
+  (Einzel-PDFs aneinandergereiht, je Bogen eigener, mit dem Geräteschlüssel
+  signierter QR-Satz wie beim Einzel-PDF, je Bogen eine eingebettete
+  JSON-Datei `erfassungsbogen-NN.json`). Betroffen sind ausschließlich die
+  mitgelieferten Übungsbögen mit erfundenen Einheiten und Personen; eigene
+  oder empfangene Bögen nimmt dieser Weg nicht auf. Die Datei trägt das
+  Wasserzeichen „ÜBUNG" auf jeder Seite und „ÜBUNG" in jeder Fußzeile. Der
+  Dialog zeigt den Fortschritt und bricht beim Schließen, bei Escape oder
+  beim Ordnerwechsel ab (dieselbe Sitzungsnummer wie beim Einzel-PDF). Kein
+  Netzzugriff über das Laden der Übungsbogen-Dateien hinaus, keine neue
+  Abhängigkeit (pdfmake wie bisher).
 
 ### 5.5 Datensparsamkeit und Löschung
 

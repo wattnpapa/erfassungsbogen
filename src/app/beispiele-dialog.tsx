@@ -98,6 +98,9 @@ const LAENDER: Record<string, string> = {
   thueringen: "Thüringen",
 };
 
+/** Kennung in `beispielLaeuft`, solange die Sammel-PDF entsteht — kein Dateiname, damit keine Zeile „wird vorbereitet" zeigt. */
+const SAMMEL_LAEUFT = "\0sammel";
+
 // Übungsbögen aus examples/ — beliebig tief verschachtelt (z. B.
 // examples/thw/*.json oder examples/katastrophenschutz/niedersachsen/*.json).
 // Abgelegt ist nur das Bogen-JSON; die PDF entsteht erst beim Klick aus dem
@@ -384,6 +387,35 @@ async function beispielPdf(datei: string, url: string, abgebrochen: () => boolea
 }
 
 /**
+ * Mehrere Übungsbögen laden und als eine Sammel-PDF ausgeben (jeder Bogen wie
+ * sein Einzel-PDF, auf eigener Seite beginnend). `fortschritt` meldet, wie weit
+ * die Vorbereitung ist. false = abgebrochen oder Share-Sheet verworfen.
+ */
+async function beispielSammelPdf(
+  datei: string,
+  titel: string,
+  urls: readonly string[],
+  fortschritt: (text: string) => void,
+  abgebrochen: () => boolean = () => false,
+): Promise<boolean> {
+  const { sammelPdfErzeugen } = await import("./pdf");
+  const boegen: Erfassungsbogen[] = [];
+  for (const [i, url] of urls.entries()) {
+    if (abgebrochen()) return false;
+    fortschritt(`Bogen ${i + 1} von ${urls.length} wird geladen …`);
+    boegen.push(await beispielKopie(url));
+  }
+  if (abgebrochen()) return false;
+  return sammelPdfErzeugen(
+    boegen,
+    `${datei}.pdf`,
+    titel,
+    (n, von) => fortschritt(n < von ? `Bogen ${n + 1} von ${von} wird vorbereitet …` : "Seiten werden gesetzt, die Datei entsteht …"),
+    abgebrochen,
+  );
+}
+
+/**
  * Übungsbogen laden und daraus den Bogen-Link erzeugen — dieselbe Voll-URL,
  * die auch im Bogen selbst unter „Link teilen" steht: Sie trägt den kompletten
  * signierten Bogen im Fragment und öffnet ihn beim Antippen in der App.
@@ -527,6 +559,11 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
   const [beispielKopiert, setBeispielKopiert] = useState("");
   // Kurze Quittung nach „PDF" (BB-H9, BB-A6): Am Telefon ging die Datei still in den Download-Ordner.
   const [beispielQuittung, setBeispielQuittung] = useState("");
+  // Für die Sammel-PDF markierte Bögen (Adresse der Datei). Gilt nur für die
+  // sichtbare Liste: Ein anderer Ordner oder eine andere Suche beginnt leer.
+  const [markiert, setMarkiert] = useState<ReadonlySet<string>>(new Set());
+  // Zwischenstand der laufenden Sammel-PDF („Bogen 3 von 12 wird vorbereitet …").
+  const [sammelStand, setSammelStand] = useState("");
   // Bögen des offenen Ordners ließen sich nicht laden (ohne Netz). Steht über der
   // Liste statt am Ende, verschwindet beim Ordnerwechsel und lädt mit „Erneut
   // laden" oder bei Netzrückkehr neu (BB-E5, BB-O3, BB-O4).
@@ -618,6 +655,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
     }
     setBeispielDaten(bekannt);
     setLadeFehlt("");
+    setMarkiert((alt) => (alt.size === 0 || [...alt].every((u) => urls.includes(u)) ? alt : new Set()));
     const fehlend = urls.filter((u) => !(u in bekannt));
     if (fehlend.length === 0) {
       setBeispielLaedt(false);
@@ -749,6 +787,58 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
     }
   }
 
+  const markierteBoegen = beispielBoegen.filter((b) => markiert.has(b.url));
+  const alleMarkiert = beispielBoegen.length > 0 && markierteBoegen.length === beispielBoegen.length;
+
+  function markierung(url: string, an: boolean) {
+    setMarkiert((alt) => {
+      const neu = new Set(alt);
+      if (an) neu.add(url);
+      else neu.delete(url);
+      return neu;
+    });
+  }
+
+  /** Die markierten Bögen als eine Sammel-PDF; Fehler im Dialog zeigen. */
+  async function sammelHolen() {
+    if (markierteBoegen.length === 0) return;
+    // Ein Doppeltipp auf ein Register traf mit dem zweiten Tipp sonst diesen Knopf (BB2-G2, BB2-E2).
+    if (performance.now() - Math.max(letzterWechsel.current, geoeffnetUm.current) < 800) return;
+    setBeispielFehler("");
+    setBeispielQuittung("");
+    setBeispielLaeuft(SAMMEL_LAEUFT);
+    setSammelStand("Wird vorbereitet …");
+    const sitzung = beispielSitzung.current;
+    const abgebrochen = () => beispielSitzung.current !== sitzung;
+    // Dateiname wie beim Einzel-PDF mit Ordner, dazu die Zahl der Bögen; bei einer Suche deren Wort.
+    const ordner = suchErgebnis ? ["suche", ...woerterVon(beispielSuche)] : beispielPfad;
+    const name = ["uebung-beispiele", ...ordner, `${markierteBoegen.length}-boegen`].join("-");
+    const woher = suchErgebnis ? `Suche „${beispielSuche.trim()}“` : ordnerLabel(beispielPfad[beispielPfad.length - 1] ?? "") || "alle Ordner";
+    const titel = `Übungsbögen ${woher} (${markierteBoegen.length} ${markierteBoegen.length === 1 ? "Bogen" : "Bögen"})`;
+    try {
+      const fertig = await beispielSammelPdf(
+        name,
+        titel,
+        markierteBoegen.map((b) => b.url),
+        (text) => {
+          if (!abgebrochen()) setSammelStand(text);
+        },
+        abgebrochen,
+      );
+      if (fertig && !abgebrochen()) {
+        setBeispielQuittung(
+          `Sammel-PDF „${name}.pdf“ mit ${markierteBoegen.length} ${markierteBoegen.length === 1 ? "Bogen" : "Bögen"} erzeugt${istNativ() ? "." : " — liegt im Download-Ordner."}`,
+        );
+        window.setTimeout(() => setBeispielQuittung((q) => (q.includes(name) ? "" : q)), 8000);
+      }
+    } catch (err) {
+      setBeispielFehler(`Sammel-PDF konnte nicht erzeugt werden: ${fehlerText(err)}`);
+    } finally {
+      setSammelStand("");
+      setBeispielLaeuft("");
+    }
+  }
+
   /**
    * Link zum Übungsbogen weitergeben: Share-Sheet, wo es eins gibt (App,
    * mobiler Browser), sonst in die Zwischenablage. Fehlt beides, steht der Link
@@ -841,7 +931,10 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
             <strong>PDF</strong> erzeugt ihn im aktuellen Layout – die eingebetteten
             QR-Codes lassen sich direkt mit der App scannen. <strong>Link</strong>{" "}
             gibt den Bogen-Link weiter (Share-Sheet, sonst Zwischenablage): Er trägt
-            den kompletten Bogen und öffnet ihn beim Antippen in der App.
+            den kompletten Bogen und öffnet ihn beim Antippen in der App. Mit den
+            Häkchen vor den Einheiten (oder <strong>Alle markieren</strong>) lassen sich
+            mehrere Bögen auswählen und mit <strong>Sammel-PDF</strong> als eine Datei
+            herunterladen, jeder Bogen darin wie sein eigenes PDF, auf einer neuen Seite beginnend.
           </p>
         </details>
         {/* Suche über alle Ordner und Bögen (BB-S2, BB-K4, BB-W8). */}
@@ -1021,6 +1114,32 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
           </p>
         )}
         {beispielBoegen.length > 0 && (
+          <div className="beispiel-auswahl" role="group" aria-label="Mehrere Bögen als eine Sammel-PDF">
+            <button
+              type="button"
+              disabled={beispielLaeuft !== ""}
+              onClick={() => setMarkiert(alleMarkiert ? new Set() : new Set(beispielBoegen.map((b) => b.url)))}
+            >
+              {alleMarkiert ? "Markierung aufheben" : "Alle markieren"}
+            </button>
+            <button
+              type="button"
+              disabled={beispielLaeuft !== "" || markierteBoegen.length === 0}
+              onClick={() => void sammelHolen()}
+            >
+              <IconPdf />
+              Sammel-PDF
+              {markierteBoegen.length > 0 && ` (${markierteBoegen.length.toLocaleString("de-DE")} ${markierteBoegen.length === 1 ? "Bogen" : "Bögen"})`}
+            </button>
+            <span className="hinweis" role="status">
+              {sammelStand ||
+                (markierteBoegen.length === 0
+                  ? "Bögen mit dem Häkchen vor der Einheit markieren — sie kommen in eine gemeinsame PDF."
+                  : `${markierteBoegen.length.toLocaleString("de-DE")} von ${beispielBoegen.length.toLocaleString("de-DE")} markiert.`)}
+            </span>
+          </div>
+        )}
+        {beispielBoegen.length > 0 && (
           <div className="tabellen-scroll">
             {/* Die role-Attribute sind kein Selbstzweck: auf schmalen Geräten
                 setzt das CSS die Zeilen auf display:block (Karten statt
@@ -1041,7 +1160,16 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
                   return (
                     <tr key={datei} role="row">
                       <td role="cell">
-                        <span className="beispiel-einheit">
+                        {/* Das Häkchen für die Sammel-PDF; das ganze Feld mit Zeichen und Namen ist sein Etikett,
+                            damit auch mit Handschuhen etwas zu treffen ist. */}
+                        <label className="beispiel-einheit beispiel-wahl">
+                          <input
+                            type="checkbox"
+                            checked={markiert.has(url)}
+                            disabled={beispielLaeuft !== ""}
+                            aria-label={`${b ? einheitsTypText(b) || datei : datei}${b && einheitOrt(b.einheit) ? ` ${einheitOrt(b.einheit)}` : ""} für die Sammel-PDF markieren`}
+                            onChange={(e) => markierung(url, e.target.checked)}
+                          />
                           {b ? (
                             <EinheitZeichen einheit={b.einheit} className="einheit-avatar" aria-hidden="true" />
                           ) : (
@@ -1052,7 +1180,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
                             {zugHinweis(datei) && <span className="hinweis">{zugHinweis(datei)}</span>}
                             {beispielLaeuft === datei && <span className="hinweis">wird vorbereitet …</span>}
                           </span>
-                        </span>
+                        </label>
                       </td>
                       <td role="cell">
                         {b ? (

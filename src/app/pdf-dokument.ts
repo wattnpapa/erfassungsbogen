@@ -2165,8 +2165,22 @@ export async function einzelPdfDokument(
   qr: QrSatz | null,
   setzen: (dd: TDocumentDefinitions) => Promise<unknown>,
 ): Promise<TDocumentDefinitions> {
-  if (b.personalErfassung === PersonalErfassung.NUR_STAERKE)
-    return pdfDokument(b, qr);
+  return pdfDokument(b, qr, undefined, undefined, await einzelNachtragsPlatz(b, qr, setzen));
+}
+
+/**
+ * Die Messung hinter {@link einzelPdfDokument}: wie viel Platz für Stiftnachträge
+ * der Bogen bekommt, ohne eine Seite zu kosten. `undefined` = keiner (Stärke ohne
+ * Namen, oder der Probesatz hat nichts gemeldet). Getrennt, damit die Sammel-PDF
+ * den Bogen danach beliebig oft frisch setzen kann — pdfmake verändert die
+ * Knoten einer Dokumentdefinition beim Setzen.
+ */
+export async function einzelNachtragsPlatz(
+  b: Erfassungsbogen,
+  qr: QrSatz | null,
+  setzen: (dd: TDocumentDefinitions) => Promise<unknown>,
+): Promise<NachtragsPlatz | undefined> {
+  if (b.personalErfassung === PersonalErfassung.NUR_STAERKE) return undefined;
   const pos = new Map<string, MessPosition>();
   const probe = pdfDokument(b, qr, undefined, undefined, { messpunkt: true });
   probe.pageBreakBefore = (knoten) => {
@@ -2177,7 +2191,7 @@ export async function einzelPdfDokument(
   await setzen(probe);
   const formular = pos.get(`${MESS_BOGEN_ENDE}-formular`);
   const ende = pos.get(`${MESS_BOGEN_ENDE}-qr`);
-  if (!formular || !ende) return pdfDokument(b, qr);
+  if (!formular || !ende) return undefined;
   const rest = (p: MessPosition) => p.pageInnerHeight * (1 - p.verticalRatio);
   // Einzelcode auf derselben Seite wie das Formularende: der Platz unter dem
   // Code zählt. Sonst (Code auf eigener Seite, mehrteiliger Code) der Platz
@@ -2193,9 +2207,124 @@ export async function einzelPdfDokument(
       : 0;
   const fahrzeug =
     zeilen > 0 && frei >= zeilen * LEERZEILE_HOEHE + LEERFAHRZEUG_HOEHE;
-  return pdfDokument(b, qr, undefined, undefined, {
-    freiePersonalZeilen: zeilen,
-    freiesFahrzeug: fahrzeug,
+  return { freiePersonalZeilen: zeilen, freiesFahrzeug: fahrzeug };
+}
+
+
+/** Ein Bogen der Übungs-Sammel-PDF: der Bogen und sein QR-Satz (null = ohne Code). */
+export interface SammelEinzelBogen {
+  bogen: Erfassungsbogen;
+  qr: QrSatz | null;
+}
+
+const SAMMEL_START = "sammel-bogen";
+
+/** Index des Bogens, dessen Seiten die Seite `seite` trägt; `start[i]` = erste Seite des Bogens i (ab 1), aufsteigend. */
+export function bogenAufSeite(start: readonly number[], seite: number): number {
+  let i = 0;
+  while (i + 1 < start.length && start[i + 1]! <= seite) i++;
+  return i;
+}
+
+/**
+ * Mehrere Einzel-PDFs in einer Datei (Übungsbögen: markierte Bögen als eine
+ * Sammel-PDF). Jeder Bogen beginnt auf einer neuen Seite und sieht aus wie sein
+ * Einzel-PDF: dieselbe Kopfzeile mit dem Platz für den Meldekopf auf Blatt 1 und
+ * „Blatt n von m dieses Bogens" auf den Folgeblättern, derselbe Platz für
+ * Stiftnachträge, sein eigener QR-Code und sein eigener Stand in der Fußzeile.
+ * Nur die Seitenzahl rechts unten zählt durch die ganze Datei, damit ein
+ * gedruckter Stapel sortiert bleibt.
+ *
+ * Die Kopfzeile muss wissen, zu welchem Bogen eine Seite gehört. pdfmake setzt
+ * Kopf- und Fußzeile, bevor es die Lage der Knoten meldet — deshalb ein
+ * Probesatz wie bei {@link einzelPdfDokument}: Er liest über `pageBreakBefore`
+ * ab, auf welcher Seite jeder Bogen beginnt. `setzen` führt den Satz aus
+ * (Browser: pdfmake-Puffer, Tests: Node). `fortschritt` meldet jeden
+ * vorbereiteten Bogen (n von von); `abgebrochen` wird davor gefragt.
+ */
+export async function boegenSammelDokument(
+  boegen: readonly SammelEinzelBogen[],
+  setzen: (dd: TDocumentDefinitions) => Promise<unknown>,
+  titel: string,
+  fortschritt: (n: number, von: number) => void = () => {},
+  abgebrochen: () => boolean = () => false,
+): Promise<TDocumentDefinitions | null> {
+  if (boegen.length === 0) throw new Error("Kein Bogen für die Sammel-PDF.");
+  const platz: (NachtragsPlatz | undefined)[] = [];
+  for (const [i, { bogen, qr }] of boegen.entries()) {
+    if (abgebrochen()) return null;
+    platz.push(await einzelNachtragsPlatz(bogen, qr, setzen));
+    fortschritt(i + 1, boegen.length);
+  }
+  if (abgebrochen()) return null;
+  // Frisch gesetzt für Probe und Datei (siehe einzelNachtragsPlatz). Der Seitenumbruch
+  // sitzt am ersten Knoten des Bogens, der unsichtbare Messpunkt (wie MESS_BOGEN_ENDE)
+  // dahinter: pdfmake fragt `pageBreakBefore` nur für Knoten mit Textzeilen und nie
+  // für einen, der selbst schon „pageBreak: before" trägt.
+  const inhalt = (): Content[] =>
+    boegen.flatMap(({ bogen, qr }, i) => {
+      const dd = pdfDokument(bogen, qr, undefined, undefined, platz[i]);
+      const knoten = Array.isArray(dd.content) ? (dd.content as Content[]) : [dd.content as Content];
+      const marker = { text: " ", fontSize: 1, id: `${SAMMEL_START}-${i}` } as Content;
+      if (i === 0) return [marker, ...knoten];
+      const [erster, ...rest] = knoten;
+      const umbruch = (typeof erster === "object" && erster ? { ...erster, pageBreak: "before" } : { text: String(erster ?? ""), pageBreak: "before" }) as Content;
+      return [umbruch, marker, ...rest];
+    });
+  const muster = pdfDokument(boegen[0]!.bogen, null);
+  const grund = { pageSize: muster.pageSize, pageMargins: muster.pageMargins, defaultStyle: muster.defaultStyle };
+
+  // Probesatz: auf welcher Seite beginnt jeder Bogen?
+  const start: number[] = [];
+  await setzen({
+    ...grund,
+    content: inhalt(),
+    pageBreakBefore: (knoten) => {
+      const k = knoten as { id?: string; startPosition?: MessPosition };
+      if (k.id?.startsWith(`${SAMMEL_START}-`) && k.startPosition) {
+        start[Number(k.id.slice(SAMMEL_START.length + 1))] = k.startPosition.pageNumber;
+      }
+      return false;
+    },
+  });
+  if (abgebrochen()) return null;
+  // Lücken (Bogen ohne Messpunkt, sollte nicht vorkommen): Seite des Vorgängers.
+  for (let i = 0; i < boegen.length; i++) start[i] ??= start[i - 1] ?? 1;
+
+  const bogenVon = (seite: number) => boegen[bogenAufSeite(start, seite)]!.bogen;
+  const wasserzeichen = uebungsWasserzeichen();
+  const hintergrund: TDocumentDefinitions["background"] =
+    boegen.some(({ bogen }) => bogen.uebung) && typeof wasserzeichen === "function"
+      ? (seite, groesse) => (bogenVon(seite).uebung ? wasserzeichen(seite, groesse) : null)
+      : undefined;
+  // Eingebettete Daten je Bogen, durchnummeriert: pdfmake bettet je Name eine Datei ein.
+  const files: NonNullable<TDocumentDefinitions["files"]> = {};
+  boegen.forEach(({ bogen }, i) => {
+    const name = EEB_JSON_DATEINAME.replace(/\.json$/, `-${String(i + 1).padStart(2, "0")}.json`);
+    files[name] = { ...bogenAlsEingebetteteDatei(bogen), name };
+  });
+  return winAnsiDokument({
+    ...grund,
+    info: { title: titel },
+    ...(hintergrund ? { background: hintergrund } : {}),
+    files,
+    header: (seite, gesamt) => {
+      const i = bogenAufSeite(start, seite);
+      const erste = start[i]!;
+      const letzte = (start[i + 1] ?? gesamt + 1) - 1;
+      return bogenKopfzeile(einheitAnzeigename(boegen[i]!.bogen.einheit), undefined, seite - erste + 1, letzte - erste + 1);
+    },
+    footer: (seite, gesamt) => {
+      const b = bogenVon(seite);
+      return {
+        columns: [
+          { text: `${b.uebung ? "ÜBUNG · " : ""}Stand: ${zeitgruppe(b.stand)}`, margin: [BOGEN_RAENDER[0], 0, 0, 0] },
+          { text: `${seite} / ${gesamt}`, alignment: "right", margin: [0, 0, BOGEN_RAENDER[2], 0] },
+        ],
+        fontSize: 8,
+      };
+    },
+    content: inhalt(),
   });
 }
 

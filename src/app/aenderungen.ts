@@ -35,6 +35,12 @@ export const MONATE: Readonly<Record<string, string>> = {
 
 export const AENDERUNGEN: readonly Aenderung[] = [
   {
+    datum: "2026-11-16",
+    punkte: [
+      "Übungsbögen: Mehrere Bögen lassen sich jetzt mit dem Häkchen vor der Einheit markieren und mit „Sammel-PDF“ als eine Datei herunterladen, etwa alle Einheiten eines Ortsverbands für eine Übung am Meldekopf. „Alle markieren“ nimmt den ganzen Ordner oder das ganze Suchergebnis, „Markierung aufheben“ setzt zurück. In der Datei beginnt jeder Bogen auf einer neuen Seite und sieht aus wie sein eigenes PDF, mit eigenem QR-Code, Platz für den Meldekopf auf Blatt 1 und „Blatt n von m dieses Bogens“ auf den Folgeblättern; nur die Seitenzahl rechts unten zählt durch die ganze Datei. Während die Datei entsteht, zeigt der Dialog an, welcher Bogen gerade vorbereitet wird.",
+    ],
+  },
+  {
     datum: "2026-11-15",
     punkte: [
       "Aus „Beispielbögen“ werden „Übungsbögen“: Startseite, Dialog, Rückfragen und Hinweise nennen die mitgelieferten Bögen jetzt so, wie sie gedacht sind, als Übungsmaterial mit erfundenen Einheiten und Personen. Wo es um den Haken „Dies ist eine Übung“ an einem eigenen Bogen geht, steht nun „als Übung gekennzeichnet“, damit beides auseinanderzuhalten bleibt.",

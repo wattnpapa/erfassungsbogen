@@ -2964,6 +2964,13 @@
     /* Zahl der Bögen im offenen Ordner, Ladestand dahinter. */
     .beispiel-zaehler { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--r-1) var(--r-3); margin: 0 0 var(--r-2); }
     .beispiel-zaehler .hinweis { margin: 0; }
+    /* Mehrere Bögen als eine Sammel-PDF: „Alle markieren", „Sammel-PDF (n Bögen)"
+       und der Stand daneben, über der Tabelle. */
+    .beispiel-auswahl { display: flex; flex-wrap: wrap; align-items: center; gap: var(--r-2) var(--r-3); margin: 0 0 var(--r-2); }
+    .beispiel-auswahl .hinweis { margin: 0; flex: 1 1 16rem; }
+    /* Das Häkchen vor dem taktischen Zeichen; das ganze Feld ist sein Etikett (Handschuhe). */
+    .beispiel-wahl { cursor: pointer; }
+    .beispiel-wahl > input[type="checkbox"] { flex: 0 0 auto; margin: 0; }
     /* Übungsbögen-Tabelle: taktisches Zeichen + Einheit, darunter jeweils die
        leisen Zusatzzeilen (Träger, Ebene, Fahrzeuge) — eine Zeile je Bogen mit
        den Aktionen rechts. */
