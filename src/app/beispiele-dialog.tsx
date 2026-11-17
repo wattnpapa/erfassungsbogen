@@ -425,6 +425,32 @@ async function beispielLinkUrl(url: string): Promise<{ link: string; titel: stri
   return { link: await bogenVollUrl(bogen), titel: `Erfassungsbogen ${einheitAnzeigename(bogen.einheit)}` };
 }
 
+/**
+ * Text in die Zwischenablage, der erst noch entsteht. Der Aufruf muss im
+ * selben Takt wie das Tippen kommen (vor dem ersten await): Mit
+ * ClipboardItem nimmt der Browser den Auftrag sofort an und wartet selbst auf
+ * den Text. Ohne ClipboardItem bleibt writeText, das in Firefox und Safari
+ * nach längerer Rechnung abgelehnt werden kann. false = nicht kopiert, der
+ * Aufrufer zeigt den Text zum Markieren.
+ */
+async function inZwischenablage(text: Promise<string>): Promise<boolean> {
+  try {
+    if (typeof ClipboardItem !== "undefined" && typeof navigator.clipboard?.write === "function") {
+      await navigator.clipboard.write([
+        new ClipboardItem({ "text/plain": text.then((t) => new Blob([t], { type: "text/plain" })) }),
+      ]);
+      return true;
+    }
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(await text);
+      return true;
+    }
+  } catch {
+    /* abgelehnt: Hinweis zum Markieren */
+  }
+  return false;
+}
+
 /** Einheitstyp im Vokabular der Organisation („Betreuungsgruppe (BTGr)"). */
 function einheitsTypText(b: Erfassungsbogen): string {
   return vokabText(b.einheit.einheitsTyp, vokabularFuer(b.einheit.organisation, "einheitstyp"), "name");
@@ -841,28 +867,44 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
 
   /**
    * Link zum Übungsbogen weitergeben: Share-Sheet, wo es eins gibt (App,
-   * mobiler Browser), sonst in die Zwischenablage. Fehlt beides, steht der Link
-   * zum Markieren im Hinweis. Derselbe Weg wie „Link teilen" im Bogen selbst.
+   * mobiler Browser), sonst in die Zwischenablage. Lehnt der Browser beides
+   * ab, steht der Link zum Markieren im Hinweis. Derselbe Weg wie „Link
+   * teilen" im Bogen selbst.
+   *
+   * Anders als dort entsteht der Link erst nach dem Tippen (Bogen laden,
+   * signieren). Firefox und Safari erlauben Zwischenablage und Share-Sheet
+   * aber nur unmittelbar nach einem Tippen; danach lehnte Firefox ab und die
+   * App meldete „Link konnte nicht erzeugt werden: undefined" (Rückmeldung
+   * 11/2026). Deshalb geht der Auftrag an die Zwischenablage sofort raus, der
+   * Link folgt als Versprechen nach.
    */
   async function beispielLinkHolen(datei: string, url: string) {
     setBeispielFehler("");
     setBeispielKopiert("");
     setBeispielLaeuft(datei);
+    const linkVersprochen = beispielLinkUrl(url);
+    const zumMarkieren = async (link: string) =>
+      zeigeHinweis({ titel: "Bogen-Link", text: "Zum Weitergeben markieren und kopieren:", kopiertext: link });
     try {
-      const { link, titel } = await beispielLinkUrl(url);
       if (shareSheetVerfuegbar()) {
-        if (istNativ()) await linkTeilen(titel, link);
-        else await navigator.share({ title: titel, text: titel, url: link });
-      } else if (navigator.clipboard) {
-        await navigator.clipboard.writeText(link);
+        const { link, titel } = await linkVersprochen;
+        try {
+          if (istNativ()) await linkTeilen(titel, link);
+          else await navigator.share({ title: titel, text: titel, url: link });
+        } catch (err) {
+          // Abbruch im Share-Dialog ist kein Fehler.
+          if (err instanceof Error && err.name === "AbortError") return;
+          if (istNativ()) throw err;
+          // Browser-Share-Sheet abgelehnt (Safari: Tippen zu lange her).
+          await zumMarkieren(link);
+        }
+      } else if (await inZwischenablage(linkVersprochen.then((l) => l.link))) {
         setBeispielKopiert(datei);
         window.setTimeout(() => setBeispielKopiert((stand) => (stand === datei ? "" : stand)), 3000);
       } else {
-        await zeigeHinweis({ titel: "Bogen-Link", text: "Zum Weitergeben markieren und kopieren:", kopiertext: link });
+        await zumMarkieren((await linkVersprochen).link);
       }
     } catch (err) {
-      // Abbruch im Share-Dialog ist kein Fehler.
-      if (err instanceof Error && err.name === "AbortError") return;
       setBeispielFehler(`Link konnte nicht erzeugt werden: ${fehlerText(err)}`);
     } finally {
       setBeispielLaeuft("");

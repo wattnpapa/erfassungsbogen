@@ -51,6 +51,9 @@ describe("Offline-Vorrat in zwei Stufen (R3-O3)", () => {
   it("lädt die Bögen aller Ortsverbände nur auf Abruf, nicht vorab", () => {
     expect(istNurAufAbruf("assets/ov-stralsund-12-2-tz-b-abc123.json")).toBe(true);
     expect(istNurAufAbruf("assets/001-albstadt-ztr-tz-abc.json")).toBe(false);
+    // Der Worker der Sammel-PDF ebenso; ohne ihn rechnet die Seite selbst.
+    expect(istNurAufAbruf("assets/pdf-sammel-worker-D5EEqS8G.js")).toBe(true);
+    expect(istNurAufAbruf("assets/pdf-Bb_75UQ7.js")).toBe(false);
     const { kern, umfang } = vorratAufteilen([
       { url: "index.html", revision: "1", size: 10 },
       { url: "assets/ov-aachen-01-1-tz-ztr-tz-1.json", revision: null, size: 3 },

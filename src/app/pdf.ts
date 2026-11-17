@@ -5,15 +5,9 @@
  * (pdfmake-frei und dadurch unit-testbar).
  */
 
-import pdfMake from "pdfmake/build/pdfmake";
-import * as pdfFonts from "pdfmake/build/vfs_fonts";
-// Metriken (AFM) der PDF-Standardschrift Helvetica. Anders als in Node, wo
-// pdfkit sie von Platte liest, muss der Browser-Build sie explizit ins
-// virtuelle Dateisystem bekommen — sonst bricht das Rendern mit
-// „File 'data/Helvetica-Bold.afm' not found in virtual file system" ab.
-import helvetica from "pdfmake/build/standard-fonts/Helvetica";
+import { pdfMake } from "./pdf-make";
 import type { Erfassungsbogen } from "@bos/eeb-format/model";
-import { ausgabeDateiname, dateinameTeil, einheitAnzeigename, qrErzeugen } from "./hilfen";
+import { ausgabeDateiname, blobAlsDownload, dateinameTeil, einheitAnzeigename, qrErzeugen } from "./hilfen";
 import { istNativ, binaerTeilen } from "./nativ";
 import {
   boegenSammelDokument,
@@ -23,40 +17,12 @@ import {
   pdfDokument,
   umschriftBetroffene,
   vereinfachtBetroffene,
+  type SammelEinzelBogen,
 } from "./pdf-dokument";
+import type { SammelAuftrag, SammelNachricht } from "./pdf-sammel-worker";
 import { BLANKO_DATEINAME, BLANKO_INFO, BLANKO_ZEILEN, leererBogen } from "./blanko";
 import { zeitEingelesen } from "./eintrag-zeiten";
 import { kaestchenZeichnen } from "./pdf-kaestchen";
-
-interface FontContainer {
-  vfs: Record<string, string | { data: string; encoding?: string }>;
-  fonts: Record<string, unknown>;
-}
-const pdf = pdfMake as unknown as {
-  addVirtualFileSystem(vfs: FontContainer["vfs"]): void;
-  addFontContainer(container: FontContainer): void;
-  addFonts(fonts: Record<string, unknown>): void;
-};
-
-// vfs-Zuweisung ist je nach pdfmake-Version unterschiedlich verpackt
-const fonts = pdfFonts as unknown as { pdfMake?: { vfs: Record<string, string> }; vfs?: Record<string, string> };
-pdf.addVirtualFileSystem(fonts.pdfMake?.vfs ?? fonts.vfs ?? {});
-
-// Die THWin-Papiervorlage ist in „BundesSans Office" gesetzt (Bund-Hausschrift,
-// nicht frei weitergebbar). Deren im Word-Dokument hinterlegte Ausweichschrift
-// ist Arial — und das metrisch praktisch deckungsgleiche Helvetica ist eine der
-// 14 PDF-Standardschriften. So wirkt die erzeugte PDF wie das Original, statt
-// im pdfmake-Standard Roboto. Roboto bleibt als Fallback erhalten (steht
-// bereits als Vorgabe in pdfMake.fonts).
-pdf.addFontContainer(helvetica as unknown as FontContainer);
-pdf.addFonts({
-  Roboto: {
-    normal: "Roboto-Regular.ttf",
-    bold: "Roboto-Medium.ttf",
-    italics: "Roboto-Italic.ttf",
-    bolditalics: "Roboto-MediumItalic.ttf",
-  },
-});
 
 /**
  * Einzel-PDF mit Platz für Stiftnachträge, wo er keine Seite kostet: ein
@@ -169,6 +135,17 @@ export async function sammelPdfErzeugen(
   for (const b of boegen) {
     if (abgebrochen()) return false;
     mitQr.push({ bogen: b, qr: await qrErzeugen(b, null) });
+    // Zwischen den Bögen die Oberfläche zum Zug kommen lassen: Die QR-Codes
+    // entstehen ohne echte Wartezeit, 100 davon wären ein Block von Sekunden.
+    await new Promise((weiter) => setTimeout(weiter, 0));
+  }
+  // Erst im Worker setzen (Oberfläche bleibt bedienbar); nur wenn es ihn
+  // nicht gibt oder er nicht startet, wie bisher im Hauptthread.
+  const imWorker = await sammelImWorker(mitQr, titel, fortschritt, abgebrochen);
+  if (imWorker === "abgebrochen") return false;
+  if (imWorker !== "kein-worker") {
+    if (abgebrochen()) return false;
+    return pdfDateiAusgeben(imWorker, dateiname);
   }
   const dd = await boegenSammelDokument(
     mitQr,
@@ -179,4 +156,74 @@ export async function sammelPdfErzeugen(
   );
   if (!dd || abgebrochen()) return false;
   return dokumentAusgeben(dd, dateiname);
+}
+
+/**
+ * Sammel-PDF im Worker setzen (pdf-sammel-worker.ts). "kein-worker" heißt:
+ * der Worker ließ sich nicht starten (Desktop-App über file://, alte Browser,
+ * Testumgebung) — dann rechnet der Aufrufer selbst. Fehler beim Setzen
+ * kommen als Ausnahme, wie im Hauptthread.
+ */
+function sammelImWorker(
+  boegen: SammelEinzelBogen[],
+  titel: string,
+  fortschritt: ((n: number, von: number) => void) | undefined,
+  abgebrochen: () => boolean,
+): Promise<ArrayBuffer | "kein-worker" | "abgebrochen"> {
+  if (typeof Worker === "undefined") return Promise.resolve("kein-worker");
+  let worker: Worker;
+  try {
+    worker = new Worker(new URL("./pdf-sammel-worker.ts", import.meta.url), { type: "module" });
+  } catch {
+    return Promise.resolve("kein-worker");
+  }
+  return new Promise((fertig, fehler) => {
+    let gemeldet = false;
+    const wache = window.setInterval(() => {
+      if (!abgebrochen()) return;
+      ende();
+      fertig("abgebrochen");
+    }, 250);
+    function ende() {
+      window.clearInterval(wache);
+      worker.terminate();
+    }
+    worker.onmessage = (e: MessageEvent<SammelNachricht>) => {
+      gemeldet = true;
+      const n = e.data;
+      if (n.art === "fortschritt") {
+        fortschritt?.(n.n, n.von);
+        return;
+      }
+      ende();
+      if (n.art === "fertig") fertig(n.pdf);
+      else fehler(new Error(n.text));
+    };
+    // Startet das Skript gar nicht (Ladefehler, CSP, file://), kam noch keine
+    // Nachricht: dann im Hauptthread. Ein Fehler mitten im Satz ist echt.
+    worker.onerror = (e) => {
+      e.preventDefault();
+      ende();
+      if (gemeldet) fehler(new Error(e.message || "Die Sammel-PDF ließ sich nicht setzen."));
+      else fertig("kein-worker");
+    };
+    try {
+      worker.postMessage({ boegen, titel } satisfies SammelAuftrag);
+    } catch {
+      ende();
+      fertig("kein-worker");
+    }
+  });
+}
+
+/** Fertige PDF-Bytes ausgeben: Download im Browser, Share-Sheet in der App. */
+async function pdfDateiAusgeben(pdf: ArrayBuffer, dateiname: string): Promise<boolean> {
+  if (istNativ()) {
+    const bytes = new Uint8Array(pdf);
+    let binaer = "";
+    for (let i = 0; i < bytes.length; i += 0x8000) binaer += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+    return binaerTeilen(dateiname, btoa(binaer));
+  }
+  blobAlsDownload(dateiname, new Blob([pdf], { type: "application/pdf" }));
+  return true;
 }

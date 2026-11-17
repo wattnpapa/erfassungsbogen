@@ -53,6 +53,10 @@ export function fehlerText(fehler: unknown): string {
       "Erst sichern, dann Platz schaffen: Papierkorb leeren (falls er Einsätze enthält) oder einen gesicherten Einsatz endgültig löschen."
     );
   }
+  // Manche Browser lehnen ohne Begründung ab (Firefox: Zwischenablage); „undefined" hilft niemandem.
+  if (fehler == null || (fehler instanceof Error && !fehler.message)) {
+    return "Der Browser hat den Vorgang ohne Angabe von Gründen abgelehnt. Bitte noch einmal versuchen.";
+  }
   return fehler instanceof Error ? fehler.message : String(fehler);
 }
 

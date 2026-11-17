@@ -16,7 +16,8 @@
  *   schreibt der Build nach `offline-zusatz.json`; dort steht auch der Umfang
  *   des Kerns, damit die Startseite beim Laden einen Fortschritt zeigen kann.
  * - **Nur auf Abruf** (seit 2026-11-08): die Bögen aller THW-Ortsverbände
- *   (istNurAufAbruf) — weder Kern noch Zusatz.
+ *   (istNurAufAbruf) — weder Kern noch Zusatz. Ebenso seit 2026-11-17 der
+ *   Worker der Sammel-PDF.
  */
 
 export interface VorratEintrag {
@@ -47,7 +48,11 @@ const KERN_SEITEN = new Set(["index.html", "anleitung.html", "vorlage.html", "da
  * verdrängen (Prüfrunde Beispielbögen, BB-O2).
  */
 export function istNurAufAbruf(url: string): boolean {
-  return /^assets\/ov-[^/]+\.json$/.test(url);
+  if (/^assets\/ov-[^/]+\.json$/.test(url)) return true;
+  // Der Worker der Sammel-PDF (pdf-sammel-worker.ts, rund 1,8 MB: pdfmake ein
+  // zweites Mal) dient nur dem Ausdruck vieler Übungsbögen. Fehlt er offline,
+  // setzt die App die Sammel-PDF wie zuvor im Hauptthread.
+  return /^assets\/pdf-sammel-worker-[^/]+\.js$/.test(url);
 }
 
 /** Gehört die Datei (Pfad wie im Precache-Manifest) in die zweite Stufe? */

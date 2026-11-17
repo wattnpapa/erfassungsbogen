@@ -408,6 +408,36 @@ describe("Übungsbogen-Link kopieren", () => {
       globalThis.fetch = echtesFetch;
     }
   }, 20000);
+
+  /**
+   * Firefox lehnt das Kopieren ab, wenn zwischen Tippen und Kopieren zu viel
+   * Zeit liegt, und gibt als Grund nur `undefined` (Rückmeldung 11/2026: „Link
+   * konnte nicht erzeugt werden: undefined"). Dann steht der Link zum Markieren
+   * im Hinweis.
+   */
+  it("zeigt den Link zum Markieren, wenn der Browser das Kopieren ablehnt", async () => {
+    const bogenJson = JSON.stringify({ ...neuerBogen(), uebung: true });
+    const echtesFetch = globalThis.fetch;
+    globalThis.fetch = async () => new Response(bogenJson, { headers: { "content-type": "application/json" } });
+    const nutzer = userEvent.setup();
+    const schreiben = vi.spyOn(navigator.clipboard, "writeText").mockImplementation(() => Promise.reject(undefined));
+    try {
+      buehne();
+      await act(async () => beispielboegenOeffnen());
+      const dialog = await screen.findByRole("dialog", { name: "Übungsbögen" }, { timeout: 15000 });
+      await nutzer.click(within(dialog).getByRole("button", { name: /^THW/ }));
+      const knoepfe = await within(dialog).findAllByRole("button", { name: "Link" }, { timeout: 15000 });
+      await nutzer.click(knoepfe[0]!);
+
+      const hinweis = await screen.findByRole("dialog", { name: "Bogen-Link" }, { timeout: 15000 });
+      const feld = within(hinweis).getByRole("textbox") as HTMLTextAreaElement;
+      expect(feld.value.startsWith("https://erfassungsbogen.app/#")).toBe(true);
+      expect(within(dialog).queryByText(/undefined/)).toBeNull();
+    } finally {
+      schreiben.mockRestore();
+      globalThis.fetch = echtesFetch;
+    }
+  }, 20000);
 });
 
 /** Audit Runde 5, R5-D5: keine doppelte Verneinung in der Löschrückfrage. */

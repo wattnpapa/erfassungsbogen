@@ -41,6 +41,11 @@ describe("fehlerText", () => {
     expect(fehlerText(new Error("Kein Platz auf dem Gerät"))).toBe("Kein Platz auf dem Gerät");
     expect(fehlerText("abgebrochen")).toBe("abgebrochen");
   });
+
+  it("sagt bei einer Ablehnung ohne Grund nicht „undefined“", () => {
+    expect(fehlerText(undefined)).toContain("ohne Angabe von Gründen");
+    expect(fehlerText(new Error(""))).toContain("ohne Angabe von Gründen");
+  });
 });
 
 describe("fehlerText bei vollem Speicher (R3-E1)", () => {

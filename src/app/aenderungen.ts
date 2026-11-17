@@ -35,6 +35,13 @@ export const MONATE: Readonly<Record<string, string>> = {
 
 export const AENDERUNGEN: readonly Aenderung[] = [
   {
+    datum: "2026-11-17",
+    punkte: [
+      "Übungsbögen: Die Sammel-PDF entsteht jetzt im Hintergrund. Bei 100 Bögen blieb die Seite vorher sekundenlang stehen, und manche Browser meldeten, das Skript reagiere nicht; jetzt bleibt sie bedienbar, bis der Download kommt.",
+      "Übungsbögen: „Link“ scheiterte in manchen Browsern mit der Meldung „Link konnte nicht erzeugt werden: undefined“. Der Link landet jetzt in der Zwischenablage, und wo der Browser das ablehnt, öffnet sich ein Fenster mit dem Link zum Markieren und Kopieren.",
+    ],
+  },
+  {
     datum: "2026-11-16",
     punkte: [
       "Übungsbögen: Mehrere Bögen lassen sich jetzt mit dem Häkchen vor der Einheit markieren und mit „Sammel-PDF“ als eine Datei herunterladen, etwa alle Einheiten eines Ortsverbands für eine Übung am Meldekopf. „Alle markieren“ nimmt den ganzen Ordner oder das ganze Suchergebnis, „Markierung aufheben“ setzt zurück. In der Datei beginnt jeder Bogen auf einer neuen Seite und sieht aus wie sein eigenes PDF, mit eigenem QR-Code, Platz für den Meldekopf auf Blatt 1 und „Blatt n von m dieses Bogens“ auf den Folgeblättern; nur die Seitenzahl rechts unten zählt durch die ganze Datei. Während die Datei entsteht, zeigt der Dialog an, welcher Bogen gerade vorbereitet wird.",

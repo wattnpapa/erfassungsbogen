@@ -1608,6 +1608,18 @@ bei `einzelPdfDokument`, dessen Messung jetzt als `einzelNachtragsPlatz` getrenn
 Fußzeile und eigener eingebetteter JSON-Datei (`erfassungsbogen-01.json` …); nur die Seitenzahl läuft durch.
 Dateiname `uebung-beispiele-<Ordner>-<n>-boegen.pdf`. Kein neuer Host, keine neue Abhängigkeit; Tests
 `pdf-sammel.test.ts` (echter Satz) und `beispiele-sammel.test.tsx` (Dialog).
+*Nachgezogen 2026-11-17 (Sammel-PDF im Worker):* pdfmake setzt synchron; bei 101 Bögen blockierten Probesatz und
+Endsatz den Hauptthread je bis zu 10 s (Chromium), in Firefox lange genug für „Skript reagiert nicht". Seither setzt
+ein Web Worker (`src/app/pdf-sammel-worker.ts`) die Sammel-PDF: Der Hauptthread erzeugt nur die QR-Sätze (Canvas,
+mit einer Pause je Bogen) und gibt die fertigen Bytes aus (`pdfDateiAusgeben` in `pdf.ts`). Der Worker bringt pdfmake
+ein zweites Mal mit, aber nur mit Helvetica (`pdf-helvetica.ts`; Roboto steht in `pdf-make.ts` nur für den
+Hauptthread), rund 1,8 MB. Er gehört weder zum Kern noch zur zweiten Stufe des Offline-Vorrats
+(`istNurAufAbruf` in `scripts/precache-aufteilung.ts`); startet er nicht (offline, Desktop-App über `file://`,
+Testumgebung), rechnet `sammelPdfErzeugen` wie zuvor im Hauptthread. Kein neuer Host, keine neue Abhängigkeit,
+keine CSP-Änderung (`worker-src` fällt auf `script-src 'self'` zurück). Längste Blockade bei 101 Bögen jetzt rund
+0,3 s. „Link" je Übungsbogen schreibt über `ClipboardItem` mit einem Versprechen in die Zwischenablage, noch im
+Takt des Tippens; ein Browser der Erprobung (vermutlich Firefox) lehnte `writeText` nach dem Laden und Signieren mit `undefined` ab. Lehnt der Browser ab,
+zeigt ein Hinweis den Link zum Markieren.
 *Nachgezogen 2026-10-06 (Audit Runde 4, R4-O1):* Bricht das Erstladen im
 Funkloch ab, scheitert der Service Worker an der Installation, und der Browser
 verwirft die Registrierung; ein späteres `update()` ginge ins Leere und die
