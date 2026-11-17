@@ -75,6 +75,9 @@ const ORDNER_LABEL: Record<string, string> = {
   "rfb-v": "Regionsfeuerwehrbereitschaft V",
   "cbrn-nord": "CBRN-Einheit Nord",
   einsatzeinheiten: "Einsatzeinheiten",
+  // Reale Wachen mit ihren Fahrzeugen nach bos-fahrzeuge.info (scripts/bos-fahrzeuge-nds-beispielboegen.mts).
+  ortsfeuerwehren: "Ortsfeuerwehren (echte Fahrzeuge, Personen erfunden)",
+  standorte: "Standorte (echte Fahrzeuge, Personen erfunden)",
 };
 
 function ordnerLabel(ordner: string): string {
@@ -136,11 +139,16 @@ const nachDatei = (a: BeispielEintrag, b: BeispielEintrag) => a.datei.localeComp
 // in jedem App-Start. Sie kommt beim Öffnen des Dialogs aus einem eigenen
 // Baustein (beispiele-thw-ov.ts) dazu.
 const BEISPIELE: BeispielEintrag[] = beispielEintraege(
-  import.meta.glob(["../../examples/**/*.json", "!../../examples/thw/ortsverbaende/**"], {
-    eager: true,
-    query: "?url",
-    import: "default",
-  }),
+  import.meta.glob(
+    [
+      "../../examples/**/*.json",
+      "!../../examples/thw/ortsverbaende/**",
+      // Wachen nach bos-fahrzeuge.info: ebenfalls im nachgeladenen Baustein (beispiele-thw-ov.ts).
+      "!../../examples/*/niedersachsen/ortsfeuerwehren/**",
+      "!../../examples/*/niedersachsen/standorte/**",
+    ],
+    { eager: true, query: "?url", import: "default" },
+  ),
 ).sort(nachDatei);
 
 /** Anzeigenamen der nachgeladenen Ordner (Landesverband, Regionalstelle, Ortsverband). */
@@ -152,10 +160,10 @@ let ovGeladen = false;
 /** Bögen aller Ortsverbände einmalig dazuholen; ein Fehlschlag (offline, alter Stand) darf später erneut versucht werden. */
 function ovBeispieleLaden(): Promise<void> {
   ovBeispieleVersprechen ??= import("./beispiele-thw-ov")
-    .then(({ THW_OV_BEISPIELE, THW_OV_ORDNER_LABEL }) => {
-      BEISPIELE.push(...beispielEintraege(THW_OV_BEISPIELE));
+    .then(({ THW_OV_BEISPIELE, THW_OV_ORDNER_LABEL, BOS_WACHEN_BEISPIELE, BOS_ORDNER_LABEL }) => {
+      BEISPIELE.push(...beispielEintraege(THW_OV_BEISPIELE), ...beispielEintraege(BOS_WACHEN_BEISPIELE));
       BEISPIELE.sort(nachDatei);
-      for (const [ordner, label] of Object.entries(THW_OV_ORDNER_LABEL)) ORDNER_LABEL_NACHGELADEN.set(ordner, label);
+      for (const [ordner, label] of Object.entries({ ...THW_OV_ORDNER_LABEL, ...BOS_ORDNER_LABEL })) ORDNER_LABEL_NACHGELADEN.set(ordner, label);
       ovGeladen = true;
     })
     .catch((err: unknown) => {
@@ -213,11 +221,14 @@ const BOGEN_CACHE = new Map<string, Erfassungsbogen>();
  * Ohne Netz darf die Meldung deshalb kein Nachladen versprechen (Prüfrunde
  * Übungsbögen, BB-S1, BB-O1, BB-H3).
  */
-const istOvBogen = (url: string): boolean => /\/ov-[^/]+\.json$/.test(url);
+const istOvBogen = (url: string): boolean => /\/(?:ov|wache)-[^/]+\.json$/.test(url);
 const OV_OFFLINE_TEXT =
-  "Die Bögen der THW-Ortsverbände lädt die App nicht vorab: Ein Bogen braucht beim ersten Öffnen Netz und bleibt danach auf dem Gerät.";
+  "Die Bögen der THW-Ortsverbände und der Wachen in Niedersachsen lädt die App nicht vorab: Ein Bogen braucht beim ersten Öffnen Netz und bleibt danach auf dem Gerät.";
 const OV_ORDNER = ["thw", "ortsverbaende"];
-const imOvOrdner = (pfad: string[]): boolean => OV_ORDNER.every((seg, i) => pfad[i] === seg);
+/** Ordner, deren Bögen erst mit dem nachgeladenen Baustein bekannt sind: THW-Ortsverbände und Wachen nach bos-fahrzeuge.info (ebenfalls „wache-…"). */
+const imOvOrdner = (pfad: string[]): boolean =>
+  OV_ORDNER.every((seg, i) => pfad[i] === seg) ||
+  (pfad[1] === "niedersachsen" && (pfad[2] === "ortsfeuerwehren" || pfad[2] === "standorte"));
 
 /**
  * Zuletzt offener Ordner des Dialogs, je Tab (Prüfrunde Beispielbögen, BB-S3,

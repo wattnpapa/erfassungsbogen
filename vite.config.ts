@@ -334,7 +334,8 @@ export default defineConfig({
             // Einträge) verdrängten ab rund 950 geöffneten OV-Bögen still alle
             // übrigen Beispielbögen und Fotos (Prüfrunde Beispielbögen, BB-O2).
             // Muss vor der allgemeinen JSON-Regel stehen: die erste passende gilt.
-            urlPattern: ({ url, sameOrigin }) => sameOrigin && /\/assets\/ov-[^/]+\.json$/.test(url.pathname),
+            // Ebenso die Bögen realer Wachen nach bos-fahrzeuge.info („wache-…", seit 2026-11-17).
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && /\/assets\/(?:ov|wache)-[^/]+\.json$/.test(url.pathname),
             handler: "CacheFirst",
             options: { cacheName: "eeb-ov-beispiele", expiration: { maxEntries: 4000 } },
           },

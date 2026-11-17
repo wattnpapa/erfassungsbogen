@@ -1,0 +1,654 @@
+{
+  "schemaVersion": 13,
+  "uebung": true,
+  "stand": 3527373,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Freiwillige Feuerwehr Sande",
+    "einheitsTyp": {
+      "freitext": "Ortsfeuerwehr"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Ortsfeuerwehr"
+        },
+        "name": "Sande"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Friesland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2449,
+    "zeitraumBis": 2451,
+    "ortAuftrag": "Großbrand Gewerbegebiet: Wasserversorgung über lange Wegstrecke, Meldekopf Friesland"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Jonas",
+      "nachname": "Arnold",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Ortsbrandmeister/-in (ELW)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5552279791"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Henrik",
+      "nachname": "Richter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (ELW)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Möller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Führungsassistent/-in (ELW)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Tobias",
+      "nachname": "Pohl",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Ortsbrandmeister/-in (LF 20)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559966854"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ines",
+      "nachname": "Kraus",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (LF 20)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Franziska",
+      "nachname": "Friedrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (LF 20)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Leon",
+      "nachname": "Hartmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (LF 20)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Daniel",
+      "nachname": "Brandt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (LF 20)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Stein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (LF 20)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Meyer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (LF 20)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Marcel",
+      "nachname": "Kuhn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (LF 20)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Weber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (LF 20)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Thorsten",
+      "nachname": "Richter",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (HLF 20)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Weber",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (HLF 20)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Winkler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (HLF 20)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Scholz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (HLF 20)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Marco",
+      "nachname": "Dietrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (HLF 20)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Fabian",
+      "nachname": "Herrmann",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (HLF 20)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Bernd",
+      "nachname": "Ernst",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (HLF 20)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Torben",
+      "nachname": "Weiß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (HLF 20)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Vogt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (HLF 20)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Kevin",
+      "nachname": "Thiel",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (GW)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Stefan",
+      "nachname": "Wolf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (GW)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Erik",
+      "nachname": "Schmidt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (GW)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 2,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Leon",
+      "nachname": "Albrecht",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (CBRN ErKw)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5558438440"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Leon",
+      "nachname": "Busch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (CBRN ErKw)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Braun",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (CBRN ErKw)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "ELW"
+      },
+      "kennzeichen": "FRI-F 4161",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          14,
+          11,
+          1
+        ]
+      },
+      "aenderungen": "Einsatzleitwagen"
+    },
+    {
+      "typ": {
+        "freitext": "LF 20"
+      },
+      "kennzeichen": "FRI-F 4471",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          14,
+          47,
+          1
+        ]
+      },
+      "aenderungen": "Löschgruppenfahrzeug"
+    },
+    {
+      "typ": {
+        "freitext": "HLF 20"
+      },
+      "kennzeichen": "FRI-F 4481",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          14,
+          48,
+          1
+        ]
+      },
+      "aenderungen": "Hilfeleistungslöschgruppenfahrzeug"
+    },
+    {
+      "typ": {
+        "freitext": "GW"
+      },
+      "kennzeichen": "FRI-F 4143",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          14,
+          59,
+          1
+        ]
+      },
+      "aenderungen": "Gerätewagen"
+    },
+    {
+      "typ": {
+        "freitext": "Anhänger P-250"
+      },
+      "kennzeichen": "JEV-H 801",
+      "aenderungen": "Anhänger; Rufname laut Quelle: Florian Friesland 14/P-250-01"
+    },
+    {
+      "typ": {
+        "freitext": "CBRN ErKw"
+      },
+      "kennzeichen": "NL4-891",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          19,
+          71,
+          1
+        ]
+      },
+      "aenderungen": "ABC/CBRN-Erkundungskraftwagen"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 27,
+    "dieselLiter": 300,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fahrzeuge, Funkrufnamen und Kennzeichen nach bos-fahrzeuge.info (Wache FF Sande OF Sande, Stand 2026-11-17); alle Personen erfunden."
+}

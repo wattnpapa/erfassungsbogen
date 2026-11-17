@@ -11,3 +11,5 @@ coverage/
 erklaerfilm/aufnahmen/
 erklaerfilm/audio/
 erklaerfilm/ausgabe/
+# Momentaufnahmen-Abruf (scripts/bos-fahrzeuge-abruf.mts)
+.cache/

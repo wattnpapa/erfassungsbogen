@@ -1,0 +1,479 @@
+{
+  "schemaVersion": 13,
+  "uebung": true,
+  "stand": 3527446,
+  "einheit": {
+    "organisation": 2,
+    "organisationName": "Freiwillige Feuerwehr Wangerland",
+    "einheitsTyp": {
+      "freitext": "Ortsfeuerwehr"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Ortsfeuerwehr"
+        },
+        "name": "Waddewarden"
+      },
+      {
+        "bezeichnung": {
+          "code": 1
+        },
+        "name": "Wangerland"
+      },
+      {
+        "bezeichnung": {
+          "code": 2
+        },
+        "name": "Friesland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2449,
+    "zeitraumBis": 2451,
+    "ortAuftrag": "Großbrand Gewerbegebiet: Wasserversorgung über lange Wegstrecke, Meldekopf Friesland"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Laura",
+      "nachname": "Krämer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Ortsbrandmeister/-in (MTF)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554122179"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Brunner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTF)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dominik",
+      "nachname": "Groß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (MTF)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Hannes",
+      "nachname": "Sommer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (MTF)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Silke",
+      "nachname": "Sommer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Ortsbrandmeister/-in (TSF-W)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Jannik",
+      "nachname": "Pohl",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (TSF-W)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Peter",
+      "nachname": "Ernst",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (TSF-W)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Kai",
+      "nachname": "Köhler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (TSF-W)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Ines",
+      "nachname": "Ludwig",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (TSF-W)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Matthias",
+      "nachname": "Busch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (TSF-W)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Sven",
+      "nachname": "Schmitt",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Gruppenführer/-in (LF 10)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559016001"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Fischer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Maschinist/-in (LF 10)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Maschinist"
+        }
+      ]
+    },
+    {
+      "vorname": "Robert",
+      "nachname": "Richter",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Melder/-in (LF 10)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sprechfunker"
+        }
+      ]
+    },
+    {
+      "vorname": "Joachim",
+      "nachname": "Schneider",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (LF 10)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Lukas",
+      "nachname": "Schröder",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (LF 10)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Sandra",
+      "nachname": "Friedrich",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (LF 10)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Hannes",
+      "nachname": "Koch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (LF 10)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Jonas",
+      "nachname": "Sommer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppführer/-in (LF 10)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    },
+    {
+      "vorname": "Frank",
+      "nachname": "Schäfer",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Truppmitglied (LF 10)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Atemschutzgeräteträger"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTF"
+      },
+      "kennzeichen": "FRI-F 6176",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          16,
+          17,
+          6
+        ]
+      },
+      "aenderungen": "Mannschaftstransportwagen"
+    },
+    {
+      "typ": {
+        "freitext": "TSF-W"
+      },
+      "kennzeichen": "FRI-F 6416",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          16,
+          41,
+          6
+        ]
+      },
+      "aenderungen": "Tragkraftspritzenfahrzeug-Wasser"
+    },
+    {
+      "typ": {
+        "freitext": "LF 10"
+      },
+      "kennzeichen": "FRI-F 6456",
+      "funkrufname": {
+        "kennwort": {
+          "code": 2
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          16,
+          45,
+          6
+        ]
+      },
+      "aenderungen": "Löschgruppenfahrzeug"
+    },
+    {
+      "typ": {
+        "freitext": "FwA-Küche"
+      },
+      "kennzeichen": "FRI-SW 69",
+      "aenderungen": "Anhänger; Rufname laut Quelle: Florian Friesland 16/FwA-Küche-06"
+    },
+    {
+      "typ": {
+        "freitext": "FwA-Transport"
+      },
+      "kennzeichen": "FRI-FA 66",
+      "aenderungen": "Anhänger; Rufname laut Quelle: Florian Friesland 16/FwA-Transport-06"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 19,
+    "dieselLiter": 160,
+    "benzinLiter": 0,
+    "gemischLiter": 10,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fahrzeuge, Funkrufnamen und Kennzeichen nach bos-fahrzeuge.info (Wache FF Wangerland OF Waddewarden, Stand 2026-11-17); alle Personen erfunden."
+}

@@ -1,0 +1,2998 @@
+{
+ "quelle": "https://bos-fahrzeuge.info/",
+ "abgerufen": "2026-11-17",
+ "hinweis": "Wachen und Fahrzeuge (Funkrufname, Kennzeichen, Organisation, Klassifizierung) aus der Wachen- und Fahrzeugdatenbank von bos-fahrzeuge.info, eingetragen von deren Nutzern. Nur Fakten, keine Fotos oder Texte.",
+ "wachen": [
+  {
+   "id": 65382,
+   "name": "DRK Jeverland RW Schillig",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Rettungsdienst: Deutsches Rotes Kreuz (DRK)",
+   "wachenart": "Bereitschaft (BS)",
+   "ort": "Wangerland",
+   "fahrzeuge": [
+    {
+     "id": 191717,
+     "funkrufname": "Rotkreuz Friesland 49/89-01",
+     "kennzeichen": "FRI-RK 491",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "First-Responder/Helfer vor Ort",
+     "ausserDienst": false,
+     "typText": "First-Responder-Fahrzeug"
+    },
+    {
+     "id": 102794,
+     "funkrufname": "Rotkreuz Friesland 46/89-01",
+     "kennzeichen": "FRI-EN 610",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "First-Responder/Helfer vor Ort",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 4326,
+   "name": "DRK KV Jeverland - BS Jever",
+   "kreis": "Friesland (FRI)",
+   "organisation": "SEG/KatS: Deutsches Rotes Kreuz (DRK)",
+   "wachenart": "Bereitschaft (BS)",
+   "ort": "Schützenhofstraße 42a",
+   "fahrzeuge": [
+    {
+     "id": 64718,
+     "funkrufname": "Rotkreuz Friesland 41 - Geschirrspühlanhänger",
+     "kennzeichen": "FRI-RD 34",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 64722,
+     "funkrufname": "Rotkreuz Friesland 41/16-01",
+     "kennzeichen": "FRI-RK 15",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Betreuungskraftwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 184136,
+     "funkrufname": "Rotkreuz Friesland 41/17-01",
+     "kennzeichen": "FRI-RK 103",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 64725,
+     "funkrufname": "Rotkreuz Friesland 41/19-01",
+     "kennzeichen": "FRI-DK 21",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW/ELW"
+    },
+    {
+     "id": 5545,
+     "funkrufname": "Rotkreuz Friesland 41/69-01",
+     "kennzeichen": "FRI-RK 32",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Feldküchenkraftwagen",
+     "ausserDienst": false,
+     "typText": "Küchenwagen"
+    },
+    {
+     "id": 87999,
+     "funkrufname": "Rotkreuz Friesland 41/93-01",
+     "kennzeichen": "FRI-RK 23",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Notfallkrankentransportwagen",
+     "ausserDienst": false,
+     "typText": "N-KTW"
+    },
+    {
+     "id": 64723,
+     "funkrufname": "Rotkreuz Friesland 49/89-02",
+     "kennzeichen": "FRI-E 882",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false
+    },
+    {
+     "id": 64724,
+     "funkrufname": "Rotkreuz Friesland 19/64",
+     "kennzeichen": "FRI-8309",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 64721,
+     "funkrufname": "Rotkreuz Friesland 19/69",
+     "kennzeichen": "FRI-CE 348",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mehrzweckfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 64720,
+     "funkrufname": "Rotkreuz Friesland 41/63-01",
+     "kennzeichen": "FRI-8310",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Betreuungslastkraftwagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 103395,
+     "funkrufname": "Rotkreuz Friesland 41/63-01",
+     "kennzeichen": "FRI-RK 99",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mehrzweckfahrzeug",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 3814,
+   "name": "DRK KV Jeverland BS Sande",
+   "kreis": "Friesland (FRI)",
+   "organisation": "SEG/KatS: Deutsches Rotes Kreuz (DRK)",
+   "wachenart": "Bereitschaft (BS)",
+   "ort": "Hauptstraße",
+   "fahrzeuge": [
+    {
+     "id": 110269,
+     "funkrufname": "Rotkreuz Friesland 44/11-01",
+     "kennzeichen": "FRI-RK 100",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Einsatzleitfahrzeug",
+     "ausserDienst": false,
+     "typText": "ELW 1"
+    },
+    {
+     "id": 64717,
+     "funkrufname": "Rotkreuz Friesland 44/17-01",
+     "kennzeichen": "FRI-RK 461",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 161476,
+     "funkrufname": "Rotkreuz Friesland 44/19-01",
+     "kennzeichen": "FRI-RK 442",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MZF"
+    },
+    {
+     "id": 109403,
+     "funkrufname": "Rotkreuz Friesland 44/93-01",
+     "kennzeichen": "FRI-RK 441",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Notfallkrankentransportwagen",
+     "ausserDienst": false,
+     "typText": "NKTW"
+    },
+    {
+     "id": 107358,
+     "funkrufname": "Rotkreuz Friesland 44/96-01",
+     "kennzeichen": "FRI-L 2796",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Gerätewagen-Sanität",
+     "ausserDienst": false,
+     "typText": "GW-San"
+    },
+    {
+     "id": 217669,
+     "funkrufname": "Rotkreuz Friesland 44/Transportanhänger 01",
+     "kennzeichen": "FRI-RK 446",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 102789,
+     "funkrufname": "Rotkreuz Friesland 44/96-01",
+     "kennzeichen": "FRI-L 2706",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Arzttruppkraftwagen",
+     "ausserDienst": true,
+     "typText": "GW-San"
+    },
+    {
+     "id": 97758,
+     "funkrufname": "Rotkreuz Friesland 49/42",
+     "kennzeichen": "FRI-RD 130",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Rettungswagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 64719,
+     "funkrufname": "Rotkreuz Friesland 49/61",
+     "kennzeichen": "FRI-CR 709",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 10931,
+   "name": "DRK KV Jeverland BS Schortens",
+   "kreis": "Friesland (FRI)",
+   "organisation": "SEG/KatS: Deutsches Rotes Kreuz (DRK)",
+   "wachenart": "Bereitschaft (BS)",
+   "ort": "Königsberger Straße 47",
+   "mitglieder": 25,
+   "fahrzeuge": [
+    {
+     "id": 215685,
+     "funkrufname": "Rotkreuz Friesland 45/17-01",
+     "kennzeichen": "FRI-RK 440",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 214328,
+     "funkrufname": "Rotkreuz Friesland 45/17-02",
+     "kennzeichen": "FRI-RK 700",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mannschaftskraftwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 1156,
+     "funkrufname": "Rotkreuz Friesland 45/59-01",
+     "kennzeichen": "FRI-RK 594",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Gerätewagen",
+     "ausserDienst": false,
+     "typText": "GW Sicherheit/Technik"
+    },
+    {
+     "id": 226779,
+     "funkrufname": "Rotkreuz Friesland 45/91-01",
+     "kennzeichen": "FRI-RK 451",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Krankentransportwagen",
+     "ausserDienst": false,
+     "typText": "KTW"
+    },
+    {
+     "id": 122155,
+     "funkrufname": "Rotkreuz Friesland 45/93-01",
+     "kennzeichen": "FRI-RK 450",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Notfallkrankentransportwagen",
+     "ausserDienst": false,
+     "typText": "N-KTW/ Typ B"
+    },
+    {
+     "id": 190574,
+     "funkrufname": "Rotkreuz Friesland 45/Lima-01",
+     "kennzeichen": "FRI-RK 452",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 3738,
+     "funkrufname": "Rotkreuz Friesland 45/17-01",
+     "kennzeichen": "FRI-E 880",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true,
+     "typText": "MTW"
+    },
+    {
+     "id": 112647,
+     "funkrufname": "Rotkreuz Friesland 45/19-01",
+     "kennzeichen": "FRI-RK 591",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mehrzweckfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 93813,
+     "funkrufname": "Rotkreuz Friesland 45/83-01",
+     "kennzeichen": "FRI-RD 62",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Rettungswagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 3740,
+     "funkrufname": "Rotkreuz Friesland 59/41",
+     "kennzeichen": "FRI-E 571",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Rettungswagen",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 17310,
+   "name": "DRK KV Varel-Friesische Wehde BS Varel",
+   "kreis": "Friesland (FRI)",
+   "organisation": "SEG/KatS: Deutsches Rotes Kreuz (DRK)",
+   "wachenart": "Bereitschaft (BS)",
+   "ort": "Emil-Heeder-Straße 18",
+   "fahrzeuge": [
+    {
+     "id": 186086,
+     "funkrufname": "Rotkreuz Friesland 42/11-01",
+     "kennzeichen": "FRI-RK 205",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Einsatzleitfahrzeug",
+     "ausserDienst": false,
+     "typText": "ELW 1"
+    },
+    {
+     "id": 175160,
+     "funkrufname": "Rotkreuz Friesland 42/17-01",
+     "kennzeichen": "FRI-RK 330",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 210163,
+     "funkrufname": "Rotkreuz Friesland 42/17-02",
+     "kennzeichen": "FRI-RK 263",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 99343,
+     "funkrufname": "Rotkreuz Friesland 42/17-0x",
+     "kennzeichen": "FRI-RK 261",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false
+    },
+    {
+     "id": 149927,
+     "funkrufname": "Rotkreuz Friesland 42/59-01",
+     "kennzeichen": "FRI-RK 47",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Gerätewagen",
+     "ausserDienst": false,
+     "typText": "GW-SEG"
+    },
+    {
+     "id": 197592,
+     "funkrufname": "Rotkreuz Friesland 42/83-01",
+     "kennzeichen": "FRI-RK 283",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Rettungswagen",
+     "ausserDienst": false,
+     "typText": "RTW"
+    },
+    {
+     "id": 175235,
+     "funkrufname": "Rotkreuz Friesland 42/96-01",
+     "kennzeichen": "FRI-L 2798",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Gerätewagen-Sanität",
+     "ausserDienst": false,
+     "typText": "GW-San"
+    },
+    {
+     "id": 230774,
+     "funkrufname": "Rotkreuz Friesland 42/GA-Sanität",
+     "kennzeichen": "FRI-RK 911",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 93815,
+     "funkrufname": "Rotkreuz Friesland 42/11-01",
+     "kennzeichen": "FRI-RK 291",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Einsatzleitfahrzeug",
+     "ausserDienst": true,
+     "typText": "ELW 1"
+    },
+    {
+     "id": 102804,
+     "funkrufname": "Rotkreuz Friesland 42/93-01",
+     "kennzeichen": "FRI-8311",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Krankentransportwagen 4-Tragen",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 41754,
+   "name": "DRK Varel - Friesische Wehde BS Friesische Wehde",
+   "kreis": "Friesland (FRI)",
+   "organisation": "SEG/KatS: Deutsches Rotes Kreuz (DRK)",
+   "wachenart": "Bereitschaft (BS)",
+   "ort": "Johann-Schütte-Straße 6",
+   "fahrzeuge": [
+    {
+     "id": 175162,
+     "funkrufname": "Rotkreuz Friesland 43/17-01",
+     "kennzeichen": "FRI-RK 172",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 186078,
+     "funkrufname": "Rotkreuz Friesland 43/83-01",
+     "kennzeichen": "FRI-RK 240",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Rettungswagen",
+     "ausserDienst": false,
+     "typText": "RTW"
+    },
+    {
+     "id": 175161,
+     "funkrufname": "Rotkreuz Friesland 43/Anh-SEG",
+     "kennzeichen": "FRI-CM 437",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 149925,
+     "funkrufname": "Rotkreuz Friesland 43/83-01",
+     "kennzeichen": "FRI-RK 340",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Deutsches Rotes Kreuz (DRK)",
+     "klassifizierung": "Rettungswagen",
+     "ausserDienst": true,
+     "typText": "RTW"
+    }
+   ]
+  },
+  {
+   "id": 21864,
+   "name": "FF Bockhorn OF Bockhorn",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Schulstraße 19",
+   "mitglieder": 50,
+   "fahrzeuge": [
+    {
+     "id": 63479,
+     "funkrufname": "Florian Friesland 17/11-01",
+     "kennzeichen": "FRI-E 711",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Einsatzleitwagen",
+     "ausserDienst": false,
+     "typText": "ELW 1"
+    },
+    {
+     "id": 201608,
+     "funkrufname": "Florian Friesland 17/17-01",
+     "kennzeichen": "FRI-F 7123",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 129981,
+     "funkrufname": "Florian Friesland 17/24-01",
+     "kennzeichen": "FRI-F 710",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Hilfeleistungstanklöschfahrzeug",
+     "ausserDienst": false,
+     "typText": "TLF 16/25"
+    },
+    {
+     "id": 201645,
+     "funkrufname": "Florian Friesland 17/45-01",
+     "kennzeichen": "FRI-F 7451",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 10"
+    },
+    {
+     "id": 129396,
+     "funkrufname": "Florian Friesland 17/48-01",
+     "kennzeichen": "FRI-F 7122",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Hilfeleistungslöschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "HLF 20"
+    },
+    {
+     "id": 217547,
+     "funkrufname": "Florian Friesland 17/FwA-JF-01",
+     "kennzeichen": "FRI-E 700",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Jugend- / Kinderfeuerwehr (JF/KF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 129421,
+     "funkrufname": "Florian Friesland 17/44-01",
+     "kennzeichen": "FRI-F 8925",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug-KatS",
+     "ausserDienst": true
+    },
+    {
+     "id": 1103,
+     "funkrufname": "Florian Friesland 71/10",
+     "kennzeichen": "FRI-E 711",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 424,
+     "funkrufname": "Florian Friesland 71/22",
+     "kennzeichen": "FRI-E 713",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 212017,
+     "funkrufname": "Florian Friesland 71/23",
+     "kennzeichen": "JEV-H 595",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 425,
+     "funkrufname": "Florian Friesland 71/40",
+     "kennzeichen": "FRI-E 716",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Gerätewagen",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 10927,
+   "name": "FF Bockhorn OF Grabstede",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Theilenmoorstraße 1",
+   "fahrzeuge": [
+    {
+     "id": 210162,
+     "funkrufname": "Florian Friesland 17/17-02",
+     "kennzeichen": "FRI-F 179",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 95090,
+     "funkrufname": "Florian Friesland 17/43-02",
+     "kennzeichen": "FRI-E 775",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 8"
+    },
+    {
+     "id": 174309,
+     "funkrufname": "Florian Friesland 17/43-02 - FwA-Schlauch",
+     "kennzeichen": "FRI-E 775",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 174308,
+     "funkrufname": "Florian Friesland 17/46-02",
+     "kennzeichen": "FRI-F 7462",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Hilfeleistungslöschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "HLF 10"
+    },
+    {
+     "id": 229581,
+     "funkrufname": "Florian Friesland 17/FwA-Hygiene",
+     "kennzeichen": "FRI-F 780",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 174310,
+     "funkrufname": "Florian Friesland 17/FwA-JF-02",
+     "kennzeichen": "FRI-E 701",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Jugend- / Kinderfeuerwehr (JF/KF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 93936,
+     "funkrufname": "Florian Friesland 17/17-02",
+     "kennzeichen": "FRI-E 720",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true,
+     "typText": "MTW"
+    },
+    {
+     "id": 166764,
+     "funkrufname": "Florian Friesland 17/20-02",
+     "kennzeichen": "FRI-E 722",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 88046,
+     "funkrufname": "Florian Friesland 72/20",
+     "kennzeichen": "FRI-E 723",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 4174,
+   "name": "FF Jever OF Cleverns",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Dorfstraße 45",
+   "mitglieder": 38,
+   "fahrzeuge": [
+    {
+     "id": 224328,
+     "funkrufname": "Florian Friesland 11/19-02",
+     "kennzeichen": "FRI-F 1192",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false
+    },
+    {
+     "id": 105426,
+     "funkrufname": "Florian Friesland 11/22-02",
+     "kennzeichen": "FRI-F 1214",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": false,
+     "typText": "TLF 8/18"
+    },
+    {
+     "id": 182268,
+     "funkrufname": "Florian Friesland 11/45-02",
+     "kennzeichen": "FRI-F 1145",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 10"
+    },
+    {
+     "id": 182277,
+     "funkrufname": "Florian Friesland 11/STA-02",
+     "kennzeichen": "FRI-E 115",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 182278,
+     "funkrufname": "NI - FF Jever OF Cleverns",
+     "kennzeichen": "FRI-F 1145 & FRI-F 1214",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Gruppenfoto",
+     "ausserDienst": false
+    },
+    {
+     "id": 105420,
+     "funkrufname": "Florian Friesland 11/43-02",
+     "kennzeichen": "FRI-F 1220",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 130238,
+     "funkrufname": "Florian Friesland 12/26",
+     "kennzeichen": "FRI-E 125",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tragkraftspritzenfahrzeug",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 3750,
+   "name": "FF Jever OF Jever",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Milchstraße 3",
+   "mitglieder": 60,
+   "fahrzeuge": [
+    {
+     "id": 156072,
+     "funkrufname": "Florian Friesland 11/11-01",
+     "kennzeichen": "FRI-F 1111",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Einsatzleitwagen",
+     "ausserDienst": false,
+     "typText": "ELW 1"
+    },
+    {
+     "id": 102776,
+     "funkrufname": "Florian Friesland 11/17-01",
+     "kennzeichen": "FRI-F 1165",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 105438,
+     "funkrufname": "Florian Friesland 11/19-01",
+     "kennzeichen": "FRI-F 1161",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 230187,
+     "funkrufname": "Florian Friesland 11/30-01",
+     "kennzeichen": "FRI-F 1301",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Drehleiter-Korb",
+     "ausserDienst": false,
+     "typText": "DLA(K) 23/12"
+    },
+    {
+     "id": 148462,
+     "funkrufname": "Florian Friesland 11/41-01",
+     "kennzeichen": "FRI-F 1411",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Kleinlöschfahrzeug",
+     "ausserDienst": false,
+     "typText": "KLF"
+    },
+    {
+     "id": 177279,
+     "funkrufname": "Florian Friesland 11/47-01",
+     "kennzeichen": "FRI-F 1471",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 20"
+    },
+    {
+     "id": 105431,
+     "funkrufname": "Florian Friesland 11/48-01",
+     "kennzeichen": "FRI-F 1125",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Hilfeleistungslöschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "HLF 20/16"
+    },
+    {
+     "id": 217872,
+     "funkrufname": "Florian Friesland 11/FwA-JF-01",
+     "kennzeichen": "FRI-E 101",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Jugend- / Kinderfeuerwehr (JF/KF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 217873,
+     "funkrufname": "Florian Friesland 11/FwA-Transport-01",
+     "kennzeichen": "FRI-F 1220",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 217871,
+     "funkrufname": "Florian Friesland 19/44-03",
+     "kennzeichen": "NL4-849",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Verbände",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 20 Kats (Land)"
+    },
+    {
+     "id": 109635,
+     "funkrufname": "Florian Friesland 11/10",
+     "kennzeichen": "JEV-H 581",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 109634,
+     "funkrufname": "Florian Friesland 11/24",
+     "kennzeichen": "FRI-E 163H",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 101591,
+     "funkrufname": "Florian Friesland 11/24-01",
+     "kennzeichen": "FRI-F 1110",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Hilfeleistungstanklöschfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 105439,
+     "funkrufname": "Florian Friesland 11/30-01",
+     "kennzeichen": "FRI-F 1130",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Drehleiter-Korb",
+     "ausserDienst": true,
+     "typText": "DLA(K) 23/12"
+    },
+    {
+     "id": 102765,
+     "funkrufname": "Florian Friesland 11/44-01",
+     "kennzeichen": "FRI-F 8923",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug-KatS",
+     "ausserDienst": true
+    },
+    {
+     "id": 101670,
+     "funkrufname": "Florian Friesland 11/47-01",
+     "kennzeichen": "FRI-F 1124",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true,
+     "typText": "LF 20"
+    },
+    {
+     "id": 217578,
+     "funkrufname": "Florian Friesland 11/49",
+     "kennzeichen": "FRI-8003",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "ABC/CBRN-Erkundungskraftwagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 217580,
+     "funkrufname": "Florian Friesland 11/61",
+     "kennzeichen": "FRI-E 110",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Einsatzleitwagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 103187,
+     "funkrufname": "Florian Friesland 11/65",
+     "kennzeichen": "FRI-F 1165",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 217579,
+     "funkrufname": "Florian Friesland 11/TSA",
+     "kennzeichen": "FRI-E 11x",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 8906,
+   "name": "FF Sande OF Gödens",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Brückstraße 17B",
+   "fahrzeuge": [
+    {
+     "id": 85780,
+     "funkrufname": "Florian Friesland 14/11-02",
+     "kennzeichen": "FRI-F 4261",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Einsatzleitwagen",
+     "ausserDienst": false,
+     "typText": "ELW"
+    },
+    {
+     "id": 130631,
+     "funkrufname": "Florian Friesland 14/24-02",
+     "kennzeichen": "FRI-F 4210",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Hilfeleistungstanklöschfahrzeug",
+     "ausserDienst": false,
+     "typText": "TLF 16/25"
+    },
+    {
+     "id": 117071,
+     "funkrufname": "Florian Friesland 14/45-02",
+     "kennzeichen": "FRI-F 4220",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 8/6"
+    },
+    {
+     "id": 230424,
+     "funkrufname": "Florian Friesland 14/FwA-JF-02",
+     "kennzeichen": "FRI-JF 420",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Jugend- / Kinderfeuerwehr (JF/KF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 182251,
+     "funkrufname": "Florian Friesland 14/TSA-02",
+     "kennzeichen": "FRI-E 420",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 166132,
+     "funkrufname": "Florian Friesland 42/14",
+     "kennzeichen": "FRI-E 422",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 3390,
+   "name": "FF Sande OF Sande",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "An der Feuerwehr 1",
+   "mitglieder": 93,
+   "fahrzeuge": [
+    {
+     "id": 86101,
+     "funkrufname": "Florian Friesland 14/11-01",
+     "kennzeichen": "FRI-F 4161",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Einsatzleitwagen",
+     "ausserDienst": false,
+     "typText": "ELW"
+    },
+    {
+     "id": 212894,
+     "funkrufname": "Florian Friesland 14/47-01",
+     "kennzeichen": "FRI-F 4471",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 20"
+    },
+    {
+     "id": 174164,
+     "funkrufname": "Florian Friesland 14/48-01",
+     "kennzeichen": "FRI-F 4481",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Hilfeleistungslöschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "HLF 20"
+    },
+    {
+     "id": 103391,
+     "funkrufname": "Florian Friesland 14/59-01",
+     "kennzeichen": "FRI-F 4143",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Gerätewagen",
+     "ausserDienst": false,
+     "typText": "GW"
+    },
+    {
+     "id": 184769,
+     "funkrufname": "Florian Friesland 14/FwA-JF-01",
+     "kennzeichen": "FRI-JF 400",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Jugend- / Kinderfeuerwehr (JF/KF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 116975,
+     "funkrufname": "Florian Friesland 14/P-250-01",
+     "kennzeichen": "JEV-H 801",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 229862,
+     "funkrufname": "Florian Friesland 19/71-01",
+     "kennzeichen": "NL4-891",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "ABC/CBRN-Erkundungskraftwagen",
+     "ausserDienst": false,
+     "typText": "CBRN ErKw"
+    },
+    {
+     "id": 103434,
+     "funkrufname": "NI - FF Sande OF Sande",
+     "kennzeichen": "FRI-F 41xx",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Gruppenfoto",
+     "ausserDienst": false
+    },
+    {
+     "id": 188432,
+     "funkrufname": "NI - FF Sande OF Sande",
+     "kennzeichen": "FRI-F xxxx",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Gruppenfoto",
+     "ausserDienst": false
+    },
+    {
+     "id": 230199,
+     "funkrufname": "NI - FF Sande OF Sande",
+     "kennzeichen": "FRI-F",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Gruppenfoto",
+     "ausserDienst": false
+    },
+    {
+     "id": 85893,
+     "funkrufname": "Florian Friesland 14/24-01",
+     "kennzeichen": "FRI-F 4110",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Hilfeleistungstanklöschfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 88766,
+     "funkrufname": "Florian Friesland 14/47-01",
+     "kennzeichen": "FRI-F 4124",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true,
+     "typText": "LF 20"
+    },
+    {
+     "id": 107351,
+     "funkrufname": "Florian Friesland 41/10",
+     "kennzeichen": "JEV-X 548",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": true,
+     "typText": "TLF 16-T"
+    }
+   ]
+  },
+  {
+   "id": 8768,
+   "name": "FF Schortens OF Accum",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Wilhelmshavener Straße 1",
+   "mitglieder": 35,
+   "fahrzeuge": [
+    {
+     "id": 124555,
+     "funkrufname": "Florian Friesland 15/17-02",
+     "kennzeichen": "FRI-F 5172",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 83917,
+     "funkrufname": "Florian Friesland 15/20-02",
+     "kennzeichen": "FRI-E 522",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": false
+    },
+    {
+     "id": 139789,
+     "funkrufname": "Florian Friesland 15/45-02",
+     "kennzeichen": "FRI-F 5452",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 10"
+    },
+    {
+     "id": 192060,
+     "funkrufname": "Florian Friesland 15/FwA-JF-02",
+     "kennzeichen": "FRI-AC 112",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Jugend- / Kinderfeuerwehr (JF/KF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 104340,
+     "funkrufname": "Florian Friesland 15/17-02",
+     "kennzeichen": "FRI-AC 112",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true,
+     "typText": "MTW"
+    },
+    {
+     "id": 101668,
+     "funkrufname": "Florian Friesland 15/43-02",
+     "kennzeichen": "FRI-AC 90",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 8767,
+   "name": "FF Schortens OF Schortens",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Plaggestraße 43",
+   "mitglieder": 58,
+   "fahrzeuge": [
+    {
+     "id": 122156,
+     "funkrufname": "Florian Friesland 15/11-01",
+     "kennzeichen": "FRI-F 1511",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Einsatzleitwagen",
+     "ausserDienst": false,
+     "typText": "ELW"
+    },
+    {
+     "id": 224325,
+     "funkrufname": "Florian Friesland 15/17-01",
+     "kennzeichen": "FRI-F 5171",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 86220,
+     "funkrufname": "Florian Friesland 15/23-01",
+     "kennzeichen": "FRI-F 5110",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": false,
+     "typText": "TLF 20/25"
+    },
+    {
+     "id": 230773,
+     "funkrufname": "Florian Friesland 15/45-01",
+     "kennzeichen": "FRI-E 533",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false
+    },
+    {
+     "id": 36592,
+     "funkrufname": "Florian Friesland 15/47-01",
+     "kennzeichen": "FRI-AK 363",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 16"
+    },
+    {
+     "id": 122159,
+     "funkrufname": "Florian Friesland 15/48-01",
+     "kennzeichen": "FRI-F 5481",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Hilfeleistungslöschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "HLF 20/16"
+    },
+    {
+     "id": 4684,
+     "funkrufname": "Florian Friesland 15/53-01",
+     "kennzeichen": "FRI-E 514",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Rüstwagen-Kran",
+     "ausserDienst": false,
+     "typText": "RW-Kran"
+    },
+    {
+     "id": 36590,
+     "funkrufname": "Florian Friesland 15/17-01",
+     "kennzeichen": "FRI-L 2703",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true,
+     "typText": "MTW"
+    },
+    {
+     "id": 36591,
+     "funkrufname": "Florian Friesland 15/19-01",
+     "kennzeichen": "FRI-E 517",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Einsatzleitwagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 36594,
+     "funkrufname": "Florian Friesland 15/43-01",
+     "kennzeichen": "FRI-E 513",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 36595,
+     "funkrufname": "Florian Friesland 51/10",
+     "kennzeichen": "FRI-E 511",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 36593,
+     "funkrufname": "Florian Friesland 51/20",
+     "kennzeichen": "JEV-S 810",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 8769,
+   "name": "FF Schortens OF Sillenstede",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Mühlenstraße",
+   "mitglieder": 29,
+   "fahrzeuge": [
+    {
+     "id": 163418,
+     "funkrufname": "Florian Friesland 15/17-03",
+     "kennzeichen": "FRI-F 5173",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 103398,
+     "funkrufname": "Florian Friesland 15/22-03",
+     "kennzeichen": "FRI-E 531",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": false,
+     "typText": "TLF 8/18"
+    },
+    {
+     "id": 148964,
+     "funkrufname": "Florian Friesland 15/FwA-JF-03",
+     "kennzeichen": "FRI-E 534",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Jugend- / Kinderfeuerwehr (JF/KF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 143777,
+     "funkrufname": "Florian Friesland 15/FwA-TH-03",
+     "kennzeichen": "FRI-HV 66",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 210556,
+     "funkrufname": "Florian Friesland 15/TSA-03",
+     "kennzeichen": "FRI-E 537",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 101635,
+     "funkrufname": "Florian Friesland 15/19-03",
+     "kennzeichen": "FRI-E 535",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true,
+     "typText": "MZF"
+    },
+    {
+     "id": 103396,
+     "funkrufname": "Florian Friesland 15/45-03",
+     "kennzeichen": "FRI-E 533",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 11348,
+   "name": "FF Varel OF Borgstede-Winkelsheide",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Ziegelstraße 1A",
+   "mitglieder": 43,
+   "fahrzeuge": [
+    {
+     "id": 103740,
+     "funkrufname": "Florian Friesland 12/17-02",
+     "kennzeichen": "FRI-F 2265",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTF"
+    },
+    {
+     "id": 139784,
+     "funkrufname": "Florian Friesland 12/24-02",
+     "kennzeichen": "FRI-E 221",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Hilfeleistungstanklöschfahrzeug",
+     "ausserDienst": false,
+     "typText": "TLF 16/25"
+    },
+    {
+     "id": 141212,
+     "funkrufname": "Florian Friesland 12/43-02",
+     "kennzeichen": "FRI-F 2220",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 8"
+    },
+    {
+     "id": 228789,
+     "funkrufname": "Florian Friesland 12/78-02",
+     "kennzeichen": "FRI-E 225",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Rettungsboot",
+     "ausserDienst": false,
+     "typText": "RTB"
+    },
+    {
+     "id": 149002,
+     "funkrufname": "Florian Friesland 12/Lichtmastanhänger-02",
+     "kennzeichen": "BRA-OD 24",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 418,
+     "funkrufname": "Florian Friesland 22/14",
+     "kennzeichen": "FRI-E 222",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 794,
+     "funkrufname": "Florian Friesland 22/20",
+     "kennzeichen": "FRI-E 224",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 2765,
+     "funkrufname": "Florian Friesland 22/LLG",
+     "kennzeichen": "FRI-LF 43",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 106133,
+     "funkrufname": "Florian Friesland 22/TSA",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 16099,
+   "name": "FF Varel OF Obenstrohe",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Wiefelsteder Straße 45",
+   "mitglieder": 35,
+   "fahrzeuge": [
+    {
+     "id": 87141,
+     "funkrufname": "Florian Friesland 12/24-03",
+     "kennzeichen": "FRI-E 231",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": false,
+     "typText": "TLF 16/25"
+    },
+    {
+     "id": 121853,
+     "funkrufname": "Florian Friesland 12/45-03",
+     "kennzeichen": "FRI-F 2320",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 10/6"
+    },
+    {
+     "id": 158752,
+     "funkrufname": "Florian Friesland 12/63-03",
+     "kennzeichen": "FRI-F 2633",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mehrzweckfahrzeug",
+     "ausserDienst": false,
+     "typText": "MZF"
+    },
+    {
+     "id": 106179,
+     "funkrufname": "Florian Friesland 12/78-03",
+     "kennzeichen": "Florian 23",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Rettungsboot",
+     "ausserDienst": false,
+     "typText": "FwA-RTB"
+    },
+    {
+     "id": 139786,
+     "funkrufname": "Florian Friesland 19/62-01",
+     "kennzeichen": "FRI-F 9621",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Verbände",
+     "klassifizierung": "Schlauchwagen",
+     "ausserDienst": false,
+     "typText": "SW 2000-Kats"
+    },
+    {
+     "id": 99778,
+     "funkrufname": "Florian Friesland 12/59-03",
+     "kennzeichen": "FRI-E 235",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Gerätewagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 87209,
+     "funkrufname": "Florian Friesland 23/20 (a.D./1)",
+     "kennzeichen": "JEV-X 114",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false
+    },
+    {
+     "id": 111154,
+     "funkrufname": "Florian Friesland 23/20 (a.D./2)",
+     "kennzeichen": "FRI-E 233",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false
+    }
+   ]
+  },
+  {
+   "id": 3563,
+   "name": "FF Varel OF Varel",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Pelzerstraße 5-7",
+   "mitglieder": 52,
+   "fahrzeuge": [
+    {
+     "id": 141207,
+     "funkrufname": "Florian Friesland 12/11-01",
+     "kennzeichen": "FRI-E 211",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Einsatzleitwagen",
+     "ausserDienst": false,
+     "typText": "ELW"
+    },
+    {
+     "id": 175163,
+     "funkrufname": "Florian Friesland 12/17-01",
+     "kennzeichen": "FRI-F 2170",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTF"
+    },
+    {
+     "id": 174926,
+     "funkrufname": "Florian Friesland 12/19-01",
+     "kennzeichen": "FRI-F 2171",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTF"
+    },
+    {
+     "id": 141208,
+     "funkrufname": "Florian Friesland 12/23-01",
+     "kennzeichen": "FRI-E 218",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": false,
+     "typText": "TLF 16/25"
+    },
+    {
+     "id": 171731,
+     "funkrufname": "Florian Friesland 12/30-01",
+     "kennzeichen": "FRI-F 2301",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Drehleiter-Korb",
+     "ausserDienst": false,
+     "typText": "DLA(K) 23/12"
+    },
+    {
+     "id": 99112,
+     "funkrufname": "Florian Friesland 12/45-01",
+     "kennzeichen": "FRI-F 2120",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 10/6"
+    },
+    {
+     "id": 171730,
+     "funkrufname": "Florian Friesland 12/48-01",
+     "kennzeichen": "FRI-F 2481",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Hilfeleistungslöschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "HLF 20"
+    },
+    {
+     "id": 141210,
+     "funkrufname": "Florian Friesland 12/51-01",
+     "kennzeichen": "FRI-E 204",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Rüstwagen",
+     "ausserDienst": false,
+     "typText": "RW 1"
+    },
+    {
+     "id": 86866,
+     "funkrufname": "Florian Friesland 12/63-01",
+     "kennzeichen": "FRI-F 2164",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mehrzweckfahrzeug",
+     "ausserDienst": false,
+     "typText": "MZF"
+    },
+    {
+     "id": 189911,
+     "funkrufname": "Florian Friesland 12/64-01",
+     "kennzeichen": "FRI-F 2641",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Gerätewagen-Logistik/Nachschub",
+     "ausserDienst": false,
+     "typText": "GW-L1"
+    },
+    {
+     "id": 178212,
+     "funkrufname": "Florian Friesland 19/44-01",
+     "kennzeichen": "FRI-F 9441",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug-KatS",
+     "ausserDienst": false
+    },
+    {
+     "id": 93811,
+     "funkrufname": "Florian Friesland 12/17-01",
+     "kennzeichen": "FRI-F 2165",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true,
+     "typText": "MTF"
+    },
+    {
+     "id": 166747,
+     "funkrufname": "Florian Friesland 12/31-01",
+     "kennzeichen": "FRI-AW 909",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Drehleiter-Korb",
+     "ausserDienst": true
+    },
+    {
+     "id": 141209,
+     "funkrufname": "Florian Friesland 12/47-01",
+     "kennzeichen": "FRI-E 212",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 141175,
+     "funkrufname": "Florian Friesland 12/61-01",
+     "kennzeichen": "FRI-263",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Schlauchwagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 792,
+     "funkrufname": "Florian Friesland 21/20",
+     "kennzeichen": "FRI-E 213",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 145,
+     "funkrufname": "Florian Friesland 21/20 (a.D./1)",
+     "kennzeichen": "JEV-X 506",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false
+    },
+    {
+     "id": 63493,
+     "funkrufname": "Florian Friesland 21/24",
+     "kennzeichen": "FRI-E 214",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 793,
+     "funkrufname": "Florian Friesland 21/30",
+     "kennzeichen": "FRI-E 218",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Drehleiter",
+     "ausserDienst": true
+    },
+    {
+     "id": 2071,
+     "funkrufname": "Florian Friesland 21/40",
+     "kennzeichen": "FRI-E 216",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Rüstwagen",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 10914,
+   "name": "FF Wangerland OF Hohenkirchen",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Jeversche Straße 16",
+   "mitglieder": 45,
+   "fahrzeuge": [
+    {
+     "id": 226804,
+     "funkrufname": "Florian Friesland 16/10-01",
+     "kennzeichen": "FRI-F 6101",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Kommandowagen",
+     "ausserDienst": false,
+     "typText": "KdoW"
+    },
+    {
+     "id": 136676,
+     "funkrufname": "Florian Friesland 16/17-01",
+     "kennzeichen": "FRI-F 6171",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 100019,
+     "funkrufname": "Florian Friesland 16/25-01",
+     "kennzeichen": "FRI-F 6110",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": false,
+     "typText": "TLF 20/35"
+    },
+    {
+     "id": 176035,
+     "funkrufname": "Florian Friesland 16/48-01",
+     "kennzeichen": "FRI-F 6481",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Hilfeleistungslöschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "HLF 20"
+    },
+    {
+     "id": 116239,
+     "funkrufname": "Florian Friesland 16/78-01",
+     "kennzeichen": "FRI-F 1678",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Rettungsboot",
+     "ausserDienst": false,
+     "typText": "RTB1"
+    },
+    {
+     "id": 226803,
+     "funkrufname": "Florian Friesland 19/61-01",
+     "kennzeichen": "FRI-263",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Verbände",
+     "klassifizierung": "Schlauchwagen",
+     "ausserDienst": false
+    },
+    {
+     "id": 143248,
+     "funkrufname": "NI - FF Wangerland OF Hohenkirchen",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Gruppenfoto",
+     "ausserDienst": false
+    },
+    {
+     "id": 140961,
+     "funkrufname": "Florian Friesland 16/11-01",
+     "kennzeichen": "FRI-F 1611",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Einsatzleitwagen",
+     "ausserDienst": true,
+     "typText": "ELW"
+    },
+    {
+     "id": 90805,
+     "funkrufname": "Florian Friesland 16/17-01",
+     "kennzeichen": "FRI-F 6161",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Einsatzleitwagen",
+     "ausserDienst": true,
+     "typText": "MTW"
+    },
+    {
+     "id": 100034,
+     "funkrufname": "Florian Friesland 16/47-01",
+     "kennzeichen": "FRI-F 6124",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 90669,
+     "funkrufname": "Florian Friesland 16/61-01",
+     "kennzeichen": "FRI-261",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Schlauchwagen",
+     "ausserDienst": true,
+     "typText": "SW 1000"
+    },
+    {
+     "id": 217593,
+     "funkrufname": "Florian Friesland 61/14",
+     "kennzeichen": "FRI-E 612",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 43078,
+     "funkrufname": "Florian Friesland 61/20",
+     "kennzeichen": "POL-37798",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 217625,
+     "funkrufname": "Florian Friesland 61/22",
+     "kennzeichen": "FRI-E 613",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 71684,
+   "name": "FF Wangerland OF Hooksiel",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Hohe Weg 112",
+   "mitglieder": 29,
+   "fahrzeuge": [
+    {
+     "id": 225005,
+     "funkrufname": "Florian Friesland 16/17-02",
+     "kennzeichen": "FRI-F 6172",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 26670,
+     "funkrufname": "Florian Friesland 16/22-02",
+     "kennzeichen": "FRI-E 666",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": false
+    },
+    {
+     "id": 148496,
+     "funkrufname": "Florian Friesland 16/48-02",
+     "kennzeichen": "FRI-F 6482",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Hilfeleistungslöschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "HLF 20"
+    },
+    {
+     "id": 214330,
+     "funkrufname": "Florian Friesland 16/FwA-Transport-02",
+     "kennzeichen": "FRI-FF 112",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 135464,
+     "funkrufname": "Hooksiel - Feuerwehr - FLB - Florian Friesland 16/76-02 - Aprilscherz 2017",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschboot",
+     "ausserDienst": false
+    },
+    {
+     "id": 152484,
+     "funkrufname": "NI - FF Wangerland OF Hooksiel",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Gruppenfoto",
+     "ausserDienst": false
+    },
+    {
+     "id": 109166,
+     "funkrufname": "Florian Friesland 16/17-02",
+     "kennzeichen": "FRI-F 6265",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true,
+     "typText": "MTW"
+    },
+    {
+     "id": 26671,
+     "funkrufname": "Florian Friesland 16/44-02",
+     "kennzeichen": "FRI-F 6224",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug-KatS",
+     "ausserDienst": true
+    },
+    {
+     "id": 97738,
+     "funkrufname": "Florian Friesland 62/14",
+     "kennzeichen": "FRI-E 622",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 76776,
+     "funkrufname": "Florian Friesland 62/22",
+     "kennzeichen": "STD-Z 108H",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 26672,
+     "funkrufname": "Florian Friesland 62/65",
+     "kennzeichen": "FRI-E 629",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 18521,
+   "name": "FF Wangerland OF Minsen",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Eschenweg 2",
+   "mitglieder": 35,
+   "fahrzeuge": [
+    {
+     "id": 158718,
+     "funkrufname": "Florian Friesland 16/19-04",
+     "kennzeichen": "FRI-F 6194",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW / First Responder"
+    },
+    {
+     "id": 214714,
+     "funkrufname": "Florian Friesland 16/FwA-Gen-04",
+     "kennzeichen": "H-DN 885",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 212787,
+     "funkrufname": "Florian Friesland 19/44-02",
+     "kennzeichen": "NL4-1528",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug-KatS",
+     "ausserDienst": false,
+     "typText": "LF 20-KatS (NDS)"
+    },
+    {
+     "id": 86128,
+     "funkrufname": "Florian Friesland 16/17-04",
+     "kennzeichen": "FRI-F 6465",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 191761,
+     "funkrufname": "Florian Friesland 16/20-04",
+     "kennzeichen": "FRI-F 6414",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 174812,
+     "funkrufname": "Florian Friesland 16/45-04",
+     "kennzeichen": "FRI-F 6420",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 191702,
+     "funkrufname": "Florian Friesland 16/Handdruckspritze",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Hand-/Pferdegezogenes Feuerwehrfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 111871,
+     "funkrufname": "Florian Friesland 64/10",
+     "kennzeichen": "FRI-E 641",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 217594,
+     "funkrufname": "Florian Friesland 64/20 (a.D./1)",
+     "kennzeichen": "JEV-",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false
+    },
+    {
+     "id": 217595,
+     "funkrufname": "Florian Friesland 64/20 (a.D./2)",
+     "kennzeichen": "FRI-E 643",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false
+    },
+    {
+     "id": 217845,
+     "funkrufname": "Florian Friesland 64/26",
+     "kennzeichen": "FRI-E 645",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tragkraftspritzenfahrzeug",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 19844,
+   "name": "FF Wangerland OF Neugarmssiel",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Nordergarmser Weg 1",
+   "mitglieder": 15,
+   "fahrzeuge": [
+    {
+     "id": 214325,
+     "funkrufname": "Florian Friesland 16/41-03",
+     "kennzeichen": "FRI-F 6413",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tragkraftspritzenfahrzeug-Wasser",
+     "ausserDienst": false,
+     "typText": "TSF-W"
+    },
+    {
+     "id": 139787,
+     "funkrufname": "Florian Friesland 16/43-03",
+     "kennzeichen": "FRI-F 6320",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 174811,
+     "funkrufname": "Florian Friesland 63/20",
+     "kennzeichen": "FRI-xxxx",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 18522,
+   "name": "FF Wangerland OF Tettens",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Hauptstraße 28",
+   "mitglieder": 25,
+   "fahrzeuge": [
+    {
+     "id": 224323,
+     "funkrufname": "Florian Friesland 16/17-05",
+     "kennzeichen": "FRI-F 6175",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 194849,
+     "funkrufname": "Florian Friesland 16/47-05",
+     "kennzeichen": "FRI-F 6475",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 20"
+    },
+    {
+     "id": 203950,
+     "funkrufname": "Florian Friesland 16/FwA-Transport-05",
+     "kennzeichen": "FRI-E 654",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 158750,
+     "funkrufname": "Florian Friesland 16/17-05",
+     "kennzeichen": "FRI-F 6565",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true,
+     "typText": "MTW"
+    },
+    {
+     "id": 101469,
+     "funkrufname": "Florian Friesland 16/43-05",
+     "kennzeichen": "FRI-F 6520",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 173198,
+     "funkrufname": "Florian Friesland 16/47-05",
+     "kennzeichen": "FRI-F 6475",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true,
+     "typText": "LF 20"
+    },
+    {
+     "id": 100322,
+     "funkrufname": "Florian Friesland 65/65",
+     "kennzeichen": "FRI-E 655",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 18523,
+   "name": "FF Wangerland OF Waddewarden",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Hooksieler Straße 10",
+   "mitglieder": 40,
+   "fahrzeuge": [
+    {
+     "id": 164274,
+     "funkrufname": "Florian Friesland 16/17-06",
+     "kennzeichen": "FRI-F 6176",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTF"
+    },
+    {
+     "id": 130943,
+     "funkrufname": "Florian Friesland 16/41-06",
+     "kennzeichen": "FRI-F 6416",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tragkraftspritzenfahrzeug-Wasser",
+     "ausserDienst": false,
+     "typText": "TSF-W"
+    },
+    {
+     "id": 215508,
+     "funkrufname": "Florian Friesland 16/45-06",
+     "kennzeichen": "FRI-F 6456",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 10"
+    },
+    {
+     "id": 202417,
+     "funkrufname": "Florian Friesland 16/FwA-Küche-06",
+     "kennzeichen": "FRI-SW 69",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 194872,
+     "funkrufname": "Florian Friesland 16/FwA-Transport-06",
+     "kennzeichen": "FRI-FA 66",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 156119,
+     "funkrufname": "Florian Friesland 16/17-06",
+     "kennzeichen": "FRI-E 629",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true,
+     "typText": "MTF"
+    },
+    {
+     "id": 129441,
+     "funkrufname": "Florian Friesland 16/40-06",
+     "kennzeichen": "FRI-F 6626",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tragkraftspritzenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 101639,
+     "funkrufname": "Florian Friesland 16/43-06",
+     "kennzeichen": "FRI-F 6620",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 139785,
+     "funkrufname": "Florian Friesland 66/20",
+     "kennzeichen": "JEV-H 579",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 16284,
+   "name": "FF Wangerland OF Wiarden",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Ring 1",
+   "mitglieder": 17,
+   "fahrzeuge": [
+    {
+     "id": 148461,
+     "funkrufname": "Florian Friesland 16/40-07",
+     "kennzeichen": "FRI-F 6407",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tragkraftspritzenfahrzeug",
+     "ausserDienst": false,
+     "typText": "TSF"
+    },
+    {
+     "id": 222544,
+     "funkrufname": "Florian Friesland 16/45-07",
+     "kennzeichen": "FRI-F 6420",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 10/6"
+    },
+    {
+     "id": 174828,
+     "funkrufname": "Florian Friesland 16/FwA-Zusatzmaterial-07",
+     "kennzeichen": "FRI-E 678",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 91023,
+     "funkrufname": "Florian Friesland 16/17-07",
+     "kennzeichen": "FRI-L 2702",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 116509,
+     "funkrufname": "Florian Friesland 16/17-07",
+     "kennzeichen": "FRI-E 629",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 104343,
+     "funkrufname": "Florian Friesland 16/40-07",
+     "kennzeichen": "FRI-E 675",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tragkraftspritzenfahrzeug",
+     "ausserDienst": true,
+     "typText": "TSF"
+    }
+   ]
+  },
+  {
+   "id": 3873,
+   "name": "FF Wangerooge OF Wangerooge",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Straße zum Westen 5",
+   "fahrzeuge": [
+    {
+     "id": 178049,
+     "funkrufname": "Florian Friesland 18/19-01",
+     "kennzeichen": "FRI-F 1819",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mehrzweckfahrzeug",
+     "ausserDienst": false,
+     "typText": "MZF"
+    },
+    {
+     "id": 147252,
+     "funkrufname": "Florian Friesland 18/20-01",
+     "kennzeichen": "FRI-F 8114",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": false,
+     "typText": "TLF 8/18"
+    },
+    {
+     "id": 4940,
+     "funkrufname": "Florian Friesland 18/45-01",
+     "kennzeichen": "FRI-F 8120",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 8/6"
+    },
+    {
+     "id": 148328,
+     "funkrufname": "Florian Friesland 18/FwA-PLA-01",
+     "kennzeichen": "JEV-EK 47",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 147297,
+     "funkrufname": "Florian Friesland 18/FwA-Schlauchanhänger",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 148329,
+     "funkrufname": "Florian Friesland 18/FwA-TSA-01",
+     "kennzeichen": "FRI-JW 112",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 178019,
+     "funkrufname": "Florian Friesland 18/32-01",
+     "kennzeichen": "FRI-F 1832",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Drehleiter-Korb",
+     "ausserDienst": true,
+     "typText": "DLK 12/9"
+    },
+    {
+     "id": 44847,
+     "funkrufname": "Florian Friesland 18/36-01",
+     "kennzeichen": "FRI-JW 113",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Drehleiter",
+     "ausserDienst": true
+    },
+    {
+     "id": 4049,
+     "funkrufname": "Florian Friesland 18/50-01",
+     "kennzeichen": "FRI-JW 112",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mehrzweckfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 2021,
+     "funkrufname": "Florian Friesland 81/14",
+     "kennzeichen": "JEV-EK 47",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 217590,
+     "funkrufname": "Florian Friesland 81/61",
+     "kennzeichen": "FRI-",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 78106,
+   "name": "FF Zetel OF Neuenburg",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Mühlenstraße 27",
+   "mitglieder": 40,
+   "fahrzeuge": [
+    {
+     "id": 196324,
+     "funkrufname": "Florian Friesland 13/17-02",
+     "kennzeichen": "FRI-F 1702",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTF"
+    },
+    {
+     "id": 129976,
+     "funkrufname": "Florian Friesland 13/43-02",
+     "kennzeichen": "FRI-F 3220",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 8"
+    },
+    {
+     "id": 218106,
+     "funkrufname": "Florian Friesland 13/46-02",
+     "kennzeichen": "FRI-F 3000",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Hilfeleistungslöschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "HLF 10"
+    },
+    {
+     "id": 195612,
+     "funkrufname": "Florian Friesland 13/FwA-JF-02",
+     "kennzeichen": "FRI-JF 112",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Jugend- / Kinderfeuerwehr (JF/KF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 86108,
+     "funkrufname": "Florian Friesland 13/17-02",
+     "kennzeichen": "FRI-F 3265",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true,
+     "typText": "MTF"
+    },
+    {
+     "id": 101640,
+     "funkrufname": "Florian Friesland 13/20-02",
+     "kennzeichen": "FRI-F 3214",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 10397,
+   "name": "FF Zetel OF Zetel",
+   "kreis": "Friesland (FRI)",
+   "organisation": "Feuerwehr: Freiwillige Feuerwehr (FF)",
+   "wachenart": "Freiwillige Feuerwehr (FF)",
+   "ort": "Neuenburger Straße 49",
+   "fahrzeuge": [
+    {
+     "id": 188431,
+     "funkrufname": "Florian Friesland 13/11-01",
+     "kennzeichen": "FRI-F 1311",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Einsatzleitwagen",
+     "ausserDienst": false,
+     "typText": "ELW"
+    },
+    {
+     "id": 166905,
+     "funkrufname": "Florian Friesland 13/17-01",
+     "kennzeichen": "FRI-F 1317",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTF"
+    },
+    {
+     "id": 148326,
+     "funkrufname": "Florian Friesland 13/23-01",
+     "kennzeichen": "FRI-F 3110",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": false,
+     "typText": "TLF 16/25"
+    },
+    {
+     "id": 148327,
+     "funkrufname": "Florian Friesland 13/47-01",
+     "kennzeichen": "FRI-F 1347",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "LF 20"
+    },
+    {
+     "id": 201098,
+     "funkrufname": "Florian Friesland 13/48-01",
+     "kennzeichen": "FRI-F 1348",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Hilfeleistungslöschgruppenfahrzeug",
+     "ausserDienst": false,
+     "typText": "HLF 20"
+    },
+    {
+     "id": 118728,
+     "funkrufname": "Florian Friesland 13/69-01",
+     "kennzeichen": "FRI-F 1369",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "All-Terrain Vehicle / Utility Task Vehicle",
+     "ausserDienst": false,
+     "typText": "MZF"
+    },
+    {
+     "id": 188582,
+     "funkrufname": "Florian Friesland 13/78-01",
+     "kennzeichen": "FRI-F 3169",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Rettungsboot",
+     "ausserDienst": false
+    },
+    {
+     "id": 192059,
+     "funkrufname": "Florian Friesland 13/FwA-JF-01",
+     "kennzeichen": "FRI-E 317",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Jugend- / Kinderfeuerwehr (JF/KF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 188585,
+     "funkrufname": "Florian Friesland 13/LIMA 01",
+     "kennzeichen": "FRI-F 1379",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Anhänger",
+     "ausserDienst": false
+    },
+    {
+     "id": 148383,
+     "funkrufname": "Florian Friesland 13/11-01",
+     "kennzeichen": "FRI-F 3161",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Einsatzleitwagen",
+     "ausserDienst": true,
+     "typText": "ELW"
+    },
+    {
+     "id": 99113,
+     "funkrufname": "Florian Friesland 13/17-01",
+     "kennzeichen": "FRI-F 3165",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true,
+     "typText": "MTF"
+    },
+    {
+     "id": 92641,
+     "funkrufname": "Florian Friesland 13/47-01",
+     "kennzeichen": "FRI-F 3124",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true,
+     "typText": "LF 20"
+    },
+    {
+     "id": 92640,
+     "funkrufname": "Florian Friesland 13/51-01",
+     "kennzeichen": "FRI-F 3140",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Rüstwagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 4549,
+     "funkrufname": "Florian Friesland 31/10",
+     "kennzeichen": "FRI-E 311",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tanklöschfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 4548,
+     "funkrufname": "Florian Friesland 31/22",
+     "kennzeichen": "FRI-E 313",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Löschgruppenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 229964,
+     "funkrufname": "Florian Friesland 31/26",
+     "kennzeichen": "JEV-H 978",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Tragkraftspritzenfahrzeug",
+     "ausserDienst": true
+    },
+    {
+     "id": 4547,
+     "funkrufname": "Florian Friesland 31/65",
+     "kennzeichen": "FRI-E 319",
+     "obergruppe": "Feuerwehr",
+     "organisation": "Freiwillige Feuerwehr (FF)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 17327,
+   "name": "JUH OV Jeverland",
+   "kreis": "Friesland (FRI)",
+   "organisation": "SEG/KatS: Johanniter-Unfall-Hilfe (JUH)",
+   "wachenart": "Bereitschaft (BS)",
+   "ort": "Brauerweg 2a",
+   "fahrzeuge": [
+    {
+     "id": 144878,
+     "funkrufname": "Akkon Friesland 55/17-01",
+     "kennzeichen": "FRI-JU 24",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Johanniter-Unfall-Hilfe (JUH)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 191378,
+     "funkrufname": "Akkon Friesland 55/17-02",
+     "kennzeichen": "FRI-JU 172",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Johanniter-Unfall-Hilfe (JUH)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 191473,
+     "funkrufname": "Akkon Friesland 55/74-01",
+     "kennzeichen": "FRI-JU 18",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Johanniter-Unfall-Hilfe (JUH)",
+     "klassifizierung": "Lastkraftwagen Ladebordwand",
+     "ausserDienst": false,
+     "typText": "GW-Verpflegung"
+    },
+    {
+     "id": 230188,
+     "funkrufname": "Akkon Friesland 55/83-01",
+     "kennzeichen": "FRI-JU 112",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Johanniter-Unfall-Hilfe (JUH)",
+     "klassifizierung": "Rettungswagen",
+     "ausserDienst": false,
+     "typText": "RTW"
+    },
+    {
+     "id": 212813,
+     "funkrufname": "Akkon Friesland 55/FKH-01",
+     "kennzeichen": "FRI-JU 29",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Johanniter-Unfall-Hilfe (JUH)",
+     "klassifizierung": "Feldkochherd",
+     "ausserDienst": false
+    },
+    {
+     "id": 82700,
+     "funkrufname": "Akkon Friesland 55/17-01",
+     "kennzeichen": "FRI-JU 24",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Johanniter-Unfall-Hilfe (JUH)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true,
+     "typText": "MTW"
+    },
+    {
+     "id": 145209,
+     "funkrufname": "Akkon Friesland 55/74-01",
+     "kennzeichen": "FRI-JU 223",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Johanniter-Unfall-Hilfe (JUH)",
+     "klassifizierung": "Feldküchenkraftwagen",
+     "ausserDienst": true,
+     "typText": "GW-Verpflegung"
+    },
+    {
+     "id": 191285,
+     "funkrufname": "Akkon Friesland 55/92-01",
+     "kennzeichen": "FRI-JU 921",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Johanniter-Unfall-Hilfe (JUH)",
+     "klassifizierung": "Krankentransportwagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 110394,
+     "funkrufname": "Akkon Friesland 55/93-01",
+     "kennzeichen": "FRI-JU 19",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Johanniter-Unfall-Hilfe (JUH)",
+     "klassifizierung": "Krankentransportwagen",
+     "ausserDienst": true
+    }
+   ]
+  },
+  {
+   "id": 3658,
+   "name": "JUH OV Varel",
+   "kreis": "Friesland (FRI)",
+   "organisation": "SEG/KatS: Johanniter-Unfall-Hilfe (JUH)",
+   "wachenart": "Bereitschaft (BS)",
+   "ort": "Windallee 15",
+   "mitglieder": 20,
+   "fahrzeuge": [
+    {
+     "id": 144327,
+     "funkrufname": "Akkon Friesland 52/17-01",
+     "kennzeichen": "FRI-JU 13",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Johanniter-Unfall-Hilfe (JUH)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": false,
+     "typText": "MTW"
+    },
+    {
+     "id": 99888,
+     "funkrufname": "Akkon Friesland 28/41",
+     "kennzeichen": "FRI-JU 14",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Johanniter-Unfall-Hilfe (JUH)",
+     "klassifizierung": "Rettungswagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 99887,
+     "funkrufname": "Akkon Friesland 28/61",
+     "kennzeichen": "FRI-JU 12",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Johanniter-Unfall-Hilfe (JUH)",
+     "klassifizierung": "Mannschaftstransportwagen",
+     "ausserDienst": true
+    },
+    {
+     "id": 95071,
+     "funkrufname": "Akkon Friesland 52/69-01",
+     "kennzeichen": "FRI-JU 10",
+     "obergruppe": "SEG/KatS",
+     "organisation": "Johanniter-Unfall-Hilfe (JUH)",
+     "klassifizierung": "Hausnotruffahrzeug",
+     "ausserDienst": true
+    }
+   ]
+  }
+ ]
+}

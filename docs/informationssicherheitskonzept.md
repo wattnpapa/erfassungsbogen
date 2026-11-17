@@ -319,6 +319,15 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > (6.4): keine neue Abhängigkeit; die Einheitenliste je OV stammt von der
 > inoffiziellen OV-Karte thw.blafusel.de und wird nur beim Erzeugen abgerufen
 > (`npm run beispiele:thw-ov -- --abrufen`), JS-Gesamtumfang 6,45 MB.
+> **Nachgezogen 2026-11-17:** Ebenso nur auf Abruf liegen die Übungsbögen
+> realer niedersächsischer Wachen (`examples/*/niedersachsen/ortsfeuerwehren/`
+> bzw. `standorte/`, Dateinamen `wache-…`, Laufzeit-Cache `eeb-ov-beispiele`).
+> Sie tragen echte Funkrufnamen, Kennzeichen und Wachennamen aus der Datenbank
+> von bos-fahrzeuge.info (Angaben zu Dienstfahrzeugen, keine Personendaten;
+> Personen erfunden). Die Momentaufnahme `scripts/quellen/bos-fahrzeuge-nds.json`
+> entsteht nur beim Erzeugen (`npm run quellen:bos-fahrzeuge`, höchstens ein
+> Abruf je Sekunde, Zwischenspeicher `.cache/` außerhalb des Repositorys);
+> zur Laufzeit kein neuer Host, keine neue Abhängigkeit.
 >
 > **Nachgezogen 2026-10-05:** Offline-Vorrat in zwei Stufen (Audit Runde 3,
 > R3-O3, `vite.config.ts`, `scripts/precache-aufteilung.ts`,

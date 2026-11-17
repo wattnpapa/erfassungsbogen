@@ -37,6 +37,7 @@ export const AENDERUNGEN: readonly Aenderung[] = [
   {
     datum: "2026-11-17",
     punkte: [
+      "Übungsbögen: Neu sind Bögen echter Wachen aus Niedersachsen, Ortsfeuerwehren und Standorte von DRK, Johanniter, Malteser und ASB, mit ihren tatsächlichen Fahrzeugen, Funkrufnamen und Kennzeichen nach der Datenbank von bos-fahrzeuge.info. Die Besatzung richtet sich nach der Normbesatzung der Fahrzeuge, alle Personen sind erfunden. Wie die Bögen der THW-Ortsverbände lädt die App sie nicht vorab, ein Bogen braucht beim ersten Öffnen Netz.",
       "PDF: Das Kästchen „von Hand geändert“ unter der Stärke entfällt, weil es mehr verwirrt hat, als es half; handschriftliche Änderungen sieht man auf dem Papier ohnehin. Der Hinweis neben dem QR-Code sagt jetzt, dass der Code nach einer Änderung mit dem Stift nicht mehr gilt.",
       "Übungsbögen: Die Sammel-PDF entsteht jetzt im Hintergrund. Bei 100 Bögen blieb die Seite vorher sekundenlang stehen, und manche Browser meldeten, das Skript reagiere nicht; jetzt bleibt sie bedienbar, bis der Download kommt.",
       "Übungsbögen: Neben „Sammel-PDF“ gibt es „Einzel-PDFs als ZIP“. Die markierten Bögen kommen dann als ZIP-Datei mit einer eigenen PDF je Bogen, benannt wie beim Einzel-Download.",

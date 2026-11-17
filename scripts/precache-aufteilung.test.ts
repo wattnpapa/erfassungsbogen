@@ -51,6 +51,8 @@ describe("Offline-Vorrat in zwei Stufen (R3-O3)", () => {
   it("lädt die Bögen aller Ortsverbände nur auf Abruf, nicht vorab", () => {
     expect(istNurAufAbruf("assets/ov-stralsund-12-2-tz-b-abc123.json")).toBe(true);
     expect(istNurAufAbruf("assets/001-albstadt-ztr-tz-abc.json")).toBe(false);
+    // Ebenso die Bögen realer Wachen nach bos-fahrzeuge.info.
+    expect(istNurAufAbruf("assets/wache-ff-zetel-of-neuenburg-AbC12.json")).toBe(true);
     // Der Worker der Sammel-PDF ebenso; ohne ihn rechnet die Seite selbst.
     expect(istNurAufAbruf("assets/pdf-sammel-worker-D5EEqS8G.js")).toBe(true);
     expect(istNurAufAbruf("assets/pdf-Bb_75UQ7.js")).toBe(false);

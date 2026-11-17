@@ -1,0 +1,354 @@
+{
+  "schemaVersion": 13,
+  "uebung": true,
+  "stand": 3530003,
+  "einheit": {
+    "organisation": 6,
+    "organisationName": "Johanniter-Unfall-Hilfe Friesland",
+    "einheitsTyp": {
+      "freitext": "Ortsverband"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Standort"
+        },
+        "name": "JUH OV Jeverland"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis"
+        },
+        "name": "Friesland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2451,
+    "zeitraumBis": 2453,
+    "ortAuftrag": "Betreuung Evakuierte: Notunterkunft Friesland"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Melanie",
+      "nachname": "Pfeiffer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Einheitsführer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5556406830"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Silke",
+      "nachname": "Ziegler",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "David",
+      "nachname": "Becker",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitätshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Katrin",
+      "nachname": "Arnold",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Kerstin",
+      "nachname": "Schneider",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Einheitsführer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Weiß",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Tim",
+      "nachname": "Thiel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitätshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Ebert",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Thomas",
+      "nachname": "Meyer",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (GW-Verpflegung)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559421506"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sarah",
+      "nachname": "Seidel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (GW-Verpflegung)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Müller",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (GW-Verpflegung)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitätshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Svenja",
+      "nachname": "Hoffmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (RTW)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5559254121"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Schröder",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (RTW)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "FRI-JU 24",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          55,
+          17,
+          1
+        ]
+      },
+      "aenderungen": "Mannschaftstransportwagen"
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "FRI-JU 172",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          55,
+          17,
+          2
+        ]
+      },
+      "aenderungen": "Mannschaftstransportwagen"
+    },
+    {
+      "typ": {
+        "freitext": "GW-Verpflegung"
+      },
+      "kennzeichen": "FRI-JU 18",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          55,
+          74,
+          1
+        ]
+      },
+      "aenderungen": "Lastkraftwagen Ladebordwand"
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "kennzeichen": "FRI-JU 112",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          55,
+          83,
+          1
+        ]
+      },
+      "aenderungen": "Rettungswagen"
+    },
+    {
+      "typ": {
+        "freitext": "FKH"
+      },
+      "kennzeichen": "FRI-JU 29",
+      "sitzplaetze": 0,
+      "aenderungen": "Feldkochherd; Rufname laut Quelle: Akkon Friesland 55/FKH-01"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 13,
+    "dieselLiter": 250,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fahrzeuge, Funkrufnamen und Kennzeichen nach bos-fahrzeuge.info (Wache JUH OV Jeverland, Stand 2026-11-17); alle Personen erfunden."
+}

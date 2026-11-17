@@ -1,0 +1,403 @@
+{
+  "schemaVersion": 13,
+  "uebung": true,
+  "stand": 3529041,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Kreisverband Jeverland",
+    "einheitsTyp": {
+      "freitext": "Bereitschaft"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Standort"
+        },
+        "name": "DRK KV Jeverland BS Schortens"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis"
+        },
+        "name": "Friesland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2450,
+    "zeitraumBis": 2452,
+    "ortAuftrag": "Betreuung Evakuierte: Notunterkunft Friesland"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Lea",
+      "nachname": "Fischer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Einheitsführer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554703453"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Niklas",
+      "nachname": "Haas",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Pascal",
+      "nachname": "Kuhn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitätshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Jana",
+      "nachname": "Peters",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Dennis",
+      "nachname": "Ebert",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Einheitsführer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551613244"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Albrecht",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Patrick",
+      "nachname": "Schulz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitätshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Julian",
+      "nachname": "Busch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Maren",
+      "nachname": "Lutz",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (GW Sicherheit/Technik)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Torben",
+      "nachname": "Ernst",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (GW Sicherheit/Technik)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ole",
+      "nachname": "König",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (GW Sicherheit/Technik)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitätshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Andreas",
+      "nachname": "Kuhn",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (KTW)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Lena",
+      "nachname": "Schröder",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (KTW)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Claudia",
+      "nachname": "Schulte",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (N-KTW/ Typ B)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5551171670"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Niklas",
+      "nachname": "Busch",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (N-KTW/ Typ B)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "FRI-RK 440",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          45,
+          17,
+          1
+        ]
+      },
+      "aenderungen": "Mannschaftstransportwagen"
+    },
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "FRI-RK 700",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          45,
+          17,
+          2
+        ]
+      },
+      "aenderungen": "Mannschaftskraftwagen"
+    },
+    {
+      "typ": {
+        "freitext": "GW Sicherheit/Technik"
+      },
+      "kennzeichen": "FRI-RK 594",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          45,
+          59,
+          1
+        ]
+      },
+      "aenderungen": "Gerätewagen"
+    },
+    {
+      "typ": {
+        "freitext": "KTW"
+      },
+      "kennzeichen": "FRI-RK 451",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          45,
+          91,
+          1
+        ]
+      },
+      "aenderungen": "Krankentransportwagen"
+    },
+    {
+      "typ": {
+        "freitext": "N-KTW/ Typ B"
+      },
+      "kennzeichen": "FRI-RK 450",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          45,
+          93,
+          1
+        ]
+      },
+      "aenderungen": "Notfallkrankentransportwagen"
+    },
+    {
+      "typ": {
+        "freitext": "Lima"
+      },
+      "kennzeichen": "FRI-RK 452",
+      "sitzplaetze": 0,
+      "aenderungen": "Anhänger; Rufname laut Quelle: Rotkreuz Friesland 45/Lima-01"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 15,
+    "dieselLiter": 295,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fahrzeuge, Funkrufnamen und Kennzeichen nach bos-fahrzeuge.info (Wache DRK KV Jeverland BS Schortens, Stand 2026-11-17); alle Personen erfunden."
+}

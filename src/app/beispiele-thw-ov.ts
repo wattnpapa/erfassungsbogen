@@ -14,3 +14,16 @@ export const THW_OV_BEISPIELE: Record<string, string> = import.meta.glob<string>
 );
 
 export { THW_OV_ORDNER_LABEL } from "./beispiele-thw-ov-ordner";
+
+/**
+ * Ebenso nachgeladen: Übungsbögen realer Wachen (Ortsfeuerwehren und Standorte
+ * der Hilfsorganisationen in Niedersachsen) mit ihren Fahrzeugen nach
+ * bos-fahrzeuge.info, erzeugt von scripts/bos-fahrzeuge-nds-beispielboegen.mts.
+ * Über tausend Dateien — dieselbe Lage wie bei den Ortsverbänden.
+ */
+export const BOS_WACHEN_BEISPIELE: Record<string, string> = import.meta.glob<string>(
+  ["../../examples/*/niedersachsen/ortsfeuerwehren/**/*.json", "../../examples/*/niedersachsen/standorte/**/*.json"],
+  { eager: true, query: "?url", import: "default" },
+);
+
+export { BOS_ORDNER_LABEL } from "./beispiele-bos-ordner";

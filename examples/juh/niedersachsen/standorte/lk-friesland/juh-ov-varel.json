@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 13,
+  "uebung": true,
+  "stand": 3528869,
+  "einheit": {
+    "organisation": 6,
+    "organisationName": "Johanniter-Unfall-Hilfe Friesland",
+    "einheitsTyp": {
+      "freitext": "Ortsverband"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Standort"
+        },
+        "name": "JUH OV Varel"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis"
+        },
+        "name": "Friesland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2450,
+    "zeitraumBis": 2452,
+    "ortAuftrag": "MANV-Übung: Behandlungsplatz Friesland"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Katharina",
+      "nachname": "Marx",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Einheitsführer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5550725915"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Franziska",
+      "nachname": "Brandt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Maren",
+      "nachname": "Arnold",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitätshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Uwe",
+      "nachname": "Ebert",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "FRI-JU 13",
+      "funkrufname": {
+        "kennwort": {
+          "code": 4
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          52,
+          17,
+          1
+        ]
+      },
+      "aenderungen": "Mannschaftstransportwagen"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 4,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fahrzeuge, Funkrufnamen und Kennzeichen nach bos-fahrzeuge.info (Wache JUH OV Varel, Stand 2026-11-17); alle Personen erfunden."
+}

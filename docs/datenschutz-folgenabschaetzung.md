@@ -807,6 +807,12 @@ biometrische Daten, strafrechtliche Daten.
 - Übungsbögen (erfundene Namen und Rufnummern, keine personenbezogenen Daten)
   lassen sich seit 2026-11-16 als Sammel-PDF und seit 2026-11-17 als
   ZIP-Archiv mit einer PDF je Bogen herunterladen; erzeugt lokal, ohne Server.
+  Seit 2026-11-17 tragen die Übungsbögen niedersächsischer Wachen
+  (Ortsfeuerwehren, Standorte von DRK, JUH, MHD, ASB) echte Fahrzeugdaten der
+  Organisationen (Funkrufname, Kennzeichen, Typ, Name der Wache) nach
+  bos-fahrzeuge.info; das sind Angaben zu Dienstfahrzeugen, keine
+  personenbezogenen Daten. Die Personen darin bleiben erfunden. Abgerufen wird
+  nur beim Erzeugen (`npm run quellen:bos-fahrzeuge`), nicht aus der App.
 - Beim Empfänger: Dekodierung, optionale Signaturprüfung (reiner Anzeigestatus,
   blockiert den Import nie), Aufnahme in die lokale Einsatz-Sammlung.
 - Seit 2026-11-09 alternativ: Einlesen eines THW-Word-Bogens (`.docx`) vom

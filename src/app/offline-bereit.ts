@@ -396,8 +396,8 @@ export function offlineText(s: OfflineZustand): string {
     // lädt die App nie vorab (precache-aufteilung.ts, istNurAufAbruf). Die
     // Zeile nennt die Ausnahme, statt „komplett" ohne Einschränkung zu sagen.
     return s.frischBereit
-      ? `✓ Jetzt offline bereit. Funktioniert komplett offline (außer den Übungsbögen der THW-Ortsverbände) — ${daten}`
-      : `✓ Funktioniert komplett offline (außer den Übungsbögen der THW-Ortsverbände) — ${daten}`;
+      ? `✓ Jetzt offline bereit. Funktioniert komplett offline (außer den Übungsbögen der THW-Ortsverbände und Wachen) — ${daten}`
+      : `✓ Funktioniert komplett offline (außer den Übungsbögen der THW-Ortsverbände und Wachen) — ${daten}`;
   }
   if (s.stand === "ohne") {
     return `Offline-Vorrat ist in diesem Browser nicht möglich (etwa im Privatmodus) — ohne Netz lässt sich die Seite nicht neu laden. ${Daten}`;

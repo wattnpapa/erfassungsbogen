@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 13,
+  "uebung": true,
+  "stand": 3525920,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Friesland",
+    "einheitsTyp": {
+      "freitext": "Bereitschaft"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Standort"
+        },
+        "name": "DRK Jeverland RW Schillig"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis"
+        },
+        "name": "Friesland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2448,
+    "zeitraumBis": 2450,
+    "ortAuftrag": "MANV-Übung: Behandlungsplatz Friesland"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Silke",
+      "nachname": "Sommer",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Einheitsführer/-in (First-Responder-Fahrzeug)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5557255542"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "König",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (First-Responder-Fahrzeug)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Paul",
+      "nachname": "Engel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (First-Responder-Fahrzeug)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitätshelfer"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "First-Responder-Fahrzeug"
+      },
+      "kennzeichen": "FRI-RK 491",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          49,
+          89,
+          1
+        ]
+      },
+      "aenderungen": "First-Responder/Helfer vor Ort"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 3,
+    "dieselLiter": 45,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": false,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fahrzeuge, Funkrufnamen und Kennzeichen nach bos-fahrzeuge.info (Wache DRK Jeverland RW Schillig, Stand 2026-11-17); alle Personen erfunden."
+}

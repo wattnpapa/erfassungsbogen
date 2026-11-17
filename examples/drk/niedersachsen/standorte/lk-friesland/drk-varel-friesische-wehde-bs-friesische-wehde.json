@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 13,
+  "uebung": true,
+  "stand": 3527761,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Friesland",
+    "einheitsTyp": {
+      "freitext": "Bereitschaft"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Standort"
+        },
+        "name": "DRK Varel - Friesische Wehde BS Friesische Wehde"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis"
+        },
+        "name": "Friesland"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2449,
+    "zeitraumBis": 2450,
+    "ortAuftrag": "Betreuung Evakuierte: Notunterkunft Friesland"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Kevin",
+      "nachname": "Böhm",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Einheitsführer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5554825612"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Karsten",
+      "nachname": "Schmidt",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Sabine",
+      "nachname": "Lutz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitätshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Katrin",
+      "nachname": "Wenzel",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (MTW)"
+        }
+      ],
+      "fahrerlaubnis": 0,
+      "geschlecht": 1,
+      "ernaehrung": 1,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ole",
+      "nachname": "Berger",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (RTW)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555925840"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Verena",
+      "nachname": "Werner",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (RTW)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "MTW"
+      },
+      "kennzeichen": "FRI-RK 172",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          43,
+          17,
+          1
+        ]
+      },
+      "aenderungen": "Mannschaftstransportwagen"
+    },
+    {
+      "typ": {
+        "freitext": "RTW"
+      },
+      "kennzeichen": "FRI-RK 240",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Friesland",
+        "teile": [
+          43,
+          83,
+          1
+        ]
+      },
+      "aenderungen": "Rettungswagen"
+    },
+    {
+      "typ": {
+        "freitext": "Anh-SEG"
+      },
+      "kennzeichen": "FRI-CM 437",
+      "aenderungen": "Anhänger; Rufname laut Quelle: Rotkreuz Friesland 43/Anh-SEG"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 6,
+    "dieselLiter": 90,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fahrzeuge, Funkrufnamen und Kennzeichen nach bos-fahrzeuge.info (Wache DRK Varel - Friesische Wehde BS Friesische Wehde, Stand 2026-11-17); alle Personen erfunden."
+}

@@ -49,6 +49,9 @@ const KERN_SEITEN = new Set(["index.html", "anleitung.html", "vorlage.html", "da
  */
 export function istNurAufAbruf(url: string): boolean {
   if (/^assets\/ov-[^/]+\.json$/.test(url)) return true;
+  // Ebenso die Bögen realer Wachen nach bos-fahrzeuge.info (examples/*/niedersachsen/
+  // {ortsfeuerwehren,standorte}/, Dateinamen „wache-…", seit 2026-11-17).
+  if (/^assets\/wache-[^/]+\.json$/.test(url)) return true;
   // Der Worker der Sammel-PDF (pdf-sammel-worker.ts, rund 1,8 MB: pdfmake ein
   // zweites Mal) dient nur dem Ausdruck vieler Übungsbögen. Fehlt er offline,
   // setzt die App die Sammel-PDF wie zuvor im Hauptthread.

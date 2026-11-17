@@ -1585,6 +1585,17 @@ OV-Bögen alle übrigen Beispiele und Fotos). Die Offline-Zeile der Startseite n
 Baustein `src/app/beispiele-thw-ov.ts` (rund 0,74 MB, gezippt 84 KB), den der Übungsbögen-Dialog beim
 Öffnen nachlädt; Startbündel unverändert, JS-Gesamtumfang 6,45 MB (`scripts/bundle-budget.json` angehoben).
 Kein neuer Host zur Laufzeit; thw.blafusel.de ruft nur das Generatorskript mit `--abrufen` auf.
+*Nachgezogen 2026-11-17 (reale Wachen Niedersachsen):* Dieselbe Klasse „nur auf Abruf" tragen die Übungsbögen
+realer Ortsfeuerwehren und Standorte von DRK, JUH, MHD und ASB in Niedersachsen
+(`examples/feuerwehr/niedersachsen/ortsfeuerwehren/lk-*/` und `examples/<org>/niedersachsen/standorte/lk-*/`,
+Dateinamen `wache-…`). Fahrzeuge, Funkrufnamen, Kennzeichen und Wachennamen stammen aus der Momentaufnahme
+`scripts/quellen/bos-fahrzeuge-nds.json`, die `scripts/bos-fahrzeuge-abruf.mts` von bos-fahrzeuge.info liest
+(Landkreis-Listen der Obergruppen Feuerwehr und SEG/KatS, je Wache Detail-, Info- und Fahrzeugseite; höchstens ein
+Abrufstart je Sekunde, Zwischenspeicher `.cache/bos-fahrzeuge/`, nicht im Repository).
+`scripts/bos-fahrzeuge-nds-beispielboegen.mts` baut daraus je Wache einen Bogen mit Normbesatzung und erfundenen
+Personen. `istNurAufAbruf` und die `CacheFirst`-Route `eeb-ov-beispiele` erkennen zusätzlich `assets/wache-*.json`;
+die Adressliste steht als `BOS_WACHEN_BEISPIELE` im nachgeladenen Baustein `src/app/beispiele-thw-ov.ts`, die
+Ordnernamen der Landkreise in `src/app/beispiele-bos-ordner.ts` (generiert). Kein neuer Host zur Laufzeit.
 *Nachgezogen 2026-11-09:* Der Übungsbögen-Dialog samt Glob der übrigen Beispiel-Dateien, Suche und
 Ordnernavigation liegt in eigenem Baustein `src/app/beispiele-dialog.tsx`, den `fusszeile.tsx` beim ersten
 Öffnen per `lazy()` lädt (vorher Teil des Startbündels, das nach den Prüfrunden-Korrekturen über dem Budget lag).
