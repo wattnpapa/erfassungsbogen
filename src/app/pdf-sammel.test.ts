@@ -25,6 +25,7 @@ import type { Content, TDocumentDefinitions } from "pdfmake/interfaces";
 import type { QrSatz } from "./hilfen";
 import { boegenSammelDokument, bogenAufSeite, einzelPdfDokument } from "./pdf-dokument";
 import { pdfBytes, seitenZahl } from "../../scripts/pdf-in-node";
+import { einzelPdfsZippen } from "./pdf-zip";
 
 const PNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
 
@@ -137,3 +138,30 @@ describe("Sammel-PDF der Übungsbögen", () => {
     expect(bogenAufSeite([1], 5)).toBe(0);
   });
 });
+
+describe("Übungsbögen als ZIP mit einer PDF je Bogen", () => {
+  it("legt jede PDF so ab, wie ihr Einzel-PDF aussieht, und macht doppelte Namen eindeutig", async () => {
+    const boegen = [
+      { bogen: bogen("Aurich", 3, "2026-11-01T08:00:00+01:00"), qr: qrSatz(1) },
+      { bogen: bogen("Emden", 30, "2026-11-01T09:00:00+01:00"), qr: qrSatz(2) },
+    ];
+    const gemeldet: string[] = [];
+    const zip = await einzelPdfsZippen(boegen, ["a.pdf", "a.pdf"], pdfBytes, (n, von) => gemeldet.push(`${n}/${von}`));
+    expect(gemeldet).toEqual(["1/2", "2/2"]);
+    const text = Buffer.from(zip!).toString("latin1");
+    expect(text.startsWith("PK")).toBe(true);
+    expect(text).toContain("a.pdf");
+    expect(text).toContain("a-2.pdf");
+    // Zwei vollständige PDFs, die zweite mit mehr Seiten (30 Personen).
+    expect((text.match(/%PDF-/g) ?? []).length).toBe(2);
+    expect((text.match(/%%EOF/g) ?? []).length).toBeGreaterThanOrEqual(2);
+    const einzeln = await Promise.all(boegen.map(async ({ bogen: b, qr }) => seitenZahl(await pdfBytes(await einzelPdfDokument(b, qr, pdfBytes)))));
+    expect(seitenZahl(zip!)).toBe(einzeln[0]! + einzeln[1]!);
+  }, 60000);
+
+  it("bricht zwischen den Bögen ab", async () => {
+    const boegen = [{ bogen: bogen("Aurich", 3, "2026-11-01T08:00:00+01:00"), qr: qrSatz(1) }];
+    expect(await einzelPdfsZippen(boegen, ["a.pdf"], pdfBytes, undefined, () => true)).toBeNull();
+  });
+});
+

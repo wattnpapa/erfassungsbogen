@@ -9,6 +9,7 @@ import { useEffect, useRef, useState, type ReactNode, type RefObject } from "rea
 import { staerke, type Erfassungsbogen } from "@bos/eeb-format/model";
 import { istNativ, linkTeilen, shareSheetVerfuegbar } from "./nativ";
 import { fehlerText } from "./nachladen";
+import type { PdfFortschritt } from "./pdf";
 import { bogenVollUrl, einheitAnzeigename, einheitOrt, heuteDatum, migriereBogen, orgLabel, stempelZeit, vokabText, vokabularFuer } from "./hilfen";
 import { beispielAufHeute } from "./beispiel-heute";
 import { EinheitZeichen } from "./zeichen-bild";
@@ -386,32 +387,135 @@ async function beispielPdf(datei: string, url: string, abgebrochen: () => boolea
   await pdfErzeugen(bogen, `${datei}.pdf`, null, abgebrochen);
 }
 
+/** Was „Sammel-PDF" und „ZIP" gerade tun; null = nichts. Nährt das Fortschrittsfenster. */
+interface AusgabeStand {
+  art: "pdf" | "zip";
+  /** `laden` = Bögen holen, dann wie {@link PdfFortschritt}. */
+  schritt: "laden" | PdfFortschritt["schritt"];
+  n: number;
+  von: number;
+}
+
 /**
- * Mehrere Übungsbögen laden und als eine Sammel-PDF ausgeben (jeder Bogen wie
- * sein Einzel-PDF, auf eigener Seite beginnend). `fortschritt` meldet, wie weit
- * die Vorbereitung ist. false = abgebrochen oder Share-Sheet verworfen.
+ * Anteil am Balken je Schritt. Die Sammel-PDF setzt am Ende alle Seiten in
+ * einem Zug; diesen Rest kann niemand zählen, der Balken läuft dann ohne Wert.
+ * Beim ZIP ist das Packen am Ende kurz.
  */
-async function beispielSammelPdf(
+const AUSGABE_ANTEILE: Record<AusgabeStand["art"], Record<Exclude<AusgabeStand["schritt"], "datei">, [number, number]>> = {
+  pdf: { laden: [0, 0.05], qr: [0.05, 0.2], satz: [0.2, 0.65] },
+  zip: { laden: [0, 0.05], qr: [0.05, 0.2], satz: [0.2, 1] },
+};
+
+/** Stand als Anteil 0…1; null = ohne Zählung (der Balken läuft ohne Wert). */
+export function ausgabeAnteil(stand: AusgabeStand): number | null {
+  if (stand.schritt === "datei") return null;
+  const [von, bis] = AUSGABE_ANTEILE[stand.art][stand.schritt];
+  return von + (bis - von) * (stand.von > 0 ? Math.min(1, stand.n / stand.von) : 0);
+}
+
+/** Satz unter dem Balken: was gerade geschieht. */
+export function ausgabeText(stand: AusgabeStand): string {
+  const zahl = (n: number) => n.toLocaleString("de-DE");
+  switch (stand.schritt) {
+    case "laden":
+      return `Bogen ${zahl(stand.n)} von ${zahl(stand.von)} wird geladen …`;
+    case "qr":
+      return `QR-Code ${zahl(stand.n)} von ${zahl(stand.von)} entsteht …`;
+    case "satz":
+      return stand.art === "zip"
+        ? `PDF ${zahl(stand.n)} von ${zahl(stand.von)} ist fertig …`
+        : `Bogen ${zahl(stand.n)} von ${zahl(stand.von)} ist vorbereitet …`;
+    case "datei":
+      return stand.art === "zip"
+        ? "Die ZIP-Datei wird gepackt …"
+        : "Alle Seiten werden in einem Zug gesetzt, die Datei entsteht. Bei vielen Bögen dauert das eine Weile.";
+  }
+}
+
+/**
+ * Mehrere Übungsbögen laden und ausgeben: als eine Sammel-PDF (jeder Bogen
+ * wie sein Einzel-PDF, auf eigener Seite beginnend) oder als ZIP mit einer
+ * PDF je Bogen. `fortschritt` meldet jeden Schritt. false = abgebrochen oder
+ * Share-Sheet verworfen.
+ */
+async function beispieleAusgeben(
+  art: AusgabeStand["art"],
   datei: string,
   titel: string,
-  urls: readonly string[],
-  fortschritt: (text: string) => void,
+  auswahl: readonly { url: string; name: string }[],
+  fortschritt: (stand: AusgabeStand) => void,
   abgebrochen: () => boolean = () => false,
 ): Promise<boolean> {
-  const { sammelPdfErzeugen } = await import("./pdf");
+  const { sammelPdfErzeugen, einzelPdfsAlsZip } = await import("./pdf");
   const boegen: Erfassungsbogen[] = [];
-  for (const [i, url] of urls.entries()) {
+  for (const [i, { url }] of auswahl.entries()) {
     if (abgebrochen()) return false;
-    fortschritt(`Bogen ${i + 1} von ${urls.length} wird geladen …`);
+    fortschritt({ art, schritt: "laden", n: i, von: auswahl.length });
     boegen.push(await beispielKopie(url));
   }
   if (abgebrochen()) return false;
-  return sammelPdfErzeugen(
-    boegen,
-    `${datei}.pdf`,
-    titel,
-    (n, von) => fortschritt(n < von ? `Bogen ${n + 1} von ${von} wird vorbereitet …` : "Seiten werden gesetzt, die Datei entsteht …"),
-    abgebrochen,
+  const weiter = (f: PdfFortschritt) => fortschritt({ art, ...f });
+  return art === "zip"
+    ? einzelPdfsAlsZip(boegen, auswahl.map((a) => `${a.name}.pdf`), `${datei}.zip`, weiter, abgebrochen)
+    : sammelPdfErzeugen(boegen, `${datei}.pdf`, titel, weiter, abgebrochen);
+}
+
+/**
+ * Fortschrittsfenster über dem Übungsbögen-Dialog, solange Sammel-PDF oder ZIP
+ * entstehen. Erscheint erst nach einer knappen halben Sekunde: Ein einzelner
+ * Bogen ist schneller fertig, als das Fenster aufgehen und wieder zugehen
+ * könnte. Escape und „Abbrechen" brechen ab.
+ */
+function AusgabeFenster({ stand, onAbbrechen }: { stand: AusgabeStand | null; onAbbrechen: () => void }) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const aktiv = stand !== null;
+  const [sichtbar, setSichtbar] = useState(false);
+  useEffect(() => {
+    if (!aktiv) {
+      setSichtbar(false);
+      return;
+    }
+    const t = window.setTimeout(() => setSichtbar(true), 400);
+    return () => window.clearTimeout(t);
+  }, [aktiv]);
+  useEffect(() => {
+    const d = ref.current;
+    if (!d) return;
+    if (sichtbar && !d.open) d.showModal?.();
+    if (!sichtbar && d.open) d.close();
+  }, [sichtbar]);
+  const anteil = stand ? ausgabeAnteil(stand) : null;
+  const titel = stand?.art === "zip" ? "ZIP-Datei entsteht" : "Sammel-PDF entsteht";
+  return (
+    <dialog
+      ref={ref}
+      className="ausgabe-fortschritt"
+      aria-labelledby="ausgabe-fortschritt-titel"
+      onCancel={(e) => {
+        e.preventDefault();
+        onAbbrechen();
+      }}
+      // Escape nicht zum Übungsbögen-Dialog durchlassen: Der ginge sonst einen Ordner zurück.
+      onKeyDown={(e) => {
+        if (e.key !== "Escape") return;
+        e.preventDefault();
+        e.stopPropagation();
+        onAbbrechen();
+      }}
+    >
+      <h2 id="ausgabe-fortschritt-titel">{titel}</h2>
+      <progress max={1} {...(anteil === null ? {} : { value: anteil })} aria-labelledby="ausgabe-fortschritt-titel" />
+      <p className="ausgabe-stand" role="status">
+        {anteil !== null && <strong>{Math.round(anteil * 100)} % </strong>}
+        {stand ? ausgabeText(stand) : ""}
+      </p>
+      <p className="hinweis">Das Fenster schließt sich von selbst, sobald die Datei fertig ist. „Abbrechen“ verwirft die halbfertige Datei.</p>
+      <div className="abfrage-aktionen">
+        <button type="button" onClick={onAbbrechen}>
+          Abbrechen
+        </button>
+      </div>
+    </dialog>
   );
 }
 
@@ -497,6 +601,16 @@ function IconPdf() {
       <path d="M14 3v4.5h4.5" />
       <path d="M12 11v5" />
       <path d="m9.75 13.75 2.25 2.25 2.25-2.25" />
+    </svg>
+  );
+}
+
+function IconZip() {
+  return (
+    <svg className="knopf-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4.5 6.5h15v13a1.5 1.5 0 0 1-1.5 1.5H6a1.5 1.5 0 0 1-1.5-1.5Z" />
+      <path d="M3.5 3h17v3.5h-17Z" />
+      <path d="M10 10.5h4" />
     </svg>
   );
 }
@@ -588,8 +702,10 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
   // Für die Sammel-PDF markierte Bögen (Adresse der Datei). Gilt nur für die
   // sichtbare Liste: Ein anderer Ordner oder eine andere Suche beginnt leer.
   const [markiert, setMarkiert] = useState<ReadonlySet<string>>(new Set());
-  // Zwischenstand der laufenden Sammel-PDF („Bogen 3 von 12 wird vorbereitet …").
-  const [sammelStand, setSammelStand] = useState("");
+  // Zwischenstand der laufenden Sammel-PDF oder ZIP-Datei (Fortschrittsfenster).
+  const [ausgabeStand, setAusgabeStand] = useState<AusgabeStand | null>(null);
+  // Hochgezählt von „Abbrechen" im Fortschrittsfenster.
+  const ausgabeAbbruch = useRef(0);
   // Bögen des offenen Ordners ließen sich nicht laden (ohne Netz). Steht über der
   // Liste statt am Ende, verschwindet beim Ordnerwechsel und lädt mit „Erneut
   // laden" oder bei Netzrückkehr neu (BB-E5, BB-O3, BB-O4).
@@ -825,42 +941,54 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
     });
   }
 
-  /** Die markierten Bögen als eine Sammel-PDF; Fehler im Dialog zeigen. */
-  async function sammelHolen() {
+  /** Die markierten Bögen als Sammel-PDF oder als ZIP mit einer PDF je Bogen; Fehler im Dialog zeigen. */
+  async function ausgabeHolen(art: AusgabeStand["art"]) {
     if (markierteBoegen.length === 0) return;
     // Ein Doppeltipp auf ein Register traf mit dem zweiten Tipp sonst diesen Knopf (BB2-G2, BB2-E2).
     if (performance.now() - Math.max(letzterWechsel.current, geoeffnetUm.current) < 800) return;
     setBeispielFehler("");
     setBeispielQuittung("");
     setBeispielLaeuft(SAMMEL_LAEUFT);
-    setSammelStand("Wird vorbereitet …");
+    const anzahl = markierteBoegen.length;
+    setAusgabeStand({ art, schritt: "laden", n: 0, von: anzahl });
     const sitzung = beispielSitzung.current;
-    const abgebrochen = () => beispielSitzung.current !== sitzung;
+    const abbruch = ausgabeAbbruch.current;
+    const abgebrochen = () => beispielSitzung.current !== sitzung || ausgabeAbbruch.current !== abbruch;
     // Dateiname wie beim Einzel-PDF mit Ordner, dazu die Zahl der Bögen; bei einer Suche deren Wort.
     const ordner = suchErgebnis ? ["suche", ...woerterVon(beispielSuche)] : beispielPfad;
-    const name = ["uebung-beispiele", ...ordner, `${markierteBoegen.length}-boegen`].join("-");
+    const name = ["uebung-beispiele", ...ordner, `${anzahl}-boegen`].join("-");
     const woher = suchErgebnis ? `Suche „${beispielSuche.trim()}“` : ordnerLabel(beispielPfad[beispielPfad.length - 1] ?? "") || "alle Ordner";
-    const titel = `Übungsbögen ${woher} (${markierteBoegen.length} ${markierteBoegen.length === 1 ? "Bogen" : "Bögen"})`;
+    const boegenWort = `${anzahl.toLocaleString("de-DE")} ${anzahl === 1 ? "Bogen" : "Bögen"}`;
+    const titel = `Übungsbögen ${woher} (${boegenWort})`;
+    const endung = art === "zip" ? "zip" : "pdf";
+    const was = art === "zip" ? "ZIP-Datei" : "Sammel-PDF";
     try {
-      const fertig = await beispielSammelPdf(
+      const fertig = await beispieleAusgeben(
+        art,
         name,
         titel,
-        markierteBoegen.map((b) => b.url),
-        (text) => {
-          if (!abgebrochen()) setSammelStand(text);
+        // Im ZIP heißt jede PDF wie ihr Einzel-PDF (mit Ordner, BB-A4).
+        markierteBoegen.map((b) => ({ url: b.url, name: ["uebung-beispiel", ...b.ordner, b.datei].join("-") })),
+        (stand) => {
+          if (!abgebrochen()) setAusgabeStand(stand);
         },
         abgebrochen,
       );
       if (fertig && !abgebrochen()) {
         setBeispielQuittung(
-          `Sammel-PDF „${name}.pdf“ mit ${markierteBoegen.length} ${markierteBoegen.length === 1 ? "Bogen" : "Bögen"} erzeugt${istNativ() ? "." : " — liegt im Download-Ordner."}`,
+          art === "zip"
+            ? `ZIP-Datei „${name}.zip“ mit ${boegenWort} als einzelne PDFs erzeugt${istNativ() ? "." : " — liegt im Download-Ordner."}`
+            : `Sammel-PDF „${name}.pdf“ mit ${boegenWort} erzeugt${istNativ() ? "." : " — liegt im Download-Ordner."}`,
         );
-        window.setTimeout(() => setBeispielQuittung((q) => (q.includes(name) ? "" : q)), 8000);
+        window.setTimeout(() => setBeispielQuittung((q) => (q.includes(`${name}.${endung}`) ? "" : q)), 8000);
+      } else if (ausgabeAbbruch.current !== abbruch && beispielSitzung.current === sitzung) {
+        setBeispielQuittung(`${was} abgebrochen.`);
+        window.setTimeout(() => setBeispielQuittung((q) => (q === `${was} abgebrochen.` ? "" : q)), 5000);
       }
     } catch (err) {
-      setBeispielFehler(`Sammel-PDF konnte nicht erzeugt werden: ${fehlerText(err)}`);
+      setBeispielFehler(`${was} konnte nicht erzeugt werden: ${fehlerText(err)}`);
     } finally {
-      setSammelStand("");
+      setAusgabeStand(null);
       setBeispielLaeuft("");
     }
   }
@@ -977,6 +1105,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
             Häkchen vor den Einheiten (oder <strong>Alle markieren</strong>) lassen sich
             mehrere Bögen auswählen und mit <strong>Sammel-PDF</strong> als eine Datei
             herunterladen, jeder Bogen darin wie sein eigenes PDF, auf einer neuen Seite beginnend.
+            <strong>Einzel-PDFs als ZIP</strong> legt stattdessen jede PDF als eigene Datei in ein ZIP-Archiv.
           </p>
         </details>
         {/* Suche über alle Ordner und Bögen (BB-S2, BB-K4, BB-W8). */}
@@ -1156,7 +1285,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
           </p>
         )}
         {beispielBoegen.length > 0 && (
-          <div className="beispiel-auswahl" role="group" aria-label="Mehrere Bögen als eine Sammel-PDF">
+          <div className="beispiel-auswahl" role="group" aria-label="Mehrere Bögen als Sammel-PDF oder ZIP">
             <button
               type="button"
               disabled={beispielLaeuft !== ""}
@@ -1167,20 +1296,30 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
             <button
               type="button"
               disabled={beispielLaeuft !== "" || markierteBoegen.length === 0}
-              onClick={() => void sammelHolen()}
+              onClick={() => void ausgabeHolen("pdf")}
             >
               <IconPdf />
               Sammel-PDF
               {markierteBoegen.length > 0 && ` (${markierteBoegen.length.toLocaleString("de-DE")} ${markierteBoegen.length === 1 ? "Bogen" : "Bögen"})`}
             </button>
+            <button
+              type="button"
+              disabled={beispielLaeuft !== "" || markierteBoegen.length === 0}
+              onClick={() => void ausgabeHolen("zip")}
+            >
+              <IconZip />
+              Einzel-PDFs als ZIP
+            </button>
             <span className="hinweis" role="status">
-              {sammelStand ||
-                (markierteBoegen.length === 0
-                  ? "Bögen mit dem Häkchen vor der Einheit markieren — sie kommen in eine gemeinsame PDF."
-                  : `${markierteBoegen.length.toLocaleString("de-DE")} von ${beispielBoegen.length.toLocaleString("de-DE")} markiert.`)}
+              {ausgabeStand
+                ? ausgabeText(ausgabeStand)
+                : markierteBoegen.length === 0
+                  ? "Bögen mit dem Häkchen vor der Einheit markieren: „Sammel-PDF“ macht daraus eine Datei, „Einzel-PDFs als ZIP“ eine PDF je Bogen."
+                  : `${markierteBoegen.length.toLocaleString("de-DE")} von ${beispielBoegen.length.toLocaleString("de-DE")} markiert.`}
             </span>
           </div>
         )}
+        <AusgabeFenster stand={ausgabeStand} onAbbrechen={() => (ausgabeAbbruch.current += 1)} />
         {beispielBoegen.length > 0 && (
           <div className="tabellen-scroll">
             {/* Die role-Attribute sind kein Selbstzweck: auf schmalen Geräten
@@ -1209,7 +1348,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
                             type="checkbox"
                             checked={markiert.has(url)}
                             disabled={beispielLaeuft !== ""}
-                            aria-label={`${b ? einheitsTypText(b) || datei : datei}${b && einheitOrt(b.einheit) ? ` ${einheitOrt(b.einheit)}` : ""} für die Sammel-PDF markieren`}
+                            aria-label={`${b ? einheitsTypText(b) || datei : datei}${b && einheitOrt(b.einheit) ? ` ${einheitOrt(b.einheit)}` : ""} für Sammel-PDF oder ZIP markieren`}
                             onChange={(e) => markierung(url, e.target.checked)}
                           />
                           {b ? (

@@ -1620,6 +1620,14 @@ keine CSP-Änderung (`worker-src` fällt auf `script-src 'self'` zurück). Läng
 0,3 s. „Link" je Übungsbogen schreibt über `ClipboardItem` mit einem Versprechen in die Zwischenablage, noch im
 Takt des Tippens; ein Browser der Erprobung (vermutlich Firefox) lehnte `writeText` nach dem Laden und Signieren mit `undefined` ab. Lehnt der Browser ab,
 zeigt ein Hinweis den Link zum Markieren.
+*Nachgezogen 2026-11-17 (Einzel-PDFs als ZIP, Fortschrittsfenster):* Neben „Sammel-PDF" gibt „Einzel-PDFs als ZIP"
+die markierten Übungsbögen als ZIP-Archiv mit einer PDF je Bogen aus (`einzelPdfsAlsZip` in `pdf.ts`, Satz in
+`pdf-zip.ts`, gleich im Worker und im Hauptthread). Jede PDF entsteht wie das Einzel-PDF (`einzelPdfDokument` mit
+Probesatz) und heißt wie dessen Download (`uebung-beispiel-<Ordner>-<Datei>.pdf`, doppelte Namen mit „-2"); das
+Archiv `uebung-beispiele-<Ordner>-<n>-boegen.zip` schreibt `zip-schreiben.ts` (ohne Kompression, aus
+`personalstamm-import.ts` herausgelöst, jetzt auch für Binärdaten). Für beide Wege zeigt ein Fenster über dem Dialog
+einen Fortschrittsbalken (Laden, QR-Codes, Satz je Bogen; der Endsatz der Sammel-PDF läuft ohne Wert) mit
+„Abbrechen"; es erscheint erst nach 400 ms. Der Worker nimmt dafür Aufträge `sammel` und `zip` an.
 *Nachgezogen 2026-10-06 (Audit Runde 4, R4-O1):* Bricht das Erstladen im
 Funkloch ab, scheitert der Service Worker an der Installation, und der Browser
 verwirft die Registrierung; ein späteres `update()` ginge ins Leere und die

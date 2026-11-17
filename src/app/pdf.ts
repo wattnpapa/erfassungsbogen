@@ -19,7 +19,8 @@ import {
   vereinfachtBetroffene,
   type SammelEinzelBogen,
 } from "./pdf-dokument";
-import type { SammelAuftrag, SammelNachricht } from "./pdf-sammel-worker";
+import type { PdfAuftrag, PdfNachricht } from "./pdf-sammel-worker";
+import { einzelPdfsZippen } from "./pdf-zip";
 import { BLANKO_DATEINAME, BLANKO_INFO, BLANKO_ZEILEN, leererBogen } from "./blanko";
 import { zeitEingelesen } from "./eintrag-zeiten";
 import { kaestchenZeichnen } from "./pdf-kaestchen";
@@ -118,6 +119,40 @@ export async function blankoPdfErzeugen(): Promise<boolean> {
 }
 
 /**
+ * Wie weit eine Ausgabe mehrerer Bögen ist: `qr` = QR-Codes erzeugt (n von
+ * von), `satz` = Bögen gesetzt bzw. vorbereitet, `datei` = die Datei entsteht
+ * (ohne Zählung).
+ */
+export interface PdfFortschritt {
+  schritt: "qr" | "satz" | "datei";
+  n: number;
+  von: number;
+}
+
+/** Pause für die Oberfläche zwischen zwei Bögen (QR-Codes und Satz im Hauptthread rechnen ohne Wartezeit). */
+const atemholen = () => new Promise<void>((weiter) => setTimeout(weiter, 0));
+
+/** Setzen im Hauptthread: Bytes der fertigen PDF. */
+const setzenHier = async (dd: Parameters<typeof kaestchenZeichnen>[0]) =>
+  (await pdfMake.createPdf(kaestchenZeichnen(dd)).getBuffer()) as Uint8Array;
+
+/** QR-Satz je Bogen, mit Fortschritt; null = abgebrochen. */
+async function qrSaetze(
+  boegen: readonly Erfassungsbogen[],
+  fortschritt: ((f: PdfFortschritt) => void) | undefined,
+  abgebrochen: () => boolean,
+): Promise<SammelEinzelBogen[] | null> {
+  const mitQr: SammelEinzelBogen[] = [];
+  for (const [i, b] of boegen.entries()) {
+    if (abgebrochen()) return null;
+    mitQr.push({ bogen: b, qr: await qrErzeugen(b, null) });
+    fortschritt?.({ schritt: "qr", n: i + 1, von: boegen.length });
+    await atemholen();
+  }
+  return mitQr;
+}
+
+/**
  * Mehrere Bögen als eine Sammel-PDF (Übungsbögen: die markierten Bögen eines
  * Ordners). Jeder Bogen bekommt seinen eigenen QR-Code und sieht aus wie sein
  * Einzel-PDF; siehe boegenSammelDokument. `fortschritt` meldet jeden
@@ -128,30 +163,24 @@ export async function sammelPdfErzeugen(
   boegen: readonly Erfassungsbogen[],
   dateiname: string,
   titel: string,
-  fortschritt?: (n: number, von: number) => void,
+  fortschritt?: (f: PdfFortschritt) => void,
   abgebrochen: () => boolean = () => false,
 ): Promise<boolean> {
-  const mitQr = [];
-  for (const b of boegen) {
-    if (abgebrochen()) return false;
-    mitQr.push({ bogen: b, qr: await qrErzeugen(b, null) });
-    // Zwischen den Bögen die Oberfläche zum Zug kommen lassen: Die QR-Codes
-    // entstehen ohne echte Wartezeit, 100 davon wären ein Block von Sekunden.
-    await new Promise((weiter) => setTimeout(weiter, 0));
-  }
+  const mitQr = await qrSaetze(boegen, fortschritt, abgebrochen);
+  if (!mitQr) return false;
   // Erst im Worker setzen (Oberfläche bleibt bedienbar); nur wenn es ihn
-  // nicht gibt oder er nicht startet, wie bisher im Hauptthread.
-  const imWorker = await sammelImWorker(mitQr, titel, fortschritt, abgebrochen);
+  // nicht gibt oder er nicht startet, im Hauptthread.
+  const imWorker = await imWorkerSetzen({ art: "sammel", boegen: mitQr, titel }, fortschritt, abgebrochen);
   if (imWorker === "abgebrochen") return false;
   if (imWorker !== "kein-worker") {
     if (abgebrochen()) return false;
-    return pdfDateiAusgeben(imWorker, dateiname);
+    return bytesAusgeben(imWorker, dateiname, "application/pdf");
   }
   const dd = await boegenSammelDokument(
     mitQr,
     (probe) => pdfMake.createPdf(kaestchenZeichnen(probe)).getBuffer(),
     titel,
-    fortschritt,
+    (n, von) => fortschritt?.(n < von ? { schritt: "satz", n, von } : { schritt: "datei", n: 0, von: 0 }),
     abgebrochen,
   );
   if (!dd || abgebrochen()) return false;
@@ -159,15 +188,47 @@ export async function sammelPdfErzeugen(
 }
 
 /**
- * Sammel-PDF im Worker setzen (pdf-sammel-worker.ts). "kein-worker" heißt:
- * der Worker ließ sich nicht starten (Desktop-App über file://, alte Browser,
- * Testumgebung) — dann rechnet der Aufrufer selbst. Fehler beim Setzen
- * kommen als Ausnahme, wie im Hauptthread.
+ * Mehrere Bögen als ZIP-Datei mit je einer eigenen PDF (Übungsbögen). Jede
+ * PDF gleicht dem Einzel-PDF des Bogens. `namen` = Dateinamen im ZIP, in der
+ * Reihenfolge der Bögen (doppelte bekommen „-2", „-3"). false = abgebrochen
+ * oder Share-Sheet verworfen.
  */
-function sammelImWorker(
-  boegen: SammelEinzelBogen[],
-  titel: string,
-  fortschritt: ((n: number, von: number) => void) | undefined,
+export async function einzelPdfsAlsZip(
+  boegen: readonly Erfassungsbogen[],
+  namen: readonly string[],
+  dateiname: string,
+  fortschritt?: (f: PdfFortschritt) => void,
+  abgebrochen: () => boolean = () => false,
+): Promise<boolean> {
+  const mitQr = await qrSaetze(boegen, fortschritt, abgebrochen);
+  if (!mitQr) return false;
+  const imWorker = await imWorkerSetzen({ art: "zip", boegen: mitQr, namen: [...namen] }, fortschritt, abgebrochen);
+  if (imWorker === "abgebrochen") return false;
+  if (imWorker !== "kein-worker") {
+    if (abgebrochen()) return false;
+    return bytesAusgeben(imWorker, dateiname, "application/zip");
+  }
+  const zip = await einzelPdfsZippen(
+    mitQr,
+    namen,
+    setzenHier,
+    (n, von) => fortschritt?.(n < von ? { schritt: "satz", n, von } : { schritt: "datei", n: 0, von: 0 }),
+    abgebrochen,
+    atemholen,
+  );
+  if (!zip || abgebrochen()) return false;
+  return bytesAusgeben(zip, dateiname, "application/zip");
+}
+
+/**
+ * Sammel-PDF oder ZIP im Worker setzen (pdf-sammel-worker.ts). "kein-worker"
+ * heißt: der Worker ließ sich nicht starten (Desktop-App über file://, ohne
+ * Netz, alte Browser, Testumgebung) — dann rechnet der Aufrufer selbst.
+ * Fehler beim Setzen kommen als Ausnahme, wie im Hauptthread.
+ */
+function imWorkerSetzen(
+  auftrag: PdfAuftrag,
+  fortschritt: ((f: PdfFortschritt) => void) | undefined,
   abgebrochen: () => boolean,
 ): Promise<ArrayBuffer | "kein-worker" | "abgebrochen"> {
   if (typeof Worker === "undefined") return Promise.resolve("kein-worker");
@@ -188,15 +249,15 @@ function sammelImWorker(
       window.clearInterval(wache);
       worker.terminate();
     }
-    worker.onmessage = (e: MessageEvent<SammelNachricht>) => {
+    worker.onmessage = (e: MessageEvent<PdfNachricht>) => {
       gemeldet = true;
       const n = e.data;
       if (n.art === "fortschritt") {
-        fortschritt?.(n.n, n.von);
+        fortschritt?.({ schritt: n.schritt, n: n.n, von: n.von });
         return;
       }
       ende();
-      if (n.art === "fertig") fertig(n.pdf);
+      if (n.art === "fertig") fertig(n.datei);
       else fehler(new Error(n.text));
     };
     // Startet das Skript gar nicht (Ladefehler, CSP, file://), kam noch keine
@@ -204,11 +265,11 @@ function sammelImWorker(
     worker.onerror = (e) => {
       e.preventDefault();
       ende();
-      if (gemeldet) fehler(new Error(e.message || "Die Sammel-PDF ließ sich nicht setzen."));
+      if (gemeldet) fehler(new Error(e.message || "Die Datei ließ sich nicht setzen."));
       else fertig("kein-worker");
     };
     try {
-      worker.postMessage({ boegen, titel } satisfies SammelAuftrag);
+      worker.postMessage(auftrag);
     } catch {
       ende();
       fertig("kein-worker");
@@ -216,14 +277,14 @@ function sammelImWorker(
   });
 }
 
-/** Fertige PDF-Bytes ausgeben: Download im Browser, Share-Sheet in der App. */
-async function pdfDateiAusgeben(pdf: ArrayBuffer, dateiname: string): Promise<boolean> {
+/** Fertige Bytes ausgeben: Download im Browser, Share-Sheet in der App. */
+async function bytesAusgeben(daten: ArrayBuffer | Uint8Array, dateiname: string, mime: string): Promise<boolean> {
+  const bytes = daten instanceof Uint8Array ? daten : new Uint8Array(daten);
   if (istNativ()) {
-    const bytes = new Uint8Array(pdf);
     let binaer = "";
     for (let i = 0; i < bytes.length; i += 0x8000) binaer += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
     return binaerTeilen(dateiname, btoa(binaer));
   }
-  blobAlsDownload(dateiname, new Blob([pdf], { type: "application/pdf" }));
+  blobAlsDownload(dateiname, new Blob([bytes as BlobPart], { type: mime }));
   return true;
 }

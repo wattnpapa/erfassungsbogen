@@ -948,6 +948,14 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
 
 > *Prüfvermerk:* Formel-Schutz im Code bestätigt (`FORMEL_START = /^[=+\-@\t\r]/`).
 
+- **Übungsbögen als Sammel-PDF oder ZIP** (`src/app/pdf.ts`, `pdf-zip.ts`,
+  `zip-schreiben.ts`, seit 2026-11-16 bzw. 2026-11-17): Markierte Übungsbögen
+  gehen als eine PDF oder als ZIP-Archiv mit einer PDF je Bogen in den
+  Download-Ordner (App: Share-Sheet). Inhalt sind nur Übungsbögen mit
+  erfundenen Daten; das ZIP ist unkomprimiert und unverschlüsselt, wie die
+  Einzel-PDFs selbst. Gesetzt wird in einem Web Worker derselben Herkunft
+  (`pdf-sammel-worker.ts`), kein neuer Host, CSP unverändert.
+
 - **Lageblatt und Übergabeblatt der Einsatz-Sammlung** (`src/app/pdf.ts`,
   `pdf-dokument.ts`, seit 2026-09-27): Das Übergabeblatt (Seite 1 der
   Sammel-PDF „Einsatz weitergeben / sichern") und das einseitige „Lageblatt"

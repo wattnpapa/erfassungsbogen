@@ -2968,6 +2968,13 @@
        und der Stand daneben, über der Tabelle. */
     .beispiel-auswahl { display: flex; flex-wrap: wrap; align-items: center; gap: var(--r-2) var(--r-3); margin: 0 0 var(--r-2); }
     .beispiel-auswahl .hinweis { margin: 0; flex: 1 1 16rem; }
+    /* Fortschrittsfenster für Sammel-PDF und ZIP der Übungsbögen: über dem Dialog, Balken in voller Breite. */
+    dialog.ausgabe-fortschritt { width: min(28rem, calc(100vw - min(2rem, 32px))); }
+    dialog.ausgabe-fortschritt h2 { margin: 0 0 var(--r-3); font-size: var(--t-l); }
+    dialog.ausgabe-fortschritt progress { display: block; width: 100%; height: 1.25rem; accent-color: var(--akzent); }
+    dialog.ausgabe-fortschritt .ausgabe-stand { margin: var(--r-3) 0 var(--r-2); min-height: 2.6em; }
+    dialog.ausgabe-fortschritt .hinweis { margin: 0; }
+    dialog.ausgabe-fortschritt .abfrage-aktionen { display: flex; justify-content: flex-end; margin-top: var(--r-3); }
     /* Das Häkchen vor dem taktischen Zeichen; das ganze Feld ist sein Etikett (Handschuhe). */
     .beispiel-wahl { cursor: pointer; }
     .beispiel-wahl > input[type="checkbox"] { flex: 0 0 auto; margin: 0; }
