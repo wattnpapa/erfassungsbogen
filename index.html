@@ -2911,8 +2911,17 @@
     .beispiel-pfad > button { flex: 0 0 auto; }
     .beispiel-pfad strong[tabindex]:focus-visible { outline: var(--fokus) solid var(--akzent); outline-offset: 2px; }
     .beispiel-pfad ol { display: flex; flex-wrap: nowrap; align-items: center; min-width: 0; flex: 1 1 auto; overflow: hidden; margin: 0; padding: 0; list-style: none; font-size: var(--t-s); }
-    .beispiel-pfad li { display: flex; align-items: center; min-width: 0; flex: 0 1 auto; }
-    .beispiel-pfad li:first-child { flex: 0 0 auto; }
+    /* Ein Listenpunkt schrumpft nie unter Trenner + 44-px-Knopf: Mit min-width: 0
+       lief der Elternordner („THW") auf dem iPhone unter den aktuellen Ordner. Kürzen
+       muss vor allem der aktuelle (letzte) Ordner, die Elternordner kaum. */
+    .beispiel-pfad li { display: flex; align-items: center; min-width: calc(44px + 1.5em); flex: 0 1 auto; }
+    .beispiel-pfad li:last-child { flex-shrink: 5; }
+    .beispiel-pfad li:first-child { flex: 0 0 auto; min-width: min-content; }
+    /* Reicht die Breite nicht für alle Ebenen (iPhone SE, große Schrift), fallen
+       erst „…", dann die Elternordner weg; „Alle" und der aktuelle Ordner bleiben. */
+    .beispiel-pfad ol { container: pfad / inline-size; }
+    @container pfad (max-width: 17em) { .beispiel-pfad li.pfad-ellipse { display: none; } }
+    @container pfad (max-width: 12.5em) { .beispiel-pfad li:not(:first-child):not(:last-child) { display: none; } }
     .beispiel-pfad li + li::before { content: "›"; color: var(--text-3); padding-inline: 0.45em; flex: 0 0 auto; }
     /* Tippziele im Pfad mindestens 44 px breit (BB-G4, BB-M4), lange Namen gekürzt. */
     .beispiel-pfad li > button.link { min-width: 44px; min-height: calc(var(--ziel-basis) + var(--ziel)); justify-content: center; padding-inline: 0.35rem; }

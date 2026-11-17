@@ -1146,7 +1146,7 @@ export default function BeispieleDialog({ anfrage, onBogenOeffnen }: {
                 <button type="button" className="link" onClick={() => tippWechsel([])}>Alle</button>
               </li>
               {beispielPfad.length > 2 && (
-                <li>
+                <li className="pfad-ellipse">
                   <button
                     type="button"
                     className="link"

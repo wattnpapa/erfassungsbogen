@@ -41,6 +41,7 @@ export const AENDERUNGEN: readonly Aenderung[] = [
       "Übungsbögen: Neben „Sammel-PDF“ gibt es „Einzel-PDFs als ZIP“. Die markierten Bögen kommen dann als ZIP-Datei mit einer eigenen PDF je Bogen, benannt wie beim Einzel-Download.",
       "Übungsbögen: Während Sammel-PDF oder ZIP entstehen, zeigt ein Fenster einen Fortschrittsbalken mit dem aktuellen Bogen und einen Knopf „Abbrechen“.",
       "Übungsbögen: „Link“ scheiterte in manchen Browsern mit der Meldung „Link konnte nicht erzeugt werden: undefined“. Der Link landet jetzt in der Zwischenablage, und wo der Browser das ablehnt, öffnet sich ein Fenster mit dem Link zum Markieren und Kopieren.",
+      "Übungsbögen: In der Ordnerzeile über der Liste lagen auf dem iPhone der übergeordnete Ordner und der aktuelle Ordner übereinander. Jetzt stehen sie nebeneinander, lange Namen enden mit „…“, und auf schmalen Geräten fallen die Zwischenebenen weg, damit der aktuelle Ordner lesbar bleibt.",
     ],
   },
   {
