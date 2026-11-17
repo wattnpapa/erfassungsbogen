@@ -190,6 +190,7 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 >
 > **Nachgezogen 2026-09-29:** Hinweis „von Hand geändert" neben dem QR-Code
 > (Audit Runde 2, R2-A4) — Stiftkorrekturen stecken nicht im Code (5.4).
+> Das Ankreuzkästchen dazu ist seit 2026-11-17 entfallen (5.4).
 >
 > **Nachgezogen 2026-09-29:** Foto-Einlesen (Audit Runde 2, R2-A2) — liest
 > alle QR-Codes eines Bildes und merkt Teile unvollständiger mehrteiliger
@@ -419,7 +420,7 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > Eingang, Zug, Übung und „ins Gerät übertragen"; die ausgelieferte Datei
 > unter `public/downloads/` ist neu erzeugt (R4-A4, R4-A8). Jede Codeseite
 > nennt Einheit, Funkrufname und Stand, das Kästchen „von Hand geändert"
-> steht auf dem Bogen neben der Stärke (R4-A5). Die Sammel-PDF setzt Bögen,
+> stand auf dem Bogen neben der Stärke (R4-A5; seit 2026-11-17 entfernt). Die Sammel-PDF setzt Bögen,
 > die mit der letzten Zeile allein auf einer Seite enden würden, per Probesatz
 > enger (R4-A7). Der Bericht von „Bögen einlesen…" fasst Bilder ohne Code
 > zusammen (R4-A6). Keine neuen Daten, keine neuen Speicherorte, keine neuen
@@ -991,12 +992,17 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   Übersichts-CSV führt sie als letzte Spalte „Bemerkung (Einheit)".
   Die ganze Sammel-PDF gibt es nur noch über „Einsatz weitergeben / sichern";
   der Teilexport „nur neue Bögen" heißt `eeb-einsatz-nachtrag-….pdf`.
-  Seit 2026-09-29 (R2-A4) steht neben jedem QR-Code eines Bogen-PDF das
-  Kästchen „[  ] von Hand geändert" mit dem Stand (DTG), den der Code trägt:
-  Eine Stiftkorrektur auf dem Ausdruck steckt nicht im Code, und wer scannt,
-  soll das vorher sehen. Die Rückmeldung von „Bögen einlesen…" wiederholt den
-  Hinweis (`STIFT_HINWEIS`, `qr-stapel.ts`). Integrität: Papier und Gerät
-  können weiterhin auseinanderlaufen; der Hinweis macht es nur sichtbar.
+  Seit 2026-09-29 (R2-A4) steht neben jedem QR-Code eines Bogen-PDF ein
+  Hinweis mit dem Stand (DTG), den der Code trägt: Eine Stiftkorrektur auf
+  dem Ausdruck steckt nicht im Code, und wer scannt, soll das vorher sehen.
+  Die Rückmeldung von „Bögen einlesen…" wiederholt den Hinweis
+  (`STIFT_HINWEIS`, `qr-stapel.ts`). Das Ankreuzkästchen „von Hand geändert"
+  neben der Stärke (R2-A4, R4-A5) ist seit 2026-11-17 entfernt: Es verwirrte
+  in der Erprobung die meisten, und Handschrift ist auf dem Papier ohnehin
+  sichtbar; der Hinweis neben dem Code spricht jetzt allgemein von einer
+  Änderung mit dem Stift. Integrität: Papier und Gerät können weiterhin
+  auseinanderlaufen; der Hinweis macht es nur sichtbar, ein Kästchen als
+  maschinenlesbare Markierung gibt es nicht mehr.
   *Nachgezogen 2026-10-05 (Audit Runde 3, R3-A3, R3-A5, R3-A6):* Auf den
   Seiten eines mehrteiligen Codes stehen Anleitung, Stift-Kästchen und Kasten
   „Stand am Meldekopf" neben den Codes statt darunter (keine fast leeren
@@ -1029,8 +1035,8 @@ Datenausleitung an eine andere Herkunft ist technisch unterbunden.
   eingebettete Dateien und setzt nur diese Bögen enger (kleinerer
   Innenabstand), der Sofortbedarf-Kasten bleibt ganz. Jede Codeseite trägt eine
   Kopfzeile mit Einheit, Funkrufname und Stand (Angaben, die schon auf Bogen
-  und Lageblatt stehen); das Kästchen „von Hand geändert" steht nicht mehr auf
-  der Codeseite, sondern auf dem Bogen neben der Stärke. Der Blanko-Vordruck
+  und Lageblatt stehen); das Kästchen „von Hand geändert" stand zeitweise auf
+  dem Bogen neben der Stärke und ist seit 2026-11-17 entfallen. Der Blanko-Vordruck
   trägt den Kasten „Meldekopf" (Nr., eingegangen am/um, Zug, „Übung",
   „ins Gerät übertragen von (Kürzel)"), bleibt bei zwei Seiten und enthält
   weiter keine Daten des Geräts. Der Bericht von „Bögen einlesen…" nennt
