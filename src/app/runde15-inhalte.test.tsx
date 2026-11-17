@@ -28,7 +28,7 @@ import { einsaetzeLaden } from "./einsaetze-lesen";
 import { funkrufText, neuePerson, neuerBogen, neuesFahrzeug, ortOhneZusatz } from "./hilfen";
 import { zeitEingelesen } from "./pdf";
 import { fahrzeugVorbelegung } from "../vokabulare/thw-funkrufname-ort";
-import { STIFT_KAESTCHEN, pdfDokument, staerkeVonHand } from "./pdf-dokument";
+import { pdfDokument, staerkeVonHand } from "./pdf-dokument";
 import type { QrSatz } from "./hilfen";
 
 beforeEach(() => localStorage.clear());
@@ -87,11 +87,10 @@ describe("R15-A1 „Stärke ändern…“ lässt die Kennzeichnung der Eintreffz
 
 describe("R15-A3 Einzelbogen nach „Stärke ändern…“", () => {
 
-  it("ein unveränderter Bogen behält das leere Kästchen und den Satz nicht", () => {
+  it("ein unveränderter Bogen trägt den Satz zur Korrektur nicht", () => {
     const b = bogenMit("Crailsheim", 12);
     expect(staerkeVonHand(b)).toBe(false);
     const t = texte(pdfDokument(b, QR).content).join("\n");
-    expect(t).toContain(STIFT_KAESTCHEN);
     expect(t).not.toContain("korrigiert");
   });
 

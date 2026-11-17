@@ -37,6 +37,7 @@ export const AENDERUNGEN: readonly Aenderung[] = [
   {
     datum: "2026-11-17",
     punkte: [
+      "PDF: Das Kästchen „von Hand geändert“ unter der Stärke entfällt, weil es mehr verwirrt hat, als es half; handschriftliche Änderungen sieht man auf dem Papier ohnehin. Der Hinweis neben dem QR-Code sagt jetzt, dass der Code nach einer Änderung mit dem Stift nicht mehr gilt.",
       "Übungsbögen: Die Sammel-PDF entsteht jetzt im Hintergrund. Bei 100 Bögen blieb die Seite vorher sekundenlang stehen, und manche Browser meldeten, das Skript reagiere nicht; jetzt bleibt sie bedienbar, bis der Download kommt.",
       "Übungsbögen: Neben „Sammel-PDF“ gibt es „Einzel-PDFs als ZIP“. Die markierten Bögen kommen dann als ZIP-Datei mit einer eigenen PDF je Bogen, benannt wie beim Einzel-Download.",
       "Übungsbögen: Während Sammel-PDF oder ZIP entstehen, zeigt ein Fenster einen Fortschrittsbalken mit dem aktuellen Bogen und einen Knopf „Abbrechen“.",

@@ -931,17 +931,8 @@ export const QR_NUR_BOGEN_HINWEIS =
  * R2-A4). Das Kästchen macht die Korrektur für den Scannenden sichtbar.
  */
 export function stiftHinweis(stand: string): string {
-  return `Ist oben auf dem Bogen „von Hand geändert“ angekreuzt, gilt dieser Code (Stand ${stand}) nicht mehr: abtippen oder neu erzeugen, nicht scannen.`;
+  return `Ist der Bogen mit dem Stift geändert, gilt dieser Code (Stand ${stand}) nicht mehr: abtippen oder neu erzeugen, nicht scannen.`;
 }
-
-/**
- * Das Kästchen selbst steht auf dem Bogen, neben der Stärke: Mit dem Stift
- * korrigiert wird dort, nicht auf der Codeseite. Wer auf Seite 1 änderte und
- * das Kästchen auf der Codeseite vergaß, lieferte einen Code, der als gültig
- * durchging (Audit Runde 4, R4-A5).
- */
-export const STIFT_KAESTCHEN = "[  ] von Hand geändert";
-export const STIFT_KAESTCHEN_ANGEKREUZT = "[X] von Hand geändert";
 
 /**
  * Am Meldekopf auf eine andere Stärke gesetzt („Stärke ändern…"), obwohl der Bogen Namen führt? Dann stimmen Zahl und
@@ -1530,25 +1521,9 @@ export function pdfDokument(
       {
         colSpan: 3,
         verticalAlignment: "middle",
-        // Mit Code: das Kästchen „von Hand geändert“ gehört hierher, wo mit
-        // dem Stift korrigiert wird, nicht auf die Codeseite (R4-A5).
-        stack: [
-          {
-            text: `${zahl(s.fuehrer)} / ${zahl(s.unterfuehrer)} / ${zahl(s.mannschaft)} // ${zahl(s.gesamt)}`,
-          },
-          ...(qr
-            ? [
-                {
-                  text:
-                    !blanko && staerkeVonHand(b)
-                      ? STIFT_KAESTCHEN_ANGEKREUZT
-                      : STIFT_KAESTCHEN,
-                  bold: true,
-                  fontSize: schrift - 2,
-                } as Content,
-              ]
-            : []),
-        ],
+        // Kein Kästchen „von Hand geändert“: Handschrift auf dem Papier sieht man,
+        // das Kästchen verwirrte in der Erprobung die meisten.
+        text: `${zahl(s.fuehrer)} / ${zahl(s.unterfuehrer)} / ${zahl(s.mannschaft)} // ${zahl(s.gesamt)}`,
       },
       ...belegt(2),
       feld("Ansprechpartner/in:", { colSpan: 2 }),

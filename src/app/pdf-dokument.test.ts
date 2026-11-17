@@ -23,7 +23,7 @@ import {
   type Erfassungsbogen,
 } from "@bos/eeb-format/model";
 import { einheitAnzeigename, orgLabel, neuePerson, neuesFahrzeug, zeitgruppe, type QrSatz } from "./hilfen";
-import { EEB_JSON_DATEINAME, bogenAlsEingebetteteDatei, pdfDokument, stiftHinweis, STIFT_KAESTCHEN, codeKopfzeile, ohneVorbelegung, erreichbarkeitZeilen, nichtDarstellbareNamen, nichtDarstellbareBetroffene, ansprechpersonPapier, umschrift, umschriftBetroffene } from "./pdf-dokument";
+import { EEB_JSON_DATEINAME, bogenAlsEingebetteteDatei, pdfDokument, stiftHinweis, codeKopfzeile, ohneVorbelegung, erreichbarkeitZeilen, nichtDarstellbareNamen, nichtDarstellbareBetroffene, ansprechpersonPapier, umschrift, umschriftBetroffene } from "./pdf-dokument";
 import { THW_LOGO_JPEG } from "./pdf-logo-thw";
 import { ORG_LOGOS } from "./pdf-logos";
 
@@ -130,15 +130,11 @@ describe("pdfDokument()", () => {
     const t = texte(pdfDokument(b, QR).content).join("\n");
     expect(t).toContain(stiftHinweis(zeitgruppe(b.stand)));
     expect(stiftHinweis("170805jul26")).toBe(
-      "Ist oben auf dem Bogen „von Hand geändert“ angekreuzt, gilt dieser Code (Stand 170805jul26) nicht mehr: abtippen oder neu erzeugen, nicht scannen.",
+      "Ist der Bogen mit dem Stift geändert, gilt dieser Code (Stand 170805jul26) nicht mehr: abtippen oder neu erzeugen, nicht scannen.",
     );
-    // Das Kästchen steht einmal, und zwar neben der Stärke auf dem Bogen — nicht auf der Codeseite.
-    expect(t.split(STIFT_KAESTCHEN)).toHaveLength(2);
-    const inhalt = pdfDokument(b, QR).content as unknown[];
-    const kopfTabelle = JSON.stringify(inhalt.slice(0, 3));
-    expect(kopfTabelle).toContain(STIFT_KAESTCHEN);
-    // Ohne Code (Vordruck, Bogen ohne QR) gibt es nichts, was durch Handschrift ungültig würde.
-    expect(texte(pdfDokument(b, null).content).join("\n")).not.toContain(STIFT_KAESTCHEN);
+    // Kein Kästchen „von Hand geändert“ mehr neben der Stärke (Rückmeldung: verwirrt die meisten).
+    expect(t).not.toContain("[  ] von Hand geändert");
+    expect(t).not.toContain("[X] von Hand geändert");
   });
 
   it("jede Codeseite nennt Einheit, Funkrufname und Stand — Einzelcode und mehrteilig (R4-A5)", () => {
