@@ -352,14 +352,21 @@ for (const k of kreise) {
     }
   });
   console.log(`${k.name}: ${[...wachen.values()].filter((w) => w.kreis === k.name).length} Wachen`);
+  speichern();
 }
 
-const momentaufnahme: Momentaufnahme = {
-  quelle: BASIS + "/",
-  abgerufen: new Date().toISOString().slice(0, 10),
-  hinweis:
-    "Wachen und Fahrzeuge (Funkrufname, Kennzeichen, Organisation, Klassifizierung) aus der Wachen- und Fahrzeugdatenbank von bos-fahrzeuge.info, eingetragen von deren Nutzern. Nur Fakten, keine Fotos oder Texte.",
-  wachen: [...wachen.values()].sort((a, b) => a.kreis.localeCompare(b.kreis, "de") || a.name.localeCompare(b.name, "de")),
-};
-writeFileSync(ZIEL, JSON.stringify(momentaufnahme, null, 1) + "\n");
-console.log(`Fertig: ${momentaufnahme.wachen.length} Wachen nach ${ZIEL} (${abrufe} neue Abrufe)`);
+/** Momentaufnahme schreiben — nach jedem Landkreis, damit ein abgebrochener Lauf nichts verliert. */
+function speichern(): number {
+  const momentaufnahme: Momentaufnahme = {
+    quelle: BASIS + "/",
+    abgerufen: new Date().toISOString().slice(0, 10),
+    hinweis:
+      "Wachen und Fahrzeuge (Funkrufname, Kennzeichen, Organisation, Klassifizierung) aus der Wachen- und Fahrzeugdatenbank von bos-fahrzeuge.info, eingetragen von deren Nutzern. Nur Fakten, keine Fotos oder Texte.",
+    wachen: [...wachen.values()].sort((a, b) => a.kreis.localeCompare(b.kreis, "de") || a.name.localeCompare(b.name, "de")),
+  };
+  writeFileSync(ZIEL, JSON.stringify(momentaufnahme, null, 1) + "\n");
+  return momentaufnahme.wachen.length;
+}
+
+const anzahl = speichern();
+console.log(`Fertig: ${anzahl} Wachen nach ${ZIEL} (${abrufe} neue Abrufe)`);
