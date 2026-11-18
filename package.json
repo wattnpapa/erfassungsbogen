@@ -145,7 +145,7 @@
     "electron-updater": "^6.8.11",
     "jsqr": "^1.4.0",
     "pako": "^3.0.2",
-    "pdfmake": "^0.3.11",
+    "pdfmake": "^0.3.14",
     "qrcode": "^1.5.4",
     "react": "^19.2.7",
     "react-dom": "^19.3.1",
