@@ -1596,6 +1596,12 @@ Abrufstart je Sekunde, Zwischenspeicher `.cache/bos-fahrzeuge/`, nicht im Reposi
 Personen. `istNurAufAbruf` und die `CacheFirst`-Route `eeb-ov-beispiele` erkennen zusätzlich `assets/wache-*.json`;
 die Adressliste steht als `BOS_WACHEN_BEISPIELE` im nachgeladenen Baustein `src/app/beispiele-thw-ov.ts`, die
 Ordnernamen der Landkreise in `src/app/beispiele-bos-ordner.ts` (generiert). Kein neuer Host zur Laufzeit.
+Stand 2026-11-18: 1.462 Bögen (1.259 Ortsfeuerwehren, 136 DRK, 29 JUH, 17 MHD, 21 ASB) aus 33 der 45 Landkreise
+und kreisfreien Städte; der erste Abruf brach am Zeitlimit ab, die übrigen zwölf fehlen noch
+(`npm run quellen:bos-fahrzeuge -- --nur-zwischenspeicher` baut die Momentaufnahme ohne Netz aus dem Zwischenspeicher,
+Landkreise mit fehlenden Listen- oder Wachenseiten fallen ganz heraus). Der Baustein `beispiele-thw-ov` wuchs dadurch
+auf rund 1,02 MB (gezippt 125 KB), JS-Gesamtumfang 8,37 MB (`scripts/bundle-budget.json` angehoben); der Suchindex der
+Übungsbögen auf 464 KB.
 *Nachgezogen 2026-11-09:* Der Übungsbögen-Dialog samt Glob der übrigen Beispiel-Dateien, Suche und
 Ordnernavigation liegt in eigenem Baustein `src/app/beispiele-dialog.tsx`, den `fusszeile.tsx` beim ersten
 Öffnen per `lazy()` lädt (vorher Teil des Startbündels, das nach den Prüfrunden-Korrekturen über dem Budget lag).

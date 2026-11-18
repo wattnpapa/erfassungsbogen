@@ -124,6 +124,8 @@ const ORG: Record<Org, { typ: OrganisationsTyp; name: string; kurz: string; ordn
 
 /** Kennwörter im Funkrufnamen → Code im Vokabular FUNKRUF_KENNWOERTER. */
 const KENNWORT: Record<string, number> = { Florian: 2, Rotkreuz: 3, Akkon: 4, Johannes: 5, Sama: 6, Pelikan: 7 };
+/** „(a.D.)", „(a.D)", „( a.D. )", „(a.D./1)": außer Dienst — Fahrzeug oder ganze Wache. */
+const AUSSER_DIENST = /\(\s*a\.\s?D\b/i;
 const RUFNAME = /^(Florian|Rotkreuz|Akkon|Johannes|Malteser|Sama|Pelikan)\s/;
 
 // ---------------------------------------------------------------- Fahrzeuge
@@ -360,7 +362,9 @@ function bogenBauen(w: Wache, org: Org, abgerufen: string): Ergebnis | null {
   const kreis = kreisName(w.kreis);
   const gesehen = new Set<string>();
   const fz = w.fahrzeuge
-    .filter((f) => !f.ausserDienst && !/\(a\.\s?D\./.test(f.funkrufname) && orgSchluessel(f.organisation) === org)
+    .filter((f) => !f.ausserDienst && !AUSSER_DIENST.test(f.funkrufname) && orgSchluessel(f.organisation) === org)
+    // Rückt nicht aus: Hausnotruf, Fahrschule, Museum.
+    .filter((f) => !/Hausnotruf|Fahrschule|Oldtimer|Museum/i.test(`${f.funkrufname} ${f.klassifizierung ?? ""} ${f.typText ?? ""}`))
     // Nur echte Funkrufnamen: keine Gruppenfotos, Sammel- oder Scherzeinträge.
     .filter((f) => RUFNAME.test(f.funkrufname) && !/Gruppenfoto/i.test(f.klassifizierung ?? ""))
     .filter((f) => org === "ff" || f.obergruppe === "SEG/KatS")
@@ -525,6 +529,7 @@ const ergebnisse: Ergebnis[] = [];
 for (const w of quelle.wachen) {
   const org = orgSchluessel(w.organisation) ?? orgSchluessel(w.fahrzeuge.find((f) => orgSchluessel(f.organisation))?.organisation);
   if (!org) continue;
+  if (AUSSER_DIENST.test(w.name)) continue; // aufgelöste Wache
   const e = bogenBauen(w, org, quelle.abgerufen);
   if (e) ergebnisse.push(e);
 }

@@ -1,0 +1,279 @@
+{
+  "schemaVersion": 13,
+  "uebung": true,
+  "stand": 3528469,
+  "einheit": {
+    "organisation": 5,
+    "organisationName": "Deutsches Rotes Kreuz Kreisverband Cuxhaven Außenwache Altenwalde",
+    "einheitsTyp": {
+      "freitext": "Bereitschaft"
+    },
+    "hierarchie": [
+      {
+        "bezeichnung": {
+          "freitext": "Standort"
+        },
+        "name": "DRK KV Cuxhaven Außenwache Altenwalde"
+      },
+      {
+        "bezeichnung": {
+          "freitext": "Landkreis"
+        },
+        "name": "Cuxhaven"
+      }
+    ]
+  },
+  "einsatz": {
+    "zeitraumVon": 2450,
+    "zeitraumBis": 2450,
+    "ortAuftrag": "Betreuung Evakuierte: Notunterkunft Cuxhaven"
+  },
+  "personalErfassung": 0,
+  "personal": [
+    {
+      "vorname": "Birgit",
+      "nachname": "Schröder",
+      "staerkeRolle": 2,
+      "funktionen": [
+        {
+          "freitext": "Einheitsführer/-in (Betr. LKW)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5555962182"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Simon",
+      "nachname": "Lorenz",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (Betr. LKW)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Ralf",
+      "nachname": "Braun",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (Betr. LKW)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitätshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Florian",
+      "nachname": "Bergmann",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "stellv. Einheitsführer/-in (GW BHP/Bt.)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Heiko",
+      "nachname": "König",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (GW BHP/Bt.)"
+        }
+      ],
+      "fahrerlaubnis": 9,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Kevin",
+      "nachname": "Klein",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (GW BHP/Bt.)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitätshelfer"
+        }
+      ]
+    },
+    {
+      "vorname": "Laura",
+      "nachname": "Krüger",
+      "staerkeRolle": 1,
+      "funktionen": [
+        {
+          "freitext": "Fahrzeugführer/-in (Mobile Sanitäts- / Unfallhilfsstelle)"
+        }
+      ],
+      "fahrerlaubnis": 10,
+      "geschlecht": 1,
+      "ernaehrung": 0,
+      "kontakte": [
+        {
+          "art": 0,
+          "dienstlich": false,
+          "wert": "5553353722"
+        }
+      ],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Martin",
+      "nachname": "Hahn",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Fahrer/-in (Mobile Sanitäts- / Unfallhilfsstelle)"
+        }
+      ],
+      "fahrerlaubnis": 7,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": []
+    },
+    {
+      "vorname": "Henrik",
+      "nachname": "Graf",
+      "staerkeRolle": 0,
+      "funktionen": [
+        {
+          "freitext": "Helfer/-in (Mobile Sanitäts- / Unfallhilfsstelle)"
+        }
+      ],
+      "fahrerlaubnis": 5,
+      "geschlecht": 0,
+      "ernaehrung": 0,
+      "kontakte": [],
+      "zusatzqualifikationen": [
+        {
+          "freitext": "Sanitätshelfer"
+        }
+      ]
+    }
+  ],
+  "fahrzeuge": [
+    {
+      "typ": {
+        "freitext": "Betr. LKW"
+      },
+      "kennzeichen": "CUX-8022",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Cuxhaven",
+        "teile": [
+          46,
+          74,
+          1
+        ]
+      },
+      "aenderungen": "Betreuungslastkraftwagen"
+    },
+    {
+      "typ": {
+        "freitext": "GW BHP/Bt."
+      },
+      "kennzeichen": "CUX-RK 121",
+      "funkrufname": {
+        "kennwort": {
+          "code": 3
+        },
+        "eigenerStandort": false,
+        "ort": "Cuxhaven",
+        "teile": [
+          46,
+          95,
+          1
+        ]
+      },
+      "aenderungen": "Gerätewagen-Betreuung"
+    },
+    {
+      "typ": {
+        "freitext": "Anhänger KatS"
+      },
+      "kennzeichen": "CUX-RK 135",
+      "aenderungen": "Anhänger; Rufname laut Quelle: Rotkreuz Cuxhaven 46/Anhänger KatS 2"
+    },
+    {
+      "typ": {
+        "freitext": "FKH Kärcher"
+      },
+      "kennzeichen": "CUX-R 1762",
+      "sitzplaetze": 0,
+      "aenderungen": "Feldkochherd; Rufname laut Quelle: Rotkreuz Cuxhaven 46/FKH Kärcher"
+    },
+    {
+      "typ": {
+        "freitext": "FKH Progress"
+      },
+      "kennzeichen": "CUX-Y 63",
+      "sitzplaetze": 0,
+      "aenderungen": "Feldkochherd; Rufname laut Quelle: Rotkreuz Cuxhaven 46/FKH Progress"
+    },
+    {
+      "typ": {
+        "freitext": "Anhänger Foodtruck"
+      },
+      "kennzeichen": "CUX-RK 114",
+      "aenderungen": "Anhänger; Rufname laut Quelle: Rotkreuz Cuxhaven 46/Foodtruck"
+    },
+    {
+      "typ": {
+        "freitext": "Mobile Sanitäts- / Unfallhilfsstelle"
+      },
+      "kennzeichen": "CUX-RK 103",
+      "aenderungen": "Rufname laut Quelle: Rotkreuz Cuxhaven 46/mobile Sanitätsstation"
+    }
+  ],
+  "sofortbedarf": {
+    "verpflegungPersonen": 9,
+    "dieselLiter": 250,
+    "benzinLiter": 0,
+    "gemischLiter": 0,
+    "unterbringung": true,
+    "ruhezeitErforderlich": false
+  },
+  "sonstiges": "Fahrzeuge, Funkrufnamen und Kennzeichen nach bos-fahrzeuge.info (Wache DRK KV Cuxhaven Außenwache Altenwalde, Stand 2026-11-18); alle Personen erfunden."
+}

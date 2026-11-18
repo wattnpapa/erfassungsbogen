@@ -7,6 +7,9 @@
  * Aufruf (Node ≥ 22):
  *   npm run quellen:bos-fahrzeuge                       ganz Niedersachsen
  *   npm run quellen:bos-fahrzeuge -- --kreis Friesland   nur Landkreise, deren Name das enthält
+ *   npm run quellen:bos-fahrzeuge -- --nur-zwischenspeicher
+ *       ohne Netz: nur, was in .cache/bos-fahrzeuge/ liegt; Landkreise mit
+ *       fehlender Seite fallen ganz heraus (nach einem abgebrochenen Lauf)
  *
  * Vorgehen:
  *  1. Die Seite „Niedersachsen" nennt die Landkreise und kreisfreien Städte.
@@ -55,10 +58,22 @@ async function startfreigabe(): Promise<void> {
   if (start > jetzt) await new Promise((r) => setTimeout(r, start - jetzt));
 }
 
+const NUR_ZWISCHENSPEICHER = process.argv.includes("--nur-zwischenspeicher");
+/** Seiten, die mit --nur-zwischenspeicher fehlten (je Landkreis zurückgesetzt). */
+let fehlend = 0;
+
 async function seite(pfad: string): Promise<string> {
   mkdirSync(CACHE, { recursive: true });
   const datei = join(CACHE, createHash("sha1").update(pfad).digest("hex") + ".html");
   if (existsSync(datei)) return readFileSync(datei, "utf8");
+  if (NUR_ZWISCHENSPEICHER) {
+    // Fehlende Detailseiten eines Fahrzeugs sind keine Lücke: Welche gebraucht
+    // wird, hängt von der Reihenfolge der parallelen Abrufe ab; das Fahrzeug kam
+    // im Online-Lauf über eine andere Gruppe zu seiner Wache. Es fehlt nur, wenn
+    // eine Listen- oder Wachenseite fehlt.
+    if (!pfad.startsWith("/einsatzfahrzeuge/")) fehlend++;
+    return "";
+  }
   for (let versuch = 1; ; versuch++) {
     await startfreigabe();
     try {
@@ -328,6 +343,7 @@ function gruppenSchluessel(f: ListenFahrzeug): string {
 const wacheLaeuft = new Map<number, Promise<void>>();
 
 for (const k of kreise) {
+  fehlend = 0;
   const fahrzeuge = (await fahrzeugeImKreis(k)).filter(gesucht);
   console.log(`${k.name}: ${fahrzeuge.length} Fahrzeuge der gesuchten Organisationen im Dienst`);
   const gruppen = new Map<string, ListenFahrzeug[]>();
@@ -351,6 +367,12 @@ for (const k of kreise) {
       for (const wf of wachen.get(w.id)?.fahrzeuge ?? []) zugeordnet.add(wf.id);
     }
   });
+  if (fehlend > 0 || (NUR_ZWISCHENSPEICHER && fahrzeuge.length === 0)) {
+    // Unvollständig: lieber ganz weglassen als einen halben Landkreis zeigen.
+    for (const [id, w] of wachen) if (w.kreis === k.name) wachen.delete(id);
+    console.log(`${k.name}: ausgelassen (${fehlend} Seiten nicht im Zwischenspeicher)`);
+    continue;
+  }
   console.log(`${k.name}: ${[...wachen.values()].filter((w) => w.kreis === k.name).length} Wachen`);
   speichern();
 }
