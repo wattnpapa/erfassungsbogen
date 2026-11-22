@@ -17,7 +17,7 @@ class MemStorage {
 }
 
 const beispiel = () =>
-  JSON.parse(readFileSync("examples/thw/001-albstadt-ztr-tz.json", "utf8")) as Record<string, any>;
+  JSON.parse(readFileSync("examples/thw/ortsverbaende/lv-baden-wuerttemberg/rst-tuebingen/ov-albstadt/ov-albstadt-01-1-tz-ztr-tz.json", "utf8")) as Record<string, any>;
 
 describe("Bestand beim Lesen prüfen (R6-E1)", () => {
   beforeEach(() => {

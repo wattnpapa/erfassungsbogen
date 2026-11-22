@@ -174,7 +174,9 @@
 > in Karte und Kurz-Liste); das PDF nennt eine Abweichung als erste Zeile der
 > Kontaktspalte („OV: Bremen - Nord"; seit 2026-11-08 klein hinter dem Namen). Die THW-Übungsbögen (`npm run beispiele`)
 > tragen seit 2026-10-27 in rund jeder dritten Einheit ein bis drei Helfer aus
-> Nachbar-Ortsverbänden (eigener Zufallsstrom, übrige Bögen unverändert). Kein
+> Nachbar-Ortsverbänden (eigener Zufallsstrom, übrige Bögen unverändert). *Nachgezogen 2026-11-22:*
+> Die 100 zufällig gewählten THW-Beispiel-Einheiten sind entfallen; Helfer aus Nachbar-Ortsverbänden trägt unter
+> den THW-Übungsbögen nur noch der Stress-Test-Großbogen, die OV-Bögen stehen genau im StAN-Soll. Kein
 > neuer Host, kein neuer Speicherort.
 >
 > **Nachgezogen 2026-10-26 (Probelauf Meldekopf):** Kap. 5, 6.2, 8.2: neuer

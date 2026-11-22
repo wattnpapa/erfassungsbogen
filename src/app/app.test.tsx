@@ -853,7 +853,7 @@ describe("Assistenten-Durchlauf", () => {
       const dialog = await screen.findByRole("dialog", { name: "Übungsbögen" }, { timeout: 15000 });
       // Erst den Ordner der eigenen Organisation, dann stehen die Bögen da. Die
       // Angaben je Bogen laden nach — die Frist deckt das mit ab.
-      await nutzer.click(within(dialog).getByRole("button", { name: /^THW/ }));
+      await nutzer.click(within(dialog).getByRole("button", { name: /^DLRG/ }));
       const anzeigen = await within(dialog).findAllByRole("button", { name: "Anzeigen" }, { timeout: 15000 });
       await nutzer.click(anzeigen[0]!);
 
@@ -910,8 +910,8 @@ describe("Assistenten-Durchlauf", () => {
       await nutzer.click(screen.getByRole("button", { name: "‹ Startseite" }));
       await nutzer.click(screen.getByRole("button", { name: "Übungsbögen ansehen" }));
       const dialog = await screen.findByRole("dialog", { name: "Übungsbögen" }, { timeout: 15000 });
-      // Der Dialog steht wieder im zuletzt offenen Ordner (BB-S3, BB-W3) — kein zweites „THW".
-      expect(within(dialog).getByText("THW", { selector: "[aria-current]" })).toBeDefined();
+      // Der Dialog steht wieder im zuletzt offenen Ordner (BB-S3, BB-W3) — kein zweites „DLRG".
+      expect(within(dialog).getByText("DLRG", { selector: "[aria-current]" })).toBeDefined();
       const anzeigen = await within(dialog).findAllByRole("button", { name: "Anzeigen" }, { timeout: 15000 });
       await nutzer.click(anzeigen[1]!);
 

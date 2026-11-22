@@ -67,7 +67,7 @@ describe("Einzel-PDF: Kopfzeile jeder Seite (R5-A2, R5-A3)", () => {
   }, 60_000);
 
   it("kein Fahrzeugblock liegt auf zwei Seiten", async () => {
-    for (const datei of ["grossbogen-verstaerkter-bergungszug.json", "015-ansbach-fgr-log-mw.json"]) {
+    for (const datei of ["grossbogen-verstaerkter-bergungszug.json", "ortsverbaende/lv-baden-wuerttemberg/rst-biberach/ov-biberach-riss/ov-biberach-riss-02-fz-log-fgr-log-mw.json"]) {
       const dd = pdfDokument(beispiel(datei), qr(1));
       const gerissen: number[][] = [];
       dd.pageBreakBefore = (k) => {

@@ -41,7 +41,7 @@ function fetchAttrappe(): () => void {
 async function dialogMitBoegen(nutzer: ReturnType<typeof userEvent.setup>) {
   render(<BeispieleDialog anfrage={1} onBogenOeffnen={async () => true} />);
   const dialog = await screen.findByRole("dialog", { name: "Übungsbögen" });
-  await nutzer.click(within(dialog).getByRole("button", { name: /^THW/ }));
+  await nutzer.click(within(dialog).getByRole("button", { name: /^DLRG/ }));
   const haken = await within(dialog).findAllByRole("checkbox", { name: /für Sammel-PDF oder ZIP markieren$/ }, { timeout: 15000 });
   return { dialog, haken };
 }
@@ -85,13 +85,13 @@ describe("Übungsbögen: markierte Bögen als Sammel-PDF", () => {
       await new Promise((r) => setTimeout(r, 850));
       await nutzer.click(within(dialog).getByRole("button", { name: "Sammel-PDF (2 Bögen)" }));
 
-      expect(await within(dialog).findByText(/Sammel-PDF „uebung-beispiele-thw-2-boegen\.pdf“ mit 2 Bögen erzeugt/)).toBeDefined();
+      expect(await within(dialog).findByText(/Sammel-PDF „uebung-beispiele-dlrg-2-boegen\.pdf“ mit 2 Bögen erzeugt/)).toBeDefined();
       expect(sammelPdfErzeugen).toHaveBeenCalledTimes(1);
       const [boegen, name, titel] = sammelPdfErzeugen.mock.calls[0]!;
       expect(boegen).toHaveLength(2);
       expect(boegen.every((b) => b.uebung)).toBe(true);
-      expect(name).toBe("uebung-beispiele-thw-2-boegen.pdf");
-      expect(titel).toBe("Übungsbögen THW (2 Bögen)");
+      expect(name).toBe("uebung-beispiele-dlrg-2-boegen.pdf");
+      expect(titel).toBe("Übungsbögen DLRG (2 Bögen)");
       // Die Markierung bleibt stehen: wer noch einen Bogen dazunehmen will, fängt nicht von vorn an.
       expect((haken[0] as HTMLInputElement).checked).toBe(true);
     } finally {
@@ -111,13 +111,13 @@ describe("Übungsbögen: markierte Bögen als Sammel-PDF", () => {
       await new Promise((r) => setTimeout(r, 850));
       await nutzer.click(within(dialog).getByRole("button", { name: "Einzel-PDFs als ZIP" }));
 
-      expect(await within(dialog).findByText(/ZIP-Datei „uebung-beispiele-thw-3-boegen\.zip“ mit 3 Bögen als einzelne PDFs erzeugt/)).toBeDefined();
+      expect(await within(dialog).findByText(/ZIP-Datei „uebung-beispiele-dlrg-3-boegen\.zip“ mit 3 Bögen als einzelne PDFs erzeugt/)).toBeDefined();
       expect(einzelPdfsAlsZip).toHaveBeenCalledTimes(1);
       const [boegen, namen, datei] = einzelPdfsAlsZip.mock.calls[0]!;
       expect(boegen).toHaveLength(3);
-      expect(datei).toBe("uebung-beispiele-thw-3-boegen.zip");
+      expect(datei).toBe("uebung-beispiele-dlrg-3-boegen.zip");
       expect(namen).toHaveLength(3);
-      expect(namen.every((n) => /^uebung-beispiel-thw-.+\.pdf$/.test(n))).toBe(true);
+      expect(namen.every((n) => /^uebung-beispiel-dlrg-.+\.pdf$/.test(n))).toBe(true);
     } finally {
       zurueck();
     }

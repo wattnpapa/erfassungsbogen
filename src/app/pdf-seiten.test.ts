@@ -125,13 +125,20 @@ describe("Einzel-PDF: Platz für Stiftnachträge, wo er keine Seite kostet (R3-A
   // Seit dem Raster der THWin-Vorlage (10 pt, Zeilenhöhen der Vorlage) steht der Code des
   // Zugtrupps Albstadt auf Seite 2. Die Regel bleibt: freie Zeilen kosten keine Seite.
   it("Zugtrupp Albstadt: freie Zeilen kosten keine Seite", async () => {
-    const b = beispiel("001-albstadt-ztr-tz.json");
+    const b = beispiel("ortsverbaende/lv-baden-wuerttemberg/rst-tuebingen/ov-albstadt/ov-albstadt-01-1-tz-ztr-tz.json");
     const dd = await einzelPdfDokument(b, qrSatz(1), pdfBytes);
     expect(seitenZahl(await pdfBytes(dd))).toBe(seitenZahl(await pdfBytes(pdfDokument(b, qrSatz(1)))));
   }, 20_000);
 
   it("50 THW-Übungsbögen: freie Zeilen und Fahrzeugblock kosten nie eine Seite", async () => {
-    for (const datei of readdirSync(new URL("../../examples/thw/", import.meta.url)).filter((d) => /^0[0-4]\d-.*\.json$/.test(d))) {
+    // Die ersten 50 OV-Bögen in Ordner-Reihenfolge (Baden-Württemberg, RSt Biberach ff.).
+    const alle = (readdirSync(new URL("../../examples/thw/ortsverbaende/", import.meta.url), { recursive: true }) as string[])
+      .filter((d) => d.endsWith(".json"))
+      .sort()
+      .slice(0, 50)
+      .map((d) => `ortsverbaende/${d}`);
+    expect(alle).toHaveLength(50);
+    for (const datei of alle) {
       const b = beispiel(datei);
       const ohne = seitenZahl(await pdfBytes(pdfDokument(b, qrSatz(1))));
       const mit = seitenZahl(await pdfBytes(await einzelPdfDokument(b, qrSatz(1), pdfBytes)));

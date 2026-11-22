@@ -23,7 +23,7 @@ describe("Offline-Vorrat in zwei Stufen (R3-O3)", () => {
   });
 
   it("legt Beispielbögen und Themenseiten in die zweite Stufe", () => {
-    for (const u of ["assets/001-albstadt-ztr-tz-abc.json", "thw.html", "katastrophenschutz-bayern.html", "uebersicht.html"]) {
+    for (const u of ["assets/grossbogen-verstaerkter-bergungszug-abc.json", "thw.html", "katastrophenschutz-bayern.html", "uebersicht.html"]) {
       expect(istZusatz(u), u).toBe(true);
     }
   });
@@ -50,7 +50,7 @@ describe("Offline-Vorrat in zwei Stufen (R3-O3)", () => {
 
   it("lädt die Bögen aller Ortsverbände nur auf Abruf, nicht vorab", () => {
     expect(istNurAufAbruf("assets/ov-stralsund-12-2-tz-b-abc123.json")).toBe(true);
-    expect(istNurAufAbruf("assets/001-albstadt-ztr-tz-abc.json")).toBe(false);
+    expect(istNurAufAbruf("assets/grossbogen-verstaerkter-bergungszug-abc.json")).toBe(false);
     // Ebenso die Bögen realer Wachen nach bos-fahrzeuge.info.
     expect(istNurAufAbruf("assets/wache-ff-zetel-of-neuenburg-AbC12.json")).toBe(true);
     // Der Worker der Sammel-PDF ebenso; ohne ihn rechnet die Seite selbst.

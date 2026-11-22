@@ -38,6 +38,7 @@ export const AENDERUNGEN: readonly Aenderung[] = [
     datum: "2026-11-22",
     punkte: [
       "Übungsbögen: Bei allen 66 Fachzügen Führung/Kommunikation der THW-Ortsverbände fehlte der Stab. Er steht jetzt als eigener Bogen direkt hinter dem Zugtrupp, mit StAN-Stärke 6 / 0 / 0 // 6 und den Sachgebietsleitern S1 bis S6.",
+      "Übungsbögen: Die 100 zufällig gewählten THW-Beispiel-Einheiten sind entfernt. Unter THW stehen jetzt die Bögen aller Einheiten aller Ortsverbände und der übergroße Bogen zum Ausprobieren des Sammel-Scans.",
     ],
   },
   {
