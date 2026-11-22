@@ -30,6 +30,8 @@
  *    Fachzüge mit ihrer festen Kennzahl.
  *  - Bergungsgruppen mit Abstützsystem Holz (Kennung „ASH" auf der Karte)
  *    werden als B (ASH) erfasst.
+ *  - Jeder Fachzug Führung/Kommunikation bekommt neben dem Zugtrupp den Stab
+ *    (StAN 10-06, 6/-/-/6, SGL S1–S6, ohne Fahrzeuge); die Karte nennt ihn nicht.
  *
  * Dateinamen beginnen mit „ov-": Daran erkennt die Aufteilung des
  * Offline-Vorrats (scripts/precache-aufteilung.ts) diese Bögen und lädt sie
@@ -180,6 +182,11 @@ const KARTE_ZU_TYP: Record<string, number> = {
   "45": 41, // Zugtrupp FZ FK
 };
 
+/** Einheitstyp „Stab" (Stabspersonal des Fachzugs Führung/Kommunikation). */
+const STAB = 45;
+/** Zusatzfunktionen SGL S1 … S6 (THW_FUNKTIONEN), in dieser Reihenfolge auf die sechs Stabsplätze. */
+const SGL_S1 = 73;
+
 type Zug = { art: "tz"; nr: number } | { art: "fk" } | { art: "log" };
 
 interface OvEinheit {
@@ -237,6 +244,9 @@ function einheitenAusQuelle(ov: QuellOv): { einheiten: OvEinheit[]; unbekannt: s
     if (typ === 41) zug = { art: "fk" };
     if (zug == null) zug = tz(++tzZaehler);
     einheiten.push({ typ, zug });
+    // Zum Fachzug Führung/Kommunikation gehört das Stabspersonal (StAN 10-06,
+    // 6/-/-/6). Die Karte führt es nicht eigens auf; es steht beim Zugtrupp.
+    if (typ === 41) einheiten.push({ typ: STAB, zug });
   }
   return { einheiten, unbekannt };
 }
@@ -406,6 +416,7 @@ function bogenBauen(
   namen: Set<string>,
 ): Erfassungsbogen {
   const personal = personalBauen(einheit.typ, z, namen);
+  if (einheit.typ === STAB) personal.forEach((p, i) => p.funktionen.push({ code: SGL_S1 + i }));
   const fahrzeuge = fahrzeugeBauen(einheit.typ, teil);
   if (
     fahrzeuge.some((f) => f.typ.code != null && SCHWERE_FAHRZEUGE.has(f.typ.code)) &&
@@ -544,6 +555,9 @@ for (const q of quelle.ortsverbaende) {
   const namen = new Set<string>();
   const bInZug = new Map<string, number>();
   let personen = 0;
+  // Der Stab würfelt aus einem eigenen Seed und erst nach allen anderen
+  // Einheiten: So bleiben die übrigen Bögen des OV inhaltlich, wie sie waren.
+  const zuletzt: (() => void)[] = [];
   einheiten.forEach((e, i) => {
     let zweiteB = false;
     if (e.typ === 4 || e.typ === 5) {
@@ -552,14 +566,20 @@ for (const q of quelle.ortsverbaende) {
       bInZug.set(k, n);
       zweiteB = n >= 2;
     }
-    const bogen = bogenBauen(ov, e, teileinheit(e.typ, e.zug, zweiteB), z, namen);
+    const teil = teileinheit(e.typ, e.zug, zweiteB);
+    const schreiben = (zz: Zufall): void => {
+    const bogen = bogenBauen(ov, e, teil, zz, namen);
     const datei = `ov-${slug(ov.name)}-${String(i + 1).padStart(2, "0")}-${zugKurz(e.zug)}-${slug(typKurz(e.typ))}`;
     fehler.push(...pruefen(datei, bogen));
     writeFileSync(join(verzeichnis, `${datei}.json`), JSON.stringify(bogen) + "\n");
     personen += bogen.personal.length;
     anzahlBoegen++;
     jeTyp.set(e.typ, (jeTyp.get(e.typ) ?? 0) + 1);
+    };
+    if (e.typ === STAB) zuletzt.push(() => schreiben(zufall(seedAus(`${ov.name}/Stab`))));
+    else schreiben(z);
   });
+  for (const f of zuletzt) f();
   zeilen.push({
     lv: struktur.landesverband,
     rst: struktur.regionalstelle,
@@ -623,6 +643,7 @@ Ortsverbänden.
 - Funkrufnamen nach Taschenkarte THW-Funkrufnamen (02/2022): 1. TZ 21/22/23/24,
   2. TZ 26/27/28, 3. TZ 71/72/73, sonst die feste Kennzahl der Einheit.
 - Bergungsgruppen mit Abstützsystem Holz stehen als B (ASH) im Bogen.
+- Zu jedem Zugtrupp FZ FK gehört ein Bogen „Stab" (6/0/0, gesamt 6, SGL S1–S6).
 
 Neu erzeugen mit \`npm run beispiele:thw-ov\` (deterministisch);
 \`npm run beispiele:thw-ov -- --abrufen\` lädt vorher die Einheitenliste neu.

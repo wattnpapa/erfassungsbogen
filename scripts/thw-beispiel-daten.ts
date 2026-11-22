@@ -151,6 +151,7 @@ export const SZENARIO: Record<number, string[]> = {
   42: ["Einsatzabschnitt {ort} — Führungsunterstützung, Lage"],
   43: ["Flächenlage {ort} — Weitverkehrsanbindung, Kommunikation"],
   44: ["Flächenlage {ort} — Richtfunkstrecken, Mastbetrieb"],
+  45: ["Einsatzabschnitt {ort} — Stabsarbeit THW-Führungsstelle"],
 };
 
 // ------------------------------------------------- Fahrzeuge: Hilfstabellen

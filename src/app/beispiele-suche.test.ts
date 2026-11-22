@@ -38,7 +38,7 @@ describe("Suchindex beispiele-suchindex.json (BB2-S2, BB2-K2)", () => {
   });
 
   it("führt die Bergungsgruppe des OV Oldenburg als „Bergungsgruppe“", () => {
-    const code = index.ov["ov-oldenburg-ni-05-1-tz-b"];
+    const code = index.ov["ov-oldenburg-ni-06-1-tz-b"];
     expect(code).toBeDefined();
     expect(index.typen[String(code)]).toMatch(/^Bergungsgruppe \| B$/);
   });

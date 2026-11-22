@@ -35,6 +35,12 @@ export const MONATE: Readonly<Record<string, string>> = {
 
 export const AENDERUNGEN: readonly Aenderung[] = [
   {
+    datum: "2026-11-22",
+    punkte: [
+      "Übungsbögen: Bei allen 66 Fachzügen Führung/Kommunikation der THW-Ortsverbände fehlte der Stab. Er steht jetzt als eigener Bogen direkt hinter dem Zugtrupp, mit StAN-Stärke 6 / 0 / 0 // 6 und den Sachgebietsleitern S1 bis S6.",
+    ],
+  },
+  {
     datum: "2026-11-17",
     punkte: [
       "Übungsbögen: Neu sind Bögen echter Wachen aus Niedersachsen, Ortsfeuerwehren und Standorte von DRK, Johanniter, Malteser und ASB, mit ihren tatsächlichen Fahrzeugen, Funkrufnamen und Kennzeichen nach der Datenbank von bos-fahrzeuge.info. Die Besatzung richtet sich nach der Normbesatzung der Fahrzeuge, alle Personen sind erfunden. Wie die Bögen der THW-Ortsverbände lädt die App sie nicht vorab, ein Bogen braucht beim ersten Öffnen Netz.",

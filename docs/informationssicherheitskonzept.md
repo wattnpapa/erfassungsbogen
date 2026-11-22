@@ -290,7 +290,7 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-09-12 — Version 
 > liegt nur im Arbeitsspeicher der geöffneten Seite.
 >
 > **Nachgezogen 2026-11-08:** Übungsbögen aller THW-Ortsverbände
-> (`examples/thw/ortsverbaende/`, 3.533 Übungsbögen, erfundene Namen, Rufnummern
+> (`examples/thw/ortsverbaende/`, 3.599 Übungsbögen, erfundene Namen, Rufnummern
 > 555…). Sie gehören weder zum Kern noch zur Zusatzstufe des Offline-Vorrats
 > (`istNurAufAbruf` in `scripts/precache-aufteilung.ts`): Ein Bogen wird beim
 > ersten Öffnen von der eigenen Herkunft geladen und liegt danach im

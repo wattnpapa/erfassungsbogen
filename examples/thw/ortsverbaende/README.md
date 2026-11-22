@@ -2,7 +2,7 @@
 
 Für Übungen: je Einheit eines Ortsverbands ein Beispiel-Erfassungsbogen,
 gegliedert nach Landesverband › Regionalstelle › Ortsverband — zusätzlich zu den
-100 fiktiven Einheiten eine Ebene höher. 3533 Bögen aus 667
+100 fiktiven Einheiten eine Ebene höher. 3599 Bögen aus 667
 Ortsverbänden.
 
 - Einheiten je OV: [thw.blafusel.de](https://thw.blafusel.de/) (inoffizielle OV-Karte), Stand
@@ -15,6 +15,7 @@ Ortsverbänden.
 - Funkrufnamen nach Taschenkarte THW-Funkrufnamen (02/2022): 1. TZ 21/22/23/24,
   2. TZ 26/27/28, 3. TZ 71/72/73, sonst die feste Kennzahl der Einheit.
 - Bergungsgruppen mit Abstützsystem Holz stehen als B (ASH) im Bogen.
+- Zu jedem Zugtrupp FZ FK gehört ein Bogen „Stab" (6/0/0, gesamt 6, SGL S1–S6).
 
 Neu erzeugen mit `npm run beispiele:thw-ov` (deterministisch);
 `npm run beispiele:thw-ov -- --abrufen` lädt vorher die Einheitenliste neu.
@@ -27,14 +28,14 @@ bleibt danach auf dem Gerät.
 
 | Landesverband | OVs | Bögen | Helfer |
 |---|---|---|---|
-| Baden-Württemberg | 93 | 471 | 3844 |
-| Bayern | 111 | 592 | 4864 |
-| Berlin, Brandenburg, Sachsen-Anhalt | 48 | 246 | 2026 |
-| Bremen, Niedersachsen | 79 | 404 | 3345 |
-| Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | 57 | 325 | 2690 |
-| Hessen, Rheinland-Pfalz, Saarland | 118 | 584 | 4782 |
-| Nordrhein-Westfalen | 127 | 706 | 5809 |
-| Sachsen, Thüringen | 34 | 205 | 1700 |
+| Baden-Württemberg | 93 | 480 | 3898 |
+| Bayern | 111 | 603 | 4930 |
+| Berlin, Brandenburg, Sachsen-Anhalt | 48 | 251 | 2056 |
+| Bremen, Niedersachsen | 79 | 412 | 3393 |
+| Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | 57 | 331 | 2726 |
+| Hessen, Rheinland-Pfalz, Saarland | 118 | 595 | 4848 |
+| Nordrhein-Westfalen | 127 | 718 | 5881 |
+| Sachsen, Thüringen | 34 | 209 | 1724 |
 
 ## Einheitstypen
 
@@ -53,6 +54,7 @@ bleibt danach auf dem Gerät.
 | FGr Log-V | 66 |
 | ZTr FZ FK | 66 |
 | FGr F | 66 |
+| Stab | 66 |
 | FGr R (C) | 58 |
 | FGr K (A) | 58 |
 | ZTr FZ Log | 57 |
@@ -90,12 +92,12 @@ bleibt danach auf dem Gerät.
 | Baden-Württemberg | Biberach | Riedlingen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Baden-Württemberg | Biberach | Überlingen | ZTr TZ (1. TZ), B (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Baden-Württemberg | Biberach | Ulm | ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
-| Baden-Württemberg | Biberach | Wangen | ZTr FZ FK, FGr F, FGr K (A), FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
+| Baden-Württemberg | Biberach | Wangen | ZTr FZ FK, Stab, FGr F, FGr K (A), FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Baden-Württemberg | Biberach | Weingarten | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr R (C) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ), Tr UL (1. TZ) |
 | Baden-Württemberg | Freiburg | Achern | FGr Log-V, ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr N (1. TZ), FGr BT (1. TZ) |
 | Baden-Württemberg | Freiburg | Biberach/Baden | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ) |
 | Baden-Württemberg | Freiburg | Breisach | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), Tr UL (1. TZ) |
-| Baden-Württemberg | Freiburg | Emmendingen | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), FGr BT (1. TZ), FGr E (1. TZ) |
+| Baden-Württemberg | Freiburg | Emmendingen | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), FGr BT (1. TZ), FGr E (1. TZ) |
 | Baden-Württemberg | Freiburg | Freiburg | ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Baden-Württemberg | Freiburg | Kehl | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ) |
 | Baden-Württemberg | Freiburg | Lahr | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
@@ -110,12 +112,12 @@ bleibt danach auf dem Gerät.
 | Baden-Württemberg | Göppingen | Göppingen | ZTr FZ Log, FGr Log-MW, FGr Log-V, Tr Log-TS, ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
 | Baden-Württemberg | Göppingen | Gruibingen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Baden-Württemberg | Göppingen | Heidenheim | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
-| Baden-Württemberg | Göppingen | Kirchheim/Teck | ZTr FZ FK, FGr F, ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), Tr ESS (1. TZ) |
+| Baden-Württemberg | Göppingen | Kirchheim/Teck | ZTr FZ FK, Stab, FGr F, ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), Tr ESS (1. TZ) |
 | Baden-Württemberg | Göppingen | Neuhausen | FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ) |
 | Baden-Württemberg | Göppingen | Ostfildern | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Baden-Württemberg | Göppingen | Schwäbisch Gmünd | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Baden-Württemberg | Heilbronn | Crailsheim | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
-| Baden-Württemberg | Heilbronn | Heilbronn | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr W (A) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ) |
+| Baden-Württemberg | Heilbronn | Heilbronn | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr W (A) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ) |
 | Baden-Württemberg | Heilbronn | Igersheim | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Baden-Württemberg | Heilbronn | Künzelsau | ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Baden-Württemberg | Heilbronn | Pfedelbach | ZTr TZ (1. TZ), B (1. TZ), FGr BrB (1. TZ), FGr SB (A) (1. TZ), FGr I (1. TZ) |
@@ -131,13 +133,13 @@ bleibt danach auf dem Gerät.
 | Baden-Württemberg | Karlsruhe | Neuenbürg-Arnbach | ZTr TZ (1. TZ), B (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ), Tr UL (1. TZ) |
 | Baden-Württemberg | Karlsruhe | Niefern-Öschelbronn | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ), FGr WP (A) (1. TZ) |
 | Baden-Württemberg | Karlsruhe | Oberhausen-Rheinhausen | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
-| Baden-Württemberg | Karlsruhe | Pforzheim | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
+| Baden-Württemberg | Karlsruhe | Pforzheim | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
 | Baden-Württemberg | Karlsruhe | Rastatt | ZTr FZ Log, FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Baden-Württemberg | Karlsruhe | Waghäusel | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
 | Baden-Württemberg | Mannheim | Adelsheim | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Baden-Württemberg | Mannheim | Eberbach | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ), FGr WP (A) (1. TZ) |
 | Baden-Württemberg | Mannheim | Haßmersheim | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
-| Baden-Württemberg | Mannheim | Heidelberg | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr O (B) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr WP (C) (1. TZ) |
+| Baden-Württemberg | Mannheim | Heidelberg | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr O (B) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr WP (C) (1. TZ) |
 | Baden-Württemberg | Mannheim | Ladenburg | ZTr TZ (1. TZ), B (1. TZ), Tr ESS (1. TZ), FGr WP (B) (1. TZ) |
 | Baden-Württemberg | Mannheim | Mannheim | FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
 | Baden-Württemberg | Mannheim | Neckargemünd | ZTr FZ Log, FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
@@ -151,14 +153,14 @@ bleibt danach auf dem Gerät.
 | Baden-Württemberg | Stuttgart | Leonberg | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), FGr Öl (C) (1. TZ) |
 | Baden-Württemberg | Stuttgart | Ludwigsburg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ), FGr WP (A) (1. TZ) |
 | Baden-Württemberg | Stuttgart | Schorndorf | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr R (A) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ) |
-| Baden-Württemberg | Stuttgart | Stuttgart | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr N (2. TZ), FGr I (2. TZ), FGr E (2. TZ) |
+| Baden-Württemberg | Stuttgart | Stuttgart | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr N (2. TZ), FGr I (2. TZ), FGr E (2. TZ) |
 | Baden-Württemberg | Tübingen | Albstadt | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr SB (B) (1. TZ) |
 | Baden-Württemberg | Tübingen | Balingen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Baden-Württemberg | Tübingen | Freudenstadt | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Baden-Württemberg | Tübingen | Hechingen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Baden-Württemberg | Tübingen | Horb | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
 | Baden-Württemberg | Tübingen | Münsingen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
-| Baden-Württemberg | Tübingen | Ofterdingen | ZTr FZ FK, FGr F, FGr K (B), ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), Tr ESS (1. TZ) |
+| Baden-Württemberg | Tübingen | Ofterdingen | ZTr FZ FK, Stab, FGr F, FGr K (B), ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), Tr ESS (1. TZ) |
 | Baden-Württemberg | Tübingen | Reutlingen | ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Baden-Württemberg | Tübingen | Rottenburg | ZTr TZ (1. TZ), B (1. TZ), FGr E (1. TZ), FGr WP (A) (1. TZ) |
 | Baden-Württemberg | Tübingen | Tübingen | ZTr TZ (1. TZ), B (1. TZ), FGr O (A) (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr TW (1. TZ) |
@@ -173,11 +175,11 @@ bleibt danach auf dem Gerät.
 | Baden-Württemberg | Villingen-Schwenningen | Stockach | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr BT (1. TZ) |
 | Baden-Württemberg | Villingen-Schwenningen | Trossingen | Tr Log-TS, ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
 | Baden-Württemberg | Villingen-Schwenningen | Tuttlingen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
-| Baden-Württemberg | Villingen-Schwenningen | Villingen-Schwenningen | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
+| Baden-Württemberg | Villingen-Schwenningen | Villingen-Schwenningen | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Baden-Württemberg | Villingen-Schwenningen | Waldshut-Tiengen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Bayern | Bad Tölz | Bad Aibling | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Bayern | Bad Tölz | Garmisch-Partenkirchen | FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
-| Bayern | Bad Tölz | Geretsried | ZTr FZ FK, FGr F, FGr K (A), ZTr FZ Log, FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
+| Bayern | Bad Tölz | Geretsried | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr FZ Log, FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Bayern | Bad Tölz | Landsberg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Bayern | Bad Tölz | Miesbach | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ) |
 | Bayern | Bad Tölz | Rosenheim | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr W (A) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ), FGr BT (1. TZ), FGr I (1. TZ), FGr WP (B) (1. TZ) |
@@ -192,7 +194,7 @@ bleibt danach auf dem Gerät.
 | Bayern | Bamberg | Gerolzhofen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Bayern | Bamberg | Haßfurt | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
 | Bayern | Bamberg | Kirchehrenbach | ZTr FZ Log, FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
-| Bayern | Bamberg | Mellrichstadt | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
+| Bayern | Bamberg | Mellrichstadt | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Bayern | Bamberg | Schweinfurt | ZTr TZ (1. TZ), B (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), Tr ESS (1. TZ) |
 | Bayern | Hof | Bayreuth | FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Bayern | Hof | Hof | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
@@ -201,13 +203,13 @@ bleibt danach auf dem Gerät.
 | Bayern | Hof | Marktredwitz | ZTr FZ Log, FGr Log-MW, ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr N (1. TZ) |
 | Bayern | Hof | Naila | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Bayern | Hof | Pegnitz | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ), FGr E (1. TZ) |
-| Bayern | Hof | Selb | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
+| Bayern | Hof | Selb | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Bayern | Hof | Weiden | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
 | Bayern | Ingolstadt | Dillingen | ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Bayern | Ingolstadt | Donauwörth | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ) |
 | Bayern | Ingolstadt | Eichstätt | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ) |
 | Bayern | Ingolstadt | Gunzenhausen | FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
-| Bayern | Ingolstadt | Hilpoltstein | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ) |
+| Bayern | Ingolstadt | Hilpoltstein | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ) |
 | Bayern | Ingolstadt | Ingolstadt | ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
 | Bayern | Ingolstadt | Neuburg | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
 | Bayern | Ingolstadt | Nördlingen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
@@ -219,7 +221,7 @@ bleibt danach auf dem Gerät.
 | Bayern | Karlstadt | Karlstadt | ZTr TZ (1. TZ), B (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
 | Bayern | Karlstadt | Kitzingen | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), Tr UL (1. TZ) |
 | Bayern | Karlstadt | Lohr | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (B) (1. TZ) |
-| Bayern | Karlstadt | Marktheidenfeld | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
+| Bayern | Karlstadt | Marktheidenfeld | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
 | Bayern | Karlstadt | Miltenberg | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
 | Bayern | Karlstadt | Obernburg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (B) (1. TZ), FGr Öl (C) (1. TZ) |
 | Bayern | Karlstadt | Ochsenfurt | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr BT (1. TZ), FGr E (1. TZ) |
@@ -227,7 +229,7 @@ bleibt danach auf dem Gerät.
 | Bayern | Kempten | Füssen | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
 | Bayern | Kempten | Günzburg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Bayern | Kempten | Kaufbeuren | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
-| Bayern | Kempten | Kempten | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ) |
+| Bayern | Kempten | Kempten | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ) |
 | Bayern | Kempten | Krumbach | ZTr FZ Log, FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Bayern | Kempten | Lindau | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), FGr BT (1. TZ) |
 | Bayern | Kempten | Lindenberg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
@@ -239,7 +241,7 @@ bleibt danach auf dem Gerät.
 | Bayern | Mühldorf | Eggenfelden | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ) |
 | Bayern | Mühldorf | Ergolding | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Bayern | Mühldorf | Landshut | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr O (C) (1. TZ), FGr Sp (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr W (B) (2. TZ), FGr N (2. TZ), FGr BT (2. TZ), FGr WP (A) (2. TZ) |
-| Bayern | Mühldorf | Mühldorf | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
+| Bayern | Mühldorf | Mühldorf | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
 | Bayern | Mühldorf | Simbach | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), FGr WP (B) (1. TZ) |
 | Bayern | Mühldorf | Traunreut | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
 | Bayern | Mühldorf | Traunstein | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
@@ -250,7 +252,7 @@ bleibt danach auf dem Gerät.
 | Bayern | München | Fürstenfeldbruck | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Bayern | München | Markt Schwaben | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ), FGr E (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr R (A) (2. TZ), FGr Sp (2. TZ) |
 | Bayern | München | München-Land | Tr Log-TS, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
-| Bayern | München | München-Mitte | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr W (B) (2. TZ) |
+| Bayern | München | München-Mitte | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr W (B) (2. TZ) |
 | Bayern | München | München-Ost | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr O (C) (2. TZ), FGr SB (A) (2. TZ) |
 | Bayern | München | München-West | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (B) (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr N (2. TZ), FGr E (2. TZ) |
 | Bayern | München | Schwabmünchen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (B) (1. TZ) |
@@ -261,12 +263,12 @@ bleibt danach auf dem Gerät.
 | Bayern | Nürnberg | Feuchtwangen | ZTr TZ (1. TZ), B (1. TZ), FGr O (A) (1. TZ), FGr N (1. TZ), Tr UL (1. TZ) |
 | Bayern | Nürnberg | Fürth | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr BrB (2. TZ), FGr I (2. TZ) |
 | Bayern | Nürnberg | Neustadt an der Aisch | Tr Log-TS, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
-| Bayern | Nürnberg | Nürnberg | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr W (A) (2. TZ), ZTr TZ (4. TZ), B (4. TZ), FGr N (4. TZ), FGr I (4. TZ) |
+| Bayern | Nürnberg | Nürnberg | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr W (A) (2. TZ), ZTr TZ (4. TZ), B (4. TZ), FGr N (4. TZ), FGr I (4. TZ) |
 | Bayern | Nürnberg | Rothenburg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Bayern | Nürnberg | Schwabach | ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Bayern | Schwandorf | Amberg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Bayern | Schwandorf | Cham | ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
-| Bayern | Schwandorf | Lauf | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
+| Bayern | Schwandorf | Lauf | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
 | Bayern | Schwandorf | Nabburg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (C) (1. TZ) |
 | Bayern | Schwandorf | Neumarkt | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Bayern | Schwandorf | Neunburg vorm Wald | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
@@ -283,10 +285,10 @@ bleibt danach auf dem Gerät.
 | Bayern | Straubing | Passau | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ), FGr WP (A) (1. TZ) |
 | Bayern | Straubing | Regen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Bayern | Straubing | Regensburg | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
-| Bayern | Straubing | Straubing | ZTr FZ FK, FGr F, FGr K (B), ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
+| Bayern | Straubing | Straubing | ZTr FZ FK, Stab, FGr F, FGr K (B), ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
 | Bayern | Straubing | Vilshofen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Bayern | Straubing | Wörth | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (B) (1. TZ) |
-| Berlin, Brandenburg, Sachsen-Anhalt | Berlin | Berlin Charlottenburg-Wilmersdorf | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), Tr UL (1. TZ), FGr WP (A) (1. TZ) |
+| Berlin, Brandenburg, Sachsen-Anhalt | Berlin | Berlin Charlottenburg-Wilmersdorf | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), Tr UL (1. TZ), FGr WP (A) (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Berlin | Berlin Friedrichshain-Kreuzberg | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Berlin | Berlin Lichtenberg | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr Öl (C) (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr N (2. TZ), FGr E (2. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Berlin | Berlin Marzahn-Hellersdorf | Tr Log-TS, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
@@ -299,13 +301,13 @@ bleibt danach auf dem Gerät.
 | Berlin, Brandenburg, Sachsen-Anhalt | Frankfurt (Oder) | Cottbus | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Frankfurt (Oder) | Eberswalde | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr E (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Frankfurt (Oder) | Forst (Lausitz) | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
-| Berlin, Brandenburg, Sachsen-Anhalt | Frankfurt (Oder) | Frankfurt (Oder) | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ) |
+| Berlin, Brandenburg, Sachsen-Anhalt | Frankfurt (Oder) | Frankfurt (Oder) | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Frankfurt (Oder) | Fürstenwalde/Spree | FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Frankfurt (Oder) | Prenzlau | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Frankfurt (Oder) | Seelow | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Frankfurt (Oder) | Senftenberg | ZTr TZ (1. TZ), B (1. TZ), FGr WP (A) (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Halle | Dessau | ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
-| Berlin, Brandenburg, Sachsen-Anhalt | Halle | Halle (Saale) | ZTr FZ FK, FGr F, FGr K (A), FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ) |
+| Berlin, Brandenburg, Sachsen-Anhalt | Halle | Halle (Saale) | ZTr FZ FK, Stab, FGr F, FGr K (A), FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Halle | Merseburg | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Halle | Naumburg | ZTr TZ (1. TZ), B (1. TZ), FGr I (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Halle | Sangerhausen | FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
@@ -317,7 +319,7 @@ bleibt danach auf dem Gerät.
 | Berlin, Brandenburg, Sachsen-Anhalt | Magdeburg | Calbe | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Magdeburg | Halberstadt | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Magdeburg | Haldensleben | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
-| Berlin, Brandenburg, Sachsen-Anhalt | Magdeburg | Magdeburg | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ), FGr E (1. TZ) |
+| Berlin, Brandenburg, Sachsen-Anhalt | Magdeburg | Magdeburg | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ), FGr E (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Magdeburg | Oschersleben | ZTr TZ (1. TZ), B (1. TZ), FGr WP (A) (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Magdeburg | Quedlinburg | FGr Log-MW, ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr O (B) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), Tr ESS (1. TZ), Tr UL (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Magdeburg | Salzwedel | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
@@ -331,10 +333,10 @@ bleibt danach auf dem Gerät.
 | Berlin, Brandenburg, Sachsen-Anhalt | Potsdam | Herzberg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Potsdam | Luckenwalde | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Potsdam | Neuruppin | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
-| Berlin, Brandenburg, Sachsen-Anhalt | Potsdam | Potsdam | ZTr FZ FK, FGr F, FGr K (B), ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
+| Berlin, Brandenburg, Sachsen-Anhalt | Potsdam | Potsdam | ZTr FZ FK, Stab, FGr F, FGr K (B), ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Potsdam | Rathenow | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Berlin, Brandenburg, Sachsen-Anhalt | Potsdam | Wittenberge | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ) |
-| Bremen, Niedersachsen | Braunschweig | Braunschweig | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr Sp (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr N (2. TZ), FGr WP (A) (2. TZ) |
+| Bremen, Niedersachsen | Braunschweig | Braunschweig | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr Sp (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr N (2. TZ), FGr WP (A) (2. TZ) |
 | Bremen, Niedersachsen | Braunschweig | Elze | ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr I (1. TZ) |
 | Bremen, Niedersachsen | Braunschweig | Gifhorn | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Bremen, Niedersachsen | Braunschweig | Helmstedt | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
@@ -346,7 +348,7 @@ bleibt danach auf dem Gerät.
 | Bremen, Niedersachsen | Braunschweig | Wolfenbüttel | ZTr TZ (1. TZ), B (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), FGr TW (1. TZ) |
 | Bremen, Niedersachsen | Braunschweig | Wolfsburg | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
 | Bremen, Niedersachsen | Bremen | Bremen Mitte | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
-| Bremen, Niedersachsen | Bremen | Bremen Nord | ZTr FZ FK, FGr F, FGr K (A), ZTr FZ Log, FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
+| Bremen, Niedersachsen | Bremen | Bremen Nord | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr FZ Log, FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Bremen, Niedersachsen | Bremen | Bremen Ost | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ), FGr WP (B) (1. TZ) |
 | Bremen, Niedersachsen | Bremen | Bremen Süd | FGr Log-V, ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr W (A) (1. TZ), FGr BrB (1. TZ), FGr N (1. TZ) |
 | Bremen, Niedersachsen | Bremen | Bremerhaven | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ), FGr Öl (B) (1. TZ) |
@@ -360,7 +362,7 @@ bleibt danach auf dem Gerät.
 | Bremen, Niedersachsen | Buxtehude | Lüchow-Dannenberg | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
 | Bremen, Niedersachsen | Buxtehude | Lüneburg | FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), FGr E (1. TZ) |
 | Bremen, Niedersachsen | Buxtehude | Rotenburg | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
-| Bremen, Niedersachsen | Buxtehude | Stade | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (B) (1. TZ) |
+| Bremen, Niedersachsen | Buxtehude | Stade | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (B) (1. TZ) |
 | Bremen, Niedersachsen | Buxtehude | Stelle-Winsen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Bremen, Niedersachsen | Buxtehude | Uelzen | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ), FGr I (1. TZ) |
 | Bremen, Niedersachsen | Göttingen | Bad Lauterberg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
@@ -372,12 +374,12 @@ bleibt danach auf dem Gerät.
 | Bremen, Niedersachsen | Göttingen | Hann. Münden | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
 | Bremen, Niedersachsen | Göttingen | Holzminden | FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), Tr UL (1. TZ) |
 | Bremen, Niedersachsen | Göttingen | Northeim | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ) |
-| Bremen, Niedersachsen | Göttingen | Osterode - NI | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
+| Bremen, Niedersachsen | Göttingen | Osterode - NI | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
 | Bremen, Niedersachsen | Hannover | Bückeburg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Bremen, Niedersachsen | Hannover | Burgdorf | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
 | Bremen, Niedersachsen | Hannover | Hameln | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
 | Bremen, Niedersachsen | Hannover | Hannover/Langenhagen | FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ), FGr WP (B) (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr O (C) (2. TZ), FGr E (2. TZ), Tr UL (2. TZ) |
-| Bremen, Niedersachsen | Hannover | Lehrte | ZTr FZ FK, FGr F, FGr K (B), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
+| Bremen, Niedersachsen | Hannover | Lehrte | ZTr FZ FK, Stab, FGr F, FGr K (B), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
 | Bremen, Niedersachsen | Hannover | Rinteln | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ) |
 | Bremen, Niedersachsen | Hannover | Ronnenberg | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr O (B) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
 | Bremen, Niedersachsen | Hannover | Springe | ZTr FZ Log, FGr Log-MW, ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ) |
@@ -387,7 +389,7 @@ bleibt danach auf dem Gerät.
 | Bremen, Niedersachsen | Lingen | Cloppenburg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr BT (1. TZ), FGr Öl (C) (1. TZ) |
 | Bremen, Niedersachsen | Lingen | Lingen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Bremen, Niedersachsen | Lingen | Lohne | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr O (A) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ) |
-| Bremen, Niedersachsen | Lingen | Melle | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
+| Bremen, Niedersachsen | Lingen | Melle | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Bremen, Niedersachsen | Lingen | Meppen | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
 | Bremen, Niedersachsen | Lingen | Nordhorn | FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Bremen, Niedersachsen | Lingen | Osnabrück | FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr SB (A) (1. TZ), FGr I (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr N (2. TZ), FGr E (2. TZ) |
@@ -399,7 +401,7 @@ bleibt danach auf dem Gerät.
 | Bremen, Niedersachsen | Oldenburg | Leer | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
 | Bremen, Niedersachsen | Oldenburg | Norden | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ), FGr Öl (B) (1. TZ) |
 | Bremen, Niedersachsen | Oldenburg | Nordenham | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ), FGr Öl (A) (1. TZ) |
-| Bremen, Niedersachsen | Oldenburg | Oldenburg (NI) | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ), FGr I (1. TZ) |
+| Bremen, Niedersachsen | Oldenburg | Oldenburg (NI) | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ), FGr I (1. TZ) |
 | Bremen, Niedersachsen | Oldenburg | Varel | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (B) (1. TZ) |
 | Bremen, Niedersachsen | Oldenburg | Westerstede | ZTr FZ Log, FGr Log-MW, Tr Log-TS, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Bremen, Niedersachsen | Oldenburg | Wilhelmshaven | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr BrB (1. TZ), FGr N (1. TZ) |
@@ -407,7 +409,7 @@ bleibt danach auf dem Gerät.
 | Bremen, Niedersachsen | Verden | Bassum | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
 | Bremen, Niedersachsen | Verden | Celle | ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Bremen, Niedersachsen | Verden | Fallingbostel-Walsrode | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
-| Bremen, Niedersachsen | Verden | Hoya | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ) |
+| Bremen, Niedersachsen | Verden | Hoya | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ) |
 | Bremen, Niedersachsen | Verden | Nienburg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Bremen, Niedersachsen | Verden | Soltau | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Bremen, Niedersachsen | Verden | Sulingen | ZTr TZ (1. TZ), B (1. TZ), FGr O (A) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
@@ -418,13 +420,13 @@ bleibt danach auf dem Gerät.
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Hamburg | Hamburg-Altona | ZTr TZ (1. TZ), B (1. TZ), FGr BrB (1. TZ), FGr N (1. TZ), FGr I (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr R (B) (2. TZ), FGr Sp (2. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Hamburg | Hamburg-Bergedorf | B (1. TZ), FGr N (1. TZ), FGr E (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr WP (B) (2. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Hamburg | Hamburg-Eimsbüttel | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), Tr ESS (2. TZ), FGr WP (A) (2. TZ) |
-| Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Hamburg | Hamburg-Harburg | ZTr FZ FK, FGr F, FGr K (B), ZTr FZ Log, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ), FGr SB (B) (1. TZ) |
+| Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Hamburg | Hamburg-Harburg | ZTr FZ FK, Stab, FGr F, FGr K (B), ZTr FZ Log, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ), FGr SB (B) (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Hamburg | Hamburg-Wandsbek | FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr R (A) (2. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Lübeck | Ahrensburg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr I (1. TZ), FGr E (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Lübeck | Bad Oldesloe | ZTr FZ Log, FGr Log-MW, Tr Log-TS, ZTr TZ (1. TZ), B (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Lübeck | Eutin | ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Lübeck | Lauenburg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
-| Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Lübeck | Lübeck | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ), FGr Öl (A) (1. TZ) |
+| Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Lübeck | Lübeck | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ), FGr Öl (A) (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Lübeck | Mölln | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Lübeck | Neustadt | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Lübeck | Oldenburg in Holstein | ZTr TZ (1. TZ), B (1. TZ), FGr WP (B) (1. TZ) |
@@ -439,12 +441,12 @@ bleibt danach auf dem Gerät.
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Neumünster | Itzehoe | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), FGr TW (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Neumünster | Kaltenkirchen | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Neumünster | Meldorf | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
-| Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Neumünster | Neumünster | ZTr FZ FK, FGr F, FGr K (A), FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr O (A) (1. TZ), FGr O (B) (1. TZ), FGr N (1. TZ) |
+| Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Neumünster | Neumünster | ZTr FZ FK, Stab, FGr F, FGr K (A), FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr O (A) (1. TZ), FGr O (B) (1. TZ), FGr N (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Neumünster | Norderstedt | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Neumünster | Pinneberg | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr W (A) (1. TZ), FGr BrB (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Neumünster | Wahlstedt | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Schleswig | Eckernförde | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ) |
-| Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Schleswig | Flensburg | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
+| Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Schleswig | Flensburg | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Schleswig | Husum | FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Schleswig | Kiel | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr O (A) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), Tr UL (1. TZ), FGr Öl (B) (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Schleswig | Niebüll | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ), FGr WP (B) (1. TZ) |
@@ -457,7 +459,7 @@ bleibt danach auf dem Gerät.
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Schwerin | Güstrow | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), Tr UL (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Schwerin | Ludwigslust | FGr Log-MW, FGr Log-V, Tr Log-TS, ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Schwerin | Parchim | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
-| Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Schwerin | Rostock | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), FGr E (1. TZ) |
+| Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Schwerin | Rostock | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), FGr E (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Schwerin | Schwerin | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), FGr WP (B) (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Schwerin | Wismar | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ), FGr WP (A) (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Stralsund | Barth | ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ) |
@@ -467,7 +469,7 @@ bleibt danach auf dem Gerät.
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Stralsund | Neubrandenburg | ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Stralsund | Neustrelitz | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Stralsund | Pasewalk | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ) |
-| Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Stralsund | Stralsund | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr O (B) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr E (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr E (2. TZ), FGr Öl (B) (2. TZ) |
+| Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Stralsund | Stralsund | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr O (B) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr E (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr E (2. TZ), FGr Öl (B) (2. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Stralsund | Waren | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
 | Hamburg, Mecklenburg-Vorpommern, Schleswig-Holstein | Stralsund | Wolgast | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ), FGr Öl (C) (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Bad Kreuznach | Alzey | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
@@ -476,12 +478,12 @@ bleibt danach auf dem Gerät.
 | Hessen, Rheinland-Pfalz, Saarland | Bad Kreuznach | Frankenthal | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ), FGr E (1. TZ), FGr WP (A) (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Bad Kreuznach | Idar-Oberstein | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Bad Kreuznach | Ludwigshafen | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
-| Hessen, Rheinland-Pfalz, Saarland | Bad Kreuznach | Mainz | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), FGr SB (B) (1. TZ), Tr ESS (1. TZ), FGr I (1. TZ) |
+| Hessen, Rheinland-Pfalz, Saarland | Bad Kreuznach | Mainz | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), FGr SB (B) (1. TZ), Tr ESS (1. TZ), FGr I (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Bad Kreuznach | Simmern | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Bad Kreuznach | Worms | ZTr FZ Log, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Bad Kreuznach | Wörrstadt | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr TW (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Darmstadt | Bensheim | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
-| Hessen, Rheinland-Pfalz, Saarland | Darmstadt | Darmstadt | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ), FGr E (1. TZ) |
+| Hessen, Rheinland-Pfalz, Saarland | Darmstadt | Darmstadt | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ), FGr E (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Darmstadt | Groß-Gerau | ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr O (B) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Darmstadt | Groß-Umstadt | ZTr FZ Log, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Darmstadt | Heppenheim | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
@@ -491,7 +493,7 @@ bleibt danach auf dem Gerät.
 | Hessen, Rheinland-Pfalz, Saarland | Darmstadt | Pfungstadt | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Darmstadt | Rüsselsheim | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ), FGr TW (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Darmstadt | Viernheim | ZTr TZ (1. TZ), B (1. TZ), FGr O (B) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
-| Hessen, Rheinland-Pfalz, Saarland | Frankfurt am Main | Bad Homburg | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
+| Hessen, Rheinland-Pfalz, Saarland | Frankfurt am Main | Bad Homburg | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Frankfurt am Main | Frankfurt | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr R (A) (2. TZ), FGr N (2. TZ), FGr Öl (C) (2. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Frankfurt am Main | Friedberg/Hessen | ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Frankfurt am Main | Geisenheim | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
@@ -506,7 +508,7 @@ bleibt danach auf dem Gerät.
 | Hessen, Rheinland-Pfalz, Saarland | Gelnhausen | Bad Orb | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr I (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Gelnhausen | Erlensee | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Gelnhausen | Fulda | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
-| Hessen, Rheinland-Pfalz, Saarland | Gelnhausen | Gelnhausen | ZTr FZ FK, FGr F, FGr K (B), ZTr TZ (1. TZ), B (1. TZ) |
+| Hessen, Rheinland-Pfalz, Saarland | Gelnhausen | Gelnhausen | ZTr FZ FK, Stab, FGr F, FGr K (B), ZTr TZ (1. TZ), B (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Gelnhausen | Hünfeld | FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr O (C) (1. TZ), FGr SB (A) (1. TZ), Tr ESS (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Gelnhausen | Lauterbach | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Gelnhausen | Neuhof | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
@@ -516,7 +518,7 @@ bleibt danach auf dem Gerät.
 | Hessen, Rheinland-Pfalz, Saarland | Gießen | Biedenkopf | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Gießen | Dillenburg | ZTr FZ Log, FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Gießen | Frankenberg | ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ) |
-| Hessen, Rheinland-Pfalz, Saarland | Gießen | Gießen | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ), FGr I (1. TZ) |
+| Hessen, Rheinland-Pfalz, Saarland | Gießen | Gießen | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ), FGr I (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Gießen | Grünberg | FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Gießen | Korbach | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Gießen | Limburg | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
@@ -524,7 +526,7 @@ bleibt danach auf dem Gerät.
 | Hessen, Rheinland-Pfalz, Saarland | Gießen | Weilburg | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Gießen | Wetzlar | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr N (1. TZ), FGr WP (B) (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr E (2. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Homberg | Bad Hersfeld | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ) |
-| Hessen, Rheinland-Pfalz, Saarland | Homberg | Eschwege | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ) |
+| Hessen, Rheinland-Pfalz, Saarland | Homberg | Eschwege | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Homberg | Fritzlar | Tr Log-TS, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Homberg | Großalmerode | ZTr FZ Log, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Homberg | Hofgeismar | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
@@ -545,7 +547,7 @@ bleibt danach auf dem Gerät.
 | Hessen, Rheinland-Pfalz, Saarland | Koblenz | Montabaur | ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Koblenz | Neuwied | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ), FGr E (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Koblenz | Sinzig | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
-| Hessen, Rheinland-Pfalz, Saarland | Koblenz | Westerburg | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
+| Hessen, Rheinland-Pfalz, Saarland | Koblenz | Westerburg | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Merzig | Beckingen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Merzig | Dillingen (Saar) | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Merzig | Freisen | FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
@@ -554,7 +556,7 @@ bleibt danach auf dem Gerät.
 | Hessen, Rheinland-Pfalz, Saarland | Merzig | Nohfelden | ZTr FZ Log, FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr O (A) (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Merzig | Perl-Obermosel | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr O (A) (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Merzig | Saarlouis | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ) |
-| Hessen, Rheinland-Pfalz, Saarland | Merzig | Saarwellingen | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
+| Hessen, Rheinland-Pfalz, Saarland | Merzig | Saarwellingen | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Merzig | St. Wendel | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Merzig | Theley | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ), FGr WP (A) (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Merzig | Wadern | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
@@ -562,7 +564,7 @@ bleibt danach auf dem Gerät.
 | Hessen, Rheinland-Pfalz, Saarland | Neustadt a.d.W. | Germersheim | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Neustadt a.d.W. | Hauenstein | ZTr FZ Log, FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr E (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Neustadt a.d.W. | Kaiserslautern | ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ) |
-| Hessen, Rheinland-Pfalz, Saarland | Neustadt a.d.W. | Landau | ZTr FZ FK, FGr F, FGr K (A), FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr O (B) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ) |
+| Hessen, Rheinland-Pfalz, Saarland | Neustadt a.d.W. | Landau | ZTr FZ FK, Stab, FGr F, FGr K (A), FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr O (B) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Neustadt a.d.W. | Neustadt an der Weinstraße | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr BrB (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Neustadt a.d.W. | Pirmasens | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Neustadt a.d.W. | Speyer | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
@@ -576,7 +578,7 @@ bleibt danach auf dem Gerät.
 | Hessen, Rheinland-Pfalz, Saarland | Saarbrücken | Riegelsberg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Saarbrücken | Saarbrücken | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr O (A) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Saarbrücken | Spiesen-Elversberg | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ) |
-| Hessen, Rheinland-Pfalz, Saarland | Saarbrücken | St. Ingbert | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ) |
+| Hessen, Rheinland-Pfalz, Saarland | Saarbrücken | St. Ingbert | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Saarbrücken | Sulzbach | ZTr FZ Log, FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Saarbrücken | Völklingen-Püttlingen | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Trier | Bitburg | ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr I (1. TZ), FGr E (1. TZ) |
@@ -585,7 +587,7 @@ bleibt danach auf dem Gerät.
 | Hessen, Rheinland-Pfalz, Saarland | Trier | Hermeskeil | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ), FGr WP (A) (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Trier | Prüm | ZTr FZ Log, FGr Log-MW, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Trier | Saarburg | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
-| Hessen, Rheinland-Pfalz, Saarland | Trier | Trier | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ) |
+| Hessen, Rheinland-Pfalz, Saarland | Trier | Trier | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Trier | Wittlich | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
 | Hessen, Rheinland-Pfalz, Saarland | Trier | Zell | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Nordrhein-Westfalen | Aachen | Aachen | ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr O (A) (2. TZ), FGr SB (A) (2. TZ) |
@@ -595,12 +597,12 @@ bleibt danach auf dem Gerät.
 | Nordrhein-Westfalen | Aachen | Euskirchen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Nordrhein-Westfalen | Aachen | Herzogenrath | ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ) |
 | Nordrhein-Westfalen | Aachen | Hürtgenwald | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ) |
-| Nordrhein-Westfalen | Aachen | Jülich | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ) |
+| Nordrhein-Westfalen | Aachen | Jülich | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ) |
 | Nordrhein-Westfalen | Aachen | Nörvenich | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), Tr UL (1. TZ) |
 | Nordrhein-Westfalen | Aachen | Schleiden | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Nordrhein-Westfalen | Aachen | Simmerath | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Nordrhein-Westfalen | Aachen | Stolberg | ZTr TZ (1. TZ), B (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
-| Nordrhein-Westfalen | Arnsberg | Arnsberg | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ), FGr WP (A) (1. TZ) |
+| Nordrhein-Westfalen | Arnsberg | Arnsberg | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ), FGr WP (A) (1. TZ) |
 | Nordrhein-Westfalen | Arnsberg | Brilon | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Nordrhein-Westfalen | Arnsberg | Büren | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ) |
 | Nordrhein-Westfalen | Arnsberg | Hallenberg-Hesborn | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
@@ -612,7 +614,7 @@ bleibt danach auf dem Gerät.
 | Nordrhein-Westfalen | Arnsberg | Warburg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Nordrhein-Westfalen | Bielefeld | Bielefeld | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr R (B) (1. TZ), FGr BrB (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ) |
 | Nordrhein-Westfalen | Bielefeld | Bünde | ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ) |
-| Nordrhein-Westfalen | Bielefeld | Detmold | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ), FGr WP (B) (1. TZ) |
+| Nordrhein-Westfalen | Bielefeld | Detmold | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ), FGr WP (B) (1. TZ) |
 | Nordrhein-Westfalen | Bielefeld | Gütersloh | ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Nordrhein-Westfalen | Bielefeld | Halle | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Nordrhein-Westfalen | Bielefeld | Herford | ZTr TZ (1. TZ), B (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
@@ -629,10 +631,10 @@ bleibt danach auf dem Gerät.
 | Nordrhein-Westfalen | Bochum | Wanne-Eickel | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr E (1. TZ) |
 | Nordrhein-Westfalen | Bochum | Wetter | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ) |
 | Nordrhein-Westfalen | Bochum | Witten | ZTr TZ (1. TZ), B (1. TZ), FGr BrB (1. TZ), FGr N (1. TZ) |
-| Nordrhein-Westfalen | Bochum | Wuppertal | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr O (A) (2. TZ), FGr SB (A) (2. TZ), FGr I (2. TZ) |
+| Nordrhein-Westfalen | Bochum | Wuppertal | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr O (A) (2. TZ), FGr SB (A) (2. TZ), FGr I (2. TZ) |
 | Nordrhein-Westfalen | Dortmund | Altena | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
 | Nordrhein-Westfalen | Dortmund | Balve | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
-| Nordrhein-Westfalen | Dortmund | Dortmund | ZTr FZ FK, FGr F, FGr K (A), ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr W (A) (2. TZ), FGr N (2. TZ), Tr ESS (2. TZ), FGr I (2. TZ) |
+| Nordrhein-Westfalen | Dortmund | Dortmund | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr W (A) (2. TZ), FGr N (2. TZ), Tr ESS (2. TZ), FGr I (2. TZ) |
 | Nordrhein-Westfalen | Dortmund | Halver | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Nordrhein-Westfalen | Dortmund | Hamm | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr Öl (C) (1. TZ) |
 | Nordrhein-Westfalen | Dortmund | Iserlohn | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr WP (B) (1. TZ) |
@@ -648,12 +650,12 @@ bleibt danach auf dem Gerät.
 | Nordrhein-Westfalen | Düsseldorf | Hilden | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr I (1. TZ) |
 | Nordrhein-Westfalen | Düsseldorf | Mülheim | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr R (C) (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ), FGr WP (A) (1. TZ) |
 | Nordrhein-Westfalen | Düsseldorf | Ratingen | ZTr TZ (1. TZ), B (1. TZ), FGr O (A) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), FGr WP (A) (1. TZ) |
-| Nordrhein-Westfalen | Düsseldorf | Solingen | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
+| Nordrhein-Westfalen | Düsseldorf | Solingen | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Nordrhein-Westfalen | Düsseldorf | Velbert | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr SB (B) (1. TZ) |
 | Nordrhein-Westfalen | Gelsenkirchen | Bottrop | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), FGr WP (B) (1. TZ) |
 | Nordrhein-Westfalen | Gelsenkirchen | Castrop-Rauxel | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ), FGr E (1. TZ) |
 | Nordrhein-Westfalen | Gelsenkirchen | Datteln | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ) |
-| Nordrhein-Westfalen | Gelsenkirchen | Essen | ZTr FZ FK, FGr F, FGr K (A), ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr N (2. TZ), FGr WP (C) (2. TZ), FGr Öl (C) (2. TZ) |
+| Nordrhein-Westfalen | Gelsenkirchen | Essen | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr N (2. TZ), FGr WP (C) (2. TZ), FGr Öl (C) (2. TZ) |
 | Nordrhein-Westfalen | Gelsenkirchen | Gelsenkirchen | ZTr TZ (1. TZ), B (1. TZ), B (ASH) (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Nordrhein-Westfalen | Gelsenkirchen | Gladbeck/Dorsten | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ), FGr WP (A) (1. TZ) |
 | Nordrhein-Westfalen | Gelsenkirchen | Haltern am See | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
@@ -670,7 +672,7 @@ bleibt danach auf dem Gerät.
 | Nordrhein-Westfalen | Köln | Brühl | ZTr TZ (1. TZ), B (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ) |
 | Nordrhein-Westfalen | Köln | Köln Nord-West | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr SB (B) (1. TZ), FGr I (1. TZ), FGr E (1. TZ) |
 | Nordrhein-Westfalen | Köln | Köln-Ost | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr R (B) (2. TZ), FGr N (2. TZ) |
-| Nordrhein-Westfalen | Köln | Köln-Porz | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
+| Nordrhein-Westfalen | Köln | Köln-Porz | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Nordrhein-Westfalen | Köln | Leverkusen | ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr O (A) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), FGr E (1. TZ) |
 | Nordrhein-Westfalen | Köln | Siegburg | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ), ZTr TZ (2. TZ), B (2. TZ), B (2. TZ), FGr WP (A) (2. TZ) |
 | Nordrhein-Westfalen | Mönchengladbach | Erkelenz | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ), FGr WP (A) (1. TZ) |
@@ -681,7 +683,7 @@ bleibt danach auf dem Gerät.
 | Nordrhein-Westfalen | Mönchengladbach | Mönchengladbach | ZTr FZ Log, FGr Log-MW, FGr Log-V, Tr Log-TS, ZTr TZ (1. TZ), B (1. TZ), B (1. TZ), FGr BrB (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Nordrhein-Westfalen | Mönchengladbach | Nettetal | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Nordrhein-Westfalen | Mönchengladbach | Neuss | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr W (B) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ) |
-| Nordrhein-Westfalen | Mönchengladbach | Übach-Palenberg | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
+| Nordrhein-Westfalen | Mönchengladbach | Übach-Palenberg | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ) |
 | Nordrhein-Westfalen | Mönchengladbach | Viersen | ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr O (A) (1. TZ), FGr SB (A) (1. TZ), Tr UL (1. TZ) |
 | Nordrhein-Westfalen | Münster | Beckum | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr N (1. TZ), FGr SB (B) (1. TZ), Tr ESS (1. TZ) |
 | Nordrhein-Westfalen | Münster | Coesfeld | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
@@ -691,7 +693,7 @@ bleibt danach auf dem Gerät.
 | Nordrhein-Westfalen | Münster | Ibbenbüren | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr TW (1. TZ) |
 | Nordrhein-Westfalen | Münster | Lengerich | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Nordrhein-Westfalen | Münster | Lüdinghausen | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ) |
-| Nordrhein-Westfalen | Münster | Münster | ZTr FZ FK, FGr F, FGr K (B), ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ) |
+| Nordrhein-Westfalen | Münster | Münster | ZTr FZ FK, Stab, FGr F, FGr K (B), ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ) |
 | Nordrhein-Westfalen | Münster | Oelde | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr E (1. TZ) |
 | Nordrhein-Westfalen | Münster | Rheine | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Nordrhein-Westfalen | Münster | Warendorf | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
@@ -702,7 +704,7 @@ bleibt danach auf dem Gerät.
 | Nordrhein-Westfalen | Olpe | Hückeswagen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Nordrhein-Westfalen | Olpe | Lennestadt | ZTr TZ (1. TZ), B (1. TZ), FGr SB (A) (1. TZ) |
 | Nordrhein-Westfalen | Olpe | Olpe | ZTr TZ (1. TZ), B (1. TZ), FGr R (A) (1. TZ), FGr O (A) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ) |
-| Nordrhein-Westfalen | Olpe | Siegen | ZTr FZ FK, FGr F, FGr K (A), ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr E (1. TZ) |
+| Nordrhein-Westfalen | Olpe | Siegen | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr E (1. TZ) |
 | Nordrhein-Westfalen | Olpe | Waldbröl | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
 | Nordrhein-Westfalen | Olpe | Wermelskirchen | ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Nordrhein-Westfalen | Wesel | Ahaus | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ), Tr UL (1. TZ) |
@@ -713,11 +715,11 @@ bleibt danach auf dem Gerät.
 | Nordrhein-Westfalen | Wesel | Gronau | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ), FGr E (1. TZ) |
 | Nordrhein-Westfalen | Wesel | Kleve | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ) |
 | Nordrhein-Westfalen | Wesel | Moers | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
-| Nordrhein-Westfalen | Wesel | Oberhausen | ZTr FZ FK, FGr F, FGr K (A), ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
+| Nordrhein-Westfalen | Wesel | Oberhausen | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Nordrhein-Westfalen | Wesel | Wesel | ZTr TZ (1. TZ), B (1. TZ), FGr W (B) (1. TZ), FGr N (1. TZ) |
 | Sachsen, Thüringen | Chemnitz | Annaberg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr UL (1. TZ), FGr E (1. TZ) |
 | Sachsen, Thüringen | Chemnitz | Aue-Schwarzenberg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
-| Sachsen, Thüringen | Chemnitz | Chemnitz | ZTr FZ FK, FGr F, FGr K (A), ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr I (2. TZ) |
+| Sachsen, Thüringen | Chemnitz | Chemnitz | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr FZ Log, FGr Log-MW, FGr Log-V, ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr I (2. TZ) |
 | Sachsen, Thüringen | Chemnitz | Döbeln | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ) |
 | Sachsen, Thüringen | Chemnitz | Freiberg | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr O (C) (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ) |
 | Sachsen, Thüringen | Chemnitz | Plauen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (B) (1. TZ) |
@@ -725,7 +727,7 @@ bleibt danach auf dem Gerät.
 | Sachsen, Thüringen | Chemnitz | Zwickau | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ), FGr TW (1. TZ) |
 | Sachsen, Thüringen | Dresden | Bautzen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ), FGr WP (A) (1. TZ) |
 | Sachsen, Thüringen | Dresden | Dippoldiswalde | ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), Tr UL (1. TZ) |
-| Sachsen, Thüringen | Dresden | Dresden | ZTr FZ FK, FGr F, FGr K (B), FGr Log-MW, ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr BrB (2. TZ), FGr I (2. TZ) |
+| Sachsen, Thüringen | Dresden | Dresden | ZTr FZ FK, Stab, FGr F, FGr K (B), FGr Log-MW, ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr R (A) (1. TZ), FGr N (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr BrB (2. TZ), FGr I (2. TZ) |
 | Sachsen, Thüringen | Dresden | Görlitz | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr N (1. TZ) |
 | Sachsen, Thüringen | Dresden | Kamenz | FGr Log-V, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Sachsen, Thüringen | Dresden | Pirna | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr Sp (1. TZ), FGr N (1. TZ), FGr BT (1. TZ) |
@@ -734,7 +736,7 @@ bleibt danach auf dem Gerät.
 | Sachsen, Thüringen | Dresden | Zittau | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr WP (A) (1. TZ) |
 | Sachsen, Thüringen | Erfurt | Apolda | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ), FGr WP (C) (1. TZ) |
 | Sachsen, Thüringen | Erfurt | Eisenach | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr SB (A) (1. TZ), FGr E (1. TZ), FGr WP (B) (1. TZ) |
-| Sachsen, Thüringen | Erfurt | Erfurt | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ), FGr TW (1. TZ) |
+| Sachsen, Thüringen | Erfurt | Erfurt | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (ASH) (1. TZ), FGr R (B) (1. TZ), FGr N (1. TZ), Tr ESS (1. TZ), FGr TW (1. TZ) |
 | Sachsen, Thüringen | Erfurt | Gotha | Tr Log-TS, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Sachsen, Thüringen | Erfurt | Heiligenstadt | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
 | Sachsen, Thüringen | Erfurt | Nordhausen | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
@@ -747,5 +749,5 @@ bleibt danach auf dem Gerät.
 | Sachsen, Thüringen | Leipzig | Eilenburg | ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), Tr MHP (1. TZ), FGr WP (A) (1. TZ) |
 | Sachsen, Thüringen | Leipzig | Gera | ZTr TZ (1. TZ), B (1. TZ), FGr R (C) (1. TZ), FGr O (A) (1. TZ), FGr N (1. TZ), FGr I (1. TZ) |
 | Sachsen, Thüringen | Leipzig | Grimma | ZTr FZ Log, FGr Log-MW, FGr Log-V, Tr Log-TS, ZTr TZ (1. TZ), B (1. TZ), FGr N (1. TZ), FGr E (1. TZ) |
-| Sachsen, Thüringen | Leipzig | Leipzig | ZTr FZ FK, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr SB (A) (1. TZ), Tr ESS (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr N (2. TZ) |
+| Sachsen, Thüringen | Leipzig | Leipzig | ZTr FZ FK, Stab, FGr F, FGr K (A), ZTr TZ (1. TZ), B (1. TZ), FGr R (B) (1. TZ), FGr SB (A) (1. TZ), Tr ESS (1. TZ), ZTr TZ (2. TZ), B (2. TZ), FGr N (2. TZ) |
 | Sachsen, Thüringen | Leipzig | Torgau | ZTr TZ (1. TZ), B (1. TZ), FGr W (A) (1. TZ), FGr O (A) (1. TZ), FGr N (1. TZ) |
