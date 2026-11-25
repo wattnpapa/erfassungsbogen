@@ -35,6 +35,12 @@ export const MONATE: Readonly<Record<string, string>> = {
 
 export const AENDERUNGEN: readonly Aenderung[] = [
   {
+    datum: "2026-11-25",
+    punkte: [
+      "PDF: Bögen der Feuerwehr tragen rechts im Titelbalken jetzt das Feuerwehr-Signet (Retten, Löschen, Bergen, Schützen) statt des Namens der Organisation.",
+    ],
+  },
+  {
     datum: "2026-11-17",
     punkte: [
       "Übungsbögen: Neu sind Bögen echter Wachen aus Niedersachsen, Ortsfeuerwehren und Standorte von DRK, Johanniter, Malteser und ASB, mit ihren tatsächlichen Fahrzeugen, Funkrufnamen und Kennzeichen nach der Datenbank von bos-fahrzeuge.info. Die Besatzung richtet sich nach der Normbesatzung der Fahrzeuge, alle Personen sind erfunden. Wie die Bögen der THW-Ortsverbände lädt die App sie nicht vorab, ein Bogen braucht beim ersten Öffnen Netz.",

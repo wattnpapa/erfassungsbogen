@@ -16,9 +16,11 @@
  * Größe: höchstens so hoch wie die THW-Marke (19 pt) und höchstens so breit
  * (96 pt), Seitenverhältnis wie im Original.
  *
- * Organisationen ohne Eintrag (Feuerwehr, Polizei, Rettungsdienst, Sonstige)
- * behalten den Namen als Text. Das Feuerwehr-Signet ist eine eingetragene
- * Marke des DFV-Versandhauses; es kommt erst nach deren Freigabe hinzu.
+ * Organisationen ohne Eintrag (Polizei, Rettungsdienst, Sonstige) behalten den
+ * Namen als Text. Das Feuerwehr-Signet (Retten, Löschen, Bergen, Schützen) ist
+ * eine eingetragene Marke; die Verwendung im Titelbalken ist per E-Mail
+ * freigegeben. Vorlage: EPS "fw logo löschen retten usw" (CorelDRAW, 2015), die
+ * Pfade 1:1 als SVG übernommen.
  */
 import { OrganisationsTyp } from "@bos/eeb-format/model";
 
@@ -29,6 +31,12 @@ export interface OrgLogo {
 }
 
 export const ORG_LOGOS: Partial<Record<OrganisationsTyp, OrgLogo>> = {
+  // Feuerwehr-Signet (Retten, Löschen, Bergen, Schützen), quadratisch
+  [OrganisationsTyp.FEUERWEHR]: {
+    breite: 19,
+    hoehe: 19,
+    svg: '',
+  },
   // Arbeiter-Samariter-Bund: public/bilder/asb-logo.svg (Wikimedia Commons, File:ASB-Logo-Screen-Standard-RGB.svg)
   [OrganisationsTyp.ASB]: {
     breite: 45.5,

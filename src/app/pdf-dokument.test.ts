@@ -646,6 +646,7 @@ describe("Titelbalken im Raster der THWin-Vorlage", () => {
     OrganisationsTyp.BUNDESWEHR,
     OrganisationsTyp.DLRG,
     OrganisationsTyp.DRK,
+    OrganisationsTyp.FEUERWEHR,
     OrganisationsTyp.JUH,
     OrganisationsTyp.MHD,
   ])("Organisation %i mit bekanntem Logo: Logo als Vektor statt Name, Gliederung darunter", (org) => {
