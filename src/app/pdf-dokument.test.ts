@@ -665,6 +665,8 @@ describe("Titelbalken im Raster der THWin-Vorlage", () => {
     for (const logo of Object.values(ORG_LOGOS)) {
       expect(logo.breite).toBeLessThanOrEqual(96);
       expect(logo.hoehe).toBeLessThanOrEqual(19);
+      // Ein leerer Eintrag lässt pdfmake mit „Unrecognized document structure“ scheitern.
+      expect(logo.svg).toMatch(/^<svg [^>]*viewBox="[^"]+"[^>]*>.*<path /s);
       // pdfmake (svg-to-pdfkit) zeichnet weder <style>/class noch <switch>.
       expect(logo.svg).not.toMatch(/<style|class=|<switch|<foreignObject/);
     }
