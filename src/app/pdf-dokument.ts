@@ -1845,7 +1845,7 @@ export function pdfDokument(
    * Titelbalken wie in der Vorlage: links das Kurzzeichen der Einheit, in der
    * Mitte der Titel weiß auf der Kennfarbe, rechts das Logo der Organisation
    * (THW: Wortbildmarke aus der Vorlage; ASB, Bundespolizei, Bundeswehr, DLRG, DRK,
-   * JUH, MHD:
+   * Feuerwehr, JUH, MHD:
    * pdf-logos.ts), bei allen ohne Logo der Name der Organisation als Text.
    */
   // Kurzzeichen links im Titelbalken (in der Vorlage „Fb Fü 6 / K (A)“): Die

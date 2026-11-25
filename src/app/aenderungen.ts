@@ -35,6 +35,12 @@ export const MONATE: Readonly<Record<string, string>> = {
 
 export const AENDERUNGEN: readonly Aenderung[] = [
   {
+    datum: "2026-11-25",
+    punkte: [
+      "PDF: Bögen der Feuerwehr tragen rechts im Titelbalken jetzt das Feuerwehr-Signet (Retten, Löschen, Bergen, Schützen) statt des Namens der Organisation.",
+    ],
+  },
+  {
     datum: "2026-11-22",
     punkte: [
       "Übungsbögen: Bei allen 66 Fachzügen Führung/Kommunikation der THW-Ortsverbände fehlte der Stab. Er steht jetzt als eigener Bogen direkt hinter dem Zugtrupp, mit StAN-Stärke 6 / 0 / 0 // 6 und den Sachgebietsleitern S1 bis S6.",
