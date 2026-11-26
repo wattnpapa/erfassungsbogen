@@ -110,16 +110,52 @@ async function parallel<T>(aufgaben: T[], arbeit: (t: T) => Promise<void>): Prom
 
 // ------------------------------------------------------------------- Parsen
 
+/** Die Entitäten, die auf den Seiten vorkommen. */
+const ENTITAETEN: Record<string, string> = {
+  rsaquo: "›",
+  amp: "&",
+  quot: '"',
+  "#39": "'",
+  "#039": "'",
+  nbsp: " ",
+  lt: "<",
+  gt: ">",
+};
+
+/**
+ * Löst Entitäten in EINEM Durchgang auf. Nacheinander ersetzt, würde aus
+ * `&amp;lt;` erst `&lt;` und dann `<` — der Text der Seite wäre verfälscht.
+ */
+function entitaeten(s: string): string {
+  return s.replace(/&(rsaquo|amp|quot|#0?39|nbsp|lt|gt);/g, (_, name: string) => ENTITAETEN[name]!);
+}
+
+/**
+ * Ersetzt Skript-Blöcke und Tags durch `ersatz`, bis nichts mehr übrig ist.
+ * Ein einzelner Durchgang ließe bei verschachtelter Eingabe (`<<a>b>`) wieder
+ * ein Tag stehen; der Browser nimmt außerdem `</script >` und `</SCRIPT>` als
+ * Ende eines Skripts.
+ */
+function ohneTags(html: string, ersatz: string): string {
+  let vorher: string;
+  let s = html;
+  do {
+    vorher = s;
+    s = s.replace(/<script\b[^>]*>[\s\S]*?<\/script\b[^>]*>/gi, ersatz).replace(/<[^>]+>/g, ersatz);
+  } while (s !== vorher);
+  return s;
+}
+
+/** Reiner Text eines HTML-Schnipsels, die Zeilen dort, wo Tags standen. */
+function textZeilen(html: string): string[] {
+  return ohneTags(html, "\n")
+    .split("\n")
+    .map((z) => entitaeten(z).trim())
+    .filter(Boolean);
+}
+
 function text(html: string): string {
-  return html
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&rsaquo;/g, "›")
-    .replace(/&amp;/g, "&")
-    .replace(/&quot;/g, '"')
-    .replace(/&#0?39;/g, "'")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
+  return entitaeten(ohneTags(html, " "))
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -164,15 +200,7 @@ function fahrzeugTabellen(html: string): ListenFahrzeug[] {
 function infoFeld(html: string, name: string): string | undefined {
   // Die Detailseiten setzen Bezeichnung und Wert in getrennte Zellen; im
   // reinen Text folgen sie direkt aufeinander.
-  const flach = html
-    .replace(/<script[\s\S]*?<\/script>/g, "")
-    .replace(/<[^>]+>/g, "\n")
-    .replace(/&rsaquo;/g, "›")
-    .replace(/&amp;/g, "&")
-    .replace(/&nbsp;/g, " ")
-    .split("\n")
-    .map((z) => z.trim())
-    .filter(Boolean);
+  const flach = textZeilen(html);
   const i = flach.indexOf(name);
   if (i < 0) return undefined;
   const wert = flach[i + 1];
@@ -181,14 +209,7 @@ function infoFeld(html: string, name: string): string | undefined {
 
 /** Fahrzeugliste aus dem Freitext der Wache: „Florian Friesland 13/46-02 - HLF 10". */
 function fahrzeugTextZeilen(html: string): Map<string, string> {
-  const flach = html
-    .replace(/<script[\s\S]*?<\/script>/g, "")
-    .replace(/<[^>]+>/g, "\n")
-    .replace(/&amp;/g, "&")
-    .replace(/&nbsp;/g, " ")
-    .split("\n")
-    .map((z) => z.trim())
-    .filter(Boolean);
+  const flach = textZeilen(html);
   const start = flach.indexOf("Fahrzeuge/Einsatzmittel");
   const ende = flach.indexOf("Adresse", start);
   const typen = new Map<string, string>();
