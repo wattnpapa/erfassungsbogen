@@ -40,6 +40,29 @@ werden muss, und die Anpassung im selben Arbeitsschritt vornehmen. Sie stehen
 sonst schnell falsch da — sie enthalten konkrete Zahlen, Dateinamen und
 Konfigurationswerte.
 
+**Die Dokumente zeigen immer den Ist-Stand, kein Änderungsprotokoll.** Die
+Anpassung gehört in den Abschnitt, den sie betrifft: Tabelle, Absatz, Diagramm,
+Risiko oder Maßnahme dort so umschreiben, dass der Text den Code von heute
+beschreibt. Was war, steht in der Git-Historie der Datei.
+
+- Keine Vermerke wie „Nachgezogen JJJJ-MM-TT“, „Prüfvermerk“, „neu seit“,
+  „inzwischen“, „bisher“, keine Sammelblöcke am Dateianfang, keine
+  durchgestrichenen Altwerte und kein „alt → neu“ (also nicht
+  „~~Mittel~~ → Niedrig-Mittel“, sondern „Niedrig-Mittel“ samt Begründung).
+- Entfällt eine Funktion, verschwindet ihre Beschreibung; sie bleibt nicht als
+  „historisch“ stehen. Ausnahme sind die ADRs im Arc42-Dokument: Kontext und
+  verworfene Alternativen sind dort Inhalt.
+- Das Datum in der Zeile „Stand“ am Dokumentanfang auf den Tag der Änderung
+  setzen.
+- Ist die Anpassung größer als der Codewechsel selbst und gerade nicht zu
+  leisten, im betroffenen Abschnitt einen Satz setzen, dass er veraltet ist,
+  und es am Ende der Arbeit melden. Lieber ein sichtbarer Hinweis als eine
+  stillschweigend falsche Angabe.
+
+Die Quell-Fassungen (`ISK-Erfassungsbogen.docx`, `DSFA-Erfassungsbogen.docx`,
+`Arc42-Erfassungsbogen.pdf`) liegen außerhalb des Repositorys; die Markdown-
+Dateien unter `docs/` sind die zu pflegende Fassung.
+
 Typische Auslöser (nicht abschließend):
 
 - **Datenmodell / Schema** (`vendor/eeb-format/src/model.ts`,
@@ -110,13 +133,3 @@ nach (die Regel im Detail: `vendor/eeb-format/CLAUDE.md`):
   passt.
 - **Neue Freitext-Konventionen** (wie das Präfix `Beruf: `) → die
   Portierungen müssen sie genauso trennen/anzeigen.
-
-Wenn eine Änderung eine dieser Stellen berührt, die Änderung im Dokument
-vornehmen und den *Prüfvermerk*/Stand dort aktualisieren. Ist die Anpassung
-größer als der Codewechsel selbst, wenigstens im Dokument vermerken, dass der
-Abschnitt veraltet ist — lieber ein sichtbarer Hinweis als eine stillschweigend
-falsche Angabe.
-
-Die Quell-Fassungen (`ISK-Erfassungsbogen.docx`, `DSFA-Erfassungsbogen.docx`,
-`Arc42-Erfassungsbogen.pdf`) liegen außerhalb des Repositorys; die Markdown-
-Dateien unter `docs/` sind die zu pflegende Fassung.
