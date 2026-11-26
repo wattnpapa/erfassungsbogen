@@ -8,7 +8,8 @@ declare const __APP_VERSION__: string;
  */
 declare module "pdfmake/build/standard-fonts/Helvetica" {
   const fontContainer: {
-    vfs: Record<string, { data: string; encoding?: string }>;
+    vfs?: Record<string, { data: string; encoding?: string }>;
+    standardFonts?: unknown[];
     fonts: Record<string, unknown>;
   };
   export default fontContainer;

@@ -5,7 +5,7 @@
  * (pdfmake-frei und dadurch unit-testbar).
  */
 
-import { pdfMake } from "./pdf-make";
+import { pdfMake } from "./pdf-helvetica";
 import type { Erfassungsbogen } from "@bos/eeb-format/model";
 import { ausgabeDateiname, blobAlsDownload, dateinameTeil, einheitAnzeigename, qrErzeugen } from "./hilfen";
 import { istNativ, binaerTeilen } from "./nativ";

@@ -806,7 +806,7 @@ wieder.
 
 > *Prüfvermerk (Stand 2026-10-25):* Versionen in `package.json` bestätigt
 > (react ^19.2.7, vite ^8.3.5, electron ^44.9.1, typescript ^7.0.2,
-> pako ^3.0.2, pdfmake ^0.3.11, @noble/ed25519 ^3.2.0, jsqr ^1.4.0,
+> pako ^3.0.2, pdfmake ^0.3.15, @noble/ed25519 ^3.2.0, jsqr ^1.4.0,
 > zxing-wasm ^3.1.4, qrcode ^1.5.4); CI-Jobs laufen auf `node-version: 24`.
 > Vite wurde wegen der Dependabot-Meldungen zu 8.2.x (u. a. GHSA-587h-7wmj-h5pm,
 > GHSA-rq7h-c2jc-7f22) auf 8.3.5 gehoben; der Build mit vite-plugin-pwa 1.3.0
@@ -1631,8 +1631,11 @@ Dateiname `uebung-beispiele-<Ordner>-<n>-boegen.pdf`. Kein neuer Host, keine neu
 Endsatz den Hauptthread je bis zu 10 s (Chromium), in Firefox lange genug für „Skript reagiert nicht". Seither setzt
 ein Web Worker (`src/app/pdf-sammel-worker.ts`) die Sammel-PDF: Der Hauptthread erzeugt nur die QR-Sätze (Canvas,
 mit einer Pause je Bogen) und gibt die fertigen Bytes aus (`pdfDateiAusgeben` in `pdf.ts`). Der Worker bringt pdfmake
-ein zweites Mal mit, aber nur mit Helvetica (`pdf-helvetica.ts`; Roboto steht in `pdf-make.ts` nur für den
-Hauptthread), rund 1,8 MB. Er gehört weder zum Kern noch zur zweiten Stufe des Offline-Vorrats
+ein zweites Mal mit, wie der Hauptthread nur mit Helvetica (`pdf-helvetica.ts`), rund 1,8 MB (seit pdfmake 0.3.15 rund 1,4 MB). *Nachgezogen
+2026-11-26 (pdfmake 0.3.15):* `pdf-make.ts` und die Roboto-Dateien (850 KB) sind entfallen; sie waren nie im
+virtuellen Dateisystem angekommen, die Beschriftung der taktischen Zeichen (`font-family: 'Roboto'` im SVG) fiel
+auf Helvetica zurück. pdfmake 0.3.15 bricht an der Stelle ab, deshalb bildet `pdf-helvetica.ts` „Roboto" jetzt
+ausdrücklich auf Helvetica ab. Papierbild unverändert. Er gehört weder zum Kern noch zur zweiten Stufe des Offline-Vorrats
 (`istNurAufAbruf` in `scripts/precache-aufteilung.ts`); startet er nicht (offline, Desktop-App über `file://`,
 Testumgebung), rechnet `sammelPdfErzeugen` wie zuvor im Hauptthread. Kein neuer Host, keine neue Abhängigkeit,
 keine CSP-Änderung (`worker-src` fällt auf `script-src 'self'` zurück). Längste Blockade bei 101 Bögen jetzt rund
