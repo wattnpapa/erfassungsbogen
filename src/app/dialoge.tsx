@@ -18,9 +18,15 @@
  */
 
 import { useEffect, useId, useRef, useState, type CSSProperties, type FormEvent, type MouseEvent, type ReactNode } from "react";
+import { NamenText } from "./personen-name";
 import { istSichereGegenhandlung, ortSperren, tippVerworfenZeigen } from "./tipp-schutz";
 import { zahlMarkieren } from "./zahl-eingabe";
 import { ersteEbeneBetreten, ersteEbeneVerlassen } from "./modal-overlay";
+
+/** Texte der Rückfragen nennen Personen („Meyer, Jan entfernen?“): mit Sichtschutz verdeckt. */
+function mitNamen(text: ReactNode): ReactNode {
+  return typeof text === "string" ? <NamenText>{text}</NamenText> : text;
+}
 
 /** Ein Eingabefeld einer Abfrage. `name` ist der Schlüssel im Ergebnis. */
 export type Eingabefeld = {
@@ -428,9 +434,9 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
         style={wartet && !w.sicher ? ({ "--wartet-ms": `${sperrDauer}ms` } as CSSProperties) : undefined}
         aria-describedby={wegeImFuss && (w.hinweis || w.kurz) ? `${idBasis}-w${i}` : undefined}
       >
-        {w.label}
+        <NamenText still>{w.label}</NamenText>
       </button>
-      {!wegeImFuss && w.hinweis && <p className="hinweis">{w.hinweis}</p>}
+      {!wegeImFuss && w.hinweis && <p className="hinweis">{mitNamen(w.hinweis)}</p>}
       {wegeImFuss && w.kurz && <p className="hinweis weg-kurz" id={`${idBasis}-w${i}`}>{w.kurz}</p>}
     </div>
   );
@@ -442,7 +448,7 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
             Fuß steht fest. Der Fuß klebte vorher per `sticky` im selben
             Rollbereich und deckte bei großer Schrift die Wahl darüber (R7-W1). */}
         <div className="abfrage-rumpf" ref={rumpf}>
-        <h2>{abfrage.titel}</h2>
+        <h2><NamenText>{abfrage.titel}</NamenText></h2>
 
         {abfrage.art === "eingabe" && (
           <>
@@ -508,13 +514,13 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
 
         {abfrage.art === "wahl" && (
           <>
-            <p>{abfrage.text}</p>
+            <p>{mitNamen(abfrage.text)}</p>
             {wegeImFuss && abfrage.wege.some((w) => w.hinweis && !w.kurz) && (
               <ul className="abfrage-wegehinweise">
                 {abfrage.wege.map((w, i) =>
                   w.hinweis && !w.kurz ? (
                     <li key={w.wert} id={`${idBasis}-w${i}`}>
-                      <strong>{w.label}:</strong> {w.hinweis}
+                      <strong><NamenText>{w.label}</NamenText>:</strong> {mitNamen(w.hinweis)}
                     </li>
                   ) : null,
                 )}
@@ -527,7 +533,7 @@ function Dialogfenster({ abfrage }: { abfrage: Abfrage }) {
         {abfrage.art === "hinweis" && (
           <>
             {/* R20-H13: Ein Text mit eigenen Absätzen und Aufklapper steht in einem Block, nicht in einem Absatz (kein <p> im <p>). */}
-            {abfrage.text && (typeof abfrage.text === "string" ? <p>{abfrage.text}</p> : <div>{abfrage.text}</div>)}
+            {abfrage.text && (typeof abfrage.text === "string" ? <p>{mitNamen(abfrage.text)}</p> : <div>{abfrage.text}</div>)}
             {abfrage.kopiertext && (
               <textarea
                 className="kopiertext"

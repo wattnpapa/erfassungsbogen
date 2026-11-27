@@ -19,6 +19,7 @@ import {
 } from "./absenderkarte";
 import { frageJaNein } from "./dialoge";
 import { emailProblem } from "./email-pruefung";
+import { PersonName, namensFeld } from "./personen-name";
 
 /** Beschriftetes Eingabefeld — gleiche Auszeichnung wie in schritte.tsx. */
 function Feld(props: { titel: string; children: ReactNode }) {
@@ -114,7 +115,7 @@ export function AbsenderkarteFeld(props: {
     return (
       <p className="hinweis">
         Absender:{" "}
-        {absenderkarteGefuellt(karte) ? <strong>{absenderLabel(karte)}</strong> : "keine Angabe"}
+        {absenderkarteGefuellt(karte) ? <strong><PersonName>{absenderLabel(karte)}</PersonName></strong> : "keine Angabe"}
         {" · "}
         <button type="button" className="link" onClick={oeffnen}>
           {absenderkarteGefuellt(karte) ? "ändern" : "Name/Kontakt hinterlegen…"}
@@ -131,6 +132,7 @@ export function AbsenderkarteFeld(props: {
       <div className="zeile">
         <Feld titel="Name">
           <input
+            {...namensFeld(entwurf.name)}
             value={entwurf.name ?? ""}
             maxLength={ABSENDER_MAX.name}
             autoComplete="name"
@@ -141,6 +143,7 @@ export function AbsenderkarteFeld(props: {
         <Feld titel="E-Mail">
           <input
             type="email"
+            {...namensFeld(entwurf.email)}
             value={entwurf.email ?? ""}
             maxLength={ABSENDER_MAX.email}
             autoComplete="email"

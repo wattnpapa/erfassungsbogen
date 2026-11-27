@@ -42,6 +42,7 @@ import { frageJaNein, frageText, zeigeHinweis } from "./dialoge";
 import { istNativ, linkTeilen, shareSheetVerfuegbar } from "./nativ";
 import { AbgangKnopf, Kartenstapel } from "./kartenstapel";
 import { datumZweistellig, papierkorbRest } from "./papierkorb-frist";
+import { PersonName } from "./personen-name";
 import { musterungStandLaden, musterungStandLoeschen, musterungStandSpeichern, standPasst } from "./musterung-stand";
 
 function personName(vorname: string, nachname: string): string {
@@ -516,7 +517,11 @@ export function Musterung(props: {
               {rolleKuerzel(p.staerkeRolle)}
             </span>
             <span className="muster-text">
-              <span className="muster-name">{personName(p.vorname, p.nachname)}</span>
+              {`${p.vorname}${p.nachname}`.trim() ? (
+                <PersonName className="muster-name">{personName(p.vorname, p.nachname)}</PersonName>
+              ) : (
+                <span className="muster-name">{personName(p.vorname, p.nachname)}</span>
+              )}
               <span className="muster-sub">{funktionsText(p, org) || "—"}</span>
             </span>
           </label>

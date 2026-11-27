@@ -116,7 +116,9 @@ import { wartendenLinkErledigt, wartendenLinkLesen, wartendenLinkMerken } from "
 import { FesteWarnung } from "./feste-warnung";
 import { speicherFehlerDetails, speicherFehlerKurz } from "./speicher-fehler-text";
 import { UhrHinweis, UhrWarnung } from "./uhr-warnung";
-import { Dialogschicht, frageJaNein, frageWahl } from "./dialoge";
+import { Dialogschicht, frageJaNein, frageWahl, zeigeHinweis } from "./dialoge";
+import { namenMerken } from "./namen-verbergen";
+import { bildschirmschutzStarten } from "./bildschirmschutz";
 import { useGeschlechtGeprueftStand } from "./geschlecht-geprueft";
 import {
   SchrittEinheit,
@@ -726,6 +728,21 @@ function AppInhalt() {
   const [bogen, setBogen] = useState<Erfassungsbogen | null>(START_SOFORT ?? ENTWURF?.bogen ?? null);
   // Ohne offenen Bogen gibt es keine Beispieldaten mehr, nach denen die Rückfrage beim Abwählen von „Übung" fragt (R14-E6).
   const keinBogen = bogen === null;
+  // Sichtschutz „Namen verbergen": Namen des Bogens auch in Rückfragen und Quittungen finden.
+  // Im Rendern selbst, damit derselbe Durchlauf sie schon kennt; das Merken ist idempotent.
+  if (bogen) namenMerken(bogen.personal);
+  // Screenshot-Sperre der installierten Fassungen (Android, iOS, Desktop). iOS kann ein
+  // Bildschirmfoto nicht verhindern, nur danach melden: dann ein Hinweis, wohin es geraten ist.
+  useEffect(() => {
+    bildschirmschutzStarten(() => {
+      void zeigeHinweis({
+        titel: "Bildschirmfoto gespeichert",
+        text:
+          "Stehen darauf Namen oder Erreichbarkeiten, liegt es jetzt in der Fotogalerie, außerhalb der App und je nach Einstellung auch in der Cloud-Sicherung. " +
+          "Die Datenschutzfrist der App erreicht es dort nicht. Bitte wie einen Export behandeln und löschen, sobald es nicht mehr gebraucht wird.",
+      });
+    });
+  }, []);
   // „Geschlecht geprüft" liegt im Gerät, nicht im Bogen: Die Schrittanzeige soll trotzdem sofort mitziehen.
   useGeschlechtGeprueftStand();
   useEffect(() => {

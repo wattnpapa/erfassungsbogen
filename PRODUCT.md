@@ -40,6 +40,7 @@ Der komplette Bogeninhalt steckt in einem einzigen QR-Code auf der letzten PDF-S
 - Optionale Ed25519-Signatur im QR-Code.
 - **Schema-Abwärtskompatibilität ist Pflicht:** alte QR-Codes und Dateien müssen per Migration lesbar bleiben.
 - Kein Server, keine Anmeldung, keine Cloud; Reichweitenmessung cookielos (GoatCounter).
+- Datenschutz am Bildschirm: Screenshot-Sperre in den installierten Fassungen ab Werk an (Android `FLAG_SECURE`, Desktop `setContentProtection`; iOS nur Verdecken bei Aufnahme und im App-Umschalter), abschaltbar für Fehlermeldungen und Schulung. Sichtschutz „Namen verbergen“ auf allen Plattformen, ab Werk aus; wirkt nur auf die Oberfläche, nie auf PDF oder Exporte.
 - Fachterminologie ist verbindlich: Stärke (Schreibweise x/y/z//g), Sofortbedarf, Meldekopf, Bereitstellungsraum, Funkrufname, taktische Zeichen, Fachgruppe, StAN.
 - Sprache der Oberfläche und des Codes: Deutsch.
 

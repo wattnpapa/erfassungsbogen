@@ -6130,6 +6130,44 @@
     .speicher-warnung > details.hinweis-mehr > summary { min-height: 44px; }
     .speicher-warnung > details.hinweis-mehr > p { margin: 0 0 var(--r-2, 0.5rem); }
     /* ===== Ende Runde 21 (Daten und Texte) ===== */
+
+    /* ===============================================================
+       Sichtschutz „Namen verbergen“ (namen-verbergen.ts, personen-name.tsx):
+       Namen als Balken fester Breite — die Länge verrät nichts. Der Balken
+       nimmt die Zweitschrift des Modus, liegt also in allen vier Anzeigemodi
+       sichtbar auf dem Grund. Eingabefelder mit Namen tragen den Balken,
+       solange sie keinen Fokus haben; Antippen setzt den Fokus und deckt auf.
+       Nur die Oberfläche: PDF und Exporte entstehen aus dem Bogen, nicht hier.
+       =============================================================== */
+    :root { --namen-balken: var(--text-2); }
+    .namen-verbergen .personname.verdeckt {
+      display: inline-block; width: 6.5em; max-width: 100%; height: 1em;
+      vertical-align: -0.12em; overflow: hidden; white-space: nowrap;
+      background: var(--namen-balken); border-radius: 0.25em;
+      color: transparent; text-shadow: none;
+      -webkit-user-select: none; user-select: none;
+    }
+    .namen-verbergen .personname.verdeckt > [aria-hidden] { visibility: hidden; }
+    .namen-verbergen .personname[role="button"] { cursor: pointer; }
+    .namen-verbergen .personname[role="button"]:focus-visible {
+      outline: var(--fokus) solid var(--akzent); outline-offset: 2px;
+    }
+    .namen-verbergen .personname.aufgedeckt {
+      border-bottom: 2px dashed var(--namen-balken);
+    }
+    .namen-verbergen input[data-personname="1"]:not(:focus),
+    .namen-verbergen textarea[data-personname="1"]:not(:focus) {
+      color: transparent !important; -webkit-text-fill-color: transparent;
+      caret-color: transparent; text-shadow: none;
+      background-image: linear-gradient(var(--namen-balken), var(--namen-balken)) !important;
+      background-repeat: no-repeat !important;
+      background-size: min(6.5em, calc(100% - 1.2em)) 1em !important;
+      background-position: 0.6em center !important;
+    }
+    .namen-verbergen textarea[data-personname="1"]:not(:focus) {
+      background-size: calc(100% - 1.2em) calc(100% - 1.2em) !important;
+    }
+    .namen-verbergen-schalter .hinweis, .bildschirm-datenschutz .hinweis { display: block; }
   </style>
 </head>
 <body>

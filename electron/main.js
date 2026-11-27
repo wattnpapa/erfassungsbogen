@@ -1,12 +1,13 @@
 /**
  * Electron-Hauptprozess: lädt die gebaute Web-App (dist/) als Offline-Desktop-App.
  *
- * Der Renderer ist die unveränderte Web-App — kein Node-Zugriff, kein Preload.
+ * Der Renderer ist die unveränderte Web-App ohne Node-Zugriff. Der Preload
+ * (preload.cjs) reicht ihr allein den Schalter der Screenshot-Sperre.
  * Capacitor meldet hier istNativ() = false, daher greifen automatisch die
  * Web-Pfade (Download-Links statt Share-Sheet).
  */
 
-import { app, BrowserWindow, dialog, shell } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 // electron-updater ist CommonJS — Default-Import und destrukturieren.
@@ -24,17 +25,44 @@ function istExtern(url) {
   return !url.startsWith("file:") && !(devServerUrl && url.startsWith(devServerUrl));
 }
 
+/** Dieselben Härtungen für jedes Fenster; der Preload reicht nur den Sperr-Schalter durch. */
+const WEB_EINSTELLUNGEN = {
+  contextIsolation: true,
+  nodeIntegration: false,
+  sandbox: true,
+  preload: path.join(hier, "preload.cjs"),
+};
+
+/**
+ * Screenshot-Sperre (setContentProtection): ab Werk an, die App kann sie in
+ * der Fußzeile abschalten (src/app/bildschirmschutz.ts). Windows nimmt das
+ * Fenster aus Bildschirmfotos, Aufnahmen und Freigaben heraus, macOS nur
+ * gegenüber Aufnahmewegen, die die Fensterfreigabe beachten; Linux kennt die
+ * Sperre nicht. Der Wert gilt für alle Fenster, auch den Lagemonitor.
+ */
+let bildschirmschutz = true;
+
+function schutzAnwenden(fenster) {
+  if (!fenster.isDestroyed()) fenster.setContentProtection(bildschirmschutz);
+}
+
+/** Nur Seiten der App selbst (Paket bzw. Dev-Server) dürfen schalten, und nur mit true/false. */
+ipcMain.handle("eeb:bildschirmschutz", (ereignis, an) => {
+  const url = ereignis.senderFrame?.url ?? "";
+  if (istExtern(url) || typeof an !== "boolean") return;
+  bildschirmschutz = an;
+  for (const fenster of BrowserWindow.getAllWindows()) schutzAnwenden(fenster);
+});
+
 function fensterErstellen() {
   const fenster = new BrowserWindow({
     width: 1100,
     height: 800,
     autoHideMenuBar: true,
-    webPreferences: {
-      contextIsolation: true,
-      nodeIntegration: false,
-      sandbox: true,
-    },
+    webPreferences: WEB_EINSTELLUNGEN,
   });
+  // Vor dem ersten Bild: Der Start zeigt schon Entwürfe mit Namen.
+  schutzAnwenden(fenster);
 
   // Nur die tatsächlich benötigten Berechtigungen erteilen: Kamera („media")
   // für den QR-Scan und die Zwischenablage beim Link-Kopieren. Alles andere
@@ -57,12 +85,14 @@ function fensterErstellen() {
         action: "allow",
         overrideBrowserWindowOptions: {
           autoHideMenuBar: true,
-          webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
+          webPreferences: WEB_EINSTELLUNGEN,
         },
       };
     }
     return { action: "deny" };
   });
+  // Das zweite Fenster erbt die Sperre nicht von selbst.
+  fenster.webContents.on("did-create-window", (neu) => schutzAnwenden(neu));
   fenster.webContents.on("will-navigate", (ereignis, url) => {
     if (istExtern(url)) {
       ereignis.preventDefault();

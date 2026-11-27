@@ -22,7 +22,7 @@ export interface Aenderung {
  */
 export const MONATE: Readonly<Record<string, string>> = {
   "2026-11":
-    "Rückmeldungen aus der Erprobung (FAG THW, OV Chemnitz): Stärke als 0 / 2 / 9 // 11, PDF im Raster der THW-Word-Vorlage mit Logo der Organisation und gezeichneten Kästchen, Fachzug Logistik nach StAN mit einzeln meldbaren Trupps, Ladungsträger wie Abrollbehälter, Funkrufname als Erreichbarkeit, orange und graue Zeichen für Gerät von Partnern, Import ausgefüllter THW-Word-Bögen, eigener Bogen für Einzelpersonen wie Fachberater, ein Personalstamm aus der Excel- oder CSV-Liste der Dienststelle und dieser Änderungsverlauf. Die Excel-Liste „Oldenburg“ entfällt. Die Einsatz-Sammlung für den Meldekopf ist jetzt eine eigene App (meldekopf.erfassungsbogen.app).",
+    "Rückmeldungen aus der Erprobung (FAG THW, OV Chemnitz): Stärke als 0 / 2 / 9 // 11, PDF im Raster der THW-Word-Vorlage mit Logo der Organisation und gezeichneten Kästchen, Fachzug Logistik nach StAN mit einzeln meldbaren Trupps, Ladungsträger wie Abrollbehälter, Funkrufname als Erreichbarkeit, orange und graue Zeichen für Gerät von Partnern, Import ausgefüllter THW-Word-Bögen, eigener Bogen für Einzelpersonen wie Fachberater, ein Personalstamm aus der Excel- oder CSV-Liste der Dienststelle, Schutz vor Bildschirmfotos mit Namen und dieser Änderungsverlauf. Die Excel-Liste „Oldenburg“ entfällt. Die Einsatz-Sammlung für den Meldekopf ist jetzt eine eigene App (meldekopf.erfassungsbogen.app).",
   "2026-10":
     "Viele Prüfrunden aus Sicht von Helfern, Führungskräften und Meldekopf: sicherere Bedienung, Lagemonitor für den Bildschirm im Führungsfahrzeug, Dienststelle und Beruf je Person, USB-Handscanner überall, Einsatzzeitraum mit Uhrzeit und ein schnellerer Start.",
   "2026-09":
@@ -34,6 +34,15 @@ export const MONATE: Readonly<Record<string, string>> = {
 };
 
 export const AENDERUNGEN: readonly Aenderung[] = [
+  {
+    datum: "2026-11-27",
+    punkte: [
+      "Neuer Schalter „Namen verbergen“ in der Fußzeile und in Schritt 3: Namen der Helferinnen und Helfer stehen in der App dann als Balken, auch in Übersicht, Vorlagen, Personalstamm, Rückfragen und Hinweisen. Antippen zeigt einen Namen für 15 Sekunden, ein Namensfeld zeigt ihn, solange man darin schreibt. Gedacht für Bildschirmfotos, Beamer und Blicke über die Schulter; PDF, Ausdruck, CSV, Link und QR-Code bleiben vollständig.",
+      "Android-App und Desktop-App sperren Bildschirmfotos und Bildschirmaufnahmen jetzt ab Werk, damit Namen nicht in der Fotogalerie und deren Cloud-Sicherung landen. Wer ein Bild für eine Fehlermeldung oder eine Schulung braucht, schaltet die Sperre in der Fußzeile unter „Datenschutz am Bildschirm“ ab. Unter Linux wirkt die Sperre nicht, unter macOS nicht gegen jedes Aufnahmeprogramm.",
+      "iPhone und iPad lassen keine Sperre zu: Die App verdeckt dort ihren Inhalt, solange der Bildschirm aufgenommen, gespiegelt oder per AirPlay übertragen wird, und in der Vorschau des App-Umschalters. Nach einem Bildschirmfoto erinnert ein Hinweis daran, dass es außerhalb der App liegt und von der Datenschutzfrist nicht gelöscht wird.",
+      "Datenschutzerklärung: Ein Punkt zu Bildschirmfotos mit Namen ist dazugekommen.",
+    ],
+  },
   {
     datum: "2026-11-25",
     punkte: [

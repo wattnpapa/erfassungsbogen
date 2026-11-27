@@ -12,6 +12,7 @@ import { funktionVergeben } from "../haeufige-funktionen";
 import { HOECHST_PERSONEN, mitGeltendemWert, zahlLesen, zahlMarkieren, type ZahlRegeln } from "../zahl-eingabe";
 import { naechstesFeld } from "../tastatur";
 import { beginntMit, falte, passtZurSuche, suchAlternativen, vokabRang } from "../schreibweise";
+import { NamenText } from "../personen-name";
 
 export type SchrittProps = {
   bogen: Erfassungsbogen;
@@ -874,10 +875,10 @@ export function Hinweise(props: {
   return (
     <div role="status">
       {hinweise.map((h) => (
-        <p key={h} className="warnung">⚠ {h}</p>
+        <p key={h} className="warnung">⚠ <NamenText>{h}</NamenText></p>
       ))}
       {hier.map((p) => (
-        <p key={p.text} className="warnung">⚠ {p.text}</p>
+        <p key={p.text} className="warnung">⚠ <NamenText>{p.text}</NamenText></p>
       ))}
     </div>
   );
@@ -911,7 +912,7 @@ export function Vollstaendigkeit(props: {
         {punkte.map((p) => (
           <li key={p.text}>
             <button type="button" className="link" onClick={() => geheZu(p.schritt, p.feld)}>
-              {p.text}
+              <NamenText still>{p.text}</NamenText>
             </button>
           </li>
         ))}

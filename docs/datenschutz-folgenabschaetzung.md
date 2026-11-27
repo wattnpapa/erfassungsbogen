@@ -1,7 +1,7 @@
 # Datenschutz-Folgenabschätzung
 
 **Digitaler Einheiten-Erfassungsbogen — Vorlage/Entwurf**
-Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-11-26 — Version 0.1 (Entwurf)
+Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-11-27 — Version 0.1 (Entwurf)
 
 > Diese Markdown-Datei ist die gepflegte Fassung (ursprünglich aus
 > `DSFA-Erfassungsbogen.docx`). Der Text beschreibt den Stand des Repositorys
@@ -13,7 +13,7 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-11-26 — Version 
 Dies ist ein technisch fundierter Entwurf, **keine Rechtsberatung** und keine
 fertige, rechtsverbindliche Datenschutz-Folgenabschätzung. Er wurde auf Basis
 einer Analyse des öffentlichen Quellcodes von `wattnpapa/erfassungsbogen`
-(Stand 2026-11-26, `main`, inkl. der vier Kern-Submodule) erstellt
+(Stand 2026-11-27, `main`, inkl. der vier Kern-Submodule) erstellt
 und beschreibt, was die Software technisch tut — nicht, wie eine konkrete
 Organisation sie einsetzt, konfiguriert oder rechtlich einordnet.
 
@@ -75,8 +75,8 @@ Ausgenommen sind Übungsbögen und Vorlagen.
 - **Wirkung:** Der Speicherbegrenzung ist technisch und nicht nur
   organisatorisch Rechnung getragen. R3 ist deshalb niedrig, R1 und R8 sind
   niedrig-mittel.
-- **Nicht erfasst:** QR-Code, PDF und Exporte selbst (R2) sowie der
-  Personalstamm (R12).
+- **Nicht erfasst:** QR-Code, PDF und Exporte selbst (R2), Bildschirmfotos
+  und Bildschirmaufnahmen der App (R13) sowie der Personalstamm (R12).
 - **Folgerisiken der Frist:** R10 (Datenverlust durch eine falsche Uhr) und R11
   (fristfreie Übungsbögen mit echten Daten).
 
@@ -89,7 +89,7 @@ Ausgenommen sind Übungsbögen und Vorlagen.
 | Vertreten durch | `[Name, Funktion]` |
 | Datenschutzbeauftragte/r (falls bestellt) | `[Name, Kontakt]` |
 | Ersteller dieses Entwurfs | KI-gestützte Analyse des öffentlichen Quellcodes (Claude), auf Anforderung von `[Name]` |
-| Grundlage | Repository `wattnpapa/erfassungsbogen`, Stand 2026-11-26, `main`, inkl. Submodule (Schema 13) |
+| Grundlage | Repository `wattnpapa/erfassungsbogen`, Stand 2026-11-27, `main`, inkl. Submodule (Schema 13) |
 | Version dieses Dokuments | 0.1 (Entwurf) |
 | Datum | `[Datum der Freigabe einfügen]` |
 | Nächste Überprüfung | `[Datum, spätestens bei wesentlicher Änderung der Software oder des Einsatzzwecks]` |
@@ -261,6 +261,19 @@ biometrische Daten, strafrechtliche Daten.
   Rufnummern abwählen, Geschlecht und Ernährung kommen nur mit Haken mit
   (datenschutzfreundliche Voreinstellung, Art. 25 Abs. 2 DSGVO).
 - Fortlaufendes Zwischenspeichern als Entwurf (`localStorage`).
+- Anzeige am Bildschirm. Der Sichtschutz „Namen verbergen" (Fußzeile und
+  Schritt 3, ab Werk aus, auf allen Plattformen) zeigt Personennamen in der
+  Oberfläche als Balken fester Breite: in den Namensfeldern, solange sie keinen
+  Fokus haben, in Übersicht, Vorlagen, Personalstamm, Absenderangabe,
+  Rückfragen, Hinweisen und Quittungen. Antippen oder Tastatur deckt einen Namen
+  für 15 Sekunden auf; ein Bildschirmvorleser sagt dort „Name verborgen" an,
+  in Eingabefeldern liest er den Inhalt weiter vor. Rufnummern und die
+  Erreichbarkeit unter dem Namen in der Übersicht bleiben sichtbar. PDF,
+  CSV, Link und QR-Code entstehen aus dem Bogen und bleiben vollständig. Die
+  installierten Fassungen sperren zusätzlich Bildschirmfotos, soweit die
+  Plattform das erlaubt (ab Werk an, abschaltbar; Grenzen je Plattform in M14).
+  Ein Bildschirmfoto, das trotzdem entsteht, ist eine Kopie außerhalb der App
+  (5.7, R13).
 - Auf „Bogen übergeben": Kodierung in ein kompaktes Binärformat, Kompression
   (DeflateRaw), optionale Signatur, Kodierung als QR-taugliche Zeichenkette
   (Base41). Daraus entstehen QR-Code, Link (Bogen im Fragment), PDF mit QR-Code
@@ -513,10 +526,20 @@ die Kurzform danach neu abgleichen.
 geteilt, als PDF gedruckt oder als Datei exportiert wurde, hat die App auf
 diese Kopien keinen Zugriff mehr (vertiefend 6.3).
 
+**Bildschirmfotos und Bildschirmaufnahmen.** Ein Bildschirmfoto der App ist
+eine Bilddatei des Betriebssystems, keine Ablage der App. Es liegt in der
+Fotogalerie, je nach Geräteeinstellung auch in deren Cloud-Sicherung (iCloud-
+Fotos, Google Fotos, OneDrive-Kamera-Upload), und wandert von dort leicht in
+Messenger. Weder die Datenschutzfrist noch „Bogen löschen", Papierkorb oder
+„Alle Daten auf diesem Gerät löschen" erreichen es. Die App kann es nur
+verhindern, nicht nachträglich entfernen: Die Screenshot-Sperre der Android-
+und der Desktop-App unter Windows hält Namen aus dem Bild heraus, iOS und der
+Browser lassen das nicht zu (M14, R13).
+
 **Empfehlung.** Die App erzwingt eine Frist nur für Bögen in der App. Für
-Papierausdrucke, Exporte, Sicherungsdateien, Übungsbögen, Vorlagen und den
-Personalstamm sollte die Organisation eigene, dokumentierte Löschfristen
-festlegen und prüfen, ob 90 Tage zum eigenen Zweck passen (M4).
+Papierausdrucke, Exporte, Sicherungsdateien, Bildschirmfotos, Übungsbögen,
+Vorlagen und den Personalstamm sollte die Organisation eigene, dokumentierte
+Löschfristen festlegen und prüfen, ob 90 Tage zum eigenen Zweck passen (M4).
 
 ### 5.8 Empfänger und Datenübermittlung an Dritte
 
@@ -607,7 +630,9 @@ betrifft insbesondere:
   über „die App".
 - **Recht auf Löschung (Art. 17 DSGVO):** die erfassende Organisation kann ihre
   eigene lokale Kopie löschen, aber nicht die eines Bogens, der bereits
-  weitergereicht oder ausgedruckt wurde.
+  weitergereicht oder ausgedruckt wurde, und nicht ein Bildschirmfoto in der
+  Fotogalerie eines Geräts oder in deren Cloud-Sicherung. Davon weiß
+  niemand außer der Person, die es gemacht hat.
 - **Berichtigung (Art. 16 DSGVO):** eine Korrektur wirkt nur auf zukünftig neu
   erzeugte Exporte, nicht auf bereits verteilte Kopien.
 
@@ -650,10 +675,14 @@ Schutzziele in Anlehnung an das Standard-Datenschutzmodell (SDM): Vertraulichkei
 | R10 | Unumkehrbarer Verlust der Personaldaten im laufenden Einsatz durch die Datenschutzfrist — bei einer falsch gehenden Geräteuhr oder einer Lage, die länger als 90 Tage ohne Bearbeitung des Bogens läuft | Vf | Niedrig: Uhrsprünge über 60 Tage (vor oder zurück) halten Anonymisierung, Aufräum- und Papierkorbfrist an und werden nie durch Zeitablauf, sondern nur nach ausdrücklicher Bestätigung durch den Helfer mit Rückfrage übernommen; „Wiederherstellen" aus dem Papierkorb setzt die Aufräumfrist neu; Ankündigung 14 Tage vor Ablauf; jede Bearbeitung startet die Frist neu | Niedrig-Mittel (Stärke und Summen bleiben erhalten, Namen fehlen) | Niedrig |
 | R11 | Übungsbögen sind von der Datenschutzfrist ausgenommen — enthalten sie echte Personaldaten, liegen diese unbefristet auf den Geräten | V | Mittel (Übungen mit echtem Personal sind üblich) | Niedrig-Mittel | Niedrig-Mittel |
 | R12 | Verlorenes oder weitergegebenes Gerät mit eingelesenem Personalstamm → Zugriff auf die vollständige Helferliste der Dienststelle, auch auf Personen ohne Einsatzbezug; keine automatische Löschfrist | V | Niedrig-Mittel (nur Geräte, auf denen die Liste eingelesen wurde) | Mittel (ganze Dienststelle, je nach Einlesen mit Rufnummern, Geschlecht und Ernährung) | Niedrig-Mittel |
+| R13 | Bildschirmfotos und Bildschirmaufnahmen mit Personaldaten (Personalliste, Übersicht, Personalstamm) liegen außerhalb der App: in der Fotogalerie, je nach Gerät in deren Cloud-Sicherung, nach Weitergabe in Messengern. Die Datenschutzfrist und alle Löschwege der App erreichen sie nicht. Kein neuer Zugriff: Wer das Bild macht, sieht die Daten berechtigt und kann denselben Bogen auch als PDF, CSV, Link oder QR-Code ausgeben, es ist ein weiterer Kopierweg wie bei R2 | V | Mittel: ein Bildschirmfoto ist schneller gemacht als ein Export, etwa für eine Rückfrage per Messenger, und die Galerie-Sicherung läuft auf vielen Geräten ungefragt. Die Sperre der Android- und der Windows-Desktop-App senkt das dort; iOS, macOS und Browser bleiben offen (M14) | Mittel (Namen, je nach Ansicht Rufnummern; Kopie bei einem Cloud-Anbieter, ohne Frist und ohne Wissen der Organisation) | Mittel |
 
 **Höchste Einzelrisiken:** R1 (Geräteverlust), R2 (Papier-/Exportverlust) und R8
 (strukturelle Grenze der Betroffenenrechte) — alle drei primär organisatorisch.
-Wo ein Personalstamm eingelesen ist, gehört R12 dazu.
+Wo ein Personalstamm eingelesen ist, gehört R12 dazu. R13 (Bildschirmfotos)
+steht neben R2: Beide sind Kopien, die die App nicht mehr erreicht, das
+Bildschirmfoto ist nur leichter gemacht und landet ungefragt in einer
+Cloud-Sicherung.
 
 ## 8. Abhilfemaßnahmen (Art. 35 Abs. 7 lit. d DSGVO)
 
@@ -673,6 +702,7 @@ Wo ein Personalstamm eingelesen ist, gehört R12 dazu.
 | M11 | R11 | Dienstanweisung: In als Übung gekennzeichnete Bögen nur Personaldaten eintragen, deren unbefristete Speicherung vertretbar ist (sonst Beispielnamen oder Stärke-Erfassung nutzen); Übungsbögen nach der Übung manuell löschen. Die App weist beim Übungshaken und im Übungs-Störer darauf hin | Organisatorisch (technischer Hinweis vorhanden) | `[Organisation]` | Niedrig |
 | M12 | R10 | Bei Lagen, die länger als 90 Tage laufen, die Bögen aktiv fortschreiben oder rechtzeitig als PDF sichern; die App kündigt die Anonymisierung 14 Tage vorher an. Die Frage „Geräteuhr prüfen" nicht ungelesen bestätigen | Organisatorisch | `[erfassende Person/Meldekopf]` | Niedrig |
 | M13 | R12 | Personalstamm nur auf dienstlichen Geräten mit Gerätesperre (M1) einlesen; festlegen, wer die Liste einliest, auf welchen Geräten sie liegen darf und wann sie zu erneuern oder zu löschen ist; Rufnummern beim Einlesen abwählen, Geschlecht und Ernährung nur einlesen, wenn nötig. Die App erinnert 90 Tage nach dem Einlesen und bietet „Personalstamm löschen…" | Organisatorisch (technische Grundlage vorhanden) | `[Organisation/Datenschutzbeauftragte/r]` | Niedrig |
+| M14 | R13, R2 | Dienstanweisung: keine Bildschirmfotos oder -aufnahmen mit Personaldaten; wo eines für eine Fehlermeldung oder Schulung nötig ist, mit Beispielnamen (Übungsbogen) oder mit „Namen verbergen" arbeiten und es danach löschen. Ein Bildschirmfoto mit Namen ist wie ein Export zu behandeln (M3). Auf Dienstgeräten die automatische Cloud-Sicherung der Fotogalerie abschalten oder auf einen von der Organisation freigegebenen Speicher legen. Technisch umgesetzt: Screenshot-Sperre ab Werk an und abschaltbar. Android-App: `FLAG_SECURE` sperrt Bildschirmfotos, Aufnahmen, Übertragung auf unsichere Anzeigen und die Vorschau in der App-Übersicht, nicht aber fremde Fenster, die die App öffnet (Kamera-Scanner, Teilen-Menü, Dateiauswahl). Desktop-App: `setContentProtection` nimmt die Fenster unter Windows (ab Windows 10 Version 2004) aus Bildschirmfotos und Aufnahmen; unter macOS umgehen neuere Aufnahmeprogramme auf Basis von ScreenCaptureKit die Sperre, unter Linux gibt es keine. iOS-App: keine Sperre möglich; bei Bildschirmaufnahme, Spiegelung und AirPlay sowie in der Vorschau des App-Umschalters ist der Inhalt verdeckt, nach einem Bildschirmfoto weist die App darauf hin, wohin es geraten ist. Browser/PWA: weder Sperre noch Erkennung. Auf allen Plattformen: Sichtschutz „Namen verbergen" (5.5). Gegen das Abfotografieren mit einem zweiten Gerät hilft keine dieser Maßnahmen | Organisatorisch / Technisch (umgesetzt) | `[Organisation/IT-Verantwortliche/r]` | Niedrig-Mittel (Android, Windows); Mittel (iOS, macOS, Browser, solange die Dienstanweisung nicht greift) |
 
 ## 9. Konsultation
 
@@ -689,19 +719,22 @@ Wo ein Personalstamm eingelesen ist, gehört R12 dazu.
 ## 10. Ergebnis und Freigabe
 
 **Gesamteinschätzung:** Unter der Voraussetzung, dass die in Abschnitt 8
-aufgeführten organisatorischen Maßnahmen (insbesondere M1, M3, M4, M5 und, wo
-ein Personalstamm eingelesen wird, M13) umgesetzt werden, verbleibt ein geringes
+aufgeführten organisatorischen Maßnahmen (insbesondere M1, M3, M4, M5, M14 und,
+wo ein Personalstamm eingelesen wird, M13) umgesetzt werden, verbleibt ein geringes
 bis gering-mittleres Restrisiko für die Rechte und Freiheiten der betroffenen
 Personen. Ein hohes Risiko im Sinne des Art. 36 DSGVO wird nicht gesehen.
 
 Die Einschätzung stützt sich auf technische und organisatorische Maßnahmen:
 - **Technisch umgesetzt** sind die Löschfrist für digital gespeicherte Bögen
-  (Datenschutzfrist, M4) und die Begrenzung der Dekomprimierung (M6).
+  (Datenschutzfrist, M4), die Begrenzung der Dekomprimierung (M6) sowie
+  Screenshot-Sperre und Sichtschutz (M14), Letztere mit plattformabhängiger
+  Reichweite.
 - **R1, R3 und R8** sind deshalb niedrig bis niedrig-mittel bewertet.
 - **Folgerisiken der Frist** sind die niedrigen Risiken R10 und R11 mit den
   Maßnahmen M11 und M12.
 - **Organisatorisch** hängt das Ergebnis an M1, M3 und M5 für Geräte, Papier,
-  Exporte und bereits weitergegebene Kopien sowie an M13 für den Personalstamm.
+  Exporte und bereits weitergegebene Kopien, an M14 für Bildschirmfotos (R13,
+  vor allem auf iOS, macOS und im Browser) sowie an M13 für den Personalstamm.
 
 Diese Einschätzung ersetzt keine rechtliche Prüfung.
 

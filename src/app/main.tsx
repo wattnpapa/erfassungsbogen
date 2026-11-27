@@ -14,6 +14,7 @@ import { App } from "./app";
 import { Fehlerfaenger } from "./fehlerfaenger";
 import { DebugLeiste, debugAktiv, wendePlattformKlasseAn, wendeRahmenAn } from "./debug-plattform";
 import { wendeAnzeigeModusAn } from "./anzeige-modus";
+import { wendeNamenVerbergenAn } from "./namen-verbergen";
 import { tastaturWaechterStarten } from "./tastatur";
 import { schriftStufeStarten } from "./schrift-stufe";
 import { statistikStarten } from "./statistik";
@@ -40,6 +41,8 @@ dialogVerlaufVerdrahten();
 wendePlattformKlasseAn();
 wendeRahmenAn();
 wendeAnzeigeModusAn();
+// Sichtschutz „Namen verbergen" vor dem ersten Render, damit kein Name aufblitzt.
+wendeNamenVerbergenAn();
 // Feste Leiste weicht der Bildschirmtastatur (R4-G3).
 tastaturWaechterStarten();
 // Große Systemschrift: Das Stylesheet verdichtet dann die niedrigen Fenster (R5-M3).

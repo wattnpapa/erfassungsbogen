@@ -55,6 +55,8 @@ import {
   type XlsxBlatt,
   type Zuordnung,
 } from "./personalstamm-import";
+import { NamenText, PersonName, useNamenVerbergen } from "./personen-name";
+import { namenMerken } from "./namen-verbergen";
 
 const ROLLE_KURZ = ["H", "UF", "F"] as const; // Index = StaerkeRolle
 const ROLLE_KLASSE = ["m", "u", "f"] as const; // Farben der Rollenmarke wie in „Einsatz vorbereiten"
@@ -64,7 +66,15 @@ function staerkeText(personal: readonly Pick<Person, "staerkeRolle">[]): string 
   return `${s.fuehrer} / ${s.unterfuehrer} / ${s.mannschaft} // ${s.gesamt}`;
 }
 
+/** Name aus dem Personalstamm; mit Sichtschutz als Balken, „(ohne Name)“ bleibt lesbar. */
+function StammName({ p, className }: { p: StammPerson; className?: string }) {
+  const text = stammName(p);
+  if (!`${p.vorname}${p.nachname}`.trim()) return <span className={className}>{text}</span>;
+  return <PersonName className={className}>{text}</PersonName>;
+}
+
 function namenAufzaehlung(personen: readonly StammPerson[], hoechstens = 12): string {
+  namenMerken(personen);
   const namen = personen.slice(0, hoechstens).map(stammName).join("; ");
   return personen.length > hoechstens ? `${namen}; … und ${personen.length - hoechstens} weitere` : namen;
 }
@@ -172,6 +182,7 @@ export function EinlesenInhalt({ vorhanden, onFertig }: {
 
   const kopf = tabelle?.[0] ?? [];
   const spalten = tabelle ? Math.max(...tabelle.slice(0, 50).map((z) => z.length)) : 0;
+  const verbergen = useNamenVerbergen();
   const beispiel = (i: number) => tabelle?.slice(1).find((z) => (z[i] ?? "") !== "")?.[i] ?? "";
   const reicht = zuordnungReicht(zuordnung);
   const ergebnis = useMemo(
@@ -267,7 +278,8 @@ export function EinlesenInhalt({ vorhanden, onFertig }: {
                   {Array.from({ length: spalten }, (_, i) => (
                     <option key={i} value={i}>
                       {kopf[i]?.trim() || `Spalte ${i + 1}`}
-                      {beispiel(i) ? ` (z. B. ${beispiel(i).slice(0, 24)})` : ""}
+                      {/* Die Beispielwerte sind oft Namen; eine Auswahlliste lässt sich nicht verdecken. */}
+                      {beispiel(i) && !verbergen ? ` (z. B. ${beispiel(i).slice(0, 24)})` : ""}
                     </option>
                   ))}
                 </select>
@@ -308,13 +320,13 @@ export function EinlesenInhalt({ vorhanden, onFertig }: {
                   </>
                 )}
               </p>
-              {abgleich && abgleich.neu.length > 0 && <p className="hinweis"><strong>Neu:</strong> {namenAufzaehlung(abgleich.neu)}</p>}
-              {abgleich && abgleich.geaendert.length > 0 && <p className="hinweis"><strong>Geändert:</strong> {namenAufzaehlung(abgleich.geaendert)}</p>}
-              {abgleich && abgleich.entfaellt.length > 0 && <p className="hinweis"><strong>Entfällt:</strong> {namenAufzaehlung(abgleich.entfaellt)}</p>}
+              {abgleich && abgleich.neu.length > 0 && <p className="hinweis"><strong>Neu:</strong> <NamenText>{namenAufzaehlung(abgleich.neu)}</NamenText></p>}
+              {abgleich && abgleich.geaendert.length > 0 && <p className="hinweis"><strong>Geändert:</strong> <NamenText>{namenAufzaehlung(abgleich.geaendert)}</NamenText></p>}
+              {abgleich && abgleich.entfaellt.length > 0 && <p className="hinweis"><strong>Entfällt:</strong> <NamenText>{namenAufzaehlung(abgleich.entfaellt)}</NamenText></p>}
               <ul className="namen-vorschau">
                 {ergebnis.personen.slice(0, 5).map((p, i) => (
                   <li key={i}>
-                    {stammName(p)} · <strong>{ROLLE_KURZ[p.rolle]}</strong>
+                    <StammName p={p} /> · <strong>{ROLLE_KURZ[p.rolle]}</strong>
                     {stammZusatz(p) ? ` · ${stammZusatz(p)}` : ""}
                     {p.mobil ? ` · Tel. ${p.mobil}` : ""}
                   </li>
@@ -495,7 +507,7 @@ export function AuswahlInhalt({ stamm, organisation, organisationWaehlbar = fals
               <input type="checkbox" checked={da || gewaehlt.has(i)} disabled={da} onChange={() => umschalten(i)} />
               <span className={`rolle-badge rolle-${ROLLE_KLASSE[p.rolle]}`}>{ROLLE_KURZ[p.rolle]}</span>
               <span className="muster-text">
-                <span className="muster-name">{stammName(p)}</span>
+                <StammName p={p} className="muster-name" />
                 <span className="muster-sub">{da ? "schon im Bogen" : stammZusatz(p) || "—"}</span>
               </span>
             </label>

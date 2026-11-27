@@ -10,6 +10,8 @@ import { fehlerText } from "./nachladen";
 import { blobAlsDownload } from "./hilfen";
 import { nutzungsKanal, statistikAbgewaehlt, statistikAbwaehlen } from "./statistik";
 import { AnzeigeSchalter } from "./anzeige-schalter";
+import { NamenVerbergenSchalter } from "./personen-name";
+import { bildschirmschutzAn, bildschirmschutzArt, bildschirmschutzSetzen } from "./bildschirmschutz";
 import { frageWahl, zeigeHinweis } from "./dialoge";
 import {
   alleDatenLoeschen,
@@ -641,6 +643,11 @@ export function Fusszeile({ onBogenOeffnen, kompakt = false, offlineHinweis }: {
           <span className="fuss-titel">Ansicht</span>
           <AnzeigeSchalter />
         </div>
+        <div className="fuss-gruppe bildschirm-datenschutz">
+          <span className="fuss-titel">Datenschutz am Bildschirm</span>
+          <NamenVerbergenSchalter />
+          <BildschirmschutzSchalter />
+        </div>
       </div>
       {offlineHinweis && <p className="fuss-offline">{offlineHinweis}</p>}
       <p className="fuss-marke">
@@ -1106,5 +1113,34 @@ function SpeicherStand() {
         ? `${istVoll(b) ? " Er ist voll — die App kann nichts mehr speichern." : " Wird er voll, kann die App nichts mehr speichern."}${groesste ? ` Am meisten belegen: ${groesste}.` : ""} Platz schafft nur Löschen — alte Einsätze sichern, den Papierkorb leeren oder einen gesicherten Einsatz dort endgültig löschen; die Sicherung selbst schafft keinen Platz, und bei vollem Speicher kostet schon das Ablegen in den Papierkorb Platz.`
         : ""}
     </p>
+  );
+}
+
+/**
+ * Schalter der Screenshot-Sperre — nur dort, wo sie etwas bewirkt (Android,
+ * iOS, Desktop unter Windows und macOS; bildschirmschutz.ts). Im Browser gibt
+ * es keine Sperre, dort steht allein „Namen verbergen".
+ */
+function BildschirmschutzSchalter() {
+  const art = bildschirmschutzArt();
+  const [an, setAn] = useState(() => bildschirmschutzAn());
+  if (art == null) return null;
+  return (
+    <label className="inline">
+      <input
+        type="checkbox"
+        checked={an}
+        onChange={(e) => {
+          setAn(e.target.checked);
+          bildschirmschutzSetzen(e.target.checked);
+        }}
+      />{" "}
+      {art === "sperre" ? "Bildschirmfotos sperren" : "Bei Bildschirmaufnahme verdecken"}
+      <span className="hinweis">
+        {art === "sperre"
+          ? " — Bildschirmfotos und Aufnahmen der App bleiben schwarz. Für Fehlermeldungen mit Bild oder Schulungsunterlagen kurz abschalten."
+          : " — iOS kann Bildschirmfotos nicht sperren: Bei Aufnahme, Spiegelung und im App-Umschalter ist der Inhalt verdeckt, nach einem Bildschirmfoto erscheint ein Hinweis."}
+      </span>
+    </label>
   );
 }

@@ -66,6 +66,7 @@ import { nachzueglerFuer } from "../vorlage-nachzuegler";
 import { stammLaden } from "../personalstamm";
 import { StammAuswahlFenster } from "../personalstamm-fenster";
 import { TabellenScroll } from "../tabellen-scroll";
+import { NamenText, NamenVerbergenSchalter, namensFeld } from "../personen-name";
 import {
   Feld,
   FREMDE_DATEN,
@@ -261,6 +262,7 @@ function KontakteEditor(props: {
                   type="email"
                   inputMode="email"
                   {...FREMDE_DATEN}
+                  {...namensFeld(k.wert)}
                   value={k.wert ?? ""}
                   onChange={(e) =>
                     set(i, { emailTemplate: undefined, wert: e.target.value })
@@ -694,6 +696,7 @@ function PersonKarte(props: {
         <Feld titel="Vorname">
           <input
             {...FREMDE_DATEN}
+            {...namensFeld(p.vorname)}
             value={p.vorname}
             onChange={(e) => set({ vorname: e.target.value })}
           />
@@ -701,6 +704,7 @@ function PersonKarte(props: {
         <Feld titel="Nachname">
           <input
             {...FREMDE_DATEN}
+            {...namensFeld(p.nachname)}
             value={p.nachname}
             onChange={(e) => set({ nachname: e.target.value })}
           />
@@ -1035,6 +1039,7 @@ function PersonalSchnellTabelle(props: {
                   aria-label={`Person ${i + 1}: Vorname`}
                   placeholder="Vorname"
                   {...FREMDE_DATEN}
+                  {...namensFeld(p.vorname)}
                   value={p.vorname}
                   autoFocus={fokusNeue && i === personal.length - 1}
                   onChange={(e) => set(i, { vorname: e.target.value })}
@@ -1046,6 +1051,7 @@ function PersonalSchnellTabelle(props: {
                   aria-label={`Person ${i + 1}: Nachname`}
                   placeholder="Nachname"
                   {...FREMDE_DATEN}
+                  {...namensFeld(p.nachname)}
                   value={p.nachname}
                   onChange={(e) => set(i, { nachname: e.target.value })}
                   onKeyDown={(e) => enterWeiter(e, i)}
@@ -2129,6 +2135,13 @@ export function SchrittPersonal({
           )}
         </p>
       )}
+      {/* Sichtschutz für Bildschirmfotos, Beamer und Blicke über die Schulter: hier, wo die Namen stehen,
+          nicht nur in der Fußzeile. */}
+      {!nurStaerke && (
+        <p className="namen-schalter-zeile">
+          <NamenVerbergenSchalter kurz />
+        </p>
+      )}
       {/* Die Karten sind die lange Wahl: Wer viele Personen hat und in den Karten
           steht, bekommt den kürzeren Weg genannt (R5-H2). */}
       {!nurStaerke && !schnell && bogen.personal.length > VIELE_PERSONEN && (
@@ -2206,7 +2219,7 @@ export function SchrittPersonal({
           onRueckgaengig={rueckgaengig}
           onSchliessen={() => setRueckweg(null)}
         >
-          <strong>Entfernt:</strong> {entferntText(rueckweg.entfernte)}
+          <strong>Entfernt:</strong> <NamenText>{entferntText(rueckweg.entfernte)}</NamenText>
         </DaumenQuittung>
       )}
       {ansprechWeg && !rueckweg && !zahlenWeg && (
@@ -2222,7 +2235,7 @@ export function SchrittPersonal({
           rueckgaengigName="Wechsel der Ansprechperson rückgängig machen"
           onSchliessen={() => setAnsprechWechsel(null)}
         >
-          <strong>Neue Ansprechperson:</strong> {ansprechWeg.name}
+          <strong>Neue Ansprechperson:</strong> <NamenText>{ansprechWeg.name}</NamenText>
         </DaumenQuittung>
       )}
       {zahlenWeg && (
@@ -2242,7 +2255,7 @@ export function SchrittPersonal({
           key={`zurueck:${zurueckgeholt.nonce}`}
           onSchliessen={() => setZurueckgeholt(null)}
         >
-          {zurueckgeholt.text}
+          <NamenText>{zurueckgeholt.text}</NamenText>
         </DaumenQuittung>
       )}
 {/* Einzelperson: genau eine Person — der Knopf bleibt nur, solange noch keine Karte da ist. */}

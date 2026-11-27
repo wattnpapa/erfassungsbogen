@@ -6,6 +6,7 @@
 import { zeitraumLeer } from "../zeitraum-eingabe";
 import { UhrHinweis } from "../uhr-warnung";
 import { beispielRestText } from "../beispiel-herkunft";
+import { PersonName } from "../personen-name";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Erfassungsbogen, PersonalErfassung, staerke, unterbringungMWD, verpflegung } from "@bos/eeb-format/model";
 import { vorlageAktualisieren, vorlageAnlegen, vorlageZahlenText, vorlagenLaden, type Vorlage } from "../vorlagen";
@@ -616,7 +617,7 @@ export function Uebersicht(props: {
             {props.signatur.zustand === "gueltig" && props.signatur.absender && (
               <>
                 <br />
-                Eigene Angabe des Absenders: <strong>{absenderLabel(props.signatur.absender)}</strong>{" "}
+                Eigene Angabe des Absenders: <strong><PersonName>{absenderLabel(props.signatur.absender)}</PersonName></strong>{" "}
                 — bei Zweifeln über diesen Kontakt zurückfragen.
               </>
             )}
@@ -762,7 +763,7 @@ export function Uebersicht(props: {
                 <td>{funktionsText(p, org) || "—"}</td>
                 {/* Leere Namenszellen sahen nach Darstellungsfehler aus: „(offen)" sagt, dass der Platz noch niemanden trägt (R18-N12). */}
                 <td>
-                  {p.nachname || p.vorname ? <>{p.nachname}{p.nachname && p.vorname ? ", " : ""}{p.vorname}</> : <span className="hinweis">(offen)</span>}
+                  {p.nachname || p.vorname ? <PersonName>{`${p.nachname}${p.nachname && p.vorname ? ", " : ""}${p.vorname}`}</PersonName> : <span className="hinweis">(offen)</span>}
                   {/* Die Erreichbarkeit steht unter dem Namen, auf jeder Breite: am Telefon lag eine vierte Spalte außerhalb des
                       Rahmens (R20-E2), am Rechner nahm sie der Funktion den Platz (Rückmeldung OV Chemnitz, 11/2026). */}
                   {zeigeErreichbarkeit && p.kontakte.some((k) => kontaktText(k) !== "") && (

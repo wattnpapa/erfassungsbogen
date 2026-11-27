@@ -11,6 +11,7 @@ import { StaerkeRolle, type Erfassungsbogen, type Person } from "@bos/eeb-format
 import { kontaktAusNummer, namenEinsetzen, namenVerdachtGruende, parseNamen, telefonAbtrennen, type NamenReihenfolge } from "../personal-schnell";
 import { beispielPersonen } from "../beispielnamen";
 import { beispielMerken } from "../beispiel-herkunft";
+import { PersonName, namensFeld } from "../personen-name";
 import { neuePerson, personUnbenannt, vokabularFuer } from "../hilfen";
 import { frageJaNein } from "../dialoge";
 import { Feld, ZahlFeld } from "./bausteine";
@@ -110,6 +111,7 @@ export default function NamenInhalt({ bogen, onUebernehmen, onBeispiele }: {
         Namensliste (eine Person je Zeile)
         <textarea
           rows={8}
+          {...namensFeld(namenText)}
           value={namenText}
           onChange={(e) => setNamenText(e.target.value)}
           placeholder={"Muster, Max\nErika Musterfrau\n…"}
@@ -202,7 +204,7 @@ export default function NamenInhalt({ bogen, onUebernehmen, onBeispiele }: {
                     </label>
                   )}
                   {/* „Vorname Nachname" in der Lesart, die gerade gilt (R18-S7): „Nachname, Vorname" las sich wie eine Vertauschung. */}
-                  {[n.vorname, n.nachname].filter(Boolean).join(" ")}
+                  <PersonName>{[n.vorname, n.nachname].filter(Boolean).join(" ")}</PersonName>
                   {n.funktion ? ` · ${n.funktion}` : ""}
                   {n.telefon ? ` · Tel. ${n.telefon}` : ""}
                   {" · "}

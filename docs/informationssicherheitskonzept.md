@@ -1,7 +1,7 @@
 # Informationssicherheitskonzept
 
 **Digitaler Einheiten-Erfassungsbogen — Vorlage/Entwurf**
-Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-11-26 — Version 0.1 (Entwurf)
+Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-11-27 — Version 0.1 (Entwurf)
 
 > Diese Markdown-Fassung ist die gepflegte Fassung (ursprünglich aus
 > `ISK-Erfassungsbogen.docx`). Der Text beschreibt den Stand des Repositorys zum
@@ -95,7 +95,7 @@ obliegt der/dem IT-Sicherheitsbeauftragten der jeweiligen Organisation.
 | IT-Sicherheitsbeauftragte/r | `[Name, Kontakt]` |
 | Vertreten durch | `[Name, Funktion]` |
 | Ersteller dieses Entwurfs | KI-gestützte Analyse des öffentlichen Quellcodes (Claude), auf Anforderung von `[Name]` |
-| Grundlage | Repository `wattnpapa/erfassungsbogen`, Checkout-Stand 2026-11-26, `main`, inkl. Submodule `@bos/eeb-format`, `@bos/meldekopf`, `@bos/vokabulare`, `@bos/taktische-zeichen` |
+| Grundlage | Repository `wattnpapa/erfassungsbogen`, Checkout-Stand 2026-11-27, `main`, inkl. Submodule `@bos/eeb-format`, `@bos/meldekopf`, `@bos/vokabulare`, `@bos/taktische-zeichen` |
 | Geltungsbereich dieses Dokuments | Die Anwendung „Erfassungsbogen" selbst (Client-Software) sowie ihre Build-, Auslieferungs- und Update-Kette. **Nicht enthalten:** die Meldekopf-App (eigenes Konzept) sowie die physische und organisatorische IT-Sicherheit der einsetzenden Organisation (Gebäude, Netzwerk, sonstige Fachverfahren) |
 | Version dieses Dokuments | 0.1 (Entwurf) |
 | Datum der Freigabe | `[Datum der Freigabe einfügen]` |
@@ -145,7 +145,7 @@ damit dieselbe Menge. Ausnahmen davon sind in der Tabelle genannt.
 | D2q | Lokaler Personalstamm | Helferliste einer Dienststelle, einmal aus CSV oder Excel (.xlsx) eingelesen (`src/app/personalstamm.ts`, `personalstamm-import.ts`; höchstens 3 000 Personen): je Person Name, Rolle (F/UF/H), Funktion, Qualifikationen, Fahrerlaubnisklassen, Teileinheit; Rufnummer nur, wenn beim Einlesen angehakt (Vorgabe: ja); Geschlecht und Ernährung nur, wenn beim Einlesen angehakt (Vorgabe: nein); dazu Dateiname und Zeitpunkt des Einlesens. **Enthält auch Personen, die in keinem Bogen stehen**; in Bogen, QR-Code, PDF und Exporte gelangen nur die in „Wer ist dabei?" ausgewählten | `localStorage` (`eeb.personalstamm.v1`); wandert **nicht** in die Datensicherung und bleibt beim Einspielen einer Sicherung liegen; fällt mit „Personalstamm löschen…" und mit „Alle Daten löschen" weg; die Startseite nennt das Datum des Einlesens und erinnert nach 90 Tagen |
 | D2r | Beiseitegelegte unlesbare Bestände | Unlesbare Gesamttexte und Teile von Vorlagen, Altbestand-Sammlungen und Absenderkarte, unverändert abgelegt, bevor der Kern sie beim nächsten Schreiben verwerfen würde (`src/app/unlesbar.ts`); **können Personendaten enthalten**; fallen nach 90 Tagen weg, auf Wunsch früher („Beiseitegelegtes entfernen…") | `localStorage` (`eeb.unlesbar.v1`) |
 | D2s | Merker zu Übungsbögen | Namen und Rufnummern des geöffneten Übungsbogens (erfundene Daten bzw. Bogen mit Übungsmarke), damit die App warnt, wenn sie nach Abwählen der Übung als echte Angaben weitergegeben würden (`eeb.beispiel-herkunft.v1`); Prüfsumme des unverändert geöffneten Übungsbogens (`eeb.beispiel-offen.v1`). Beide entfallen, sobald kein Bogen offen ist (`src/app/beispiel-herkunft.ts`) | `localStorage` |
-| D2t | Bedienvorgaben und Hilfseinträge | Anzeige-Modus (`eeb.anzeigemodus.v1`, Vorgänger `eeb.feldmodus.v1`), zuletzt gewählte Organisation (`eeb.schnellOrganisation.v1`, eine Zahl), Ein-Zeichen-Probe bei Schreibfehlern, die sofort entfernt wird (`eeb.speicherprobe`). Ohne Präfix `eeb.` und damit weder in der Datensicherung noch von „Alle Daten löschen" erfasst: gewählte Kamera (`eeb-kamera`), gewählter Scan-Weg (`eeb-scanweg`, nur „handscanner"), Schalter der Plattform-Vorschau (`eeb-debug`, `eeb-debug-plattform`, `eeb-debug-rahmen`) und der Widerspruch gegen die Reichweitenmessung (`skipgc`). Keine Personendaten | `localStorage` |
+| D2t | Bedienvorgaben und Hilfseinträge | Anzeige-Modus (`eeb.anzeigemodus.v1`, Vorgänger `eeb.feldmodus.v1`), Sichtschutz „Namen verbergen" (`eeb.namen-verbergen.v1`, nur gesetzt, wenn an), abgeschaltete Screenshot-Sperre (`eeb.bildschirmschutz.v1`, nur gesetzt, wenn aus), zuletzt gewählte Organisation (`eeb.schnellOrganisation.v1`, eine Zahl), Ein-Zeichen-Probe bei Schreibfehlern, die sofort entfernt wird (`eeb.speicherprobe`). Ohne Präfix `eeb.` und damit weder in der Datensicherung noch von „Alle Daten löschen" erfasst: gewählte Kamera (`eeb-kamera`), gewählter Scan-Weg (`eeb-scanweg`, nur „handscanner"), Schalter der Plattform-Vorschau (`eeb-debug`, `eeb-debug-plattform`, `eeb-debug-rahmen`) und der Widerspruch gegen die Reichweitenmessung (`skipgc`). Keine Personendaten | `localStorage` |
 | D2u | Offline-Vorrat im Cache Storage | Anwendungsdateien (Workbox-Precache), zweite Stufe mit Übungsbögen, Themenseiten und Fotos (`eeb-zusatz`, höchstens 1 500 Einträge), auf Abruf geöffnete Übungsbögen der THW-Ortsverbände und niedersächsischer Wachen (`eeb-ov-beispiele`, höchstens 4 000 Einträge). Nur Dateien der eigenen Herkunft; keine Bögen des Nutzers, keine Personendaten (die Übungsbögen tragen erfundene Personen; die Wachen-Bögen echte Funkrufnamen, Kennzeichen und Wachennamen von Dienstfahrzeugen) | Cache Storage des Browsers (nur Web-App) |
 | D3 | Absenderkarte | Freiwillige Kontaktangabe (Name/E-Mail/Telefon) der meldenden Person | `localStorage` (`eeb.absenderkarte.v1`) |
 | D4 | Privater Geräteschlüssel | Ed25519-Schlüssel zur Signatur weitergereichter Bögen (`src/app/geraete-schluessel.ts`) | `localStorage` (`eeb.geraeteschluessel.v1`), **unverschlüsselt als Hex**; lässt er sich beim ersten Erzeugen nicht speichern (Speicher voll/gesperrt), nur im Arbeitsspeicher der offenen Seite, bis Platz ist — die Übersicht sagt das am Siegel. Der private Schlüssel steht auch in jeder Sicherungsdatei |
@@ -242,9 +242,23 @@ deren Auslieferungskette (B1–B5).
 Der Electron-Hauptprozess (`electron/main.js`) ist nach aktuellem Stand der
 Technik gehärtet:
 
-- `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true` — der
-  Renderer-Prozess hat keinerlei Zugriff auf Node.js- oder Electron-APIs; es
-  existiert kein Preload-Skript, das eine Brücke schlagen könnte.
+- `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true` für jedes
+  Fenster (gemeinsame `WEB_EINSTELLUNGEN`) — der Renderer-Prozess hat keinen
+  Zugriff auf Node.js- oder Electron-APIs. Das Preload-Skript
+  (`electron/preload.cjs`, CommonJS, läuft in der Sandbox und lädt nur das
+  Modul `electron`) reicht der Seite über `contextBridge` genau zwei Dinge:
+  `process.platform` und eine Funktion, die die Screenshot-Sperre schaltet.
+  Der Hauptprozess nimmt den IPC-Kanal `eeb:bildschirmschutz` nur von Seiten
+  der App selbst (`file:` bzw. Dev-Server) und nur mit einem Wahrheitswert an.
+- **Screenshot-Sperre:** `setContentProtection` auf jedem Fenster, ab dem
+  Erzeugen und für Fenster aus `setWindowOpenHandler` über `did-create-window`
+  (der Schutz vererbt sich nicht von selbst). Ab Werk an; die App kann ihn in
+  der Fußzeile abschalten, der Wert gilt dann für alle Fenster. Unter Windows
+  (ab Windows 10 Version 2004, `SetWindowDisplayAffinity`) fehlen die Fenster
+  in Bildschirmfotos, Aufnahmen und Bildschirmfreigaben. Unter macOS setzt es
+  `NSWindowSharingNone`; Aufnahmeprogramme auf Basis von ScreenCaptureKit
+  erfassen das Fenster laut Electron-Dokumentation trotzdem. Unter Linux wirkt
+  es nicht, dort zeigt die App die Einstellung nicht an.
 - **Minimale Rechtevergabe:** Permission-Request- und Permission-Check-Handler
   erlauben ausschließlich `media` (Kamera für QR-Scan) und Zwischenablage-Zugriff
   (`clipboard-read`, `clipboard-sanitized-write`); alle anderen
@@ -261,6 +275,26 @@ Technik gehärtet:
 
 Die Android-Hülle fordert im Manifest `INTERNET` und für das Selbst-Update
 `REQUEST_INSTALL_PACKAGES` an (`android/app/src/main/AndroidManifest.xml`).
+Sie setzt `FLAG_SECURE` auf das App-Fenster, bevor das erste Bild entsteht
+(`MainActivity`, eigenes Capacitor-Plugin `Bildschirmschutz.java` zum
+Abschalten). Bildschirmfotos, Bildschirmaufnahmen und Übertragungen auf
+unsichere Anzeigen bleiben schwarz, die Vorschau in der App-Übersicht leer.
+Das Flag gilt nur für dieses Fenster, nicht für fremde Activities, die die App
+aufruft (Kamera-Scanner, Teilen-Menü, Dateiauswahl).
+
+Die iOS-Hülle kann Bildschirmfotos nicht sperren; Apple bietet dafür keine
+öffentliche Schnittstelle. Das eigene Plugin (`ios/App/App/Bildschirmschutz.swift`,
+registriert über `AppViewController` in `Main.storyboard`) deckt den Inhalt
+ab, solange der Bildschirm aufgenommen, gespiegelt oder per AirPlay übertragen
+wird (ab iOS 17 `sceneCaptureState`, davor `UIScreen.isCaptured`), und wenn
+die App den Vordergrund verlässt (Vorschau im App-Umschalter). Ein
+Bildschirmfoto meldet iOS erst nach dem Speichern; die App zeigt dann einen
+Hinweis zum Umgang damit.
+
+Auf allen Plattformen, auch im Browser, gibt es den Sichtschutz „Namen
+verbergen" (ab Werk aus): Personennamen erscheinen in der Oberfläche als
+Balken und werden erst auf Antippen aufgedeckt (`src/app/namen-verbergen.ts`,
+`src/app/personen-name.tsx`). Exporte bleiben unverändert.
 
 ### 5.2 Kryptografische Herkunfts- und Integritätsprüfung
 
@@ -536,6 +570,7 @@ ORP.1 Organisation, INF.1 Gebäude) sind nicht Gegenstand dieses Dokuments.
 | Anforderung (sinngemäß) | Status | Fundstelle/Anmerkung |
 | --- | --- | --- |
 | Minimale Rechtevergabe der Anwendung | Erfüllt | `electron/main.js`: nur `media`, `clipboard-*` erlaubt |
+| Schutz angezeigter Daten vor Bildschirmaufnahmen | Teilweise erfüllt | Screenshot-Sperre ab Werk an: Android (`FLAG_SECURE`) und Desktop unter Windows wirksam, macOS lückenhaft, Linux ohne; iOS nur Verdecken bei Aufnahme und im App-Umschalter, Bildschirmfotos erst nachträglich erkannt; Browser ohne Schutz. Sichtschutz „Namen verbergen" auf allen Plattformen (5.1, R10) |
 | Sichere Speicherung sensibler Daten auf dem Endgerät | Teilweise erfüllt | Fachdaten in `localStorage`; privater Signaturschlüssel dort unverschlüsselt (siehe 6.3); automatische Anonymisierung nach 90 Tagen (5.5) |
 | Deaktivierung nicht benötigter Schnittstellen | Erfüllt | CSP lässt als fremde Herkunft nur den GoatCounter-Host zu; Update-Prüfung des Desktops im Hauptprozess (3.4) |
 | Sichere Update-Mechanismen | Teilweise erfüllt | Vorhanden (`electron-updater`, Android-Selbst-Update); Windows- und Linux-Pakete unsigniert, Android-APK signiert (siehe 6.4); Android-Prüfung steht im Widerspruch zur CSP (5.6) |
@@ -551,7 +586,7 @@ ORP.1 Organisation, INF.1 Gebäude) sind nicht Gegenstand dieses Dokuments.
 | Robustheit gegenüber fehlerhaften/böswilligen Eingabedaten | Erfüllt | Dekomprimierung importierter QR-/Link-/Dateidaten läuft über `inflateRawBegrenzt` (`src/app/hilfen.ts`) mit Obergrenze `MAX_ENTPACKT = 4 MiB`: Die Streaming-Fassung prüft die entpackte Größe stückweise und bricht mit `RangeError` ab, bevor der Speicher vollläuft. Die Grenze sitzt beim hineingereichten Kompressor (`browserKompressor`), nicht im Codec (`vendor/eeb-format/src/codec.ts`). Word-Import und Personalstamm-Import nutzen dieselbe Funktion mit eigenen Deckeln (8 MiB bzw. 40 MB) und Dateigrößengrenzen (25 MiB bzw. 10 MB), siehe 5.4 |
 | Pflichtfelder von Bögen aus Dateien, Entwürfen und Speicher | Erfüllt | `src/app/bogen-pruefung.ts`: Harmloses (fehlender Einheitstyp, Listen, Namen) wird ergänzt, Unbrauchbares (Einheit, Stand, Einsatzzeitraum, Personenliste) mit Ursache abgelehnt — an den Datei-Eingängen, beim Entwurf und beim Lesen gespeicherter Vorlagen und Sammlungen; Unlesbares wird beiseitegelegt statt überschrieben (3.3 D2l, D2r) |
 | Fangnetz bei Abstürzen der Ansicht | Erfüllt | `src/app/fehlerfaenger.tsx` um die ganze App: deutsche Meldung, Neu laden, Zur Startseite, „Daten sichern" (Datei mit allen `eeb.`-Einträgen) und, mit Rückfrage, „Alle Daten löschen" |
-| Kontextisolation bei hybriden Apps (Electron/Capacitor) | Erfüllt | `contextIsolation`, `sandbox`, kein Preload |
+| Kontextisolation bei hybriden Apps (Electron/Capacitor) | Erfüllt | `contextIsolation`, `sandbox`, `nodeIntegration: false` für alle Fenster; Preload reicht über `contextBridge` nur Plattform und Sperr-Schalter, IPC mit Absender- und Typprüfung (5.1) |
 
 ### 6.3 CON.8 Software-Entwicklung / Kryptokonzept
 
@@ -614,6 +649,7 @@ Anmerkungen zur Lieferkette:
 | R7 | Ausfall der Anwendung im Einsatzfall (Gerätedefekt, Akku, Absturz) | A1–A4 (Verfügbarkeit) | Mittel (typisches Einsatzrisiko) | Hoch | **Hoch** (durch Papierform als Rückfallebene begrenzt) |
 | R8 | Bekannte Schwachstellen in Abhängigkeiten bleiben unbemerkt | B3 (Software-Lieferkette) | Niedrig (Dependabot wöchentlich, `npm audit` blockierend im CI, SBOM je Release) | Mittel | Niedrig |
 | R9 | Verlust lokaler Daten ohne Zutun des Nutzers: Browser räumt Website-Daten, Speicher voll oder gesperrt, falsch gehende Geräteuhr löst Fristen aus, Einspielen einer Sicherung ersetzt den Bestand | D1, D2, D2q, D4 (Verfügbarkeit) | Niedrig-Mittel (die App bittet um dauerhaften Speicher, meldet Schreibfehler, hält Fristen bei Uhrsprüngen ab 60 Tagen an und fragt vor dem Ersetzen; Sprünge darunter zählen als echte Zeit) | Mittel (Vorlagen, angefangener Bogen und Geräteschlüssel liegen nur auf diesem Gerät) | Mittel |
+| R10 | Bildschirmfotos und -aufnahmen mit Personaldaten gelangen in die Fotogalerie, in deren automatische Cloud-Sicherung und in Messenger; Datenschutzfrist und Löschwege der App erreichen sie nicht. Kein neuer Zugriffsweg: Wer das Bild macht, kann denselben Bogen auch exportieren | D1, D2, D2q (Vertraulichkeit) | Mittel (Bildschirmfoto ist der schnellste Weg, etwas weiterzugeben); auf Android und Windows durch die Sperre niedrig, auf iOS, macOS und im Browser nicht technisch begrenzt | Mittel (Namen, teils Rufnummern bei einem Cloud-Anbieter, ohne Frist) | Mittel |
 
 **Höchste Einzelrisiken:** R1 (Geräteverlust) und R7 (Ausfall im Einsatzfall)
 sind primär organisatorisch/physisch bedingt; R5 (Lieferkette) liegt in der
@@ -636,16 +672,18 @@ Organisation.
 | M10 | — | Diesen Entwurf durch die/den IT-Sicherheitsbeauftragte/n prüfen und freigeben lassen, insbesondere die Schutzbedarfsfeststellung (Abschnitt 4) | Organisatorisch | `[IT-Sicherheitsbeauftragte/r]` | Hoch |
 | M11 | R9, R3 | Datensicherung regeln: wer wann „Sicherung erstellen…" auslöst (die App erinnert nach drei Tagen, erzwingt nichts) und wo die Datei liegt. Die Sicherungsdatei enthält alle Fachdaten und den privaten Geräteschlüssel unverschlüsselt und ist entsprechend geschützt abzulegen. Web-App auf Mobilgeräten installieren (Home-Bildschirm) und dauerhaften Speicher zulassen; Datum und Uhrzeit der Geräte automatisch stellen lassen | Organisatorisch | `[Organisation/IT-Verantwortliche/r]` | Mittel |
 | M12 | R1 | Umgang mit dem lokalen Personalstamm regeln: auf welchen Geräten die Helferliste eingelesen wird, ob mit Rufnummern, Geschlecht und Ernährung, und wann sie zu löschen ist („Personalstamm löschen…"; die App erinnert nach 90 Tagen). Altbestand an Einsatz-Sammlungen auf Geräten in die Meldekopf-App übernehmen oder löschen | Organisatorisch | `[Organisation]` | Mittel |
+| M13 | R10 | Dienstanweisung: keine Bildschirmfotos oder -aufnahmen mit Personaldaten; nötige Bilder für Fehlermeldung oder Schulung mit Übungsbogen oder „Namen verbergen" anfertigen und danach löschen; ein Bildschirmfoto mit Namen wie einen Export behandeln (M9). Auf Dienstgeräten die automatische Cloud-Sicherung der Fotogalerie abschalten oder auf freigegebenen Speicher legen; die Screenshot-Sperre der App nicht dauerhaft abschalten. Technisch umgesetzt: Sperre und Sichtschutz (5.1) | Organisatorisch / Technisch (umgesetzt) | `[Organisation/IT-Verantwortliche/r]` | Mittel |
 
 ## 9. Restrisikobetrachtung
 
-Unter der Voraussetzung, dass die organisatorischen Maßnahmen M1, M5, M7, M9 und
-M11 umgesetzt werden, verbleibt nach Einschätzung dieses Entwurfs ein **mittleres
+Unter der Voraussetzung, dass die organisatorischen Maßnahmen M1, M5, M7, M9,
+M11 und M13 umgesetzt werden, verbleibt nach Einschätzung dieses Entwurfs ein **mittleres
 bis geringes Restrisiko**. Die verbleibenden technischen Schwachstellen (R3
 Schlüsselspeicherung, R4 Restfläche `style-src`, R5 unsignierte Desktop-Pakete)
 liegen im Verantwortungsbereich der Software-Weiterentwicklung und sind durch die
 einsetzende Organisation nicht direkt behebbar, wohl aber durch M1, M3 und M5 zu
-kompensieren.
+kompensieren. Bildschirmfotos (R10) lassen sich auf iOS, macOS und im Browser
+technisch nicht verhindern; dort trägt allein M13.
 
 Diese Einschätzung ersetzt keine rechtliche oder technische Prüfung.
 

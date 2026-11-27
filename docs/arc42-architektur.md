@@ -2,7 +2,7 @@
 
 > Diese Markdown-Datei ist die gepflegte Fassung (ursprünglich aus
 > `Arc42-Erfassungsbogen.pdf`). Sie beschreibt den Stand des Repositorys
-> `wattnpapa/erfassungsbogen` am 2026-11-26 einschließlich der vier Kern-Submodule
+> `wattnpapa/erfassungsbogen` am 2026-11-27 einschließlich der vier Kern-Submodule
 > unter `vendor/`. Der Änderungsverlauf steht in der Git-Historie dieser Datei.
 
 ---
@@ -126,7 +126,7 @@ Festlegungen im Code (CSP, Bundle-Budget, Schema-Migrationen):
 
 ### 1.4 Hinweis zu dieser Dokumentation
 
-Beschrieben sind das Hauptrepository (Stand `main`, 2026-11-26) und die vier
+Beschrieben sind das Hauptrepository (Stand `main`, 2026-11-27) und die vier
 Kern-Submodule auf ihren angehefteten Commits (`git ls-tree HEAD vendor/`):
 
 | Submodul | Repository | angehefteter Commit |
@@ -443,7 +443,8 @@ Releases als Downloadquelle für native Installer.
 - **Electron** (`electron/main.js`) – lädt dasselbe gebaute `dist/` als
   Datei-URL, kein Node-Zugriff im Renderer (`contextIsolation: true`,
   `nodeIntegration: false`, `sandbox: true`); native Fähigkeiten werden gezielt
-  und minimal freigeschaltet.
+  und minimal freigeschaltet. Einzige Brücke ist `electron/preload.cjs` mit dem
+  Schalter der Screenshot-Sperre.
 - **Capacitor** (Android, iOS in Vorbereitung) – dieselbe Web-App in einer
   WebView; native Fähigkeiten über Capacitor-Plugins (`src/app/nativ.ts`).
 
@@ -546,8 +547,8 @@ flowchart LR
 | --- | --- |
 | Web-App (`src/app/`) | React-Oberfläche, Assistent, Vorlagen und Personalstamm, Empfang und Übergabe eines Bogens, PDF- und CSV-Ausgabe, Plattform-Anpassung, lokale Persistenz. |
 | Statische Seiten (`public/*.html`) | 36 SEO-/Informationsseiten je Organisation (THW, Feuerwehr, DRK, …), Anleitung, Datenschutz, Impressum – teilen sich Kopfnavigation und Design-Token mit der App, laufen aber außerhalb des React-Bundles. Sie übernehmen den Anzeigemodus der App (Dunkel/Feld/Nacht, ohne gespeicherte Wahl die Systemeinstellung) über einen kleinen Inline-Block, den `scripts/content-stil.mts` schreibt; er liest nur `eeb.anzeigemodus.v1` und setzt eine Klasse auf `<html>`. |
-| Electron-Hülle (`electron/main.js`) | Desktop-Fenster, Auto-Update (`electron-updater`), eingeschränkte Berechtigungsvergabe, externe Links im Systembrowser öffnen. |
-| Capacitor-Hüllen (`android/`, `ios/`) | Native Projekte (Gradle/Xcode), binden Capacitor-Plugins (Kamera-Barcode-Scanner, Filesystem, Share, App) ein. |
+| Electron-Hülle (`electron/main.js`, `electron/preload.cjs`) | Desktop-Fenster, Auto-Update (`electron-updater`), eingeschränkte Berechtigungsvergabe, externe Links im Systembrowser öffnen, Screenshot-Sperre (`setContentProtection`) mit Schalter über `contextBridge`. |
+| Capacitor-Hüllen (`android/`, `ios/`) | Native Projekte (Gradle/Xcode), binden Capacitor-Plugins (Kamera-Barcode-Scanner, Filesystem, Share, App) ein, dazu zwei eigene: `AppUpdate` (Android-Selbst-Update) und `Bildschirmschutz` (Android `FLAG_SECURE`; iOS Verdecken bei Aufnahme und im App-Umschalter, registriert über `AppViewController`). |
 | Build-/Content-Skripte (`scripts/`) | Vite-Plugin-Hilfsfunktionen, Übungsbogen-Generatoren je Bundesland/Organisation, Blanko-Vordruck, Icon-/Screenshot-Rendering, Sitemap, Kopfnavigation, Aufteilung des Offline-Vorrats, Bundle-Budget-Prüfung, Kern-Kopien-Prüfung, SBOM, VBA-Vokabular für die Format-Portierung. |
 | E2E-Spezifikation (`features/`) | Gherkin-Szenarien auf Deutsch als ausführbare Anforderungsdokumentation und Regressionsschutz. |
 | App-lokale Vokabulare (`src/vokabulare/`) | Inhalte, die laut `docs/entwicklung.md` bewusst nicht in den Kern gewandert sind: Landesvorlagen (`import.meta.glob`, eine Vite-Eigenschaft) und die Großstadtregelung der Funkrufnamen (`thw-funkrufname-ort.ts`). |
@@ -610,6 +611,7 @@ flowchart TB
 | `meldekopf-weg.tsx` / `meldekopf-app.ts` / `meldekopf-altbestand.ts` | Abschnitt „Bögen sammeln (Meldekopf)" der Startseite mit Link zur Meldekopf-App, Adresse und Rückweg (`meldekopfLink`, `rueckMarkeUebernehmen`, `kamVomMeldekopf`), Zählen, Sichern und Löschen des Altbestands (`SAMMLUNGS_SCHLUESSEL`). |
 | `sicherung.ts` / `absenderkarte.ts` / `geraete-schluessel.ts` | Datensicherung aller `eeb.`-Einträge als Datei, „Alle Daten löschen", freiwillige Absenderkarte, Erzeugung und Verwaltung des geräteeigenen Ed25519-Schlüssels. |
 | `nativ.ts` / `hilfen.ts` | Abstraktion nativer Fähigkeiten über Capacitor; Kodieren, Signieren und Laden (`bogenLaden`, `migriereBogen`, `browserKompressor`, `QrSatz` mit `teileOhneGegenzeichnung`, `vorlageTransportErzeugen`), Anzeigehelfer (`einheitAnzeigename` gibt jeden Namensteil nur einmal aus, `einzelpersonAbgleich`, `dateinameSicher`). |
+| `namen-verbergen.ts` / `personen-name.tsx` / `bildschirmschutz.ts` | Datenschutz am Bildschirm. Sichtschutz „Namen verbergen" (Klasse `namen-verbergen` auf `<html>`, `<PersonName>` als Balken mit Aufdecken auf Tipp oder Tastatur, `<NamenText>` findet in dieser Sitzung gemerkte Namen in Rückfragen und Hinweisen, `namensFeld()` kennzeichnet Eingabefelder); nur Darstellung, Exporte unberührt. Screenshot-Sperre der installierten Fassungen: Plattformweiche `bildschirmschutzArt()` (Android und Desktop unter Windows/macOS „sperre", iOS „verdecken", Browser und Linux nichts), Schalter in der Fußzeile, iOS-Hinweis nach einem Bildschirmfoto. |
 | `anzeige-modus.ts` / `org-farben.ts` | Dunkel-/Feld-/Nacht-Modus als Design-Token-Umschaltung; organisationsspezifische Akzentfarben, dazu je Kennfarbe die auf 4,5:1 gerechneten Kopf-Töne, im Dunkel-Modus der abgedunkelte Kopfbalken (`kopfDunkel()`), im Feld-Modus die auf 7:1 abgedunkelte Kennfarbe (`kopfFeld()`, die Statusleiste folgt). Auf Papier gilt für das THW das Vorlagen-Blau #003399 (`orgFarbePapier`), die Oberfläche bleibt bei #20214f. |
 | `zeichen-bild.tsx` / `taktische-zeichen-bogen.ts` | `EinheitZeichen` und `FahrzeugZeichen` laden die Zeichensammlung (`symbole.ts`) als eigenen Chunk nach; `taktische-zeichen-bogen.ts` löst das Zeichen aus dem konkreten Bogen auf, einschließlich der Zeichenfarbe. |
 | `fusszeile.tsx` / `beispiele-dialog.tsx` / `beispiele-thw-ov.ts` / `aenderungen.ts` | Fußzeile mit Datensicherung, „Alle Daten löschen", „Geräteschlüssel neu erzeugen", Blanko-Vordruck und Version. Sie lädt den Übungsbögen-Dialog selbst nach (`import()` mit Fehlerfang statt `React.lazy`, damit ein Fehlschlag ohne Netz nicht die ganze App in den Fehlerfänger reißt) und beim Öffnen von „Was ist neu" den Änderungsverlauf (`aenderungen.ts`: ein Eintrag je Tag, je Monat ein Satz in `MONATE`, monatsweise blätterbar; eigener Chunk im Precache). |
@@ -1265,6 +1267,8 @@ Daten löschen" erfassen den Bestand über dieses Präfix.
 | `eeb.beispiel-herkunft.v1`, `eeb.beispiel-offen.v1` | Namen und Ziffernfolgen aus einem Übungsbogen, damit das Abwählen von „Übung" daran erinnert, und die Prüfsumme des unverändert offenen Beispiels; beide verschwinden, sobald kein Bogen offen ist | `beispiel-herkunft.ts` |
 | `eeb.schnellOrganisation.v1` | Zuletzt gewählte Organisation der Schnellerfassung (eine Zahl) | `schnell-organisation.ts` |
 | `eeb.anzeigemodus.v1` | Dunkel-/Feld-/Nacht-Modus | `anzeige-modus.ts` |
+| `eeb.namen-verbergen.v1` | Sichtschutz „Namen verbergen" (nur gesetzt, wenn an) | `namen-verbergen.ts` |
+| `eeb.bildschirmschutz.v1` | Abgeschaltete Screenshot-Sperre (nur gesetzt, wenn aus; ab Werk an) | `bildschirmschutz.ts` |
 | `eeb-scanweg`, `eeb-kamera` | Kamera oder Handscanner, zuletzt gewählte Kamera; keine Personendaten | `handscanner.ts`, `kamera.ts` |
 | `eeb.einsaetze.v1` und die übrigen `SAMMLUNGS_SCHLUESSEL` | Altbestand der Einsatz-Sammlung (Sammlungen, Export-, Lageblatt-, Weitergabe- und Kenntnis-Stände, Lagemonitor-Angaben, Papierkorb der Meldungen, Abschluss, Widersprüche); `eeb.aufgeraeumt.v1` nennt ruhende Sammlungen, die der Kern aufgeräumt hat | `meldekopf-altbestand.ts`, `einsaetze-lesen.ts`, `aufraeum-hinweis.ts` |
 
@@ -1482,11 +1486,29 @@ bleiben auf diesem Gerät".
   signiert (bis zu 32 Stufen, `MAX_STUFEN` in `codec.ts`).
 - **Absenderkarte ist Eigenangabe**, keine Identitätszusicherung.
 - **Electron-Härtung:** `contextIsolation: true`, `nodeIntegration: false`,
-  `sandbox: true`; nur die Berechtigungen `media` (Kamera), `clipboard-read` und
-  `clipboard-sanitized-write` werden gewährt, alles andere pauschal abgelehnt.
+  `sandbox: true` für jedes Fenster; nur die Berechtigungen `media` (Kamera),
+  `clipboard-read` und `clipboard-sanitized-write` werden gewährt, alles andere
+  pauschal abgelehnt. Der Preload (`preload.cjs`, CommonJS in der Sandbox) legt
+  über `contextBridge` nur `eebDesktop.plattform` und
+  `eebDesktop.bildschirmschutz(an)` an; der Hauptprozess nimmt den Kanal
+  `eeb:bildschirmschutz` nur von App-Seiten und nur mit einem Wahrheitswert an.
   Externe Adressen öffnet der Systembrowser; neue Fenster lehnt
   `setWindowOpenHandler` ab, mit einer Ausnahme für Adressen mit `?lagemonitor=`,
   die diese App nicht erzeugt (Kapitel 11.3).
+- **Bildschirmfotos und -aufnahmen:** Screenshot-Sperre, ab Werk an und in der
+  Fußzeile abschaltbar (für Fehlermeldungen und Schulungsunterlagen). Android:
+  `FLAG_SECURE` auf dem Fenster der BridgeActivity, gesetzt in `onCreate`,
+  bevor das erste Bild entsteht; fremde Activities (Scanner, Teilen-Menü) sind
+  nicht erfasst. Desktop: `setContentProtection` auf jedem Fenster, für Fenster
+  aus `setWindowOpenHandler` über `did-create-window`; wirksam unter Windows,
+  unter macOS umgehbar durch ScreenCaptureKit, unter Linux ohne Wirkung (die
+  Einstellung erscheint dort nicht). iOS: keine öffentliche Sperre; das Plugin
+  verdeckt den Inhalt bei Aufnahme, Spiegelung, AirPlay und im App-Umschalter
+  und meldet ein Bildschirmfoto nachträglich, worauf die App einen Hinweis
+  zeigt. Browser/PWA: weder Sperre noch Erkennung. Für alle Plattformen gibt es
+  den Sichtschutz „Namen verbergen" (Kapitel 5.2). Ein entstandenes
+  Bildschirmfoto liegt außerhalb der App und wird von keiner Frist erreicht
+  (DSFA R13).
 
 ### 8.4 Kompatibilitätskonzept (Schema-Evolution)
 
@@ -1930,7 +1952,8 @@ Angaben des Projekts.
 | Sehr große Einzeldateien | `app.tsx` (2942 Zeilen), `schritte/personal.tsx` (2377), `pdf-dokument.ts` (2351) sowie `codec.ts` (1089) und `einsaetze.ts` (854) in den Submodulen. | Höheres Risiko von Merge-Konflikten und höherer kognitiver Aufwand; kein Hinweis, dass weitere Modularisierung geplant ist. |
 | Bus-Faktor / Ein-Personen-Projekt | Alle fünf Repositories nennen denselben einzelnen Autor/Maintainer; keine sichtbaren CODEOWNERS oder weiteren Committer-Hinweise. | Wartung, Sicherheitsreaktion und Weiterentwicklung hängen an einer Person – verschärft dadurch, dass auch S1-Control vom selben Kern abhängt. |
 | TOFU-Vertrauensmodell ohne PKI | Bewusster Verzicht auf zentrale Zertifizierung bei den Ed25519-Signaturen. | Ein Schlüssel-Fingerabdruck bestätigt nur „derselbe Absender wie zuvor", nicht die reale Identität; Social-Engineering-Angriffe sind architektonisch nicht ausgeschlossen. |
-| Native Gerätetests fehlen | Kamera-Scanner, Filesystem-Zugriff und Share-Sheet sind laut `docs/tests.md` „Ausbaustufe 3". | Regressionen in den plattformspezifischsten Pfaden werden nicht automatisch erkannt. |
+| Native Gerätetests fehlen | Kamera-Scanner, Filesystem-Zugriff und Share-Sheet sind laut `docs/tests.md` „Ausbaustufe 3". Für die Screenshot-Sperre (Android, iOS, Electron) prüft die Testsuite nur die Verdrahtung im Quelltext. | Regressionen in den plattformspezifischsten Pfaden werden nicht automatisch erkannt. |
+| Bildschirmfotos nicht überall verhinderbar | iOS bietet keine Sperre, macOS-Aufnahmen über ScreenCaptureKit umgehen `setContentProtection`, Browser und Linux kennen nichts davon (Kapitel 8.3). | Personaldaten können als Bilddatei in Fotogalerie und Cloud-Sicherung gelangen; dort bleiben nur Sichtschutz „Namen verbergen" und Dienstanweisung. |
 | Offene Punkte im Datenmodell (Stufe 2) | `docs/datenmodell.md` nennt u. a. einen noch festzulegenden Aktualisierungsweg für das eingebettete THW-Ortsverbandsverzeichnis und ein noch nicht umgesetztes Deflate-Preset-Dictionary (zusätzliche 10–20 % Kompression). | Ohne Aktualisierungsweg veralten die eingebetteten Referenzdaten mit der Zeit. |
 | `style-src` mit `'unsafe-inline'` | `script-src` gibt die Inline-Blöcke einzeln per `sha256`-Hash frei und kommt ohne `'unsafe-inline'` aus; `style-src` braucht es, weil React `style`-Attribute setzt. | Ein eingeschleustes Skript fängt die CSP ab. Style-Injection bleibt möglich: in dieser App kein Datenabfluss, aber eine Darstellungsmanipulation. |
 | Drei Apps und eine Portierung lesen dasselbe Format | Meldekopf-App, S1-Control und der VBA-Leser müssen jede Schemaänderung mitgehen (Kapitel 2.2); die Regel steht in `CLAUDE.md`, technisch erzwungen ist nur der Schema-Stand der Portierung in der CI des Format-Repos. | Bleibt ein Leser zurück, lehnt er neue Bögen ab oder zeigt sie falsch an, und zwar am Meldekopf, wo der Bogen gebraucht wird. |

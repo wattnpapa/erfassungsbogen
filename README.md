@@ -68,6 +68,12 @@ Wer noch abwägt: [Papier oder digital?](https://erfassungsbogen.app/papier-oder
   Übersicht, eine Zeile je Einheit.
 - **Alles bleibt auf dem Gerät**: keine Anmeldung, kein Server, keine Cloud —
   siehe [Datenschutzerklärung](https://erfassungsbogen.app/datenschutz.html).
+- **Datenschutz am Bildschirm**: Die Android-App und die Desktop-App sperren
+  Bildschirmfotos ab Werk (unter Windows vollständig, unter macOS lückenhaft,
+  unter Linux gar nicht); die iOS-App verdeckt den Inhalt bei Bildschirmaufnahme
+  und im App-Umschalter. Überall, auch im Browser, zeigt der Schalter „Namen
+  verbergen" Personennamen als Balken, bis man sie antippt. PDF und Exporte
+  bleiben vollständig.
 
 ## Für wen ist sie gedacht?
 
