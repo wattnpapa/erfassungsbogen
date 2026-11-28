@@ -35,6 +35,12 @@ export const MONATE: Readonly<Record<string, string>> = {
 
 export const AENDERUNGEN: readonly Aenderung[] = [
   {
+    datum: "2026-11-28",
+    punkte: [
+      "Das PDF eines Bogens druckt unter den Fahrzeugen keinen leeren Fahrzeugblock mehr. Er sah aus wie ein gemeldetes Fahrzeug ohne Angaben; die zwei freien Personalzeilen zum Nachtragen bleiben.",
+    ],
+  },
+  {
     datum: "2026-11-27",
     punkte: [
       "Neuer Schalter „Namen verbergen“ in der Fußzeile und in Schritt 3: Namen der Helferinnen und Helfer stehen in der App dann als Balken, auch in Übersicht, Vorlagen, Personalstamm, Rückfragen und Hinweisen. Antippen zeigt einen Namen für 15 Sekunden, ein Namensfeld zeigt ihn, solange man darin schreibt. Gedacht für Bildschirmfotos, Beamer und Blicke über die Schulter; PDF, Ausdruck, CSV, Link und QR-Code bleiben vollständig.",

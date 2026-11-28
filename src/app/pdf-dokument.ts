@@ -1395,8 +1395,6 @@ const ROLLE_KURZ: Record<number, string> = {
 export interface NachtragsPlatz {
   /** Freie Zeilen unter dem Personal. */
   freiePersonalZeilen?: number;
-  /** Ein leerer Fahrzeugblock unter den Fahrzeugen. */
-  freiesFahrzeug?: boolean;
   /** Messpunkt hinter dem letzten Inhalt (nur für den Probesatz). */
   messpunkt?: boolean;
   /** Kennung des Messpunkts — in der Sammel-PDF je Bogen eine eigene (R4-A7). */
@@ -1413,8 +1411,6 @@ export interface NachtragsPlatz {
 const PERSONAL_NACHTRAG_ZEILEN = 2;
 /** Höhe einer leeren Personalzeile in pt: Zeilenhöhe der Vorlage (19,85), aufgerundet. */
 const LEERZEILE_HOEHE = 20;
-/** Höhe eines leeren Fahrzeugblocks in pt: 28,35 + 56,7 aus der Vorlage, aufgerundet; Blöcke stoßen ohne Abstand aneinander. */
-const LEERFAHRZEUG_HOEHE = 86;
 const MESS_BOGEN_ENDE = "bogen-ende";
 
 /** Fahrzeug ohne Angaben — Platzhalter für die Fahrzeugblöcke des Blanko-Vordrucks. */
@@ -1440,13 +1436,12 @@ export function pdfDokument(
   zusatz?: NachtragsPlatz,
 ): TDocumentDefinitions {
   b = ohneVorbelegung(b);
-  // Platz für Stiftnachträge nur, wo etwas nachzutragen wäre: Ohne gemeldetes Fahrzeug stand ein leerer
-  // Fahrzeugblock samt Zeichen auf dem Blatt, als gäbe es eins (Fachberater mit Mitfahrt). Eine Einzelperson
-  // bekommt auch keine freien Personalzeilen — der Bogen meldet genau eine Person.
+  // Platz für Stiftnachträge nur, wo etwas nachzutragen wäre: Eine Einzelperson bekommt keine freien
+  // Personalzeilen — der Bogen meldet genau eine Person. Einen leeren Fahrzeugblock druckt das Einzel-PDF
+  // nicht: In den Übungsbögen las er sich wie ein gemeldetes Fahrzeug ohne Angaben.
   if (zusatz) {
     zusatz = {
       ...zusatz,
-      freiesFahrzeug: zusatz.freiesFahrzeug && b.fahrzeuge.length > 0,
       freiePersonalZeilen: b.einheit.einzelperson ? 0 : zusatz.freiePersonalZeilen,
     };
   }
@@ -1684,13 +1679,7 @@ export function pdfDokument(
     ? Array.from({ length: blanko.fahrzeuge }, () =>
         fahrzeugBlock(BLANKO_FAHRZEUG),
       )
-    : [
-        ...b.fahrzeuge.map((f) => fahrzeugBlock(f)),
-        // Ein leerer Fahrzeugblock zum Nachtragen, wenn Platz ist (R3-A6).
-        ...(zusatz?.freiesFahrzeug
-          ? [fahrzeugBlock(BLANKO_FAHRZEUG, true)]
-          : []),
-      ];
+    : b.fahrzeuge.map((f) => fahrzeugBlock(f));
 
   // Spalte „Rolle" (F / UF / M): Ohne sie ließ sich eine von Hand geänderte
   // Stärke auf dem Blatt nicht gegen die Namen prüfen (Audit Runde 3, R3-A6).
@@ -2180,9 +2169,7 @@ export async function einzelNachtragsPlatz(
     frei >= PERSONAL_NACHTRAG_ZEILEN * LEERZEILE_HOEHE
       ? PERSONAL_NACHTRAG_ZEILEN
       : 0;
-  const fahrzeug =
-    zeilen > 0 && frei >= zeilen * LEERZEILE_HOEHE + LEERFAHRZEUG_HOEHE;
-  return { freiePersonalZeilen: zeilen, freiesFahrzeug: fahrzeug };
+  return { freiePersonalZeilen: zeilen };
 }
 
 

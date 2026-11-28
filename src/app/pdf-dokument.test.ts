@@ -513,13 +513,14 @@ describe("einsatzLageblattDokument()", () => {
     expect(t).toMatch(/\nM\nmiddle\ncenter\nWeber, Anna\n/);
     // Ohne Messung keine freien Zeilen — die gibt es nur über einzelPdfDokument.
     expect(JSON.stringify(dd.content)).not.toContain('"text":" ","margin":[0,2,0,2]');
-    const frei = pdfDokument(basisBogen(), QR, undefined, undefined, { freiePersonalZeilen: 2, freiesFahrzeug: true });
+    const frei = pdfDokument(basisBogen(), QR, undefined, undefined, { freiePersonalZeilen: 2 });
     expect(JSON.stringify(frei.content).match(/"text":" ","margin":\[0,2,0,2\]/g)).toHaveLength(6);
-    expect(texte(frei.content)).toContain("Kennzeichen:");
+    // Kein leerer Fahrzeugblock: Er las sich wie ein gemeldetes Fahrzeug ohne Angaben.
+    expect(texte(frei.content)).not.toContain("Kennzeichen:");
   });
 
-  it("druckt ohne gemeldetes Fahrzeug keinen leeren Fahrzeugblock und für eine Einzelperson keine freien Personalzeilen", () => {
-    const platz = { freiePersonalZeilen: 2, freiesFahrzeug: true };
+  it("druckt für eine Einzelperson keine freien Personalzeilen", () => {
+    const platz = { freiePersonalZeilen: 2 };
     const ohne = pdfDokument({ ...basisBogen(), fahrzeuge: [] }, QR, undefined, undefined, platz);
     expect(texte(ohne.content)).not.toContain("Kennzeichen:");
     // Die Einheit behält ihre freien Personalzeilen …

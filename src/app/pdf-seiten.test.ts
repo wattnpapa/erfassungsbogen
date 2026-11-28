@@ -105,16 +105,16 @@ describe("Einzel-PDF: Platz für Stiftnachträge, wo er keine Seite kostet (R3-A
   const beispiel = (datei: string): Erfassungsbogen =>
     JSON.parse(readFileSync(new URL(`../../examples/thw/${datei}`, import.meta.url), "utf8")) as Erfassungsbogen;
 
-  it.each([3])("kleiner Bogen (%i QR-Teile): zwei freie Personalzeilen und ein leerer Fahrzeugblock, Seitenzahl gleich", async (teile) => {
+  it.each([3])("kleiner Bogen (%i QR-Teile): zwei freie Personalzeilen, kein leerer Fahrzeugblock, Seitenzahl gleich", async (teile) => {
     const b = bogen(4);
     const dd = await einzelPdfDokument(b, qrSatz(teile), pdfBytes);
     expect(freieZeilen(dd)).toBe(2);
-    expect(JSON.stringify(dd.content)).toContain('"Kennzeichen:"');
+    expect(JSON.stringify(dd.content)).not.toContain('"Kennzeichen:"');
     expect(seitenZahl(await pdfBytes(dd))).toBe(seitenZahl(await pdfBytes(pdfDokument(b, qrSatz(teile)))));
   }, 20_000);
 
   // Mit Einzelcode auf Seite 1 bleibt beim Raster der THWin-Vorlage unter dem Code
-  // weniger Platz als zwei Zeilen und ein Fahrzeugblock brauchen: dann eben ohne.
+  // weniger Platz als zwei Zeilen brauchen: dann eben ohne.
   it("kleiner Bogen mit Einzelcode auf Seite 1: nichts dazu, was eine Seite kostet", async () => {
     const b = bogen(4);
     const dd = await einzelPdfDokument(b, qrSatz(1), pdfBytes);
@@ -130,7 +130,7 @@ describe("Einzel-PDF: Platz für Stiftnachträge, wo er keine Seite kostet (R3-A
     expect(seitenZahl(await pdfBytes(dd))).toBe(seitenZahl(await pdfBytes(pdfDokument(b, qrSatz(1)))));
   }, 20_000);
 
-  it("50 THW-Übungsbögen: freie Zeilen und Fahrzeugblock kosten nie eine Seite", async () => {
+  it("50 THW-Übungsbögen: freie Zeilen kosten nie eine Seite", async () => {
     // Die ersten 50 OV-Bögen in Ordner-Reihenfolge (Baden-Württemberg, RSt Biberach ff.).
     const alle = (readdirSync(new URL("../../examples/thw/ortsverbaende/", import.meta.url), { recursive: true }) as string[])
       .filter((d) => d.endsWith(".json"))
