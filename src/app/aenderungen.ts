@@ -35,6 +35,15 @@ export const MONATE: Readonly<Record<string, string>> = {
 
 export const AENDERUNGEN: readonly Aenderung[] = [
   {
+    datum: "2026-11-28",
+    punkte: [
+      "Gespeicherte Vorlagen zeigen, wann die Mannschaft zuletzt geändert wurde. Nach einem halben Jahr ohne Änderung fragt die Karte, ob jemand ausgeschieden ist; „Mannschaft stimmt noch“ bestätigt das, ohne die Vorlage zu ändern.",
+      "„Vorlage teilen“ nennt vorher, wie viele private Rufnummern und Adressen in der Vorlage stehen.",
+      "Beim Teilen eines Bogens oder einer Vorlage als Link steht jetzt dabei, dass der Link alle Namen enthält und im Chat und im Browserverlauf der Gegenstelle stehen bleibt, auch nach der Datenschutzfrist. Vor Ort sind QR-Code und Nahbereich der bessere Weg.",
+      "Datenschutzerklärung in App und Website: Ein Absatz zu geteilten Links ist dazugekommen.",
+    ],
+  },
+  {
     datum: "2026-11-27",
     punkte: [
       "Neuer Schalter „Namen verbergen“ in der Fußzeile und in Schritt 3: Namen der Helferinnen und Helfer stehen in der App dann als Balken, auch in Übersicht, Vorlagen, Personalstamm, Rückfragen und Hinweisen. Antippen zeigt einen Namen für 15 Sekunden, ein Namensfeld zeigt ihn, solange man darin schreibt. Gedacht für Bildschirmfotos, Beamer und Blicke über die Schulter; PDF, Ausdruck, CSV, Link und QR-Code bleiben vollständig.",

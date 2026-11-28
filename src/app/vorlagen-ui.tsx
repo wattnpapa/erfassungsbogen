@@ -26,6 +26,11 @@ import {
   type VorlagenTransport,
 } from "./hilfen";
 import {
+  mannschaftAlterTage,
+  mannschaftBestaetigen,
+  mannschaftPruefen,
+  mannschaftStand,
+  privateKontakte,
   vorlageEndgueltigLoeschen,
   vorlageInstanziieren,
   vorlageLoeschen,
@@ -156,7 +161,26 @@ export function VorlagenListe(props: {
           </p>
           <p className="hinweis">
             Stärke {staerkeText(v.bogen)} · {v.bogen.personal.length} Personen · {v.bogen.fahrzeuge.length} Fahrzeuge
+            {" · "}Mannschaft Stand {datumZweistellig(mannschaftStand(v))}
           </p>
+          {/* Die Vorlage hat keine Datenschutzfrist. Ohne Erinnerung blieben
+              Ausgeschiedene samt Rufnummern stehen (DSFA M15). */}
+          {mannschaftPruefen(v) && v.bogen.personal.length > 0 && (
+            <div className="vorlage-pruefen">
+              <p className="hinweis warnung-text">
+                Seit {mannschaftAlterTage(v)} Tagen unverändert. Ist jemand ausgeschieden? Dann über „Bearbeiten“ entfernen.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  mannschaftBestaetigen(v.id);
+                  onGeaendert();
+                }}
+              >
+                Mannschaft stimmt noch
+              </button>
+            </div>
+          )}
           <div className="vorlage-aktionen">
             <button type="button" onClick={() => onBearbeiten(v)}>Bearbeiten</button>{" "}
             <button type="button" onClick={() => umbenennen(v)}>Umbenennen</button>{" "}
@@ -220,6 +244,7 @@ export function VorlageTeilen(props: { vorlage: Vorlage; onSchliessen: () => voi
   const [transport, setTransport] = useState<VorlagenTransport | null>(null);
   const [fehler, setFehler] = useState("");
   const [linkKopiert, setLinkKopiert] = useState(false);
+  const privat = privateKontakte(vorlage.bogen);
 
   useEffect(() => {
     dialog.current?.showModal();
@@ -281,8 +306,9 @@ export function VorlageTeilen(props: { vorlage: Vorlage; onSchliessen: () => voi
           legt, gibt Namen und Erreichbarkeiten dorthin — das soll vor dem
           Knopf stehen, nicht danach. */}
       <p className="hinweis">
-        Die Vorlage enthält Namen und Erreichbarkeiten aller erfassten Personen. Nur dort ablegen
-        oder hinschicken, wo diese Daten nach den Regeln eurer Organisation hindürfen.
+        Die Vorlage enthält Namen und Erreichbarkeiten aller erfassten Personen
+        {privat > 0 ? `, darunter ${privat === 1 ? "1 private Rufnummer oder Adresse" : `${privat} private Rufnummern oder Adressen`}` : ""}.
+        Nur dort ablegen oder hinschicken, wo diese Daten nach den Regeln eurer Organisation hindürfen.
       </p>
       <div className="teilen-weg">
         {transport?.qrDatenUrl ? (
@@ -300,7 +326,10 @@ export function VorlageTeilen(props: { vorlage: Vorlage; onSchliessen: () => voi
         <button type="button" onClick={linkWeitergeben} disabled={!transport}>
           {linkKopiert ? "Link kopiert ✓" : "Link teilen"}
         </button>
-        <p className="hinweis">Für Chat, Mail oder Notiz — öffnet die App und legt die Vorlage an.</p>
+        <p className="hinweis">
+          Für Chat, Mail oder Notiz — öffnet die App und legt die Vorlage an. Der Link trägt die ganze
+          Mannschaft und bleibt im Chat und im Browserverlauf stehen.
+        </p>
       </div>
       <div className="teilen-weg">
         <button type="button" onClick={alsDatei}>Als Datei speichern</button>

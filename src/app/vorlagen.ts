@@ -13,7 +13,7 @@
  */
 
 import type { Erfassungsbogen } from "@bos/eeb-format/model";
-import { datumAusIso, mitTransportVersion, staerke } from "@bos/eeb-format/model";
+import { KontaktArt, datumAusIso, mitTransportVersion, staerke } from "@bos/eeb-format/model";
 import { bogenPruefen, dateinameTeil, einheitAnzeigename, migriereBogen } from "./hilfen";
 import { bogenBefund } from "./bogen-pruefung";
 import { einsatzVorgabe } from "./zeitraum-eingabe";
@@ -33,8 +33,49 @@ export interface Vorlage {
   standard?: boolean;
   /** Im Papierkorb seit (Date.now()); fehlt = aktiv. Siehe papierkorb.ts. */
   geloeschtAm?: number;
+  /**
+   * Zuletzt bestätigt, dass die Mannschaft stimmt (Date.now()): beim Anlegen,
+   * bei „Vorlage aktualisieren" und mit „Stimmt noch" auf der Karte — nicht
+   * beim Umbenennen. Fehlt (ältere Vorlagen) = `geaendert`. Grundlage der
+   * Erinnerung nach VORLAGE_PRUEFEN_TAGE (DSFA M15).
+   */
+  mannschaftGeprueft?: number;
   /** Einsatzfreier Bogen: einheit + personal + fahrzeuge + Standard-Sofortbedarf. */
   bogen: Erfassungsbogen;
+}
+
+/**
+ * Nach so vielen Tagen ohne Änderung oder Bestätigung fragt die Vorlagenkarte,
+ * ob die Mannschaft noch stimmt. Eine Vorlage hat keine Datenschutzfrist (sie
+ * ist der Ausdruck in der Führungsmappe); ohne Erinnerung wanderten
+ * ausgeschiedene Helfer jahrelang mit, samt Rufnummern (DSFA M15). Halbjährlich
+ * statt der 90 Tage des Personalstamms: Eine Mannschaft ändert sich langsamer
+ * als die Helferliste einer Dienststelle, und eine Erinnerung, die zu oft kommt,
+ * wird weggetippt.
+ */
+export const VORLAGE_PRUEFEN_TAGE = 180;
+
+/** Zeitpunkt, ab dem das Alter der Mannschaft zählt. */
+export function mannschaftStand(v: Pick<Vorlage, "geaendert" | "mannschaftGeprueft">): number {
+  return v.mannschaftGeprueft ?? v.geaendert;
+}
+
+/** Tage seit der letzten Änderung oder Bestätigung der Mannschaft (nie negativ, auch bei verstellter Uhr). */
+export function mannschaftAlterTage(v: Pick<Vorlage, "geaendert" | "mannschaftGeprueft">, jetzt = Date.now()): number {
+  return Math.max(0, Math.floor((jetzt - mannschaftStand(v)) / 86_400_000));
+}
+
+export function mannschaftPruefen(v: Pick<Vorlage, "geaendert" | "mannschaftGeprueft">, jetzt = Date.now()): boolean {
+  return mannschaftAlterTage(v, jetzt) >= VORLAGE_PRUEFEN_TAGE;
+}
+
+/**
+ * Private Rufnummern und Adressen der Personen (Kontakt nicht dienstlich).
+ * Ein Funkrufname ist nie privat. „Vorlage teilen" nennt die Zahl vor dem
+ * Teilen (DSFA M15).
+ */
+export function privateKontakte(b: Pick<Erfassungsbogen, "personal">): number {
+  return b.personal.reduce((n, p) => n + p.kontakte.filter((k) => !k.dienstlich && k.art !== KontaktArt.FUNK).length, 0);
 }
 
 // ------------------------------------------------------- Konvertierung (rein)
@@ -280,6 +321,7 @@ export function vorlageAnlegen(name: string, bogen: Erfassungsbogen): Vorlage {
     name: name.trim() || einheitAnzeigename(bogen.einheit),
     erstellt: jetzt,
     geaendert: jetzt,
+    mannschaftGeprueft: jetzt,
     bogen: bogenAlsVorlage(bogen),
   };
   liste.push(v);
@@ -300,7 +342,8 @@ export function vorlageAktualisieren(id: string, bogen: Erfassungsbogen): Vorlag
   const alt = liste.find((v) => v.id === id);
   if (!alt) return null;
   const { geloeschtAm: _, ...rest } = alt;
-  const neu: Vorlage = { ...rest, bogen: bogenAlsVorlage(bogen), geaendert: Date.now() };
+  const jetzt = Date.now();
+  const neu: Vorlage = { ...rest, bogen: bogenAlsVorlage(bogen), geaendert: jetzt, mannschaftGeprueft: jetzt };
   vorlagenSpeichern(liste.map((v) => (v.id === id ? neu : v)));
   return neu;
 }
@@ -319,6 +362,12 @@ export function vorlageUmbenennen(id: string, name: string): void {
       v.id === id ? { ...v, name: name.trim() || v.name, geaendert: Date.now() } : v,
     ),
   );
+}
+
+/** „Stimmt noch": Mannschaft bestätigt, ohne die Vorlage zu ändern (DSFA M15). */
+export function mannschaftBestaetigen(id: string): void {
+  const jetzt = Date.now();
+  vorlagenSpeichern(alleVorlagenLaden().map((v) => (v.id === id ? { ...v, mannschaftGeprueft: jetzt } : v)));
 }
 
 /** In den Papierkorb verschieben (30 Tage wiederherstellbar). */

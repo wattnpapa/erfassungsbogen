@@ -163,6 +163,16 @@ When("ich die Seite neu lade", async function (this: EebWelt) {
   await this.page.reload({ waitUntil: "domcontentloaded" });
 });
 
+/** Mannschaft aller Vorlagen künstlich altern lassen (DSFA M15: Erinnerung „Mannschaft noch aktuell?"). */
+When("die Mannschaft meiner Vorlagen {int} Tage alt ist", async function (this: EebWelt, tage: number) {
+  await this.page.evaluate((t) => {
+    const alt = Date.now() - t * 86_400_000;
+    const liste = JSON.parse(localStorage.getItem("eeb.vorlagen.v1") ?? "[]") as Record<string, unknown>[];
+    localStorage.setItem("eeb.vorlagen.v1", JSON.stringify(liste.map((v) => ({ ...v, geaendert: alt, mannschaftGeprueft: alt }))));
+  }, tage);
+  await this.page.reload({ waitUntil: "domcontentloaded" });
+});
+
 /**
  * Klick, der einen Download auslöst. Bewusst ein eigener Schritt: ohne das
  * Abwarten des Download-Ereignisses liefe das Szenario weiter, bevor die Datei

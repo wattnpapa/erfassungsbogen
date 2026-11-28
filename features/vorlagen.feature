@@ -65,6 +65,14 @@ Funktionalität: Vorlagen anlegen, verwalten und mustern
     Wenn ich im Dialog auf "Endgültig löschen" klicke
     Dann sehe ich die Schaltfläche "Papierkorb Vorlagen (1)" nicht
 
+  # DSFA M15: Eine Vorlage hat keine Datenschutzfrist; ohne Erinnerung blieben Ausgeschiedene stehen.
+  Szenario: Eine lange unveränderte Vorlage fragt, ob die Mannschaft noch stimmt
+    Dann sehe ich "Tagen unverändert" nicht
+    Wenn die Mannschaft meiner Vorlagen 200 Tage alt ist
+    Dann sehe ich den Hinweis "Seit 200 Tagen unverändert"
+    Wenn ich auf "Mannschaft stimmt noch" klicke
+    Dann sehe ich "Tagen unverändert" nicht
+
   Szenario: Musterung streicht Abwesende und startet einen frischen Bogen
     Wenn ich auf "Einsatz vorbereiten" klicke
     Dann sehe ich die Überschrift "Personal (3/3)"

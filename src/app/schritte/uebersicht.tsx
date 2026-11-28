@@ -1118,6 +1118,14 @@ export function Uebersicht(props: {
               Ohne Netz öffnet er sich nur, wenn die Gegenstelle die App schon einmal mit Netz
               geöffnet hat — sonst QR-Code oder PDF weitergeben (die PDF trägt den Bogen selbst).
             </p>
+            {/* DSFA M18/R16: Der Link ist der ganze Bogen als Text. Die App
+                vergisst ihn nach der Datenschutzfrist, der Chat und der
+                Browserverlauf der Gegenstelle nicht (Chromium behält die
+                Adresse samt Fragment trotz replaceState, geprüft 2026-11). */}
+            <p className="hinweis">
+              Der Link enthält alle Namen und Erreichbarkeiten und bleibt im Chat und im Browserverlauf
+              stehen, auch nach der Datenschutzfrist. Vor Ort besser QR-Code oder Nahbereich.
+            </p>
           </div>
           {/* Anders als die Wege darüber ist CSV eine Einbahnstraße: es trägt
               keinen QR und lässt sich nicht zurücklesen. Steht trotzdem hier,

@@ -128,6 +128,13 @@ function Datenschutzdialog({ dialogRef }: { dialogRef: RefObject<HTMLDialogEleme
         selbst eine Datei, ein PDF oder einen QR-Code erzeugen und teilen.
       </p>
       <p>
+        Ein geteilter Link enthält den Bogen vollständig. Er bleibt im Chat oder in
+        der Mail stehen und im Browserverlauf des Geräts, das ihn öffnet, auch wenn
+        die App die Adresse danach leert. Ist dort die Synchronisierung des Browsers
+        eingeschaltet, gelangt er mit dem Verlauf in das Konto beim Browser-Anbieter.
+        Die Datenschutzfrist erreicht diese Kopien nicht.
+      </p>
+      <p>
         Freiwillig können unter „Absender“ Name, E-Mail-Adresse und Telefonnummer
         hinterlegt werden. Diese Angaben bleiben auf dem Gerät gespeichert und werden
         in jedem selbst erzeugten QR-Code, Link und PDF mitgegeben, damit die
