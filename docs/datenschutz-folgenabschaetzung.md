@@ -1,7 +1,7 @@
 # Datenschutz-Folgenabschätzung
 
 **Digitaler Einheiten-Erfassungsbogen — Vorlage/Entwurf**
-Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-11-27 — Version 0.1 (Entwurf)
+Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-11-28 — Version 0.1 (Entwurf)
 
 > Diese Markdown-Datei ist die gepflegte Fassung (ursprünglich aus
 > `DSFA-Erfassungsbogen.docx`). Der Text beschreibt den Stand des Repositorys
@@ -13,7 +13,7 @@ Grundlage: Repository `wattnpapa/erfassungsbogen`, Stand 2026-11-27 — Version 
 Dies ist ein technisch fundierter Entwurf, **keine Rechtsberatung** und keine
 fertige, rechtsverbindliche Datenschutz-Folgenabschätzung. Er wurde auf Basis
 einer Analyse des öffentlichen Quellcodes von `wattnpapa/erfassungsbogen`
-(Stand 2026-11-27, `main`, inkl. der vier Kern-Submodule) erstellt
+(Stand 2026-11-28, `main`, inkl. der vier Kern-Submodule) erstellt
 und beschreibt, was die Software technisch tut — nicht, wie eine konkrete
 Organisation sie einsetzt, konfiguriert oder rechtlich einordnet.
 
@@ -80,6 +80,15 @@ Ausgenommen sind Übungsbögen und Vorlagen.
 - **Folgerisiken der Frist:** R10 (Datenverlust durch eine falsche Uhr) und R11
   (fristfreie Übungsbögen mit echten Daten).
 
+**Vergleich mit dem Papierverfahren (6.5):** Gemessen an der heutigen Praxis
+(vorbereitete Namensliste, Durchstreichen, Foto oder Scan am Meldekopf,
+Weiterleitung per Mail oder Messenger, Kopien ohne Löschkontrolle auf den
+Laufwerken der Führungsstelle) verarbeitet die App bei bestimmungsgemäßer
+Nutzung weniger Daten: Die Musterung lässt Abwesende gar nicht erst in den
+Bogen, und das Fotografieren am Meldekopf entfällt. Mehr als das Papier gibt
+sie mit Geschlecht und Ernährung je Person (R14), im Mischweg mit vorab
+gedrucktem PDF (R15) und mit Links im Chatverlauf (R16) preis.
+
 ## 2. Rahmendaten
 
 | Feld | Angabe |
@@ -89,7 +98,7 @@ Ausgenommen sind Übungsbögen und Vorlagen.
 | Vertreten durch | `[Name, Funktion]` |
 | Datenschutzbeauftragte/r (falls bestellt) | `[Name, Kontakt]` |
 | Ersteller dieses Entwurfs | KI-gestützte Analyse des öffentlichen Quellcodes (Claude), auf Anforderung von `[Name]` |
-| Grundlage | Repository `wattnpapa/erfassungsbogen`, Stand 2026-11-27, `main`, inkl. Submodule (Schema 13) |
+| Grundlage | Repository `wattnpapa/erfassungsbogen`, Stand 2026-11-28, `main`, inkl. Submodule (Schema 13) |
 | Version dieses Dokuments | 0.1 (Entwurf) |
 | Datum | `[Datum der Freigabe einfügen]` |
 | Nächste Überprüfung | `[Datum, spätestens bei wesentlicher Änderung der Software oder des Einsatzzwecks]` |
@@ -655,6 +664,72 @@ einsetzende Organisation. Deren eigene Datenschutzinformation für das erfasste
 Personal — einschließlich der Personen im Personalstamm — muss die
 Organisation selbst bereitstellen (z. B. als Aushang/Dienstanweisung, M10).
 
+### 6.5 Vergleich mit dem Papierverfahren
+
+Die Verarbeitung ist nicht neu. Einheiten melden ihre Stärke am Meldekopf seit
+jeher mit einem Erfassungsbogen auf Papier, beim THW mit den Word-Vorlagen
+`06-*_Erfassungsbogen.dotx`. Die Verhältnismäßigkeit der App bemisst sich
+deshalb nicht an „keine Verarbeitung", sondern an dem Verfahren, das sie
+ersetzt oder ergänzt. Dieser Abschnitt stellt beide nebeneinander. Das
+Papierverfahren ist so beschrieben, wie es in der Praxis läuft, nicht wie es
+auf dem Vordruck gedacht ist.
+
+**Das Papierverfahren in der Praxis.** In der persönlichen Einsatzvorbereitung
+legen Führer und Unterführer einen Ausdruck mit allen Namen ihrer Einheit in
+die Führungsmappe, so wird es teils auch gelehrt. Im Einsatz streicht der
+Einheitsführer die Helfer durch, die nicht mitfahren, und gibt das Blatt am
+Meldekopf ab. Die durchgestrichenen Namen bleiben lesbar. Am Meldekopf wird der
+Bogen eingescannt oder mit einem Telefon fotografiert und auf irgendeinem Weg
+zur Führungsstelle weitergeleitet: als Mail, über einen Messenger, auf einem
+Stick. Dort wird er im Einsatztagebuch dokumentiert und liegt danach als Scan
+oder Foto auf Arbeitsplatzrechnern, Netzlaufwerken und den Telefonen, mit denen
+fotografiert wurde, oft auch in deren Cloud-Sicherung. Eine Löschkontrolle für
+diese Kopien gibt es nicht. Der Ausdruck in der Führungsmappe hat keine Frist;
+er wird ersetzt, wenn jemand eine neue Liste druckt.
+
+Der Vordruck selbst ist dabei sparsamer als seine Praxis: Verpflegung
+(„davon vegetarisch") und Unterbringung nach Geschlecht stehen dort nur als
+Kopfzahlen, nicht je Person. Der Word-Import der App bildet das ab
+(`src/app/word-bogen.ts`, Kopfzahlen landen unter „Sonstiges").
+
+**Gegenüberstellung.**
+
+| Schritt | Papierverfahren heute | Erfassungsbogen-App | Bewertung |
+| --- | --- | --- | --- |
+| Vorbereitung | Ausdruck der ganzen Einheit in der Führungsmappe, unbefristet | „Meine Vorlagen" mit der ganzen Mannschaft, unbefristet (5.7), auf einem Gerät mit Gerätesperre (M1); per „Vorlage teilen" leicht zu vervielfältigen | Gleichwertig. Die Vorlage ist besser geschützt als eine offene Mappe, wenn das Gerät gesperrt ist, aber schneller kopiert. Eine Erinnerung an das Alter der Vorlage fehlt (M15) |
+| Abwesende streichen | Durchstreichen; die Namen bleiben lesbar und gehen mit zum Meldekopf und in jede Kopie | Musterung „Einsatz vorbereiten": abgewählte Personen kommen gar nicht in den Bogen (`vorlageInstanziieren` in `src/app/vorlagen.ts`), die Vorlage bleibt unangetastet | Besser. Personen, die nicht am Einsatz teilnehmen, verlassen das Gerät nicht. Ausnahme: ein vorab gedrucktes PDF der ganzen Einheit, das mit dem Stift gestrichen wird (R15) |
+| Inhalt je Person | Name, Funktion, Qualifikation, Fahrerlaubnis; Verpflegung und Unterbringung als Kopfzahlen | Zusätzlich Geschlecht und Ernährungsform je Person im Datenmodell, im QR-Code, im Link und in der CSV; das PDF druckt nur Summen | Schlechter. Die Zuordnung zur einzelnen Person geht über den Vordruck hinaus (R14, M17) |
+| Übergabe am Meldekopf | Blatt abgeben | QR-Code scannen, Link, Datei, Nahfeld, oder weiter Papier (PDF, Blanko-Vordruck) | Gleichwertig bis besser: Der Meldekopf erhält die Daten strukturiert und muss nichts fotografieren |
+| Weiterleitung zur Führungsstelle | Foto/Scan per Mail, Messenger, Stick; Kopien auf privaten Telefonen und deren Cloud | In der Meldekopf-App weitergereicht; dort wo sie nicht genutzt wird, als PDF, CSV oder Link — dann dieselbe Kopierkette wie heute | Besser, soweit Meldekopf und Führungsstelle die Apps nutzen; sonst gleich. Ein Link im Messenger trägt den ganzen Bogen als Text im Chatverlauf (R16) |
+| Dokumentation im Einsatztagebuch | Scan oder Original als Anlage | PDF oder Ausdruck als Anlage | Gleich. Die Aufbewahrung im Einsatztagebuch folgt dessen eigenen Regeln, nicht dieser App |
+| Löschung | Keine Kontrolle über Scans, Fotos, Mails, Festplatten | Datenschutzfrist von 90 Tagen für jeden Bogen in einer App-Installation, auch für empfangene (5.7); keine Wirkung auf PDF, CSV, QR-Inhalt und Bildschirmfotos | Besser für digitale Kopien in den Apps, gleich für alles, was als Datei oder Bild herausgegeben wurde |
+| Lesbarkeit für Unbefugte | Jeder, der das Blatt oder Foto findet | Jeder, der Gerät, Datei oder QR-Code in die Hand bekommt (unverschlüsselt) | Gleich. Die Signatur verbessert nur die Integrität, nicht die Vertraulichkeit |
+| Neue Empfänger | Keine | Hoster der Webfassung und GoatCounter mit technischen Metadaten, ohne Bogendaten (5.8) | Geringfügig schlechter, abschaltbar bzw. durch Installation der App vermeidbar |
+| Umfang auf dem Gerät | Liste der eigenen Einheit | Optional der Personalstamm der ganzen Dienststelle (R12) | Schlechter, wo ein Personalstamm eingelesen wird |
+
+**Ergebnis des Vergleichs.** Bei bestimmungsgemäßer Nutzung, also Vorlage plus
+Musterung und Übergabe per QR-Code an die Meldekopf-App, verarbeitet die App
+weniger personenbezogene Daten als das Papierverfahren in seiner heutigen
+Praxis. Zwei Gründe tragen das. Personen, die nicht mitfahren, stehen gar nicht
+erst im Bogen, während sie auf dem gestrichenen Blatt in jeden Scan wandern.
+Und der Schritt, an dem heute die unkontrollierten Kopien entstehen, das
+Fotografieren und Mailen am Meldekopf, entfällt, wenn der Meldekopf scannt.
+Digitale Kopien in den Apps verfallen nach 90 Tagen; für Scans auf den
+Festplatten einer Führungsstelle gibt es heute keine Entsprechung.
+
+Schlechter als das Papier ist die App an drei Stellen. Sie überträgt Geschlecht
+und Ernährungsform je Person, wo der Vordruck nur Summen kennt (R14). Sie
+erlaubt einen Mischweg, in dem ein vorab gedrucktes PDF der ganzen Einheit mit
+dem Stift gestrichen wird: Der QR-Code und die eingebetteten Daten tragen dann
+auch die gestrichenen Personen, vollständig und maschinenlesbar (R15). Und ein
+geteilter Link legt den ganzen Bogen als Text in einen Chatverlauf, ohne
+Frist (R16). Alle drei lassen sich technisch entschärfen (M16 bis M18).
+
+Ob der Gewinn eintritt, hängt am Rest der Kette. Exportiert die Führungsstelle
+PDF oder CSV auf ihre Laufwerke, steht sie dort, wo sie heute mit dem Scan
+steht. Die Organisation sollte deshalb die Weiterleitung vom Meldekopf zur
+Führungsstelle mitregeln (M19); die App kann das nicht.
+
 ## 7. Risikobewertung (Art. 35 Abs. 7 lit. c DSGVO)
 
 Schutzziele in Anlehnung an das Standard-Datenschutzmodell (SDM): Vertraulichkeit
@@ -676,13 +751,17 @@ Schutzziele in Anlehnung an das Standard-Datenschutzmodell (SDM): Vertraulichkei
 | R11 | Übungsbögen sind von der Datenschutzfrist ausgenommen — enthalten sie echte Personaldaten, liegen diese unbefristet auf den Geräten | V | Mittel (Übungen mit echtem Personal sind üblich) | Niedrig-Mittel | Niedrig-Mittel |
 | R12 | Verlorenes oder weitergegebenes Gerät mit eingelesenem Personalstamm → Zugriff auf die vollständige Helferliste der Dienststelle, auch auf Personen ohne Einsatzbezug; keine automatische Löschfrist | V | Niedrig-Mittel (nur Geräte, auf denen die Liste eingelesen wurde) | Mittel (ganze Dienststelle, je nach Einlesen mit Rufnummern, Geschlecht und Ernährung) | Niedrig-Mittel |
 | R13 | Bildschirmfotos und Bildschirmaufnahmen mit Personaldaten (Personalliste, Übersicht, Personalstamm) liegen außerhalb der App: in der Fotogalerie, je nach Gerät in deren Cloud-Sicherung, nach Weitergabe in Messengern. Die Datenschutzfrist und alle Löschwege der App erreichen sie nicht. Kein neuer Zugriff: Wer das Bild macht, sieht die Daten berechtigt und kann denselben Bogen auch als PDF, CSV, Link oder QR-Code ausgeben, es ist ein weiterer Kopierweg wie bei R2 | V | Mittel: ein Bildschirmfoto ist schneller gemacht als ein Export, etwa für eine Rückfrage per Messenger, und die Galerie-Sicherung läuft auf vielen Geräten ungefragt. Die Sperre der Android- und der Windows-Desktop-App senkt das dort; iOS, macOS und Browser bleiben offen (M14) | Mittel (Namen, je nach Ansicht Rufnummern; Kopie bei einem Cloud-Anbieter, ohne Frist und ohne Wissen der Organisation) | Mittel |
+| R14 | Geschlecht und Ernährungsform stehen je Person in Bogen, QR-Code, Link und CSV, obwohl Unterbringung und Verpflegung nur Summen brauchen und der Papiervordruck nur Kopfzahlen führt (6.5). „D" oder „vegan" an einem Namen lässt im Einzelfall Rückschlüsse auf Geschlechtsidentität, Religion oder Gesundheit zu; die Angabe geht an jeden Empfänger im Meldeweg | V/N | Hoch (jeder Bogen mit Namen) | Niedrig-Mittel | Niedrig-Mittel |
+| R15 | Mischweg Papier: Ein Führer druckt in der Einsatzvorbereitung das PDF der ganzen Einheit und streicht im Einsatz mit dem Stift. Der Hinweis neben dem Code sagt „nicht scannen" (`stiftHinweis` in `src/app/pdf-dokument.ts`), QR-Code und eingebettete Daten tragen die gestrichenen Personen aber weiter vollständig, samt Erreichbarkeiten. Jeder Scan oder jedes Foto am Meldekopf nimmt sie mit | V | Mittel (das Vorbereiten auf Papier wird gelehrt) | Niedrig-Mittel (Personen ohne Einsatzbezug, maschinenlesbar) | Niedrig-Mittel |
+| R16 | Ein über „Senden" oder „Link teilen" weitergegebener Bogen liegt als vollständiger Text im Verlauf des gewählten Messengers oder Mailprogramms, bei nicht Ende-zu-Ende-verschlüsselten Diensten auch beim Anbieter, ohne Frist. Beim Öffnen entfernt die App das Fragment aus der Adresszeile (`fragmentNehmen` in `src/app/app.tsx`); ob ein Browser die ursprüngliche Adresse dennoch im Verlauf oder in dessen Synchronisation behält, ist nicht geprüft | V | Mittel | Mittel (ganze Mannschaft mit Erreichbarkeiten) | Mittel |
 
 **Höchste Einzelrisiken:** R1 (Geräteverlust), R2 (Papier-/Exportverlust) und R8
 (strukturelle Grenze der Betroffenenrechte) — alle drei primär organisatorisch.
 Wo ein Personalstamm eingelesen ist, gehört R12 dazu. R13 (Bildschirmfotos)
 steht neben R2: Beide sind Kopien, die die App nicht mehr erreicht, das
 Bildschirmfoto ist nur leichter gemacht und landet ungefragt in einer
-Cloud-Sicherung.
+Cloud-Sicherung. R14 bis R16 sind die Stellen, an denen die App mehr
+preisgibt als das Papierverfahren (6.5); sie sind technisch zu senken.
 
 ## 8. Abhilfemaßnahmen (Art. 35 Abs. 7 lit. d DSGVO)
 
@@ -703,6 +782,11 @@ Cloud-Sicherung.
 | M12 | R10 | Bei Lagen, die länger als 90 Tage laufen, die Bögen aktiv fortschreiben oder rechtzeitig als PDF sichern; die App kündigt die Anonymisierung 14 Tage vorher an. Die Frage „Geräteuhr prüfen" nicht ungelesen bestätigen | Organisatorisch | `[erfassende Person/Meldekopf]` | Niedrig |
 | M13 | R12 | Personalstamm nur auf dienstlichen Geräten mit Gerätesperre (M1) einlesen; festlegen, wer die Liste einliest, auf welchen Geräten sie liegen darf und wann sie zu erneuern oder zu löschen ist; Rufnummern beim Einlesen abwählen, Geschlecht und Ernährung nur einlesen, wenn nötig. Die App erinnert 90 Tage nach dem Einlesen und bietet „Personalstamm löschen…" | Organisatorisch (technische Grundlage vorhanden) | `[Organisation/Datenschutzbeauftragte/r]` | Niedrig |
 | M14 | R13, R2 | Dienstanweisung: keine Bildschirmfotos oder -aufnahmen mit Personaldaten; wo eines für eine Fehlermeldung oder Schulung nötig ist, mit Beispielnamen (Übungsbogen) oder mit „Namen verbergen" arbeiten und es danach löschen. Ein Bildschirmfoto mit Namen ist wie ein Export zu behandeln (M3). Auf Dienstgeräten die automatische Cloud-Sicherung der Fotogalerie abschalten oder auf einen von der Organisation freigegebenen Speicher legen. Technisch umgesetzt: Screenshot-Sperre ab Werk an und abschaltbar. Android-App: `FLAG_SECURE` sperrt Bildschirmfotos, Aufnahmen, Übertragung auf unsichere Anzeigen und die Vorschau in der App-Übersicht, nicht aber fremde Fenster, die die App öffnet (Kamera-Scanner, Teilen-Menü, Dateiauswahl). Desktop-App: `setContentProtection` nimmt die Fenster unter Windows (ab Windows 10 Version 2004) aus Bildschirmfotos und Aufnahmen; unter macOS umgehen neuere Aufnahmeprogramme auf Basis von ScreenCaptureKit die Sperre, unter Linux gibt es keine. iOS-App: keine Sperre möglich; bei Bildschirmaufnahme, Spiegelung und AirPlay sowie in der Vorschau des App-Umschalters ist der Inhalt verdeckt, nach einem Bildschirmfoto weist die App darauf hin, wohin es geraten ist. Browser/PWA: weder Sperre noch Erkennung. Auf allen Plattformen: Sichtschutz „Namen verbergen" (5.5). Gegen das Abfotografieren mit einem zweiten Gerät hilft keine dieser Maßnahmen | Organisatorisch / Technisch (umgesetzt) | `[Organisation/IT-Verantwortliche/r]` | Niedrig-Mittel (Android, Windows); Mittel (iOS, macOS, Browser, solange die Dienstanweisung nicht greift) |
+| M15 | R1, 6.5 | Vorschlag: Die Startseite nennt bei jeder Vorlage das Datum der letzten Änderung und erinnert nach 180 Tagen „Mannschaft noch aktuell?", wie sie es beim Personalstamm nach 90 Tagen tut. Ausgeschiedene Helfer verschwinden dann aus Vorlagen, statt jahrelang mitzuwandern. „Vorlage teilen" nennt vor dem Teilen die Zahl privater Rufnummern und Adressen | Technisch (Vorschlag, ohne Schemaänderung) | `[Projektbetreiber/Maintainer]` | Niedrig |
+| M16 | R15 | Vorschlag: Ein eigener Ausdruck „Liste zum Abhaken" aus einer Vorlage, ohne QR-Code und ohne eingebettete Daten, mit einer Spalte „dabei" und dem Satz, dass am Meldekopf ein Bogen aus der Musterung abgegeben wird. Ergänzend: Das Bogen-PDF fragt vor dem Druck, wenn es aus einer ungemusterten Vorlage stammt, ob wirklich alle mitfahren. Organisatorisch bis dahin: in der Einsatzvorbereitung die Vorlage in der App pflegen und erst nach der Musterung drucken; ein mit dem Stift gestrichenes PDF wie das Papierverfahren behandeln, nicht scannen und nicht fotografieren | Technisch (Vorschlag) / Organisatorisch | `[Projektbetreiber/Maintainer]`, `[Organisation]` | Niedrig |
+| M17 | R14 | Vorschlag: Unterbringung und Verpflegung nur als Summen übertragen, wie auf dem Vordruck. Erster Schritt ohne Formatänderung: Geschlecht und Ernährung je Person in der CSV nur auf ausdrückliche Wahl ausgeben. Zweiter Schritt mit Schemaänderung: ein Bogen-Flag „nur Summen", bei dem QR-Code und Link Kopfzahlen statt Personenwerten tragen. Der zweite Schritt betrifft `vendor/eeb-format`, die VBA-Portierung, die Meldekopf-App und S1-Control und ist mit den Nutzern der Unterbringungsplanung abzustimmen, falls dort Zimmer je Person vergeben werden | Technisch (Vorschlag) | `[Projektbetreiber/Maintainer]` | Niedrig |
+| M18 | R16 | Vorschlag: Vor „Link teilen" und „Senden" ein kurzer Satz, dass der Link den ganzen Bogen mit Namen enthält und im Chat ohne Frist liegen bleibt, mit QR-Code und Nahfeld-Übergabe als erster Wahl. Prüfen, ob gängige Browser (Chrome, Safari, Firefox, Edge) nach `replaceState` die ursprüngliche Adresse samt Fragment im Verlauf und in dessen Synchronisation behalten; falls ja, im Datenschutz-Dialog darauf hinweisen. Organisatorisch: Bögen nicht über Messenger ohne Ende-zu-Ende-Verschlüsselung oder über private Konten weitergeben, Chats nach dem Einsatz löschen | Technisch (Vorschlag) / Organisatorisch | `[Projektbetreiber/Maintainer]`, `[Organisation]` | Niedrig-Mittel |
+| M19 | R2, R8, 6.5 | Weiterleitung vom Meldekopf zur Führungsstelle regeln: Bögen am Meldekopf per QR-Code einlesen statt fotografieren, keine Fotos von Bögen mit privaten Telefonen; festlegen, welche Kopie ins Einsatztagebuch geht (eine, als Anlage) und dass Scans, PDF- und CSV-Exporte außerhalb des Einsatztagebuchs nach Abschluss des Einsatzes gelöscht werden; Ablageort und Löschfrist für Exporte auf Laufwerken der Führungsstelle bestimmen. Die Regel gilt für Papierbögen genauso und schließt eine Lücke, die es ohne die App schon gibt | Organisatorisch | `[Organisation/Führungsstelle/Datenschutzbeauftragte/r]` | Niedrig-Mittel |
 
 ## 9. Konsultation
 
@@ -735,6 +819,11 @@ Die Einschätzung stützt sich auf technische und organisatorische Maßnahmen:
 - **Organisatorisch** hängt das Ergebnis an M1, M3 und M5 für Geräte, Papier,
   Exporte und bereits weitergegebene Kopien, an M14 für Bildschirmfotos (R13,
   vor allem auf iOS, macOS und im Browser) sowie an M13 für den Personalstamm.
+- **Gegenüber dem Papierverfahren** (6.5) ist die App bei Nutzung von Vorlage,
+  Musterung und QR-Übergabe datensparsamer. R14 bis R16 sind die Stellen, an
+  denen sie mehr preisgibt; die Vorschläge M15 bis M18 senken sie technisch,
+  M19 regelt die Weiterleitung zur Führungsstelle, die heute schon ohne
+  Löschkontrolle läuft.
 
 Diese Einschätzung ersetzt keine rechtliche Prüfung.
 
@@ -742,7 +831,7 @@ Diese Einschätzung ersetzt keine rechtliche Prüfung.
 | --- | --- | --- | --- |
 | Verantwortlicher/Leitung | `[Name]` | | |
 | Datenschutzbeauftragte/r | `[Name]` | | |
-| Ersteller/in dieses Entwurfs | KI-gestützte Analyse (Claude), fachlich zu verantworten durch `[Name]` | 2026-11-26 | |
+| Ersteller/in dieses Entwurfs | KI-gestützte Analyse (Claude), fachlich zu verantworten durch `[Name]` | 2026-11-28 | |
 
 ## Anhang: Herangezogene Quellen
 
@@ -754,7 +843,9 @@ Diese Einschätzung ersetzt keine rechtliche Prüfung.
 - `src/app/entwurf.ts`, `src/app/unlesbar.ts`, `src/app/rueckweg-sitzung.ts`, `src/app/wartender-link.ts` — Entwurf, Rückholplatz, Beiseitegelegtes, Merker im Sitzungsspeicher
 - `src/app/personalstamm.ts`, `src/app/personalstamm-import.ts` — Personalstamm
 - `src/app/meldekopf-app.ts`, `src/app/meldekopf-altbestand.ts`, `src/app/einsaetze-lesen.ts` — Verweis auf die Meldekopf-App, Altbestand an Sammlungen
-- `src/app/word-bogen.ts` — Import des THW-Word-Bogens
+- `src/app/word-bogen.ts` — Import des THW-Word-Bogens, Kopfzahlen des Vordrucks
+- `src/app/vorlagen.ts`, `src/app/vorlagen-ui.tsx` — Vorlagen und Musterung (`vorlageInstanziieren`)
+- `src/app/pdf-dokument.ts` — Ausdruck, Hinweis zu Stiftänderungen (`stiftHinweis`)
 - `src/app/statistik.ts` — Reichweitenmessung (GoatCounter), dokumentierte Rechtsgrundlage im Code-Kommentar
 - `src/app/csv.ts`, `src/app/bogen-csv.ts` — Export-Format CSV und dessen Absicherung
 - `src/app/sicherung.ts`, `src/app/vorlagen.ts` — Datensicherung, Löschen, Papierkorb
